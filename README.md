@@ -1,54 +1,71 @@
-# React + TypeScript + Vite
+# Virtual Tabletop Nihil 🎲
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Um aplicativo de mesa virtual (VTT) para facilitar suas sessões de RPG de mesa online. Gerencie tokens, controle pontos de vida, role dados e interaja com seus jogadores em um ambiente intuitivo e dinâmico.
 
-Currently, two official plugins are available:
+## ✨ Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-   **Gerenciamento de Tokens**: Crie, mova e edite tokens de personagens e monstros no tabuleiro.
+-   **Controle de HP**: Acompanhe os pontos de vida dos personagens com uma interface dedicada.
+-   **Rolagem de Dados**: Um sistema de rolagem de dados integrado com suporte a diversos tipos de dados (d4, d6, d8, d10, d12, d20, d100).
+-   **Chat Integrado**: Comunique-se com os jogadores e mestres diretamente no aplicativo.
+-   **Fichas de Personagem**: Visualize e edite informações detalhadas dos personagens.
+-   **Configurações de Tabuleiro**: Personalize o tabuleiro de jogo para suas necessidades.
 
-## Expanding the ESLint configuration
+## 🚀 Tecnologias Utilizadas
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Este projeto foi desenvolvido com as seguintes tecnologias:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+-   **React**: Uma biblioteca JavaScript para construir interfaces de usuário.
+-   **TypeScript**: Um superconjunto tipado de JavaScript que compila para JavaScript puro.
+-   **Vite**: Um bundler de próxima geração para desenvolvimento web.
+-   **Tailwind CSS**: Um framework CSS utilitário para estilização rápida e responsiva.
+-   **Jest**: Um framework de teste JavaScript para garantir a qualidade do código.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Instalação
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Siga os passos abaixo para configurar e rodar o projeto localmente:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+1.  **Clone o repositório**:
+    ```bash
+    git clone https://github.com/seu-usuario/vttnihil.git
+    cd vttnihil
+    ```
+
+2.  **Instale as dependências**:
+    ```bash
+    npm install
+    ```
+
+3.  **Inicie o servidor de desenvolvimento**:
+    ```bash
+    npm run dev
+    ```
+    O aplicativo estará disponível em `http://localhost:5173` (ou outra porta disponível).
+
+4.  **Execute os testes**:
+    ```bash
+    npm test
+    ```
+
+## 🎮 Uso
+
+Após iniciar o aplicativo, você pode:
+
+-   Adicionar novos tokens ao tabuleiro.
+-   Clicar em tokens para abrir suas fichas e controlar o HP.
+-   Usar o painel de chat para enviar mensagens e rolar dados.
+-   Acessar as configurações para personalizar a experiência.
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Se você deseja contribuir, por favor, siga estas diretrizes:
+
+1.  Faça um fork do repositório.
+2.  Crie uma nova branch (`git checkout -b feature/sua-feature`).
+3.  Faça suas alterações e commit (`git commit -m 'feat: adiciona nova funcionalidade'`).
+4.  Envie para a branch (`git push origin feature/sua-feature`).
+5.  Abra um Pull Request.
+
+## 📄 Licença
+
+Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
