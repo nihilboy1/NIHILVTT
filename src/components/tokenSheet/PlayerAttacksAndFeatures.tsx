@@ -1,0 +1,132 @@
+import React from "react";
+import { type Attack, type PlayerToken as TokenInfo } from "../../types/index"; // Caminho corrigido
+import { PlusCircleIcon, TrashIcon } from "../icons"; // Caminho corrigido
+import {
+  condensedLabelClass,
+  inputClass, // Usar inputClass em vez de condensedInputClass
+} from "../../styles/formClasses";
+
+interface PlayerAttacksAndFeaturesProps {
+  attacks: Attack[];
+  handleAddAttack: () => void;
+  handleRemoveAttack: (id: string) => void;
+  handleAttackChange: (id: string, field: keyof Attack, value: string) => void;
+  featuresAndTraits: TokenInfo["featuresAndTraits"];
+  setFeaturesAndTraits: React.Dispatch<
+    React.SetStateAction<TokenInfo["featuresAndTraits"]>
+  >;
+}
+
+const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
+  attacks,
+  handleAddAttack,
+  handleRemoveAttack,
+  handleAttackChange,
+  featuresAndTraits,
+  setFeaturesAndTraits,
+}) => {
+  return (
+    <div className="col-span-1 flex flex-col space-y-2.5 border border-border-inactive p-2 rounded-md">
+      <h3 className={`${condensedLabelClass} text-center uppercase mb-1`}>
+        Ataques & Cantrips
+      </h3>
+      {attacks &&
+        attacks.map((attack) => (
+          <div
+            key={attack.id}
+            className="grid grid-cols-12 gap-x-1.5 items-center border-b border-border-inactive pb-1.5 mb-1.5"
+          >
+            <div className="col-span-5">
+              <input
+                type="text"
+                placeholder="Nome do Ataque"
+                value={attack.name}
+                onChange={(e) =>
+                  handleAttackChange(attack.id, "name", e.target.value)
+                }
+                className={`${inputClass} text-xs`}
+              />
+            </div>
+            <div className="col-span-3">
+              <input
+                type="text"
+                placeholder="+ Ataque"
+                value={attack.attackBonus}
+                onChange={(e) =>
+                  handleAttackChange(attack.id, "attackBonus", e.target.value)
+                }
+                className={`${inputClass} text-xs text-center`}
+              />
+            </div>
+            <div className="col-span-3">
+              <input
+                type="text"
+                placeholder="Dano/Tipo"
+                value={attack.damage}
+                onChange={(e) =>
+                  handleAttackChange(attack.id, "damage", e.target.value)
+                }
+                className={`${inputClass} text-xs`}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => handleRemoveAttack(attack.id)}
+              className="col-span-1 text-accent-negative hover:text-accent-negative-hover justify-self-center"
+            >
+              <TrashIcon className="h-4 w-4" />
+            </button>
+          </div>
+        ))}
+      <button
+        type="button"
+        onClick={handleAddAttack}
+        className="flex items-center justify-center space-x-1 py-1 text-xs text-accent-primary hover:text-accent-primary-hover border border-accent-primary hover:border-accent-primary-hover rounded-md"
+      >
+        <PlusCircleIcon className="h-4 w-4" />
+        <span>Adicionar Ataque</span>
+      </button>
+      <div className="border border-border-inactive p-2 rounded-md mt-2 flex-grow flex flex-col">
+        <h3 className={`${condensedLabelClass} text-center uppercase mb-1`}>
+          Características & Talentos
+        </h3>
+        <textarea
+          value={
+            featuresAndTraits
+              ?.map(
+                (ft) =>
+                  `${ft.name}${ft.source ? ` (${ft.source})` : ""}:\n${
+                    ft.description
+                  }`
+              )
+              .join("\n\n") || ""
+          }
+          onChange={(e) => {
+            const newFeaturesText = e.target.value;
+            const newFeaturesArray = newFeaturesText
+              .split("\n\n")
+              .map((textBlock, index) => {
+                const firstLineEnd = textBlock.indexOf(":\n");
+                let name = `Característica ${index + 1}`;
+                let description = textBlock;
+                if (firstLineEnd !== -1) {
+                  name = textBlock.substring(0, firstLineEnd);
+                  description = textBlock.substring(firstLineEnd + 2);
+                }
+                return {
+                  id: String(Date.now() + index),
+                  name,
+                  description,
+                };
+              });
+            setFeaturesAndTraits(newFeaturesArray);
+          }}
+          placeholder="Descreva características de classe, espécie, talentos, etc."
+          className={`${inputClass} min-h-[150px] flex-grow text-xs`}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default PlayerAttacksAndFeatures;

@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    @apply text-text-primary;
+  }
+}
+
+@theme {
+  /* Superfícies e Fundos */
+  --color-surface-0: #111111;
+  --color-surface-1: #181818;
+  --color-surface-2: #4e4e50;
+  --color-surface-3: #1b1f23;
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Texto */
+  --color-text-primary: #e4e8e8; /* Platinum - texto principal */
+  --color-text-secondary: #a9a9a9; /* Um tom de cinza para texto secundário */
+
+  /* Acentos */
+
+  --color-accent-primary: #522678;
+  --color-accent-primary-hover: #3f1d5c;
+  --color-accent-secondary: #875cad;
+  --color-accent-secondary-hover: #704b8f;
+
+  /* Feedback (Positivo/Negativo) */
+  --color-feedback-positive: #50fa7b; /* Verde para ações positivas */
+  --color-feedback-positive-hover: #45d96a; /* Verde mais escuro para hover */
+  --color-feedback-positive-text: #242331;
+
+  --color-feedback-negative: #ff5555; /* Vermelho para ações negativas */
+  --color-feedback-negative-hover: #e04444; /* Vermelho mais escuro para hover */
+  --color-feedback-negative-text: #e8e8e8; /* Platinum - texto sobre feedback-negative */
+}
+
+@layer utilities {
+  /* Usado para esconder as setas de inputs do tipo number em alguns navegadores */
+  .hide-arrows::-webkit-outer-spin-button,
+  .hide-arrows::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Para Firefox */
+  .hide-arrows[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+/* Estilos para as alças de redimensionamento do modal */
+.resize-handle {
+  position: absolute;
+  background: transparent;
+  z-index: 1; /* Acima do conteúdo, mas abaixo do header */
+}
+
+.resize-s {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+}
+
+.resize-e {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  cursor: ew-resize;
+}
+
+.resize-n {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+}
+
+.resize-w {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  cursor: ew-resize;
+}
+
+.resize-se {
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+}
+
+.resize-sw {
+  bottom: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  cursor: sw-resize;
+}
+
+.resize-ne {
+  top: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: ne-resize;
+}
+
+.resize-nw {
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nw-resize;
+}

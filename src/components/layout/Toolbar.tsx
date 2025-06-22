@@ -1,0 +1,106 @@
+import React, { useState, useEffect } from "react";
+import { Tool } from "../../types/index"; // Caminho corrigido
+import {
+  SelectIcon,
+  DiceIcon,
+  PanIcon,
+  RulerIcon,
+  ChevronLeftIcon,
+} from "../icons"; // Caminho corrigido
+import RulerPopover from "../ui/RulerPopover"; // Caminho corrigido
+import DiceRollPopover from "../ui/DiceRollPopover"; // Caminho corrigido
+import { useChat } from "../../contexts/ChatContext"; // Caminho corrigido
+import { useBoardSettings } from "../../contexts/BoardSettingsContext"; // Caminho corrigido
+import { useUI } from "../../contexts/UIContext"; // Caminho corrigido
+import { ToolbarButton } from "../ui/ToolbarButton";
+import ToolbarPopoverButton from "../ui/ToolbarPopoverButton"; // Novo import
+
+const Toolbar: React.FC = () => {
+  const { rollAndSendMessage } = useChat();
+  const {
+    rulerPlacementMode,
+    setRulerPlacementMode,
+    rulerPersists,
+    setRulerPersists,
+  } = useBoardSettings();
+  const { activeTool, setActiveTool, setIsToolbarVisible } = useUI();
+
+  const [activePopover, setActivePopover] = useState<"ruler" | "dice" | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (activeTool !== Tool.RULER && activePopover === "ruler") {
+      setActivePopover(null);
+    }
+  }, [activeTool, activePopover]);
+
+  return (
+    <div className="w-16 flex flex-col border-r shadow-xl py-5 space-y-3  relative bg-toolbar-bg">
+      <ToolbarButton
+        label="Mover Mapa"
+        icon={<PanIcon className="w-6 h-6" />}
+        isActive={activeTool === Tool.PAN}
+        onClick={() => {
+          setActiveTool(Tool.PAN);
+          setActivePopover(null);
+        }}
+      />
+      <ToolbarButton
+        label="Ferramenta de Seleção"
+        icon={<SelectIcon className="w-6 h-6" />}
+        isActive={activeTool === Tool.SELECT}
+        onClick={() => {
+          setActiveTool(Tool.SELECT);
+          setActivePopover(null);
+        }}
+      />
+
+      <ToolbarPopoverButton
+        label="Ferramenta de Régua"
+        icon={<RulerIcon className="w-6 h-6" />}
+        isActive={activeTool === Tool.RULER}
+        popoverComponent={RulerPopover}
+        popoverProps={{
+          currentMode: rulerPlacementMode,
+          onSetMode: setRulerPlacementMode,
+          rulerPersistsPath: rulerPersists,
+          onToggleRulerPersistPath: () => setRulerPersists(!rulerPersists),
+        }}
+        activeTool={activeTool}
+        setActiveTool={setActiveTool}
+        toolType={Tool.RULER}
+        activePopover={activePopover}
+        setActivePopover={setActivePopover}
+        popoverName="ruler"
+      />
+
+      <ToolbarPopoverButton
+        label="Rolar Dados"
+        icon={<DiceIcon className="w-7 h-7" />}
+        isActive={false}
+        popoverComponent={DiceRollPopover}
+        popoverProps={{
+          onRoll: rollAndSendMessage,
+        }}
+        activeTool={activeTool}
+        setActiveTool={setActiveTool}
+        toolType={Tool.DICE}
+        activePopover={activePopover}
+        setActivePopover={setActivePopover}
+        popoverName="dice"
+      />
+
+      <div className="flex-grow"></div>
+      <ToolbarButton
+        label="Esconder Barra de Ferramentas"
+        icon={<ChevronLeftIcon className="w-6 h-6" />}
+        isActive={false}
+        onClick={() => setIsToolbarVisible(false)}
+        isHideButton={true}
+      />
+    </div>
+  );
+};
+
+export default Toolbar;
