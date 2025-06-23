@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import Toolbar from "./components/layout/Toolbar"; // Atualizado
+import { Toolbar } from "./components/layout/Toolbar"; // Atualizado
 import { GameBoard } from "./features/board/GameBoard"; // Atualizado
-import RightSidebar from "./components/layout/RightSidebar"; // Atualizado
+import { RightSidebar } from "./components/layout/RightSidebar"; // Atualizado
 import HPControlModal, {
   HP_MODAL_ESTIMATED_HEIGHT,
 } from "./components/modals/HPControlModal"; // Atualizado
 import SimpleNameModal from "./components/modals/SimpleNameModal"; // Atualizado
-import TokenSheetModal from "./components/modals/TokenSheetModal";
-import ConfirmationModal from "./components/modals/ConfirmationModal";
+import { TokenSheetModal } from "./components/modals/TokenSheetModal";
+import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 import {
   Tool,
   TokenType,
@@ -30,7 +30,7 @@ import { useUI } from "./contexts/UIContext";
 import { useModal } from "./contexts/ModalContext";
 import { TokenSheetProvider } from "./contexts/TokenSheetContext"; // Importar TokenSheetProvider
 
-export function App() {
+export default function App() {
   const {
     tokens,
     gridInstances,
@@ -127,12 +127,11 @@ export function App() {
     name: string,
     tokenTypeFromModal?: TokenType
   ) => {
+    console.log("handleSaveNewTokenName chamado com:", { name, tokenTypeFromModal });
     // Usar o tokenType vindo diretamente do modal, que é mais confiável
     const typeToUse = tokenTypeFromModal || modalProps.tokenType; // Mantendo o fallback para modalProps.tokenType por segurança, embora modalProps.type seja o correto agora.
 
     if (!typeToUse) {
-      // Este console.error pode ser removido se o fallback acima for considerado suficiente
-      // ou se quisermos ser estritos sobre tokenTypeFromModal estar sempre presente.
       console.error("handleSaveNewTokenName: tokenType is missing.");
       return;
     }
@@ -174,6 +173,7 @@ export function App() {
       } as Omit<TokenInfo, "id">; // Assert as Omit<BaseToken, "id"> which is compatible with Omit<TokenInfo, "id">
     }
     const newTokenInfo = addToken(newSheetData);
+    console.log("Novo token criado:", newTokenInfo);
     closeModal();
     openModal("tokenSheet", { tokenId: newTokenInfo.id });
   };
@@ -431,7 +431,7 @@ export function App() {
 
   return (
     <div
-      className="flex h-screen w-screen bg-surface-0 text-text-primary overflow-hidden"
+      className="flex h-screen w-screen bg-surface-0 overflow-hidden"
       ref={gameBoardRef}
     >
       {isToolbarVisible ? (
@@ -540,5 +540,3 @@ export function App() {
     </div>
   );
 }
-
-export default App;

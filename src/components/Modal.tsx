@@ -7,7 +7,7 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   useEffect(() => {
     // Manipulador para fechar o modal com a tecla 'Escape'
     const handleEsc = (event: KeyboardEvent) => {
@@ -47,6 +47,4 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
       </div>
     </div>
   );
-};
-
-export default Modal;
+}

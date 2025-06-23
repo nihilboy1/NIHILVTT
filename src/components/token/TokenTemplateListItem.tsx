@@ -13,11 +13,11 @@ interface TokenTemplateListItemProps {
   openTokenSheetModal: (tokenInfoId: string) => void;
 }
 
-const TokenTemplateListItem: React.FC<TokenTemplateListItemProps> = ({ 
+export function TokenTemplateListItem({ 
   tokenInfo, 
   instanceCount, 
   openTokenSheetModal 
-}) => {
+}: TokenTemplateListItemProps) {
   const { deleteToken, duplicateToken } = useTokens();
   const { openModal, closeModal } = useModal();
 
@@ -133,6 +133,4 @@ const TokenTemplateListItem: React.FC<TokenTemplateListItemProps> = ({
       </OptionsPopover>
     </li>
   );
-};
-
-export default TokenTemplateListItem;
+}

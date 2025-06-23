@@ -7,12 +7,11 @@ import {
   getAllCommands,
   type CommandContext,
 } from "../../lib/chatCommands";
-import ChatCommandPopover from "./ChatCommandPopover";
-import MessageList from "./MessageList";
+import { ChatCommandPopover } from "./ChatCommandPopover";
+import { MessageList } from "./MessageList";
 
 // inclui a caixa do chat, o popover de comandos e o formulário de envio
-
-const ChatPanel: React.FC = () => {
+export function ChatPanel() {
   const { messages, sendMessage, rollAndSendMessage } = useChat();
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -191,8 +190,5 @@ const ChatPanel: React.FC = () => {
       </form>
     </>
   );
-};
-
-export default ChatPanel;
-
+}
 // ESTILO AJUSTADO

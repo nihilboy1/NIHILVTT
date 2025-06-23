@@ -1,13 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
 interface OptionsPopoverProps {
   isOpen: boolean;
   onClose: () => void;
-  targetRef: React.RefObject<HTMLElement | null>; // Alterado para aceitar null
+  targetRef: React.RefObject<HTMLElement | null>;
   children: React.ReactNode;
 }
 
-const OptionsPopover: React.FC<OptionsPopoverProps> = ({ isOpen, onClose, targetRef, children }) => {
+// popover gennérico para opções (apenas para opções do token na aba de tokens)
+export default function OptionsPopover({
+  isOpen,
+  onClose,
+  targetRef,
+  children,
+}: OptionsPopoverProps) {
   const popoverRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, opacity: 0 });
 
@@ -26,7 +32,8 @@ const OptionsPopover: React.FC<OptionsPopoverProps> = ({ isOpen, onClose, target
       }
 
       // Prioriza alinhar à esquerda do target, mas se não couber, tenta alinhar à direita
-      if (leftPosition + popoverWidth >= window.innerWidth) { // Changed > to >=
+      if (leftPosition + popoverWidth >= window.innerWidth) {
+        // Changed > to >=
         leftPosition = targetRect.right - popoverWidth;
       }
 
@@ -45,14 +52,13 @@ const OptionsPopover: React.FC<OptionsPopoverProps> = ({ isOpen, onClose, target
         leftPosition = window.innerWidth - popoverWidth; // Clamp to right of screen
       }
 
-
-      setPosition({ 
-        top: topPosition, 
+      setPosition({
+        top: topPosition,
         left: leftPosition,
-        opacity: 1 
+        opacity: 1,
       });
     } else {
-      setPosition(prev => ({ ...prev, opacity: 0 }));
+      setPosition((prev) => ({ ...prev, opacity: 0 }));
     }
   }, [isOpen, targetRef, children]); // Recalcula se o conteúdo mudar (pode afetar altura/largura)
 
@@ -71,17 +77,17 @@ const OptionsPopover: React.FC<OptionsPopoverProps> = ({ isOpen, onClose, target
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscapeKey);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscapeKey);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [isOpen, onClose, targetRef]);
 
@@ -93,19 +99,17 @@ const OptionsPopover: React.FC<OptionsPopoverProps> = ({ isOpen, onClose, target
     <div
       ref={popoverRef}
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: `${position.top}px`,
         left: `${position.left}px`,
         opacity: position.opacity,
-        transition: 'opacity 0.1s ease-in-out',
+        transition: "opacity 0.1s ease-in-out",
       }}
-      className="bg-theme-input-bg border border-theme-border-inactive rounded-md shadow-xl z-[70] p-1"
+      className=" border border-accent-primary-hover rounded-md shadow-xl z-[70] p-1"
       role="menu"
       aria-orientation="vertical"
     >
       {children}
     </div>
   );
-};
-
-export default OptionsPopover;
+}

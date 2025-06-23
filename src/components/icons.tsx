@@ -1,14 +1,26 @@
 import React from "react";
 import d20 from "../assets/d20.png";
+import detatch from "../assets/detach-svgrepo-com.svg";
 export interface IconProps {
   className?: string;
   width?: string | number;
   height?: string | number;
 }
 
-export function DiceIcon({}: IconProps) {
+export function DiceIcon({ className }: IconProps) {
+  const defaultClasses = "invert w-5 h-5";
   return (
-    <img className="invert w-5 h-5" src={d20} alt="dado de vinte lados"></img>
+    <img className={`${defaultClasses} ${className || ''}`.trim()} src={d20} alt="dado de vinte lados" data-testid="dice-icon"></img>
+  );
+}
+
+export function DetatchIcon({}: IconProps) {
+  return (
+    <img
+      className="invert w-3 h-3"
+      src={detatch}
+      alt="clip de papel partido ao meio"
+    ></img>
   );
 }
 export const SelectIcon: React.FC<IconProps> = ({

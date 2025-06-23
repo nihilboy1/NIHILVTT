@@ -11,12 +11,12 @@ const diceOptions = [
   "1D2", "1D4", "1D6", "1D8", "1D10", "1D12", "1D20", "1D100",
 ];
 
-const DiceRollPopover: React.FC<DiceRollPopoverProps> = ({
+export function DiceRollPopover({
   isOpen,
   onClose,
   onRoll,
   targetRef,
-}) => {
+}: DiceRollPopoverProps) {
   const popoverRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
@@ -78,6 +78,4 @@ const DiceRollPopover: React.FC<DiceRollPopoverProps> = ({
       ))}
     </div>
   );
-};
-
-export default DiceRollPopover;
+}

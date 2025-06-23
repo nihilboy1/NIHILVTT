@@ -1,11 +1,11 @@
 import React from 'react';
 import { TokenType } from '../../types/index'; // Ajustar o caminho do tipo
 import { UserCircleIcon, BugAntIcon } from '../icons'; // Ajustar o caminho do componente
-import TokenTemplateListItem from '../token/TokenTemplateListItem'; // Ajustar o caminho do componente
+import { TokenTemplateListItem } from '../token/TokenTemplateListItem'; // Ajustar o caminho do componente
 import { useTokens } from '../../contexts/TokensContext'; // Ajustar o caminho do contexto
 import { useModal } from '../../contexts/ModalContext'; // Ajustar o caminho do contexto
 
-const TokensPanel: React.FC = () => {
+export function TokensPanel() {
   const { tokens, gridInstanceCounts } = useTokens();
   const { openModal } = useModal();
 
@@ -57,6 +57,4 @@ const TokensPanel: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default TokensPanel;
+}

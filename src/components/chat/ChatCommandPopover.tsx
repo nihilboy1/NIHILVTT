@@ -13,13 +13,13 @@ interface ChatCommandPopoverProps {
 // Exibe sugestões de comandos quando o usuário digita "/"
 // Permite navegação com setas e seleção com Enter ou clique
 // Fecha com Escape ou clique fora do popover
-const ChatCommandPopover: React.FC<ChatCommandPopoverProps> = ({
+export function ChatCommandPopover({
   isOpen,
   onClose,
   targetInputRef,
   onCommandSelect,
   inputValue,
-}) => {
+}: ChatCommandPopoverProps) {
   const popoverRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [position, setPosition] = useState({ top: 0, left: 0, opacity: 0 });
@@ -266,8 +266,5 @@ const ChatCommandPopover: React.FC<ChatCommandPopoverProps> = ({
       </ul>
     </div>
   );
-};
-
-export default ChatCommandPopover;
-
+}
 // ESTILO AJUSTADO

@@ -19,7 +19,7 @@ interface ToolbarPopoverButtonProps {
   popoverName: "ruler" | "dice"; // Nome para identificar este popover
 }
 
-const ToolbarPopoverButton: React.FC<ToolbarPopoverButtonProps> = ({
+export function ToolbarPopoverButton({
   label,
   icon,
   isActive,
@@ -30,7 +30,7 @@ const ToolbarPopoverButton: React.FC<ToolbarPopoverButtonProps> = ({
   activePopover,
   setActivePopover,
   popoverName,
-}) => {
+}: ToolbarPopoverButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleClick = () => {
@@ -59,5 +59,3 @@ const ToolbarPopoverButton: React.FC<ToolbarPopoverButtonProps> = ({
     </div>
   );
 };
-
-export default ToolbarPopoverButton;

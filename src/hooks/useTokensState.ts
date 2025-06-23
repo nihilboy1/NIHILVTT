@@ -117,6 +117,7 @@ export const useTokensState = (): TokensState => {
 
   const addToken = useCallback(
     (tokenData: Omit<Token, "id">): Token => { // Changed parameter and return type
+      console.log("addToken chamado com:", tokenData);
       let newToken: Token; // Declare as Token
 
       const commonProps = {
@@ -186,7 +187,12 @@ export const useTokensState = (): TokensState => {
         } as Token; // Assert as generic Token
       }
 
-      setTokens((prevTokens) => [...prevTokens, newToken]);
+      setTokens((prevTokens) => {
+        console.log("Tokens antes da atualização:", prevTokens);
+        const updatedTokens = [...prevTokens, newToken];
+        console.log("Tokens depois da atualização:", updatedTokens);
+        return updatedTokens;
+      });
       return newToken;
     },
     []

@@ -320,22 +320,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -485,9 +485,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -525,12 +525,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
-&nbsp;
-export interface DiceRollDetails {
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export interface DiceRollDetails {
   notation: string;
   rolls: number[];
-  modifierOperator?: '+' | '-';
+  modifierOperator?: "+" | "-";
   modifierValue?: number;
   finalResult: number;
 }
@@ -554,54 +552,55 @@ export interface DiceRollMessage extends BaseMessage {
 export type Message = TextMessage | DiceRollMessage;
 &nbsp;
 export const Tool = {
-  SELECT: 'SELECT',
-  PAN: 'PAN', 
-  RULER: 'RULER',
+  SELECT: "SELECT",
+  PAN: "PAN",
+  RULER: "RULER",
+  DICE: "DICE", // Adicionado para o botão de dados
 } as const;
-export type Tool = typeof Tool[keyof typeof Tool];
+export type Tool = (typeof Tool)[keyof typeof Tool];
 &nbsp;
 export const SidebarTab = {
-  CHAT: 'CHAT',
-  TOKENS: 'TOKENS',
+  CHAT: "CHAT",
+  TOKENS: "TOKENS",
 } as const;
-export type SidebarTab = typeof SidebarTab[keyof typeof SidebarTab];
+export type SidebarTab = (typeof SidebarTab)[keyof typeof SidebarTab];
 &nbsp;
 export const TokenType = {
-  PLAYER: 'Player',
-  MONSTER_NPC: 'Monster/NPC',
-  OBJECT: 'Object',
+  PLAYER: "Player",
+  MONSTER_NPC: "Monster/NPC",
+  OBJECT: "Object",
 } as const;
-export type TokenType = typeof TokenType[keyof typeof TokenType];
+export type TokenType = (typeof TokenType)[keyof typeof TokenType];
 &nbsp;
 // Interface base com campos comuns a todos os tokens
 export interface BaseToken {
   id: string;
   name: string;
   type: TokenType; // O discriminador
-  color: string; 
-  size: string; 
-  currentHp?: number; 
-  maxHp?: number;     
-  notes?: string;     
+  color: string;
+  size: string;
+  currentHp?: number;
+  maxHp?: number;
+  notes?: string;
 }
 &nbsp;
 // Interface para Tokens de Jogador
 export interface PlayerToken extends BaseToken {
   type: typeof TokenType.PLAYER; // Garante que este é um token de jogador
   species?: string;
-  charClass?: string; 
+  charClass?: string;
   subclass?: string;
   level?: number;
   background?: string;
-  xp?: number; 
-  inspiration?: boolean; 
+  xp?: number;
+  inspiration?: boolean;
   armorClass?: number;
   shieldEquipped?: boolean;
   tempHp?: number;
   hitDiceUsed?: number;
-  hitDiceMax?: number; 
-  deathSavesSuccesses?: number; 
-  deathSavesFailures?: number; 
+  hitDiceMax?: number;
+  deathSavesSuccesses?: number;
+  deathSavesFailures?: number;
 &nbsp;
   // Campos D&amp;D 5.5
   attributes?: {
@@ -650,7 +649,7 @@ export interface PlayerToken extends BaseToken {
 &nbsp;
   attacks?: Attack[];
   equipment?: EquipmentItem[];
-  featuresAndTraits?: FeatureOrTrait[]; 
+  featuresAndTraits?: FeatureOrTrait[];
 }
 &nbsp;
 // Interface para Tokens de Monstro/NPC
@@ -682,7 +681,7 @@ export interface EquipmentItem {
   name: string;
   quantity: number;
   description?: string;
-  weight?: number; 
+  weight?: number;
   equipped?: boolean; // Para itens como armaduras, escudos, armas
 }
 &nbsp;
@@ -694,37 +693,40 @@ export interface FeatureOrTrait {
   uses?: {
     current: number;
     max: number;
-    per?: 'short rest' | 'long rest' | 'day' | string; // string para usos customizados
+    per?: "short rest" | "long rest" | "day" | string; // string para usos customizados
   };
 }
 &nbsp;
 export interface GridInstance {
   instanceId: string; // Unique ID for this specific instance on the board
   tokenInfoId: string; // Foreign key to TokenInfo.id
-  gridX: number;       // Grid X coordinate of this instance
-  gridY: number;       // Grid Y coordinate of this instance
+  gridX: number; // Grid X coordinate of this instance
+  gridY: number; // Grid Y coordinate of this instance
 }
 &nbsp;
-&nbsp;
 export interface GridSettings {
-  visualCellSize: number; 
-  lineColor: string; 
-  metersPerSquare: number; 
+  visualCellSize: number;
+  lineColor: string;
+  metersPerSquare: number;
 }
 &nbsp;
 export interface PageSettings {
-  widthInUnits: number; 
-  heightInUnits: number; 
-  backgroundColor: string; 
+  widthInUnits: number;
+  heightInUnits: number;
+  backgroundColor: string;
 }
 &nbsp;
 export const RulerPlacementMode = {
-  SNAP_TO_CENTER: 'SNAP_TO_CENTER',
-  FREE_PLACEMENT: 'FREE_PLACEMENT',
+  SNAP_TO_CENTER: "SNAP_TO_CENTER",
+  FREE_PLACEMENT: "FREE_PLACEMENT",
 } as const;
-export type RulerPlacementMode = typeof RulerPlacementMode[keyof typeof RulerPlacementMode];
+export type RulerPlacementMode =
+  (typeof RulerPlacementMode)[keyof typeof RulerPlacementMode];
 &nbsp;
-export interface Point { x: number; y: number; }
+export interface Point {
+  x: number;
+  y: number;
+}
 &nbsp;
 export interface RulerPointData {
   point: Point;
@@ -732,22 +734,20 @@ export interface RulerPointData {
 }
 &nbsp;
 export interface RulerPathState {
-  isActive: boolean;        
-  points: RulerPointData[]; 
-  liveEndPoint: Point | null; 
+  isActive: boolean;
+  points: RulerPointData[];
+  liveEndPoint: Point | null;
 }
 &nbsp;
 export interface HPControlModalState {
   instanceId: string | null; // Changed from tokenId to instanceId
-  anchorPoint: Point | null; 
-}
-&nbsp;
-export interface TokenScreenRect extends DOMRect {
+  anchorPoint: Point | null;
 }
 &nbsp;
 // For tracking the token *instance* being dragged and its visual position
-export interface DraggingVisuals { // Renamed from DraggingTokenVisuals
-  instanceId: string | null;      // ID of the GridInstance being dragged
+export interface DraggingVisuals {
+  // Renamed from DraggingTokenVisuals
+  instanceId: string | null; // ID of the GridInstance being dragged
   visualSVGPoint: Point | null; // Its current visual SVG position during drag
 }
 &nbsp;
@@ -763,7 +763,7 @@ export interface MarqueeSelectionState {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-20T02:34:43.662Z
+                at 2025-06-23T01:17:58.286Z
             </div>
         <script src="../prettify.js"></script>
         <script>

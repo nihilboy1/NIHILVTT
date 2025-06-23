@@ -23,7 +23,7 @@ interface GenericTokenSheetProps {
   setEditingTokenSize: (size: string) => void;
 }
 
-const GenericTokenSheet: React.FC<GenericTokenSheetProps> = ({
+export function GenericTokenSheet({
   editingTokenName,
   setEditingTokenName,
   editingTokenType,
@@ -38,7 +38,7 @@ const GenericTokenSheet: React.FC<GenericTokenSheetProps> = ({
   setEditingTokenColor,
   editingTokenSize,
   setEditingTokenSize,
-}) => {
+}: GenericTokenSheetProps) {
   return (
     <div className="p-0.5 space-y-3 overflow-y-auto max-h-[calc(100vh-200px)]">
       <div>
@@ -153,6 +153,4 @@ const GenericTokenSheet: React.FC<GenericTokenSheetProps> = ({
       </div>
     </div>
   );
-};
-
-export default GenericTokenSheet;
+}

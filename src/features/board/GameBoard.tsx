@@ -17,8 +17,8 @@ import {
   type MarqueeSelectionState,
 } from "../../types/index"; // Ajustar o caminho do tipo
 import { PageConfigIcon } from "../../components/icons"; // Ajustar o caminho do componente
-import PageSettingsModal from "../../components/modals/PageSettingsModal"; // Ajustar o caminho do componente
-import BoardToken from "../../components/token/BoardToken"; // Ajustar o caminho do componente
+import { PageSettingsModal } from "../../components/modals/PageSettingsModal"; // Ajustar o caminho do componente
+import { BoardToken } from "../../components/token/BoardToken"; // Ajustar o caminho do componente
 import { useTokens } from "../../contexts/TokensContext"; // Ajustar o caminho do contexto
 import { useBoardSettings } from "../../contexts/BoardSettingsContext"; // Ajustar o caminho do contexto
 import { useUI } from "../../contexts/UIContext"; // Ajustar o caminho do contexto

@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Tool } from "../../types/index"; // Caminho corrigido
+import { Tool } from "../../types/index";
 import {
   SelectIcon,
   DiceIcon,
   PanIcon,
   RulerIcon,
   ChevronLeftIcon,
-} from "../icons"; // Caminho corrigido
-import RulerPopover from "../ui/RulerPopover"; // Caminho corrigido
-import DiceRollPopover from "../ui/DiceRollPopover"; // Caminho corrigido
-import { useChat } from "../../contexts/ChatContext"; // Caminho corrigido
-import { useBoardSettings } from "../../contexts/BoardSettingsContext"; // Caminho corrigido
-import { useUI } from "../../contexts/UIContext"; // Caminho corrigido
+} from "../icons";
+import RulerPopover from "../ui/RulerPopover";
+import { DiceRollPopover } from "../ui/DiceRollPopover";
+import { useChat } from "../../contexts/ChatContext";
+import { useBoardSettings } from "../../contexts/BoardSettingsContext";
+import { useUI } from "../../contexts/UIContext";
 import { ToolbarButton } from "../ui/ToolbarButton";
-import ToolbarPopoverButton from "../ui/ToolbarPopoverButton"; // Novo import
+import { ToolbarPopoverButton } from "../ui/ToolbarPopoverButton";
 
-const Toolbar: React.FC = () => {
+// barra lateral esquerda com os botões de ferramentas
+export function Toolbar() {
   const { rollAndSendMessage } = useChat();
   const {
     rulerPlacementMode,
@@ -101,6 +102,5 @@ const Toolbar: React.FC = () => {
       />
     </div>
   );
-};
-
-export default Toolbar;
+}
+// VISTO

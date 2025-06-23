@@ -15,7 +15,7 @@ interface HPControlModalProps {
 
 export const HP_MODAL_ESTIMATED_HEIGHT = 40;
 
-const HPControlModal: React.FC<HPControlModalProps> = ({
+export function HPControlModal({
   instanceId,
   tokenInfo,
   anchorPoint,
@@ -24,7 +24,7 @@ const HPControlModal: React.FC<HPControlModalProps> = ({
   onHPChange,
   onRemoveFromBoard,
   onMakeIndependent,
-}) => {
+}: HPControlModalProps) {
   const [editableHP, setEditableHP] = useState<string>("");
   const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -223,5 +223,3 @@ const HPControlModal: React.FC<HPControlModalProps> = ({
     </div>
   );
 };
-
-export default HPControlModal;

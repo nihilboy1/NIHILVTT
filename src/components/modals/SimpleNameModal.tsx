@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Modal from "../ui/Modal"; // Usar o componente Modal base
 import { TokenType } from "../../types/index"; // Importar TokenType
-import useDismissable from "../../hooks/useDismissable"; // Importar useDismissable (default export)
-import {
-  labelClass,
-  inputClass,
-  buttonPositiveClass,
-  buttonSecondaryClass,
-} from "../../styles/formClasses"; // Importar classes de formulário
+import { labelClass, inputClass } from "../../styles/formClasses"; // Importar classes de formulário
 
 interface SimpleNameModalProps {
   isOpen: boolean;
@@ -28,7 +22,6 @@ const SimpleNameModal: React.FC<SimpleNameModalProps> = ({
 }) => {
   const [name, setName] = useState(currentName);
   const inputRef = useRef<HTMLInputElement>(null);
-  const modalContentRef = useRef<HTMLDivElement>(null); // Ref para o conteúdo do modal para useDismissable
 
   useEffect(() => {
     if (isOpen) {
@@ -36,9 +29,6 @@ const SimpleNameModal: React.FC<SimpleNameModalProps> = ({
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [isOpen, currentName]);
-
-  // Usar o hook useDismissable
-  useDismissable(modalContentRef, isOpen, onClose);
 
   const handleSaveClick = () => {
     if (name.trim()) {
@@ -56,7 +46,7 @@ const SimpleNameModal: React.FC<SimpleNameModalProps> = ({
       onConfirm={handleSaveClick} // Passa a função de salvar para o modal base
       confirmText="Salvar" // Define o texto do botão de confirmação
     >
-      <div ref={modalContentRef}>
+      <div>
         {" "}
         {/* Envolver o conteúdo com a ref */}
         <form

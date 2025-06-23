@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import DiceRollPopover from './DiceRollPopover';
+import { DiceRollPopover } from './DiceRollPopover';
 
 describe('DiceRollPopover', () => {
   const mockOnClose = jest.fn();
@@ -86,12 +86,12 @@ describe('DiceRollPopover', () => {
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  test('não deve chamar onClose ao clicar dentro do popover', () => {
+  test('não deve chamar onClose ao clicar dentro do popover (em área não interativa)', () => {
     render(<DiceRollPopover {...defaultProps} />);
-    const d4Button = screen.getByRole('button', { name: '1D4' });
-    // Simula um clique dentro do popover (no botão)
-    fireEvent.mouseDown(d4Button);
-    expect(mockOnClose).not.toHaveBeenCalled(); // onClose é chamado pelo onClick do botão, não pelo click outside
+    const popover = screen.getByRole('dialog', { name: 'Opções de Rolagem de Dados' });
+    // Simula um clique no próprio popover, não em um botão de dado
+    fireEvent.mouseDown(popover);
+    expect(mockOnClose).not.toHaveBeenCalled();
   });
 
   test('não deve chamar onClose ao clicar no targetRef', () => {

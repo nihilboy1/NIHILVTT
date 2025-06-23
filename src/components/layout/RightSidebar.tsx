@@ -1,11 +1,12 @@
-import { SidebarTab } from "../../types/index"; // Ajustar o caminho do tipo
-import { ChatBubbleIcon, UsersIcon, ChevronRightIcon } from "../icons"; // Ajustar o caminho do componente
-import TabButton from "../ui/TabButton"; // Ajustar o caminho do componente
-import { useUI } from "../../contexts/UIContext"; // Ajustar o caminho do contexto
-import ChatPanel from "../chat/ChatPanel"; // Importar o novo componente
-import TokensPanel from "../tokens/TokensPanel"; // Importar o novo componente
+import { SidebarTab } from "../../types/index"; 
+import { ChatBubbleIcon, UsersIcon, ChevronRightIcon } from "../icons"; 
+import { TabButton } from "../ui/TabButton";
+import { useUI } from "../../contexts/UIContext"; 
+import { ChatPanel } from "../chat/ChatPanel";
+import { TokensPanel } from "../tokens/TokensPanel";
 
-const RightSidebar = () => {
+// a barra lateral direita como um todo. botões de abas e as condicionais para exibir os painéis de chat e tokens
+export function RightSidebar() {
   const { activeSidebarTab, setActiveSidebarTab, setIsRightSidebarVisible } =
     useUI();
 
@@ -68,8 +69,5 @@ const RightSidebar = () => {
       </div>
     </div>
   );
-};
-
-export default RightSidebar;
-
+}
 // ESTILO CORRIJIDO

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useTokens } from "../../contexts/TokensContext";
 import { TokenType, type Point, type PlayerToken } from "../../types"; // Added PlayerToken
-import InteractiveModal from "../InteractiveModal";
+import { InteractiveModal } from "../InteractiveModal";
 import { useTokenSheetForm } from "../../hooks/useTokenSheetForm";
 import {
   buttonPositiveClass,
@@ -10,7 +10,7 @@ import {
 import PlayerSheetPrincipalTab from "../tokenSheet/PlayerSheetPrincipalTab";
 import PlayerSheetDetailsTab from "../tokenSheet/PlayerSheetDetailsTab";
 import PlayerSheetConfigTab from "../tokenSheet/PlayerSheetConfigTab";
-import GenericTokenSheet from "../tokenSheet/GenericTokenSheet";
+import {GenericTokenSheet} from "../tokenSheet/GenericTokenSheet";
 
 type PlayerSheetTab = "principal" | "detalhes" | "configuracoes";
 const ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT = 700;
@@ -20,10 +20,7 @@ interface TokenSheetModalProps {
   onClose: () => void;
 }
 
-const TokenSheetModal: React.FC<TokenSheetModalProps> = ({
-  tokenId,
-  onClose,
-}) => {
+export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
   const { tokens, updateToken } = useTokens();
   const initialTokenData = tokenId
     ? tokens.find((t) => t.id === tokenId) || null
@@ -325,6 +322,4 @@ const TokenSheetModal: React.FC<TokenSheetModalProps> = ({
       </form>
     </InteractiveModal>
   );
-};
-
-export default TokenSheetModal;
+}

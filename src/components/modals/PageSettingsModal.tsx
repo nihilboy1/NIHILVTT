@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 // PageSettings, GridSettings types removed from direct import, will get from context
-import Modal from "../ui/Modal";
+import { Modal } from "../Modal";
 import {
   DEFAULT_METERS_PER_SQUARE,
   GRID_CELL_SIZE,
@@ -16,10 +16,10 @@ interface PageAndGridSettingsModalProps {
   // onSave prop removed
 }
 
-const PageSettingsModal: React.FC<PageAndGridSettingsModalProps> = ({
+export function PageSettingsModal({
   isOpen,
   onClose,
-}) => {
+}: PageAndGridSettingsModalProps) {
   const {
     pageSettings: contextPageSettings,
     gridSettings: contextGridSettings,
@@ -86,8 +86,6 @@ const PageSettingsModal: React.FC<PageAndGridSettingsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Configurações da Página e Grade"
-      onConfirm={handleSave} // Passa a função de salvar para o modal base
-      confirmText="Salvar Alterações" // Define o texto do botão de confirmação
     >
       <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
         <h3 className="text-lg font-semibold text-theme-foreground mb-3">
@@ -207,5 +205,3 @@ const PageSettingsModal: React.FC<PageAndGridSettingsModalProps> = ({
     </Modal>
   );
 };
-
-export default PageSettingsModal;

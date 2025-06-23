@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { type Token as TokenInfo, type Point } from "../../types"; // TokenInfo might be needed if HP is directly on instance
-import { EjectIcon } from "../icons"; // BranchIcon removed
+import { DetatchIcon, EjectIcon } from "../icons"; // BranchIcon removed
 import { calculateNewHP } from "../../utils/hpUtils";
 import useDismissable from "../../hooks/useDismissable";
 
@@ -135,15 +135,13 @@ const HPControlModal: React.FC<HPControlModalProps> = ({
     <div
       ref={modalRef}
       style={modalStyle}
-      className={`bg-input-bg bg-opacity-90 p-1.5 rounded-md shadow-lg border border-border-inactive flex items-center space-x-1.5`}
+      className={`bg-surface-1  p-1.5 rounded-md shadow-lg border flex items-center space-x-1.5`}
       role="dialog"
       aria-modal="true"
       aria-label="Controle de Vida" // Adicionado para acessibilidade
       onClick={(e) => e.stopPropagation()}
     >
-      <span className="text-xs text-text-secondary mr-0.5 select-none">
-        HP:
-      </span>
+      <span className="text-xs select-none mr-1">{"HP:"}</span>
       <input
         ref={inputRef}
         type="text"
@@ -151,29 +149,32 @@ const HPControlModal: React.FC<HPControlModalProps> = ({
         onChange={handleInputChange}
         onKeyDown={handleInputKeyDown}
         onBlur={handleInputBlur}
-        className="w-12 h-7 p-1 bg-background border border-border-inactive rounded-sm text-foreground text-sm focus:ring-1 focus:ring-border-active hide-arrows"
+        className="w-12 h-7 p-1 text-center border rounded-sm text-sm focus:ring-1 hide-arrows "
         aria-label="Vida Atual"
         inputMode="tel"
       />
       <span className="text-text-secondary text-sm select-none">/</span>
-      <span data-testid="max-hp-display" className="text-foreground text-sm font-medium min-w-[20px] text-center select-none">
+      <span
+        data-testid="max-hp-display"
+        className="text-foreground text-sm font-medium min-w-[20px] text-center select-none"
+      >
         {tokenInfo.maxHp ?? "N/A"}
       </span>
 
       {showMakeIndependentButton && (
         <button
           onClick={handleMakeIndependentClick}
-          className="ml-1 p-1 text-text-secondary hover:text-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-6 h-6"
-          title="Tornar Instância Independente (Cria Cópia da Ficha)"
+          className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-6 h-6"
+          title="Tornar Token Independente"
           aria-label="Tornar instância independente"
         >
-          <span className="font-bold text-sm">I</span>
+          <DetatchIcon />
         </button>
       )}
 
       <button
         onClick={handleRemoveClick}
-        className="ml-1 p-1 text-text-secondary hover:text-accent-negative focus:outline-none focus:ring-1 focus:ring-accent-negative rounded-full"
+        className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-6 h-6"
         title="Remover do Tabuleiro"
         aria-label="Remover instância do tabuleiro"
       >

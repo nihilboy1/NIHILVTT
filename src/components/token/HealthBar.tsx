@@ -11,12 +11,12 @@ interface HealthBarProps {
   zoomLevel: number;
 }
 
-const HealthBar: React.FC<HealthBarProps> = ({
+export function HealthBar({
   currentHp,
   maxHp,
   tokenRenderHeight,
   zoomLevel,
-}) => {
+}: HealthBarProps) {
   const showHealthBar = maxHp !== undefined && maxHp > 0 && currentHp !== undefined;
   if (!showHealthBar) {
     return null;
@@ -69,6 +69,4 @@ const HealthBar: React.FC<HealthBarProps> = ({
       />
     </g>
   );
-};
-
-export default React.memo(HealthBar);
+}

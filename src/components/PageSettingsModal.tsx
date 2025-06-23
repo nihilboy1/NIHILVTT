@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 // PageSettings, GridSettings types removed from direct import, will get from context
-import Modal from './Modal';
+import { Modal } from './Modal';
 import { DEFAULT_METERS_PER_SQUARE, GRID_CELL_SIZE, GRID_LINE_COLOR } from '../constants';
 import { useBoardSettings } from '../contexts/BoardSettingsContext'; // Import useBoardSettings
 

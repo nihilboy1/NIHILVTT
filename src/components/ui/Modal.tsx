@@ -49,19 +49,16 @@ const Modal: React.FC<ModalProps> = ({
       aria-labelledby="modal-title" // Associa o título ao modal para acessibilidade
     >
       <div
-        className="bg-surface-0 p-6 rounded-lg shadow-xl max-w-md w-full text-theme-foreground" // Container do conteúdo do modal
+        className="bg-surface-0 p-6 rounded-lg shadow-xl max-w-md w-full" // Container do conteúdo do modal
         onClick={(e) => e.stopPropagation()} // Impede que o clique dentro do modal feche-o
       >
         <div className="flex justify-between items-center mb-6">
-          <h2
-            id="modal-title"
-            className="text-2xl font-semibold text-theme-foreground"
-          >
+          <h2 id="modal-title" className="text-2xl font-semibold">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="bg-surface-2 p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-accent-secondary cursor-pointer hover:bg-accent-secondary"
+            className="bg-surface-2 p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-feedback-negative cursor-pointer hover:bg-feedback-negative"
             aria-label="Fechar modal"
           >
             <XMarkIcon className="w-6 h-6" />
@@ -72,14 +69,14 @@ const Modal: React.FC<ModalProps> = ({
           <div className="flex justify-end space-x-3 pt-4">
             <button
               onClick={onClose}
-              className="cursor-pointer bg-surface-1 hover:bg-accent-secondary-hover px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary"
+              className="text-surface-0 cursor-pointer bg-surface-2 border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-feedback-negative-hover hover:text-text-primary hover:bg-feedback-negative-hover"
             >
               {cancelText}
             </button>
             {onConfirm && ( // Renderiza o botão de confirmação apenas se onConfirm for fornecido
               <button
                 onClick={onConfirm}
-                className="text-surface-0 cursor-pointer bg-accent-primary border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-accent-primary hover:text-text-primary"
+                className="text-surface-0 cursor-pointer bg-surface-2 border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-accent-primary-hover hover:text-text-primary hover:bg-accent-primary-hover"
               >
                 {confirmText}
               </button>
