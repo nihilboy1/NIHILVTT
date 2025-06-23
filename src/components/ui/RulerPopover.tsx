@@ -64,16 +64,10 @@ const RulerPopover: React.FC<RulerPopoverProps> = ({
     return null;
   }
 
-  // Classes CSS para os botões de opção
-  const baseButtonClass = "w-full text-left px-4 py-2 text-sm text-foreground transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-opacity-50";
-  const selectedButtonClass = `bg-accent-primary text-accent-primary-text`;
-  const unselectedButtonClass = `hover:bg-accent-secondary`;
-
-
   return (
     <div
       ref={popoverRef}
-      className="bg-surface-1 fixed border border-border-inactive rounded-md shadow-xl z-[60] w-56" // z-index alto e largura aumentada para o checkbox
+      className="bg-surface-1 fixed border rounded-md shadow-xl z-[60] w-56" // z-index alto e largura aumentada para o checkbox
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
       role="dialog" // Papel semântico para o popover
       aria-label="Opções de Posicionamento da Régua" 
@@ -84,7 +78,7 @@ const RulerPopover: React.FC<RulerPopoverProps> = ({
             onSetMode(RulerPlacementMode.SNAP_TO_CENTER);
             onClose(); // Fecha após a seleção
           }}
-          className={`${baseButtonClass} rounded-t-md ${currentMode === RulerPlacementMode.SNAP_TO_CENTER ? selectedButtonClass : unselectedButtonClass}`}
+          className={`w-full text-left px-4 py-2 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-opacity-50 rounded-t-md ${currentMode === RulerPlacementMode.SNAP_TO_CENTER ? 'bg-accent-primary' : 'hover:bg-accent-secondary'}`}
           aria-pressed={currentMode === RulerPlacementMode.SNAP_TO_CENTER} // Indica se está selecionado
           role="option"
           aria-selected={currentMode === RulerPlacementMode.SNAP_TO_CENTER}
@@ -96,7 +90,7 @@ const RulerPopover: React.FC<RulerPopoverProps> = ({
             onSetMode(RulerPlacementMode.FREE_PLACEMENT);
             onClose(); // Fecha após a seleção
           }}
-          className={`${baseButtonClass} ${currentMode === RulerPlacementMode.FREE_PLACEMENT ? selectedButtonClass : unselectedButtonClass}`}
+          className={`w-full text-left px-4 py-2 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary  ${currentMode === RulerPlacementMode.FREE_PLACEMENT ? 'bg-accent-primary' : 'hover:bg-accent-secondary'}`}
           aria-pressed={currentMode === RulerPlacementMode.FREE_PLACEMENT}
           role="option"
           aria-selected={currentMode === RulerPlacementMode.FREE_PLACEMENT}
@@ -110,14 +104,14 @@ const RulerPopover: React.FC<RulerPopoverProps> = ({
         {/* Opção para persistir o caminho da régua */}
         <label 
           htmlFor="persistRulerPath" 
-          className="flex items-center px-3 py-2 text-sm text-foreground cursor-pointer hover:bg-accent-secondary rounded-b-md"
+          className="flex items-center px-3 py-2 text-sm cursor-pointer hover:bg-accent-secondary rounded-b-md"
         >
           <input
             type="checkbox"
             id="persistRulerPath"
             checked={rulerPersistsPath}
             onChange={onToggleRulerPersistPath}
-            className="mr-2 h-4 w-4 rounded border-border-inactive text-accent-primary focus:ring-accent-primary bg-input-bg"
+            className="mr-2 h-4 w-4 rounded text-accent-primary focus:ring-accent-primary bg-input-bg"
           />
           Manter marcação ao soltar {/* Traduzido */}
         </label>

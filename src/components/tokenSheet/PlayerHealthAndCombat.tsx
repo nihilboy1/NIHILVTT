@@ -53,7 +53,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
 }) => {
   return (
     <div className="col-span-1 flex flex-col space-y-2.5">
-      <div className="border border-border-inactive p-2 rounded-md">
+      <div className="border p-2 rounded-md">
         <div className="grid grid-cols-3 gap-x-1.5 items-end">
           <div className="w-16">
             <label htmlFor="editingArmorClass" className="block text-[11px] font-medium text-accent-primary mb-px">
@@ -110,8 +110,8 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
           </label>
         </div>
       </div>
-      <div className="flex flex-col space-y-1.5 border border-border-inactive p-2 rounded-md">
-        <div className="border border-border-inactive p-1.5 rounded">
+      <div className="flex flex-col space-y-1.5 border p-2 rounded-md">
+        <div className="border p-1.5 rounded">
           <label
             className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-xs text-center mb-1 block uppercase")}
           >
@@ -168,7 +168,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
           </div>
         </div>
         <div className="flex space-x-1.5">
-          <div className="flex-1 border border-border-inactive p-1.5 rounded">
+          <div className="flex-1 border p-1.5 rounded">
             <label
               className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-xs text-center mb-1 block uppercase")}
             >
@@ -209,7 +209,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex-1 border border-border-inactive p-1.5 rounded">
+          <div className="flex-1 border p-1.5 rounded">
             <label
               className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-xs text-center mb-0.5 block uppercase")}
             >

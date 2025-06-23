@@ -59,7 +59,7 @@ export function DiceRollPopover({
   return (
     <div
       ref={popoverRef}
-      className="fixed bg-surface-1 border border-theme-border-inactive rounded-md shadow-xl z-[60] p-2 grid grid-cols-2 gap-2"
+      className="fixed bg-surface-1 border rounded-md shadow-xl z-[60] p-2 grid grid-cols-2 gap-2"
       style={{ top: `${position.top}px`, left: `${position.left}px`, minWidth: '160px' }}
       role="dialog"
       aria-label="Opções de Rolagem de Dados"
@@ -71,7 +71,7 @@ export function DiceRollPopover({
             onRoll(notation);
             onClose();
           }}
-          className="w-full text-center px-3 py-1.5 text-sm transition-colors duration-150 hover:bg-accent-primary-hover cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary-hover focus:ring-opacity-50 rounded"
+          className="w-full text-center px-3 py-1.5 text-sm  hover:bg-accent-primary-hover cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary-hover rounded"
         >
           {notation}
         </button>

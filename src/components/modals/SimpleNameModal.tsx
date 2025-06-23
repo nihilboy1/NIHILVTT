@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Modal } from "../ui/Modal"; // Usar o componente Modal base
 import { TokenType } from "../../types/index"; // Importar TokenType
 

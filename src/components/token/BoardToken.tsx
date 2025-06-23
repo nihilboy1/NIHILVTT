@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import {
   type Token as TokenInfo,
   Tool,
@@ -96,10 +96,10 @@ export function BoardToken({
     ? baseStrokeWidth + Math.max(0.3, 1 / zoomLevel)
     : baseStrokeWidth;
   const strokeColor = isMultiSelected
-    ? "var(--color-accent-positive)"
-    : isDragging
     ? "var(--color-accent-primary)"
-    : "var(--color-border-inactive)";
+    : isDragging
+    ? "var(--color-accent-secondary)"
+    : "var(--color-border-primary)";
 
   // Ajustar fontSize para o nome, pode precisar de mais ajustes dependendo do visual final
   const nameplateFontSize = Math.max(8, 12 / zoomLevel);
@@ -138,7 +138,6 @@ export function BoardToken({
   // Ajustar o deslocamento vertical para que o nome fique diretamente acima do token
   // Considera a altura da fonte e um pequeno espaçamento
   const nameplateYOffset = -(nameplateFontSize + 2 / zoomLevel);
-  const nameplateTextColor = "var(--color-foreground)"; // Cor base para o texto, pode ser ajustada
 
   return (
     <g
@@ -153,7 +152,7 @@ export function BoardToken({
       <HealthBar
         currentHp={tokenInfo.currentHp}
         maxHp={tokenInfo.maxHp}
-        tokenRenderHeight={tokenRenderHeight} /* Passar tokenRenderHeight */
+        tokenRenderWidth={tokenRenderWidth}
         zoomLevel={zoomLevel}
       />
       <TokenVisual metrics={tokenMetrics} />
@@ -164,7 +163,6 @@ export function BoardToken({
           nameplateYOffset
         } /* nameplateYOffset já é negativo, posicionando acima */
         fontSize={nameplateFontSize}
-        fill={nameplateTextColor}
         textAnchor="middle"
         dominantBaseline="alphabetic"
         fontWeight="bold"
@@ -177,3 +175,6 @@ export function BoardToken({
     </g>
   );
 }
+
+
+// visto

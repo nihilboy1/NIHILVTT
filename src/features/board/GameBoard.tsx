@@ -246,22 +246,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     const targetElement = event.target as SVGElement;
     const isTokenClick = targetElement.closest(".board-token-group");
 
-    // Prioriza o fechamento do modal de HP se ele estiver aberto e o clique for no background do grid
     if (activeHPModalInstanceId && isLMB && !isTokenClick) {
-      event.preventDefault(); // Previne o comportamento padrão do navegador (ex: seleção de texto)
-      // event.stopPropagation(); // REMOVIDO - Permite que useDismissable capture o evento
-      // if (onBackgroundClick) onBackgroundClick(); // REMOVIDO/COMENTADO - useDismissable irá acionar o fechamento do modal através do seu próprio mecanismo onClose, que inclui o salvamento.
-      return; // Impede qualquer outra lógica de mouse down no GameBoard
+      event.preventDefault();
+      return;
     }
 
-    if (isTokenClick) return; // Se for um clique em token, não faça nada aqui
+    if (isTokenClick) return;
 
-    // Lógica para seleção de área ou outros cliques de fundo, só se o modal de HP NÃO estiver ativo
-    // Lógica para seleção de área ou outros cliques de fundo, só se o modal de HP NÃO estiver ativo
     if (isLMB && !activeHPModalInstanceId) {
-      // Adicionado !activeHPModalInstanceId aqui
       if (activeTool === Tool.SELECT) {
-        if (onBackgroundClick) onBackgroundClick(); // Notifica o App.tsx para limpar seleção ou fechar outros modais
+        if (onBackgroundClick) onBackgroundClick();
         onClearMultiSelection();
         const startPt = getSVGPoint(event.clientX, event.clientY);
         setMarqueeSelection({
@@ -285,8 +279,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           liveEndPoint: startPoint,
         });
       } else {
-        // Se nenhuma ferramenta específica estiver ativa para clique esquerdo no background,
-        // ainda assim notifica o App.tsx para fechar modais ou limpar seleção.
         if (onBackgroundClick) onBackgroundClick();
       }
     }
@@ -696,7 +688,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }
 
   return (
-    <div className="flex-grow bg-background relative overflow-hidden">
+    <div className="flex-grow bg-surface-0 relative overflow-hidden">
       <svg
         ref={svgRef}
         width="100%"
@@ -784,7 +776,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             x={12 / zoomLevel}
             y={3 / zoomLevel}
             fontSize={10 / zoomLevel}
-            fill={'var(--color-accent-primary)'} // cor do 
+            fill={"var(--color-accent-primary)"} // cor do
             className="select-none"
           >
             0,0
@@ -827,7 +819,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             width={multiSelectBoundingBox.width}
             height={multiSelectBoundingBox.height}
             fill="none"
-            stroke={'var(--color-accent-primary)'}
+            stroke={"var(--color-accent-primary)"}
             strokeWidth={1.5 / zoomLevel}
             strokeOpacity="0.5"
           />
@@ -836,9 +828,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         {marqueeRectProps && (
           <rect
             {...marqueeRectProps}
-            fill={'var(--color-accent-primary)'} // cor do bloco de seleção
+            fill={"var(--color-accent-primary)"} // cor do bloco de seleção
             fillOpacity="0.8" /* Equivalente a CC em hexadecimal (204/255) */
-            stroke={'var(--color-accent-primary)'} // cor do tracejado da ferramenta de seleção
+            stroke={"var(--color-accent-primary)"} // cor do tracejado da ferramenta de seleção
             strokeWidth={1 / zoomLevel}
             strokeDasharray={`${4 / zoomLevel} ${2 / zoomLevel}`}
           />
@@ -857,7 +849,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     y1={prevWp.point.y}
                     x2={wp.point.x}
                     y2={wp.point.y}
-                    stroke={'var(--color-accent-primary)'} // cor da linha fixada da regua
+                    stroke={"var(--color-accent-primary)"} // cor da linha fixada da regua
                     strokeWidth={rulerLineStrokeWidth}
                   />
                 );
@@ -868,7 +860,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                   cx={wp.point.x}
                   cy={wp.point.y}
                   r={rulerWaypointRadius}
-                  fill={'var(--color-accent-primary)'} // cor da bolinha do ponto fixado da regua
+                  fill={"var(--color-accent-primary)"} // cor da bolinha do ponto fixado da regua
                   strokeWidth={0.5 / zoomLevel}
                 />
               );
@@ -907,7 +899,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       y={textY - textBgHeight * 0.65}
                       width={textBgWidth}
                       height={textBgHeight}
-                      fill={'var(--color-accent-secondary)'} // cor do background do ponto fixado da regua 
+                      fill={"var(--color-accent-secondary)"} // cor do background do ponto fixado da regua
                       rx={rulerTextBgRx}
                       ry={rulerTextBgRx}
                     />
@@ -915,7 +907,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       x={textX}
                       y={textY}
                       fontSize={rulerTextFontSize}
-                      fill={'var(--color-text-secondary)'} // cor do texto do ponto fixado da regua 
+                      fill={"var(--color-text-secondary)"} // cor do texto do ponto fixado da regua
                       textAnchor="middle"
                       dominantBaseline="middle"
                       className="select-none"
@@ -942,7 +934,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     y1={rulerPath.points[rulerPath.points.length - 1].point.y}
                     x2={rulerPath.liveEndPoint.x}
                     y2={rulerPath.liveEndPoint.y}
-                    stroke={'var(--color-accent-primary)'} // cor da linha da regua enquanto arrasta
+                    stroke={"var(--color-accent-primary)"} // cor da linha da regua enquanto arrasta
                     strokeWidth={rulerLineStrokeWidth}
                     strokeDasharray={`${6 / zoomLevel},${3 / zoomLevel}`}
                   />
@@ -974,7 +966,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                           y={textY - textBgHeight * 0.65}
                           width={textBgWidth}
                           height={textBgHeight}
-                          fill={'var(--color-accent-primary)'} // background da caixinha de medição da regua enquanto arrasta
+                          fill={"var(--color-accent-primary)"} // background da caixinha de medição da regua enquanto arrasta
                           rx={rulerTextBgRx}
                           ry={rulerTextBgRx}
                         />
@@ -982,7 +974,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                           x={textX}
                           y={textY}
                           fontSize={rulerTextFontSize}
-                          fill={'var(--color-text-primary)'} // texto da caixinha de medição da regua enquanto arrasta
+                          fill={"var(--color-text-primary)"} // texto da caixinha de medição da regua enquanto arrasta
                           textAnchor="start"
                           dominantBaseline="middle"
                           className="select-none"
@@ -997,21 +989,21 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           </g>
         )}
       </svg>
-      <div className="absolute top-2 right-2 flex flex-col items-end space-y-2">
+      <div className="bg-surface-0 absolute top-2 right-2 flex flex-col items-end space-y-2 rounded">
         <button
           onClick={() => setIsPageAndGridSettingsModalOpen(true)}
-          className="p-2 bg-toolbar-bg hover:bg-border-inactive rounded-md shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-border-active cursor-pointer"
+          className="hover:bg-accent-primary-hover p-2  rounded-md shadow-md  focus:outline-none focus:ring-2  cursor-pointer"
           aria-label="Configurações da Página e Grade"
           title="Configurações da Página e Grade"
         >
-          <PageConfigIcon className="w-6 h-6 text-foreground" />
+          <PageConfigIcon className="w-6 h-6 p-[0.1rem]" />
         </button>
-        <div className="bg-toolbar-bg bg-opacity-80 p-2 rounded-md shadow-md flex flex-col items-center space-y-2 w-10">
+        <div className="bg-opacity-80 p-2 rounded-md shadow-md flex flex-col items-center space-y-2 w-10">
           <button
-          onClick={handleZoomIn}
-          disabled={zoomLevel >= MAX_ZOOM_LEVEL}
-          className="zoom-control-button p-1 rounded text-foreground hover:bg-border-inactive disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-border-active cursor-pointer"
-          aria-label="Aumentar zoom"
+            onClick={handleZoomIn}
+            disabled={zoomLevel >= MAX_ZOOM_LEVEL}
+            className=" hover:bg-accent-primary-hover zoom-control-button p-1 rounded  disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2  cursor-pointer"
+            aria-label="Aumentar zoom"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1023,10 +1015,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             </svg>
           </button>
           <button
-          onClick={handleZoomOut}
-          disabled={zoomLevel <= MIN_ZOOM_LEVEL}
-          className="zoom-control-button p-1 rounded text-foreground hover:bg-border-inactive disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-border-active cursor-pointer"
-          aria-label="Diminuir zoom"
+            onClick={handleZoomOut}
+            disabled={zoomLevel <= MIN_ZOOM_LEVEL}
+            className="hover:bg-accent-primary-hover zoom-control-button p-1 rounded  disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2  cursor-pointer"
+            aria-label="Diminuir zoom"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1041,7 +1033,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               />
             </svg>
           </button>
-          <div className="text-foreground text-xs mt-1 p-0.5 bg-black bg-opacity-50 rounded">
+          <span className="text-[0.6rem]">Zoom</span>
+          <div className="bg-surface-3 text-xs px-2 p-1 rounded border -mt-[0.4rem]">
             {zoomLevel.toFixed(2)}x
           </div>
         </div>

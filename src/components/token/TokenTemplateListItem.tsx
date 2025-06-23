@@ -67,7 +67,7 @@ export function TokenTemplateListItem({
 
   return (
     <li
-      className="p-3 bg-input-bg rounded-md flex justify-between items-center shadow transition-colors duration-150 group"
+      className="bg-surface-3 p-3 rounded-md flex justify-between items-center shadow transition-colors duration-150  "
       title={`Arraste '${tokenInfo.name}' para o tabuleiro para criar uma instância, ou clique para abrir a ficha.`}
       draggable={true}
       onDragStart={(e) => handleDragStart(e, tokenInfo.id)}
@@ -75,7 +75,7 @@ export function TokenTemplateListItem({
       aria-label={`Modelo de token ${tokenInfo.name}. Tipo: ${tokenTypeTranslations[tokenInfo.type]}. Tamanho: ${tokenInfo.size}. ${instanceCount} instâncias no tabuleiro.`}
     >
       <div
-        className="flex items-center space-x-3 flex-grow cursor-pointer rounded -ml-1 pl-1 -my-1 py-1 group-hover:bg-background"
+        className="hover:bg-surface-0 flex items-center space-x-3 flex-grow cursor-pointer rounded -ml-1 pl-5 -my-1 py-1"
         onClick={() => openTokenSheetModal(tokenInfo.id)}
         role="button"
         tabIndex={0}
@@ -88,7 +88,7 @@ export function TokenTemplateListItem({
             aria-hidden="true"
         ></div>
         <div className="overflow-hidden" id={`token-details-${tokenInfo.id}`}>
-          <span className="text-foreground font-medium block truncate" title={tokenInfo.name}>{tokenInfo.name}</span>
+          <span className=" font-medium block truncate" title={tokenInfo.name}>{tokenInfo.name}</span>
           <span className="text-xs text-text-secondary block">
             {tokenTypeTranslations[tokenInfo.type]} - {tokenInfo.size}
             {instanceCount > 0 && <span className="italic text-text-secondary/80"> ({instanceCount} no tabuleiro)</span>}
@@ -98,7 +98,7 @@ export function TokenTemplateListItem({
       <button
         ref={popoverAnchorRef}
         onClick={handleOpenPopover}
-        className="text-text-secondary hover:text-foreground p-1 ml-2 flex-shrink-0 rounded-full focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-offset-input-bg focus:ring-accent-primary"
+        className="hover:bg-accent-primary p-1 ml-2 flex-shrink-0 rounded-full focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-accent-primary"
         aria-label={`Mais opções para o modelo de token ${tokenInfo.name}`}
         title={`Mais opções para o modelo de token ${tokenInfo.name}`}
       >
@@ -110,11 +110,11 @@ export function TokenTemplateListItem({
         onClose={handleClosePopover}
         targetRef={popoverAnchorRef}
       >
-        <ul className="min-w-[150px]">
+        <ul className="min-w-[150px] ">
           <li>
             <button
               onClick={handleDuplicate}
-              className="block w-full text-left px-3 py-2 text-sm text-foreground hover:bg-accent-secondary rounded-md"
+              className=" block w-full text-left px-3 py-2 text-sm hover:bg-accent-secondary rounded-md"
               role="menuitem"
             >
               Duplicar Personagem
@@ -123,7 +123,7 @@ export function TokenTemplateListItem({
           <li>
             <button
               onClick={handleDeleteClick}
-              className="block w-full text-left px-3 py-2 text-sm  rounded-md"
+              className="hover:bg-feedback-negative-hover block w-full text-left px-3 py-2 text-sm  rounded-md"
               role="menuitem"
             >
               Excluir Personagem
@@ -134,3 +134,6 @@ export function TokenTemplateListItem({
     </li>
   );
 }
+
+
+// visto

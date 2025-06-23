@@ -252,7 +252,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
       <div
         ref={modalRef}
         style={style}
-        className="bg-surface-0 border  rounded-md shadow-xl flex items-center justify-between px-3"
+        className="bg-surface-0 border rounded-md shadow-xl flex items-center justify-between px-3"
         role="dialog"
         aria-label={`${title} (Minimizado)`}
         aria-modal="false"
@@ -260,7 +260,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
         <span className="text-sm truncate font-medium">{title}</span>
         <button
           onClick={onRestore}
-          className="p-1   rounded-full focus:outline-none focus:ring-1 "
+          className="p-1 rounded-full focus:outline-none focus:ring-1 "
           aria-label="Restaurar modal"
         >
           <RestoreWindowIcon className="w-4 h-4" />
@@ -283,27 +283,27 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
     >
       {/* Header */}
       <div
-        className={` flex items-center justify-between p-3 border-b border-theme-border-inactive bg-theme-input-bg ${
+        className={` flex items-center justify-between p-3 border-b ${
           isDragging ? "cursor-grabbing" : "cursor-grab"
         }`}
       >
         <h2
           id={`modal-title-${id}`}
-          className="text-lg font-semibold text-theme-foreground truncate"
+          className="text-lg font-semibold truncate"
         >
           {title}
         </h2>
         <div className="flex items-center space-x-2">
           <button
             onClick={onMinimize}
-            className="p-1 text-theme-text-secondary hover:text-theme-accent-primary rounded-full focus:outline-none focus:ring-1 focus:ring-theme-border-active"
+            className="p-1 rounded-full focus:outline-none focus:ring-1"
             aria-label="Minimizar modal"
           >
             <MinimizeIcon className="w-4 h-4" />
           </button>
           <button
             onClick={onClose}
-            className="p-1 text-theme-text-secondary hover:text-theme-accent-negative rounded-full focus:outline-none focus:ring-1 focus:ring-theme-border-active"
+            className="p-1 rounded-full focus:outline-none focus:ring-1"
             aria-label="Fechar modal"
           >
             <XMarkIcon className="w-5 h-5" />
@@ -312,7 +312,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-4 overflow-y-auto flex-grow text-theme-foreground">
+      <div className="p-4 overflow-y-auto flex-grow ">
         {children}
       </div>
 

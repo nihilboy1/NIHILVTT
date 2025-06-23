@@ -83,7 +83,7 @@ export function PageSettingsModal({
       cancelText="Cancelar"
     >
       <div className="space-y-6 max-h-[70vh] overflow-y-auto px-2 hide-scrollbar">
-        <h3 className="text-lg font-semibold text-foreground mb-3">Página</h3>
+        <h3 className="text-lg font-semibold mb-3">Página</h3>
         <div>
           <label
             htmlFor="pageWidthInUnits"

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import TabButton from './TabButton';
+import {TabButton} from './TabButton';
 import { DiceIcon } from '../icons'; // Importe um ícone de exemplo
 import { SidebarTab } from '../../types';
 

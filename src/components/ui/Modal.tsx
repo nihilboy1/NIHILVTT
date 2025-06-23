@@ -76,7 +76,7 @@ export function Modal({
             {onConfirm && ( // Renderiza o botão de confirmação apenas se onConfirm for fornecido
               <button
                 onClick={onConfirm}
-                className="text-surface-0 cursor-pointer bg-surface-2 border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-accent-primary-hover hover:text-text-primary hover:bg-accent-primary-hover"
+                className="text-surface-0 cursor-pointer bg-accent-secondary border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-accent-primary-hover hover:text-text-primary hover:bg-accent-primary-hover"
               >
                 {confirmText}
               </button>

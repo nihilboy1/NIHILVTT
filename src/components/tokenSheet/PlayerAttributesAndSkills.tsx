@@ -85,7 +85,7 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
                 />
               </div>
               <div className="flex items-center justify-center col-span-1">
-                <span className="text-2xl font-bold text-foreground p-1 border border-border-inactive rounded bg-background">
+                <span className="text-2xl font-bold p-1 border rounded ">
                   {modifier >= 0 ? `+${modifier}` : modifier}
                 </span>
               </div>
@@ -153,10 +153,9 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
                         </label>
                         <label
                           htmlFor={`skill-prof-${skillKey}-${attrName}`}
-                          className={cn("block text-[11px] font-medium text-accent-primary mb-px", "col-span-10 text-xs mb-0 cursor-pointer hover:text-foreground")}
+                          className={cn("block text-[11px] font-medium text-accent-primary mb-px", "col-span-10 text-xs mb-0 cursor-pointer")}
                         >
                           {skillInfo.label}{" "}
-                          {/* A abreviação do atributo pai não é mais necessária aqui, pois está implícito pelo aninhamento */}
                         </label>
                       </div>
                     );

@@ -105,7 +105,7 @@ export default function OptionsPopover({
         opacity: position.opacity,
         transition: "opacity 0.1s ease-in-out",
       }}
-      className=" border border-accent-primary-hover rounded-md shadow-xl z-[70] p-1"
+      className="bg-surface-0 border border-accent-primary-hover rounded-md shadow-xl z-[70] p-1"
       role="menu"
       aria-orientation="vertical"
     >

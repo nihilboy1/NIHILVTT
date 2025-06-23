@@ -37,7 +37,7 @@ export function Toolbar() {
   }, [activeTool, activePopover]);
 
   return (
-    <div className="w-16 flex flex-col border-r shadow-xl py-5 space-y-3  relative bg-toolbar-bg">
+    <div className="w-16 flex flex-col border-r shadow-xl py-5 space-y-3  relative">
       <ToolbarButton
         label="Mover Mapa"
         icon={<PanIcon className="w-6 h-6" />}

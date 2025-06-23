@@ -1,23 +1,23 @@
-import React from 'react';
 
-const HEALTH_BAR_WIDTH = 4; // Largura fixa da barra de vida vertical
-const HEALTH_BAR_MARGIN = 2; // Margem entre a barra de vida e o token
+const HEALTH_BAR_HEIGHT = 4; // Altura fixa da barra de vida
+const HEALTH_BAR_MARGIN_TOP = 2; // Margem entre a barra de vida e o topo do token
 const HEALTH_BAR_CORNER_RADIUS = 1; // Raio da borda da barra de vida
 
 interface HealthBarProps {
   currentHp: number | undefined;
   maxHp: number | undefined;
-  tokenRenderHeight: number; // Usar a altura do token para a barra de vida
+  tokenRenderWidth: number; // Usar a largura do token para a barra de vida
   zoomLevel: number;
 }
 
 export function HealthBar({
   currentHp,
   maxHp,
-  tokenRenderHeight,
+  tokenRenderWidth,
   zoomLevel,
 }: HealthBarProps) {
-  const showHealthBar = maxHp !== undefined && maxHp > 0 && currentHp !== undefined;
+  const showHealthBar =
+    maxHp !== undefined && maxHp > 0 && currentHp !== undefined;
   if (!showHealthBar) {
     return null;
   }
@@ -25,48 +25,49 @@ export function HealthBar({
   const actualCurrentHp = currentHp ?? 0;
   const actualMaxHp = maxHp ?? 0;
   const clampedCurrentHp = Math.max(0, Math.min(actualCurrentHp, actualMaxHp));
-  const healthPercentage = actualMaxHp > 0 ? clampedCurrentHp / actualMaxHp : 0;
+  const healthPercentage =
+    actualMaxHp > 0 ? clampedCurrentHp / actualMaxHp : 0;
 
-  // A altura da barra de vida será a altura do token
-  const healthBarTotalHeight = tokenRenderHeight;
-  const healthBarWidthScaled = Math.max(1, HEALTH_BAR_WIDTH / zoomLevel); // Largura da barra de vida escalada
-  const healthBarStrokeWidth = Math.max(0.2, 0.5 / zoomLevel); // Largura do traço da barra de vida
+  const healthBarTotalWidth = tokenRenderWidth;
+  const healthBarHeightScaled = Math.max(1, HEALTH_BAR_HEIGHT / zoomLevel);
+  const healthBarStrokeWidth = Math.max(0.2, 0.5 / zoomLevel);
 
-  // Posição X da barra de vida (à esquerda do token)
-  // O tokenRenderWidth não é mais necessário aqui, mas sim no BoardToken para posicionar o HealthBar
-  const healthBarX = -healthBarWidthScaled - (HEALTH_BAR_MARGIN / zoomLevel);
+  // Posição Y da barra de vida (acima do token)
+  const healthBarY =
+    -healthBarHeightScaled - HEALTH_BAR_MARGIN_TOP / zoomLevel;
 
-  // Altura do foreground (vida atual)
-  const healthBarForegroundHeight = healthBarTotalHeight * healthPercentage;
-  // Posição Y do foreground para que ele diminua para baixo
-  const healthBarForegroundY = healthBarTotalHeight - healthBarForegroundHeight;
+  const healthBarForegroundWidth = healthBarTotalWidth * healthPercentage;
 
-  const cornerRadius = Math.min(HEALTH_BAR_CORNER_RADIUS / zoomLevel, HEALTH_BAR_CORNER_RADIUS);
+  const cornerRadius = Math.min(
+    HEALTH_BAR_CORNER_RADIUS / zoomLevel,
+    HEALTH_BAR_CORNER_RADIUS
+  );
 
   return (
-    <g className="token-health-bar" transform={`translate(${healthBarX}, 0)`}>
+    <g className="token-health-bar" transform={`translate(0, ${healthBarY})`}>
       {/* Background da barra de vida */}
       <rect
         x="0"
         y="0"
-        width={healthBarWidthScaled}
-        height={healthBarTotalHeight}
-        fill={'var(--color-health-bar-background)'}
+        width={healthBarTotalWidth}
+        height={healthBarHeightScaled}
+        fill={"var(--color-surface-0)"}
         rx={cornerRadius}
         ry={cornerRadius}
-        stroke={'var(--color-background)'}
+        stroke={"var(--color-surface-0)"}
         strokeWidth={healthBarStrokeWidth}
       />
-      {/* Foreground da barra de vida (vida atual) */}
       <rect
         x={healthBarStrokeWidth / 2}
-        y={healthBarForegroundY + healthBarStrokeWidth / 2}
-        width={healthBarWidthScaled - healthBarStrokeWidth}
-        height={healthBarForegroundHeight - healthBarStrokeWidth}
-        fill={'var(--color-health-bar-foreground)'}
+        y={healthBarStrokeWidth / 2}
+        width={healthBarForegroundWidth - healthBarStrokeWidth}
+        height={healthBarHeightScaled - healthBarStrokeWidth}
+        fill={"var(--color-feedback-positive-hover)"}
         rx={Math.max(0, cornerRadius - healthBarStrokeWidth / 2)}
         ry={Math.max(0, cornerRadius - healthBarStrokeWidth / 2)}
       />
     </g>
   );
 }
+
+// visto

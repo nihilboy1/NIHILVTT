@@ -35,7 +35,7 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
   setEditingExp,
 }) => {
   return (
-    <div className="col-span-3 border border-border-inactive p-2 rounded-md">
+    <div className="col-span-3 border p-2 rounded-md">
       <div className="grid grid-cols-7 gap-x-2 gap-y-1.5 items-end ">
         <div className="col-span-2">
           <label htmlFor="editingTokenName" className="block text-[11px] font-medium text-accent-primary mb-px">
