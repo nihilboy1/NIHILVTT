@@ -6,9 +6,12 @@
   }
 
   html,
-  body,
-  div {
+  body {
     @apply bg-surface-0;
+  }
+
+  button {
+    @apply cursor-pointer;
   }
 }
 
@@ -34,11 +37,9 @@
   /* Feedback (Positivo/Negativo) */
   --color-feedback-positive: #50fa7b; /* Verde para ações positivas */
   --color-feedback-positive-hover: #45d96a; /* Verde mais escuro para hover */
-  --color-feedback-positive-text: #242331;
 
   --color-feedback-negative: #ff5555; /* Vermelho para ações negativas */
   --color-feedback-negative-hover: #e04444; /* Vermelho mais escuro para hover */
-  --color-feedback-negative-text: #e8e8e8; /* Platinum - texto sobre feedback-negative */
 }
 
 @layer utilities {
@@ -52,6 +53,16 @@
   /* Para Firefox */
   .hide-arrows[type="number"] {
     -moz-appearance: textfield;
+  }
+
+  .hide-scrollbar {
+    /* Para Webkit (Chrome, Safari, Edge) */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Para Firefox */
+    scrollbar-width: none; /* Oculta a scrollbar */
   }
 }
 
@@ -125,3 +136,5 @@
   height: 16px;
   cursor: nw-resize;
 }
+
+/* Classe para esconder a scrollbar */

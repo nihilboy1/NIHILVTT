@@ -1,5 +1,5 @@
 import React from "react";
-import { condensedLabelClass, condensedCheckboxClass } from "../../styles/formClasses"; // Importar as classes
+import { cn } from "../../utils/cn"; // Importar utilitário de classes
 
 interface DeathSaveCheckboxGroupProps {
   count: number;
@@ -17,7 +17,7 @@ const DeathSaveCheckboxGroup: React.FC<DeathSaveCheckboxGroupProps> = ({
   return (
     <div className="flex flex-col items-center">
       <label
-        className={`${condensedLabelClass} text-[10px] text-center uppercase`}
+        className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-[10px] text-center uppercase")}
       >
         {label}
       </label>
@@ -26,7 +26,7 @@ const DeathSaveCheckboxGroup: React.FC<DeathSaveCheckboxGroupProps> = ({
           <input
             key={value}
             type="checkbox"
-            className={condensedCheckboxClass + " cursor-pointer !h-3 !w-3"}
+            className={cn("h-3.5 w-3.5 rounded-sm border-surface-2 text-accent-primary focus:ring-accent-primary bg-surface-1", "cursor-pointer !h-3 !w-3")}
             checked={count >= value}
             onChange={() => {
               if (count >= value) {

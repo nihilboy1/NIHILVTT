@@ -12,7 +12,7 @@ interface ModalProps {
   hideFooter?: boolean; // Oculta o rodapé com os botões
 }
 
-const Modal: React.FC<ModalProps> = ({
+export function Modal({
   isOpen,
   onClose,
   title,
@@ -21,7 +21,7 @@ const Modal: React.FC<ModalProps> = ({
   confirmText = "Confirmar", // Texto padrão para o botão de confirmação
   cancelText = "Cancelar", // Texto padrão para o botão de cancelar
   hideFooter = false, // Por padrão, o rodapé é visível
-}) => {
+}: ModalProps) {
   useEffect(() => {
     // Manipulador para fechar o modal com a tecla 'Escape'
     const handleEsc = (event: KeyboardEvent) => {
@@ -86,6 +86,5 @@ const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
-};
+}
 
-export default Modal;

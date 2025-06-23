@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  condensedLabelClass,
-  inputClass, // Usar inputClass em vez de condensedInputClass
-} from "../../styles/formClasses";
+import { cn } from "../../utils/cn";
 
 interface PlayerBasicInfoProps {
   editingTokenName: string;
@@ -39,9 +36,9 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
 }) => {
   return (
     <div className="col-span-3 border border-border-inactive p-2 rounded-md">
-      <div className="grid grid-cols-7 gap-x-2 gap-y-1.5 items-end">
+      <div className="grid grid-cols-7 gap-x-2 gap-y-1.5 items-end ">
         <div className="col-span-2">
-          <label htmlFor="editingTokenName" className={condensedLabelClass}>
+          <label htmlFor="editingTokenName" className="block text-[11px] font-medium text-accent-primary mb-px">
             NOME DO PERSONAGEM
           </label>
           <input
@@ -49,13 +46,13 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
             type="text"
             value={editingTokenName}
             onChange={(e) => setEditingTokenName(e.target.value)}
-            className={inputClass}
+            className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
             required
             maxLength={28}
           />
         </div>
         <div>
-          <label htmlFor="editingCharClass" className={condensedLabelClass}>
+          <label htmlFor="editingCharClass" className="block text-[11px] font-medium text-accent-primary mb-px">
             CLASSE
           </label>
           <input
@@ -63,11 +60,11 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
             type="text"
             value={editingCharClass}
             onChange={(e) => setEditingCharClass(e.target.value)}
-            className={inputClass}
+            className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           />
         </div>
         <div className="w-16">
-          <label htmlFor="editingLevel" className={condensedLabelClass}>
+          <label htmlFor="editingLevel" className="block text-[11px] font-medium text-accent-primary mb-px">
             NÍVEL
           </label>
           <input
@@ -78,14 +75,14 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
               const val = e.target.value;
               if (val.length <= 2) setEditingLevel(val);
             }}
-            className={`${inputClass} text-center hide-number-spinners`}
+            className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
             min="1"
             max="99"
             step="1"
           />
         </div>
         <div>
-          <label htmlFor="editingBackground" className={condensedLabelClass}>
+          <label htmlFor="editingBackground" className="block text-[11px] font-medium text-accent-primary mb-px">
             ANTECEDENTE
           </label>
           <input
@@ -93,11 +90,11 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
             type="text"
             value={editingBackground}
             onChange={(e) => setEditingBackground(e.target.value)}
-            className={inputClass}
+            className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           />
         </div>
         <div>
-          <label htmlFor="editingSpecies" className={condensedLabelClass}>
+          <label htmlFor="editingSpecies" className="block text-[11px] font-medium text-accent-primary mb-px">
             ESPÉCIE
           </label>
           <input
@@ -105,11 +102,11 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
             type="text"
             value={editingSpecies}
             onChange={(e) => setEditingSpecies(e.target.value)}
-            className={inputClass}
+            className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           />
         </div>
         <div>
-          <label htmlFor="editingSubclass" className={condensedLabelClass}>
+          <label htmlFor="editingSubclass" className="block text-[11px] font-medium text-accent-primary mb-px">
             SUBCLASSE
           </label>
           <input
@@ -117,11 +114,11 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
             type="text"
             value={editingSubclass}
             onChange={(e) => setEditingSubclass(e.target.value)}
-            className={inputClass}
+            className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           />
         </div>
         <div className="col-start-7 w-20 justify-self-end">
-          <label htmlFor="editingExp" className={condensedLabelClass}>
+          <label htmlFor="editingExp" className="block text-[11px] font-medium text-accent-primary mb-px">
             EXP
           </label>
           <input
@@ -129,7 +126,7 @@ const PlayerBasicInfo: React.FC<PlayerBasicInfoProps> = ({
             type="number"
             value={editingExp}
             onChange={(e) => setEditingExp(e.target.value)}
-            className={`${inputClass} text-center hide-number-spinners`}
+            className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
             min="0"
           />
         </div>

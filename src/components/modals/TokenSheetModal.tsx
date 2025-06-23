@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTokens } from "../../contexts/TokensContext";
 import { TokenType, type Point, type PlayerToken } from "../../types"; // Added PlayerToken
-import { InteractiveModal } from "../InteractiveModal";
+import InteractiveModal from "../ui/InteractiveModal";
 import { useTokenSheetForm } from "../../hooks/useTokenSheetForm";
-import {
-  buttonPositiveClass,
-  buttonSecondaryClass,
-} from "../../styles/formClasses";
 import PlayerSheetPrincipalTab from "../tokenSheet/PlayerSheetPrincipalTab";
 import PlayerSheetDetailsTab from "../tokenSheet/PlayerSheetDetailsTab";
 import PlayerSheetConfigTab from "../tokenSheet/PlayerSheetConfigTab";
-import {GenericTokenSheet} from "../tokenSheet/GenericTokenSheet";
+import { GenericTokenSheet } from "../tokenSheet/GenericTokenSheet";
+import { cn } from "../../utils/cn"; // Importar o utilitário cn
 
 type PlayerSheetTab = "principal" | "detalhes" | "configuracoes";
 const ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT = 700;
@@ -147,12 +144,12 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
   }, []);
 
   const tabButtonClass = (tabName: PlayerSheetTab) =>
-    `px-4 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2
-     ${
-       playerSheetActiveTab === tabName
-         ? "border-accent-primary text-accent-primary bg-input-bg"
-         : "border-transparent text-text-secondary hover:bg-input-bg hover:border-border-inactive"
-     }`;
+    cn(
+      "px-4 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2",
+      playerSheetActiveTab === tabName
+        ? "border-accent-primary text-accent-primary bg-surface-1"
+        : "border-transparent text-text-secondary hover:bg-surface-1 hover:border-accent-primary-hover"
+    );
 
   if (!tokenId || editingTokenType === null) {
     // Adicionado null check para editingTokenType
@@ -184,9 +181,9 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
       maxHeight={MAX_SHEET_HEIGHT}
       zIndex={51}
     >
-      <form onSubmit={handleSave} className="space-y-0.5">
+      <form onSubmit={handleSave} className="space-y-0.5 bg-surface-0 ">
         {editingTokenType === TokenType.PLAYER && (
-          <div className="flex border-b border-border-inactive mb-2.5">
+          <div className="flex border-b border-surface-2 mb-2.5">
             <button
               type="button"
               onClick={() => setPlayerSheetActiveTab("principal")}
@@ -307,13 +304,13 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className={buttonSecondaryClass}
+            className="px-4 py-2 bg-accent-secondary hover:bg-accent-secondary-hover text-text-primary font-semibold rounded-md transition-colors"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className={buttonPositiveClass}
+            className="px-4 py-2  text-text-primary font-semibold rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!hasTokenSheetChanged}
           >
             Salvar
@@ -323,3 +320,6 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
     </InteractiveModal>
   );
 }
+
+
+//visto

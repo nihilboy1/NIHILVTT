@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { XMarkIcon, MinimizeIcon, RestoreWindowIcon } from '../icons';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { XMarkIcon, MinimizeIcon, RestoreWindowIcon } from "../icons";
 
 interface InteractiveModalProps {
   id: string;
@@ -11,9 +11,14 @@ interface InteractiveModalProps {
   onMinimize: () => void;
   onRestore: () => void;
   onPositionChange: (newPosition: { x: number; y: number }) => void;
+  onResize?: (newWidth: number, newHeight: number) => void; // Adicionado para redimensionamento
   children: React.ReactNode;
   initialWidth?: number;
   initialHeight?: string | number; // Can be 'auto' or a number
+  minWidth?: number; // Adicionado para redimensionamento
+  minHeight?: number; // Adicionado para redimensionamento
+  maxWidth?: number; // Adicionado para redimensionamento
+  maxHeight?: number; // Adicionado para redimensionamento
   zIndex?: number;
 }
 
@@ -31,95 +36,213 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
   onMinimize,
   onRestore,
   onPositionChange,
+  onResize,
   children,
   initialWidth = 450,
-  initialHeight = 'auto',
+  initialHeight = "auto",
+  minWidth = 200, // Default min width
+  minHeight = 150, // Default min height
+  maxWidth = window.innerWidth, // Default max width
+  maxHeight = window.innerHeight, // Default max height
   zIndex = 50,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(initialWidth);
+  const [height, setHeight] = useState(initialHeight);
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
   const [dragStartOffset, setDragStartOffset] = useState({ x: 0, y: 0 });
+  const [resizeStart, setResizeStart] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
+  const [resizeDirection, setResizeDirection] = useState("");
 
-  const currentWidth = isMinimized ? MINIMIZED_WIDTH : initialWidth;
-  const currentHeight = isMinimized ? MINIMIZED_HEIGHT : initialHeight;
-
+  // Update internal width/height when initialWidth/Height props change
+  useEffect(() => {
+    setWidth(initialWidth);
+    setHeight(initialHeight);
+  }, [initialWidth, initialHeight]);
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
-    if (isOpen && !isMinimized) { // Only listen for Esc when fully open
-      document.addEventListener('keydown', handleEsc);
+    if (isOpen && !isMinimized) {
+      // Only listen for Esc when fully open
+      document.addEventListener("keydown", handleEsc);
     }
     return () => {
-      document.removeEventListener('keydown', handleEsc);
+      document.removeEventListener("keydown", handleEsc);
     };
   }, [isOpen, isMinimized, onClose]);
 
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (isMinimized) return; // No dragging or resizing when minimized
 
-  const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    if (isMinimized) return; // No dragging when minimized
-    // Only allow dragging by the header
-    if ((event.target as HTMLElement).closest('.modal-header')) {
-        setIsDragging(true);
-        const modalRect = modalRef.current?.getBoundingClientRect();
-        if (modalRect) {
-          setDragStartOffset({
-            x: event.clientX - modalRect.left,
-            y: event.clientY - modalRect.top,
-          });
-        }
+      const target = event.target as HTMLElement;
+      const modalRect = modalRef.current?.getBoundingClientRect();
+
+      if (!modalRect) return;
+
+      // Check for resize handles
+      const resizeHandle = target.closest(".resize-handle");
+      if (resizeHandle) {
+        setIsResizing(true);
+        setResizeDirection(
+          Array.from(resizeHandle.classList).find((cls) =>
+            cls.startsWith("resize-")
+          ) || ""
+        );
+        setResizeStart({
+          x: event.clientX,
+          y: event.clientY,
+          width: modalRect.width,
+          height: modalRect.height,
+        });
         event.preventDefault(); // Prevent text selection
-    }
-  }, [isMinimized]);
+        return;
+      }
+
+      // Only allow dragging by the header
+      if (target.closest(".modal-header")) {
+        setIsDragging(true);
+        setDragStartOffset({
+          x: event.clientX - modalRect.left,
+          y: event.clientY - modalRect.top,
+        });
+        event.preventDefault(); // Prevent text selection
+      }
+    },
+    [isMinimized]
+  );
+
+  const handleMouseMove = useCallback(
+    (event: MouseEvent) => {
+      if (isDragging) {
+        let newX = event.clientX - dragStartOffset.x;
+        let newY = event.clientY - dragStartOffset.y;
+
+        // Clamp position to viewport
+        const modalCurrentWidth = modalRef.current?.offsetWidth || width;
+        const modalCurrentHeight =
+          modalRef.current?.offsetHeight ||
+          (typeof height === "number" ? height : 400); // estimate if auto
+
+        newX = Math.max(
+          0,
+          Math.min(newX, window.innerWidth - modalCurrentWidth)
+        );
+        newY = Math.max(
+          0,
+          Math.min(newY, window.innerHeight - modalCurrentHeight)
+        );
+
+        // Ensure header is always visible for y-axis
+        newY = Math.max(0, Math.min(newY, window.innerHeight - HEADER_HEIGHT));
+
+        onPositionChange({ x: newX, y: newY });
+      } else if (isResizing) {
+        let newWidth = resizeStart.width;
+        let newHeight = resizeStart.height;
+        let newX = position.x;
+        let newY = position.y;
+
+        const dx = event.clientX - resizeStart.x;
+        const dy = event.clientY - resizeStart.y;
+
+        if (resizeDirection.includes("e")) {
+          newWidth = Math.min(
+            maxWidth,
+            Math.max(minWidth, resizeStart.width + dx)
+          );
+        }
+        if (resizeDirection.includes("s")) {
+          newHeight = Math.min(
+            maxHeight,
+            Math.max(minHeight, resizeStart.height + dy)
+          );
+        }
+        if (resizeDirection.includes("w")) {
+          newWidth = Math.min(
+            maxWidth,
+            Math.max(minWidth, resizeStart.width - dx)
+          );
+          if (newWidth > minWidth && newWidth < maxWidth) {
+            newX = position.x + dx; // Adjust x position when resizing from west
+          }
+        }
+        if (resizeDirection.includes("n")) {
+          newHeight = Math.min(
+            maxHeight,
+            Math.max(minHeight, resizeStart.height - dy)
+          );
+          if (newHeight > minHeight && newHeight < maxHeight) {
+            newY = position.y + dy; // Adjust y position when resizing from north
+          }
+        }
+
+        setWidth(newWidth);
+        setHeight(newHeight);
+        onPositionChange({ x: newX, y: newY });
+        onResize?.(newWidth, newHeight); // Notify parent of resize
+      }
+    },
+    [
+      isDragging,
+      isResizing,
+      dragStartOffset,
+      resizeStart,
+      resizeDirection,
+      onPositionChange,
+      onResize,
+      position,
+      minWidth,
+      minHeight,
+      maxWidth,
+      maxHeight,
+      width,
+      height,
+    ]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    setIsResizing(false);
+    setResizeDirection("");
+  }, []);
 
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isDragging || isMinimized) return;
-
-      let newX = event.clientX - dragStartOffset.x;
-      let newY = event.clientY - dragStartOffset.y;
-      
-      // Clamp position to viewport
-      const modalCurrentWidth = modalRef.current?.offsetWidth || currentWidth;
-      const modalCurrentHeight = modalRef.current?.offsetHeight || (typeof currentHeight === 'number' ? currentHeight : 400); // estimate if auto
-
-      newX = Math.max(0, Math.min(newX, window.innerWidth - modalCurrentWidth));
-      newY = Math.max(0, Math.min(newY, window.innerHeight - modalCurrentHeight));
-      
-      // Ensure header is always visible for y-axis
-      newY = Math.max(0, Math.min(newY, window.innerHeight - HEADER_HEIGHT));
-
-
-      onPositionChange({ x: newX, y: newY });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+    if (isDragging || isResizing) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
     }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, dragStartOffset, onPositionChange, isMinimized, currentWidth, currentHeight]);
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
   if (!isOpen) return null;
 
   const style: React.CSSProperties = {
-    position: 'fixed',
+    position: "fixed",
     top: isMinimized ? undefined : `${position.y}px`,
-    left: isMinimized ? '20px' : `${position.x}px`, // Minimized to bottom-left
-    bottom: isMinimized ? '20px' : undefined,
-    width: `${currentWidth}px`,
-    height: typeof currentHeight === 'number' ? `${currentHeight}px` : currentHeight,
+    left: isMinimized ? "20px" : `${position.x}px`, // Minimized to bottom-left
+    bottom: isMinimized ? "20px" : undefined,
+    width: `${isMinimized ? MINIMIZED_WIDTH : width}px`,
+    height:
+      typeof height === "number"
+        ? `${isMinimized ? MINIMIZED_HEIGHT : height}px`
+        : isMinimized
+        ? `${MINIMIZED_HEIGHT}px`
+        : height,
     zIndex,
     minHeight: isMinimized ? `${MINIMIZED_HEIGHT}px` : undefined, // Enforce min height for minimized state
   };
@@ -129,15 +252,15 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
       <div
         ref={modalRef}
         style={style}
-        className="bg-theme-toolbar-bg border border-theme-border-active rounded-md shadow-xl flex items-center justify-between px-3"
+        className="bg-surface-0 border  rounded-md shadow-xl flex items-center justify-between px-3"
         role="dialog"
         aria-label={`${title} (Minimizado)`}
-        aria-modal="false" 
+        aria-modal="false"
       >
-        <span className="text-sm text-theme-foreground truncate font-medium">{title}</span>
+        <span className="text-sm truncate font-medium">{title}</span>
         <button
           onClick={onRestore}
-          className="p-1 text-theme-foreground hover:bg-theme-accent-secondary rounded-full focus:outline-none focus:ring-1 focus:ring-theme-border-active"
+          className="p-1   rounded-full focus:outline-none focus:ring-1 "
           aria-label="Restaurar modal"
         >
           <RestoreWindowIcon className="w-4 h-4" />
@@ -150,15 +273,24 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
     <div
       ref={modalRef}
       style={style}
-      className={`bg-theme-toolbar-bg rounded-lg shadow-xl flex flex-col overflow-hidden border border-theme-border-inactive ${isDragging ? 'cursor-grabbing' : ''}`}
+      className={`bg-surface-0 rounded-lg shadow-xl flex flex-col overflow-hidden border   ${
+        isDragging ? "cursor-grabbing" : ""
+      }`}
       onMouseDown={handleMouseDown}
       role="dialog"
       aria-modal="true"
       aria-labelledby={`modal-title-${id}`}
     >
       {/* Header */}
-      <div className={`modal-header flex items-center justify-between p-3 border-b border-theme-border-inactive bg-theme-input-bg ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
-        <h2 id={`modal-title-${id}`} className="text-lg font-semibold text-theme-foreground truncate">
+      <div
+        className={` flex items-center justify-between p-3 border-b border-theme-border-inactive bg-theme-input-bg ${
+          isDragging ? "cursor-grabbing" : "cursor-grab"
+        }`}
+      >
+        <h2
+          id={`modal-title-${id}`}
+          className="text-lg font-semibold text-theme-foreground truncate"
+        >
           {title}
         </h2>
         <div className="flex items-center space-x-2">
@@ -183,6 +315,16 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
       <div className="p-4 overflow-y-auto flex-grow text-theme-foreground">
         {children}
       </div>
+
+      {/* Resize Handles */}
+      <div className="resize-handle resize-s" />
+      <div className="resize-handle resize-e" />
+      <div className="resize-handle resize-n" />
+      <div className="resize-handle resize-w" />
+      <div className="resize-handle resize-se" />
+      <div className="resize-handle resize-sw" />
+      <div className="resize-handle resize-ne" />
+      <div className="resize-handle resize-nw" />
     </div>
   );
 };

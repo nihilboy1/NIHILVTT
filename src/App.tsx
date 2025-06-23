@@ -2,10 +2,11 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { Toolbar } from "./components/layout/Toolbar"; // Atualizado
 import { GameBoard } from "./features/board/GameBoard"; // Atualizado
 import { RightSidebar } from "./components/layout/RightSidebar"; // Atualizado
-import HPControlModal, {
+import {
+  HPControlModal,
   HP_MODAL_ESTIMATED_HEIGHT,
 } from "./components/modals/HPControlModal"; // Atualizado
-import SimpleNameModal from "./components/modals/SimpleNameModal"; // Atualizado
+import { SimpleNameModal } from "./components/modals/SimpleNameModal"; // Atualizado
 import { TokenSheetModal } from "./components/modals/TokenSheetModal";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 import {
@@ -127,7 +128,10 @@ export default function App() {
     name: string,
     tokenTypeFromModal?: TokenType
   ) => {
-    console.log("handleSaveNewTokenName chamado com:", { name, tokenTypeFromModal });
+    console.log("handleSaveNewTokenName chamado com:", {
+      name,
+      tokenTypeFromModal,
+    });
     // Usar o tokenType vindo diretamente do modal, que é mais confiável
     const typeToUse = tokenTypeFromModal || modalProps.tokenType; // Mantendo o fallback para modalProps.tokenType por segurança, embora modalProps.type seja o correto agora.
 
@@ -490,7 +494,9 @@ export default function App() {
       {activeModal === "tokenSheet" && (
         <TokenSheetProvider
           initialTokenData={(() => {
-            const foundToken = tokens.find((t: TokenInfo) => t.id === modalProps.tokenId);
+            const foundToken = tokens.find(
+              (t: TokenInfo) => t.id === modalProps.tokenId
+            );
             return foundToken && foundToken.type === TokenType.PLAYER
               ? (foundToken as PlayerToken)
               : null;

@@ -1,11 +1,7 @@
 import React from "react";
 import { type PlayerToken} from "../../types/index"; // Caminho corrigido
 import { ATTRIBUTE_LABELS } from "../../constants/tokenSheetDefaults"; // Importar ATTRIBUTE_LABELS
-import {
-  condensedLabelClass, // Manter condensedLabelClass
-  inputClass, // Usar inputClass
-  condensedCheckboxClass,
-} from "../../styles/formClasses";
+import { cn } from "../../utils/cn";
 
 interface PlayerAttributesAndSkillsProps {
   attributes: NonNullable<PlayerToken["attributes"]>;
@@ -63,7 +59,7 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
                 <div className="flex flex-col items-center col-span-1">
                   <label
                     htmlFor={`attr-${attrName}`}
-                    className={`${condensedLabelClass} text-xs uppercase`}
+                    className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-xs uppercase")}
                   >
                     {attrLabel}
                 </label>
@@ -85,7 +81,7 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
                       }));
                     }
                   }}
-                  className={`${inputClass} text-center hide-number-spinners w-12 text-lg font-semibold p-0`}
+                  className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners w-12 text-lg font-semibold p-0")}
                 />
               </div>
               <div className="flex items-center justify-center col-span-1">
@@ -96,7 +92,7 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
               <div className="flex flex-col items-center col-span-1">
                 <label
                   htmlFor={`save-prof-${attrName}`}
-                  className={`${condensedLabelClass} text-[10px] text-center`}
+                  className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-[10px] text-center")}
                 >
                   Prof. em Salvaguarda {/* Label Localizada */}
                 </label>
@@ -114,7 +110,7 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
                       [attrName]: e.target.checked,
                     }))
                   }
-                  className={`${condensedCheckboxClass} h-4 w-4`}
+                  className={cn("h-3.5 w-3.5 rounded-sm border-surface-2 text-accent-primary focus:ring-accent-primary bg-surface-1", "h-4 w-4")}
                 />
               </div>
               </div> {/* Fim da grid original */}
@@ -147,17 +143,17 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
                               [skillKey]: e.target.checked,
                             }))
                           }
-                          className={`${condensedCheckboxClass} h-3.5 w-3.5 col-span-1 justify-self-center`}
+                          className={cn("h-3.5 w-3.5 rounded-sm border-surface-2 text-accent-primary focus:ring-accent-primary bg-surface-1", "h-3.5 w-3.5 col-span-1 justify-self-center")}
                         />
                         <label
                           htmlFor={`skill-prof-${skillKey}-${attrName}`}
-                          className={`${condensedLabelClass} col-span-1 text-[10px] text-center mb-0`}
+                          className={cn("block text-[11px] font-medium text-accent-primary mb-px", "col-span-1 text-[10px] text-center mb-0")}
                         >
                           {totalBonus >= 0 ? `+${totalBonus}` : totalBonus}
                         </label>
                         <label
                           htmlFor={`skill-prof-${skillKey}-${attrName}`}
-                          className={`${condensedLabelClass} col-span-10 text-xs mb-0 cursor-pointer hover:text-foreground`}
+                          className={cn("block text-[11px] font-medium text-accent-primary mb-px", "col-span-10 text-xs mb-0 cursor-pointer hover:text-foreground")}
                         >
                           {skillInfo.label}{" "}
                           {/* A abreviação do atributo pai não é mais necessária aqui, pois está implícito pelo aninhamento */}

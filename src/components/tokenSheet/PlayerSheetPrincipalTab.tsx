@@ -50,7 +50,9 @@ interface PlayerSheetPrincipalTabProps {
     PlayerToken["proficiencies"]
   >["savingThrows"];
   setSavingThrowProficiencies: React.Dispatch<
-    React.SetStateAction<NonNullable<PlayerToken["proficiencies"]>["savingThrows"]>
+    React.SetStateAction<
+      NonNullable<PlayerToken["proficiencies"]>["savingThrows"]
+    >
   >;
   skillProficiencies: NonNullable<PlayerToken["proficiencies"]>["skills"];
   setSkillProficiencies: React.Dispatch<
@@ -59,11 +61,7 @@ interface PlayerSheetPrincipalTabProps {
   attacks: NonNullable<PlayerToken["attacks"]>;
   handleAddAttack: () => void;
   handleRemoveAttack: (id: string) => void;
-  handleAttackChange: (
-    id: string,
-    field: keyof Attack,
-    value: string
-  ) => void;
+  handleAttackChange: (id: string, field: keyof Attack, value: string) => void;
   featuresAndTraits: PlayerToken["featuresAndTraits"];
   setFeaturesAndTraits: React.Dispatch<
     React.SetStateAction<PlayerToken["featuresAndTraits"]>
@@ -129,7 +127,7 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
   proficiencyBonus,
 }) => {
   return (
-    <div className="grid grid-cols-3 gap-2.5 p-0.5 overflow-y-auto max-h-[calc(100vh-200px)]">
+    <div className="grid grid-cols-3 gap-2.5 p-0.5 overflow-y-auto max-h-[calc(100vh-200px)] hide-scrollbar">
       <PlayerBasicInfo
         editingTokenName={editingTokenName}
         setEditingTokenName={setEditingTokenName}

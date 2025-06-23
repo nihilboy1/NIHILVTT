@@ -1,10 +1,6 @@
 import React from "react";
 import DeathSaveCheckboxGroup from "../ui/DeathSaveCheckboxGroup";
-import {
-  condensedLabelClass,
-  inputClass, // Usar inputClass em vez de condensedInputClass
-  condensedCheckboxClass,
-} from "../../styles/formClasses";
+import { cn } from "../../utils/cn";
 
 interface PlayerHealthAndCombatProps {
   editingArmorClass: string;
@@ -60,7 +56,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
       <div className="border border-border-inactive p-2 rounded-md">
         <div className="grid grid-cols-3 gap-x-1.5 items-end">
           <div className="w-16">
-            <label htmlFor="editingArmorClass" className={condensedLabelClass}>
+            <label htmlFor="editingArmorClass" className="block text-[11px] font-medium text-accent-primary mb-px">
               CA
             </label>
             <input
@@ -68,12 +64,12 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
               type="number"
               value={editingArmorClass}
               onChange={(e) => setEditingArmorClass(e.target.value)}
-              className={`${inputClass} text-center hide-number-spinners`}
+              className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
               min="0"
             />
           </div>
           <div className="w-16">
-            <label htmlFor="editingInitiative" className={condensedLabelClass}>
+            <label htmlFor="editingInitiative" className="block text-[11px] font-medium text-accent-primary mb-px">
               INICIATIVA
             </label>
             <input
@@ -81,11 +77,11 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
               type="number"
               value={editingInitiative}
               onChange={(e) => setEditingInitiative(e.target.value)}
-              className={`${inputClass} text-center hide-number-spinners`}
+              className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
             />
           </div>
           <div className="w-16">
-            <label htmlFor="editingSpeed" className={condensedLabelClass}>
+            <label htmlFor="editingSpeed" className="block text-[11px] font-medium text-accent-primary mb-px">
               VELOCIDADE
             </label>
             <input
@@ -93,7 +89,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
               type="number"
               value={editingSpeed}
               onChange={(e) => setEditingSpeed(e.target.value)}
-              className={`${inputClass} text-center hide-number-spinners`}
+              className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
               min="0"
             />
           </div>
@@ -108,16 +104,16 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
               type="checkbox"
               checked={editingShieldEquipped}
               onChange={(e) => setEditingShieldEquipped(e.target.checked)}
-              className={condensedCheckboxClass}
+              className="h-3.5 w-3.5 rounded-sm border-surface-2 text-accent-primary focus:ring-accent-primary bg-surface-1"
             />
-            <span className={`${condensedLabelClass} mb-0`}>ESCUDO</span>
+            <span className={cn("block text-[11px] font-medium text-accent-primary mb-px", "mb-0")}>ESCUDO</span>
           </label>
         </div>
       </div>
       <div className="flex flex-col space-y-1.5 border border-border-inactive p-2 rounded-md">
         <div className="border border-border-inactive p-1.5 rounded">
           <label
-            className={`${condensedLabelClass} text-xs text-center mb-1 block uppercase`}
+            className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-xs text-center mb-1 block uppercase")}
           >
             PONTOS DE VIDA
           </label>
@@ -125,7 +121,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
             <div>
               <label
                 htmlFor="editingCurrentHp"
-                className={`${condensedLabelClass} text-[10px] text-center block`}
+                className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-[10px] text-center block")}
               >
                 ATUAL
               </label>
@@ -134,13 +130,13 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
                 type="number"
                 value={editingCurrentHp}
                 onChange={(e) => setEditingCurrentHp(e.target.value)}
-                className={`${inputClass} text-center hide-number-spinners`}
+                className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
               />
             </div>
             <div>
               <label
                 htmlFor="editingTempHp"
-                className={`${condensedLabelClass} text-[10px] text-center block`}
+                className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-[10px] text-center block")}
               >
                 TEMP
               </label>
@@ -149,14 +145,14 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
                 type="number"
                 value={editingTempHp}
                 onChange={(e) => setEditingTempHp(e.target.value)}
-                className={`${inputClass} text-center hide-number-spinners`}
+                className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
                 min="0"
               />
             </div>
             <div>
               <label
                 htmlFor="editingMaxHp"
-                className={`${condensedLabelClass} text-[10px] text-center block`}
+                className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-[10px] text-center block")}
               >
                 MAX
               </label>
@@ -165,7 +161,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
                 type="number"
                 value={editingMaxHp}
                 onChange={(e) => setEditingMaxHp(e.target.value)}
-                className={`${inputClass} text-center hide-number-spinners`}
+                className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
                 min="1"
               />
             </div>
@@ -174,7 +170,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
         <div className="flex space-x-1.5">
           <div className="flex-1 border border-border-inactive p-1.5 rounded">
             <label
-              className={`${condensedLabelClass} text-xs text-center mb-1 block uppercase`}
+              className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-xs text-center mb-1 block uppercase")}
             >
               DADOS DE VIDA
             </label>
@@ -182,7 +178,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
               <div>
                 <label
                   htmlFor="editingHitDiceUsed"
-                  className={`${condensedLabelClass} text-[10px] text-center block`}
+                  className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-[10px] text-center block")}
                 >
                   GASTO
                 </label>
@@ -191,14 +187,14 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
                   type="number"
                   value={editingHitDiceUsed}
                   onChange={(e) => setEditingHitDiceUsed(e.target.value)}
-                  className={`${inputClass} text-center hide-number-spinners`}
+                  className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
                   min="0"
                 />
               </div>
               <div>
                 <label
                   htmlFor="editingHitDiceMax"
-                  className={`${condensedLabelClass} text-[10px] text-center block`}
+                  className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-[10px] text-center block")}
                 >
                   MAX
                 </label>
@@ -207,7 +203,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
                   type="number"
                   value={editingHitDiceMax}
                   onChange={(e) => setEditingHitDiceMax(e.target.value)}
-                  className={`${inputClass} text-center hide-number-spinners`}
+                  className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
                   min="0"
                 />
               </div>
@@ -215,7 +211,7 @@ const PlayerHealthAndCombat: React.FC<PlayerHealthAndCombatProps> = ({
           </div>
           <div className="flex-1 border border-border-inactive p-1.5 rounded">
             <label
-              className={`${condensedLabelClass} text-xs text-center mb-0.5 block uppercase`}
+              className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-xs text-center mb-0.5 block uppercase")}
             >
               SALVAGUARDA CONTRA MORTE
             </label>

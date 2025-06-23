@@ -1,10 +1,7 @@
 import React from "react";
 import { TokenType } from "../../types";
 import { TOKEN_TYPES_OPTIONS } from "../../constants";
-import {
-  condensedLabelClass,
-  inputClass,
-} from "../../styles/formClasses";
+import { cn } from "../../utils/cn";
 
 interface GenericTokenSheetProps {
   editingTokenName: string;
@@ -42,7 +39,7 @@ export function GenericTokenSheet({
   return (
     <div className="p-0.5 space-y-3 overflow-y-auto max-h-[calc(100vh-200px)]">
       <div>
-        <label htmlFor="editingTokenName" className={condensedLabelClass}>
+        <label htmlFor="editingTokenName" className="block text-[11px] font-medium text-accent-primary mb-px">
           Nome do Token
         </label>
         <input
@@ -50,20 +47,20 @@ export function GenericTokenSheet({
           type="text"
           value={editingTokenName}
           onChange={(e) => setEditingTokenName(e.target.value)}
-          className={inputClass}
+          className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           required
           maxLength={35}
         />
       </div>
       <div>
-        <label htmlFor="editingTokenType" className={condensedLabelClass}>
+        <label htmlFor="editingTokenType" className="block text-[11px] font-medium text-accent-primary mb-px">
           Tipo
         </label>
         <select
           id="editingTokenType"
           value={editingTokenType || ""}
           onChange={(e) => setEditingTokenType(e.target.value as TokenType)}
-          className={inputClass}
+          className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
         >
           {TOKEN_TYPES_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -74,7 +71,7 @@ export function GenericTokenSheet({
       </div>
       <div className="grid grid-cols-2 gap-x-2">
         <div className="flex-1">
-          <label htmlFor="editingCurrentHp" className={condensedLabelClass}>
+          <label htmlFor="editingCurrentHp" className="block text-[11px] font-medium text-accent-primary mb-px">
             Vida Atual
           </label>
           <input
@@ -82,14 +79,14 @@ export function GenericTokenSheet({
             type="number"
             value={editingCurrentHp}
             onChange={(e) => setEditingCurrentHp(e.target.value)}
-            className={`${inputClass} hide-number-spinners`}
+            className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "hide-number-spinners")}
             min="0"
             step="1"
             required
           />
         </div>
         <div className="flex-1">
-          <label htmlFor="editingMaxHp" className={condensedLabelClass}>
+          <label htmlFor="editingMaxHp" className="block text-[11px] font-medium text-accent-primary mb-px">
             Vida Máxima
           </label>
           <input
@@ -97,7 +94,7 @@ export function GenericTokenSheet({
             type="number"
             value={editingMaxHp}
             onChange={(e) => setEditingMaxHp(e.target.value)}
-            className={`${inputClass} hide-number-spinners`}
+            className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "hide-number-spinners")}
             min="1"
             step="1"
             required
@@ -105,18 +102,18 @@ export function GenericTokenSheet({
         </div>
       </div>
       <div>
-        <label htmlFor="editingTokenNotes" className={condensedLabelClass}>
+        <label htmlFor="editingTokenNotes" className="block text-[11px] font-medium text-accent-primary mb-px">
           Notas
         </label>
         <textarea
           id="editingTokenNotes"
           value={editingTokenNotes}
           onChange={(e) => setEditingTokenNotes(e.target.value)}
-          className={`${inputClass} min-h-[100px]`}
+          className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "min-h-[100px]")}
         />
       </div>
       <div>
-        <label htmlFor="editingTokenColor" className={condensedLabelClass}>
+        <label htmlFor="editingTokenColor" className="block text-[11px] font-medium text-accent-primary mb-px">
           Cor
         </label>
         <div className="flex items-center space-x-2">
@@ -125,25 +122,25 @@ export function GenericTokenSheet({
             type="color"
             value={editingTokenColor}
             onChange={(e) => setEditingTokenColor(e.target.value)}
-            className={`${inputClass} h-9 w-14 p-0.5 cursor-pointer`}
+            className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "h-9 w-14 p-0.5 cursor-pointer")}
           />
           <input
             type="text"
             value={editingTokenColor}
             onChange={(e) => setEditingTokenColor(e.target.value)}
-            className={`${inputClass} flex-grow`}
+            className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "flex-grow")}
           />
         </div>
       </div>
       <div>
-        <label htmlFor="editingTokenSize" className={condensedLabelClass}>
+        <label htmlFor="editingTokenSize" className="block text-[11px] font-medium text-accent-primary mb-px">
           Tamanho
         </label>
         <select
           id="editingTokenSize"
           value={editingTokenSize}
           onChange={(e) => setEditingTokenSize(e.target.value)}
-          className={inputClass}
+          className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
         >
           <option value="1x1">1x1 (Padrão)</option>
           <option value="2x2">2x2 (Grande)</option>

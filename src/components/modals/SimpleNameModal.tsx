@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import Modal from "../ui/Modal"; // Usar o componente Modal base
+import { Modal } from "../ui/Modal"; // Usar o componente Modal base
 import { TokenType } from "../../types/index"; // Importar TokenType
-import { labelClass, inputClass } from "../../styles/formClasses"; // Importar classes de formulário
 
 interface SimpleNameModalProps {
   isOpen: boolean;
@@ -12,14 +11,14 @@ interface SimpleNameModalProps {
   tokenType?: TokenType; // Adicionado tokenType como prop
 }
 
-const SimpleNameModal: React.FC<SimpleNameModalProps> = ({
+export function SimpleNameModal({
   isOpen,
   onClose,
   onSave,
   title,
   currentName = "",
   tokenType, // Receber tokenType
-}) => {
+}: SimpleNameModalProps) {
   const [name, setName] = useState(currentName);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -56,7 +55,10 @@ const SimpleNameModal: React.FC<SimpleNameModalProps> = ({
           }}
         >
           <div className="mb-4">
-            <label htmlFor="simpleModalNameInput" className={labelClass}>
+            <label
+              htmlFor="simpleModalNameInput"
+              className="block text-sm font-medium text-accent-primary mb-1"
+            >
               Nome do Personagem
             </label>
             <input
@@ -65,7 +67,7 @@ const SimpleNameModal: React.FC<SimpleNameModalProps> = ({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={inputClass}
+              className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
               required
               minLength={1}
               placeholder="Digite o nome"
@@ -76,6 +78,7 @@ const SimpleNameModal: React.FC<SimpleNameModalProps> = ({
       </div>
     </Modal>
   );
-};
+}
 
-export default SimpleNameModal;
+
+//visto

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 // PageSettings, GridSettings types removed from direct import, will get from context
-import { Modal } from "../Modal";
+import { Modal } from "../ui/Modal";
+import { cn } from "../../utils/cn";
 import {
   DEFAULT_METERS_PER_SQUARE,
   GRID_CELL_SIZE,
@@ -11,9 +12,6 @@ import { useBoardSettings } from "../../contexts/BoardSettingsContext"; // Impor
 interface PageAndGridSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // currentPageSettings prop removed
-  // currentGridSettings prop removed
-  // onSave prop removed
 }
 
 export function PageSettingsModal({
@@ -75,24 +73,22 @@ export function PageSettingsModal({
     onClose();
   };
 
-  const inputClass =
-    "w-full p-2 bg-theme-input-bg border border-theme-border-inactive rounded-md focus:ring-1 focus:ring-theme-border-active focus:border-theme-border-active text-theme-foreground placeholder-theme-text-secondary";
-  const labelClass = "block text-sm font-medium text-theme-accent-primary mb-1";
-  const subHeadingClass =
-    "text-lg font-semibold text-theme-foreground mt-6 mb-3 pt-4 border-t border-theme-border-inactive";
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Configurações da Página e Grade"
+      title="Ajustes de Página e Grade"
+      onConfirm={handleSave}
+      confirmText="Salvar Alterações"
+      cancelText="Cancelar"
     >
-      <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-        <h3 className="text-lg font-semibold text-theme-foreground mb-3">
-          Página
-        </h3>
+      <div className="space-y-6 max-h-[70vh] overflow-y-auto px-2 hide-scrollbar">
+        <h3 className="text-lg font-semibold text-foreground mb-3">Página</h3>
         <div>
-          <label htmlFor="pageWidthInUnits" className={labelClass}>
+          <label
+            htmlFor="pageWidthInUnits"
+            className="block text-sm font-medium text-accent-primary mb-1"
+          >
             Largura da Página (quadrados)
           </label>
           <input
@@ -102,13 +98,16 @@ export function PageSettingsModal({
             onChange={(e) =>
               setWidthInUnits(Math.max(1, parseInt(e.target.value, 10)))
             }
-            className={inputClass}
+            className=" w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1   text-text-primary placeholder-text-secondary"
             min="1"
             step="1"
           />
         </div>
         <div>
-          <label htmlFor="pageHeightInUnits" className={labelClass}>
+          <label
+            htmlFor="pageHeightInUnits"
+            className="block text-sm font-medium text-accent-primary mb-1"
+          >
             Altura da Página (quadrados)
           </label>
           <input
@@ -118,13 +117,16 @@ export function PageSettingsModal({
             onChange={(e) =>
               setHeightInUnits(Math.max(1, parseInt(e.target.value, 10)))
             }
-            className={inputClass}
+            className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1    placeholder-text-secondary"
             min="1"
             step="1"
           />
         </div>
         <div>
-          <label htmlFor="pageBackgroundColor" className={labelClass}>
+          <label
+            htmlFor="pageBackgroundColor"
+            className="block text-sm font-medium text-accent-primary mb-1"
+          >
             Cor de Fundo da Página
           </label>
           <div className="flex items-center space-x-2">
@@ -133,21 +135,32 @@ export function PageSettingsModal({
               type="color"
               value={backgroundColor}
               onChange={(e) => setBackgroundColor(e.target.value)}
-              className={`${inputClass} h-10 w-16 p-1`}
+              className={cn(
+                "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1   text-text-primary placeholder-text-secondary",
+                "h-10 w-16 p-1"
+              )}
             />
             <input
               type="text"
               value={backgroundColor}
               onChange={(e) => setBackgroundColor(e.target.value)}
-              className={`${inputClass} flex-grow`}
+              className={cn(
+                "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1    placeholder-text-secondary",
+                "flex-grow"
+              )}
               placeholder="#FFFFFF"
             />
           </div>
         </div>
 
-        <h3 className={subHeadingClass}>Grade</h3>
+        <h3 className="text-lg font-semibold mt-6 mb-3 pt-4 border-t">
+          Grade
+        </h3>
         <div>
-          <label htmlFor="visualCellSize" className={labelClass}>
+          <label
+            htmlFor="visualCellSize"
+            className="block text-sm font-medium text-accent-primary mb-1"
+          >
             Tamanho da Célula (px)
           </label>
           <input
@@ -157,14 +170,17 @@ export function PageSettingsModal({
             onChange={(e) =>
               setVisualCellSize(Math.max(10, parseFloat(e.target.value)))
             }
-            className={inputClass}
+            className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1   text-text-primary placeholder-text-secondary"
             min="10"
             step="1"
             placeholder={String(GRID_CELL_SIZE)}
           />
         </div>
         <div>
-          <label htmlFor="lineColor" className={labelClass}>
+          <label
+            htmlFor="lineColor"
+            className="block text-sm font-medium text-accent-primary mb-1"
+          >
             Cor da Linha da Grade
           </label>
           <div className="flex items-center space-x-2">
@@ -173,19 +189,28 @@ export function PageSettingsModal({
               type="color"
               value={lineColor}
               onChange={(e) => setLineColor(e.target.value)}
-              className={`${inputClass} h-10 w-16 p-1`}
+              className={cn(
+                "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1   text-text-primary placeholder-text-secondary",
+                "h-10 w-16 p-1"
+              )}
             />
             <input
               type="text"
               value={lineColor}
               onChange={(e) => setLineColor(e.target.value)}
-              className={`${inputClass} flex-grow`}
+              className={cn(
+                "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1   text-text-primary placeholder-text-secondary",
+                "flex-grow"
+              )}
               placeholder={GRID_LINE_COLOR}
             />
           </div>
         </div>
         <div>
-          <label htmlFor="metersPerSquare" className={labelClass}>
+          <label
+            htmlFor="metersPerSquare"
+            className="block text-sm font-medium text-accent-primary mb-1"
+          >
             Metros por Quadrado
           </label>
           <input
@@ -195,7 +220,7 @@ export function PageSettingsModal({
             onChange={(e) =>
               setMetersPerSquare(Math.max(0.1, parseFloat(e.target.value)))
             }
-            className={inputClass}
+            className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1   text-text-primary placeholder-text-secondary"
             min="0.1"
             step="0.1"
             placeholder={String(DEFAULT_METERS_PER_SQUARE)}
@@ -204,4 +229,7 @@ export function PageSettingsModal({
       </div>
     </Modal>
   );
-};
+}
+
+
+// visto

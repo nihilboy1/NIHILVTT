@@ -123,7 +123,7 @@ export function TokenTemplateListItem({
           <li>
             <button
               onClick={handleDeleteClick}
-              className="block w-full text-left px-3 py-2 text-sm text-accent-negative hover:bg-accent-negative/20 rounded-md"
+              className="block w-full text-left px-3 py-2 text-sm  rounded-md"
               role="menuitem"
             >
               Excluir Personagem

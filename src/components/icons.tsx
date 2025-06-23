@@ -7,10 +7,9 @@ export interface IconProps {
   height?: string | number;
 }
 
-export function DiceIcon({ className }: IconProps) {
-  const defaultClasses = "invert w-5 h-5";
+export function DiceIcon({}: IconProps) {
   return (
-    <img className={`${defaultClasses} ${className || ''}`.trim()} src={d20} alt="dado de vinte lados" data-testid="dice-icon"></img>
+    <img className="invert w-5 h-5" src={d20} alt="dado de vinte lados"></img>
   );
 }
 

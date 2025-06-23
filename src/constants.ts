@@ -19,7 +19,7 @@ export const DEFAULT_TOKEN_SIZE = "1x1";
 export const DEFAULT_TOKEN_HP = 10;
 
 // Cor da linha da grade, correspondente a 'grid-line' no tailwind.config.ts
-export const GRID_LINE_COLOR = '#788475';
+export const GRID_LINE_COLOR = '#000';
 
 // Padrões para Personagens Jogadores (PJ)
 export const DEFAULT_PLAYER_LEVEL = 1;

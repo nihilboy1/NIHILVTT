@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'; // Import userEvent
 import '@testing-library/jest-dom';
-import HPControlModal from './HPControlModal';
+import { HPControlModal } from './HPControlModal';
 import useDismissable from '../../hooks/useDismissable';
 import { calculateNewHP } from '../../utils/hpUtils';
 import { TokenType } from '../../types'; // Importar TokenType
@@ -124,7 +124,7 @@ describe('HPControlModal', () => {
     expect(screen.getByRole('dialog', { name: 'Controle de Vida' })).toBeInTheDocument();
     expect(screen.getByLabelText('Vida Atual')).toHaveValue('50');
     expect(screen.getByTestId('max-hp-display')).toHaveTextContent('100'); // Usar data-testid
-    expect(screen.getByTitle('Tornar Token Independente')).toBeInTheDocument();
+    expect(screen.getByTitle('Tornar Instância Independente (Cria Cópia da Ficha)')).toBeInTheDocument();
     expect(screen.getByTitle('Remover do Tabuleiro')).toBeInTheDocument();
   });
 
@@ -282,7 +282,7 @@ describe('HPControlModal', () => {
 
   test('deve chamar onMakeIndependent quando o botão de tornar independente é clicado', () => {
     render(<HPControlModal {...defaultProps} />);
-    fireEvent.click(screen.getByTitle('Tornar Token Independente'));
+    fireEvent.click(screen.getByTitle('Tornar Instância Independente (Cria Cópia da Ficha)'));
     expect(mockOnMakeIndependent).toHaveBeenCalledWith('instance-1');
     expect(mockOnClose).not.toHaveBeenCalled(); // onClose é tratado pelo componente pai
   });
