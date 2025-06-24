@@ -13,8 +13,8 @@ interface GenericTokenSheetProps {
   setEditingMaxHp: (hp: string) => void;
   editingTokenNotes: string;
   setEditingTokenNotes: (notes: string) => void;
-  editingTokenColor: string;
-  setEditingTokenColor: (color: string) => void;
+  editingTokenImage: string; // Nova propriedade para a imagem
+  setEditingTokenImage: (image: string) => void; // Novo setter
   editingTokenSize: string;
   setEditingTokenSize: (size: string) => void;
 }
@@ -30,8 +30,8 @@ export function GenericTokenSheet({
   setEditingMaxHp,
   editingTokenNotes,
   setEditingTokenNotes,
-  editingTokenColor,
-  setEditingTokenColor,
+  editingTokenImage, // Usar a imagem
+  setEditingTokenImage, // Usar o setter da imagem
   editingTokenSize,
   setEditingTokenSize,
 }: GenericTokenSheetProps) {
@@ -136,33 +136,17 @@ export function GenericTokenSheet({
         />
       </div>
       <div>
-        <label
-          htmlFor="editingTokenColor"
-          className="block text-[11px] font-medium text-accent-primary mb-px"
-        >
-          Cor
+        <label htmlFor="editingTokenImage" className="block text-[11px] font-medium text-accent-primary mb-px">
+          URL da Imagem do Token
         </label>
-        <div className="flex items-center space-x-2">
-          <input
-            id="editingTokenColor"
-            type="color"
-            value={editingTokenColor}
-            onChange={(e) => setEditingTokenColor(e.target.value)}
-            className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-              "h-9 w-14 p-0.5 cursor-pointer"
-            )}
-          />
-          <input
-            type="text"
-            value={editingTokenColor}
-            onChange={(e) => setEditingTokenColor(e.target.value)}
-            className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-              "flex-grow"
-            )}
-          />
-        </div>
+        <input
+          id="editingTokenImage"
+          type="text"
+          value={editingTokenImage}
+          onChange={(e) => setEditingTokenImage(e.target.value)}
+          placeholder="Cole a URL da imagem aqui"
+          className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary")}
+        />
       </div>
       <div>
         <label

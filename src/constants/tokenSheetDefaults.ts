@@ -64,6 +64,11 @@ export const defaultSavingThrows: NonNullable<
   wisdom: false,
   charisma: false,
 };
+import { TokenType } from '../types/index';
+import defaultTokenImage from '../assets/defaultToken.png'; // Importar a imagem diretamente
+
+export const DEFAULT_TOKEN_IMAGE = defaultTokenImage; // Usar a URL processada pelo Vite
+
 export const defaultSkills: NonNullable<PlayerToken["proficiencies"]>["skills"] = {
   acrobatics: false,
   animalHandling: false,
@@ -83,4 +88,26 @@ export const defaultSkills: NonNullable<PlayerToken["proficiencies"]>["skills"] 
   sleightOfHand: false,
   stealth: false,
   survival: false,
+};
+
+export const DEFAULT_TOKEN_DATA = {
+  name: 'Novo Token',
+  type: TokenType.PLAYER,
+  image: DEFAULT_TOKEN_IMAGE,
+  size: 'medium',
+  currentHp: 10,
+  maxHp: 10,
+  notes: '',
+  attributes: defaultAttributes,
+  proficiencyBonus: 2,
+  initiative: 0,
+  speed: 30,
+  passivePerception: 10,
+  proficiencies: {
+    savingThrows: defaultSavingThrows,
+    skills: defaultSkills,
+  },
+  attacks: [],
+  equipment: [],
+  featuresAndTraits: [],
 };

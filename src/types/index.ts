@@ -50,7 +50,7 @@ export interface BaseToken {
   id: string;
   name: string;
   type: TokenType; // O discriminador
-  color: string;
+  image: string;
   size: string;
   currentHp?: number;
   maxHp?: number;

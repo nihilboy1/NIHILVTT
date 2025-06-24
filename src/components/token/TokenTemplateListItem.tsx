@@ -1,11 +1,11 @@
 
 import React, { useState, useRef } from 'react';
 import { type Token as TokenInfo } from '../../types/index'; // Caminho corrigido
-import { tokenTypeTranslations } from '../../constants'; // Caminho corrigido
 import { EllipsisVerticalIcon } from '../icons'; // Caminho corrigido
 import { useTokens } from '../../contexts/TokensContext'; // Caminho corrigido
 import OptionsPopover from '../ui/OptionsPopover'; // Caminho corrigido
 import { useModal } from '../../contexts/ModalContext'; // Caminho corrigido
+import { tokenTypeTranslations } from '../../constants'; // Manter importação se ainda for usada para o texto do tipo
 
 interface TokenTemplateListItemProps {
   tokenInfo: TokenInfo;
@@ -82,11 +82,12 @@ export function TokenTemplateListItem({
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openTokenSheetModal(tokenInfo.id); }}
         aria-describedby={`token-details-${tokenInfo.id}`}
       >
-        <div 
-            style={{ backgroundColor: tokenInfo.color }} 
-            className="w-6 h-6 rounded-sm border flex-shrink-0 shadow-sm"
+        <img
+            src={tokenInfo.image}
+            alt={`Imagem do token ${tokenInfo.name}`}
+            className="w-8 h-8 rounded-sm flex-shrink-0 shadow-sm object-cover" // Adicionado object-cover para garantir que a imagem preencha o espaço
             aria-hidden="true"
-        ></div>
+        />
         <div className="overflow-hidden" id={`token-details-${tokenInfo.id}`}>
           <span className=" font-medium block truncate" title={tokenInfo.name}>{tokenInfo.name}</span>
           <span className="text-xs text-text-secondary block">

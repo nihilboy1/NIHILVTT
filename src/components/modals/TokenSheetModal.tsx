@@ -26,8 +26,8 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
   const {
     editingTokenName,
     setEditingTokenName,
-    editingTokenColor,
-    setEditingTokenColor,
+    editingTokenImage, // Adicionado para a imagem
+    setEditingTokenImage, // Adicionado para o setter da imagem
     editingTokenSize,
     setEditingTokenSize,
     editingTokenType,
@@ -275,8 +275,8 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
             />
           ) : (
             <PlayerSheetConfigTab
-              editingTokenColor={editingTokenColor}
-              setEditingTokenColor={setEditingTokenColor}
+              editingTokenImage={editingTokenImage} // Passar a imagem
+              setEditingTokenImage={setEditingTokenImage} // Passar o setter da imagem
               editingTokenSize={editingTokenSize}
               setEditingTokenSize={setEditingTokenSize}
             />
@@ -293,8 +293,8 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
             setEditingMaxHp={setEditingMaxHp}
             editingTokenNotes={editingTokenNotes}
             setEditingTokenNotes={setEditingTokenNotes}
-            editingTokenColor={editingTokenColor}
-            setEditingTokenColor={setEditingTokenColor}
+            editingTokenImage={editingTokenImage} // Passar a imagem
+            setEditingTokenImage={setEditingTokenImage} // Passar o setter da imagem
             editingTokenSize={editingTokenSize}
             setEditingTokenSize={setEditingTokenSize}
           />
@@ -320,6 +320,3 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
     </InteractiveModal>
   );
 }
-
-
-//visto

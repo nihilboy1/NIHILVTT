@@ -1,12 +1,16 @@
 import { useState, useCallback, useMemo } from "react";
-import { type Token, TokenType, type GridInstance, type PlayerToken, type MonsterNPCToken, type ObjectToken } from "../types"; // Import all necessary token types
 import {
-  DEFAULT_TOKEN_HP,
-  DEFAULT_PLAYER_LEVEL,
-  DEFAULT_PLAYER_INSPIRATION,
-  DEFAULT_TOKEN_COLOR,
-  DEFAULT_TOKEN_SIZE,
-} from "../constants";
+  type Token,
+  TokenType,
+  type GridInstance,
+  type PlayerToken,
+  type MonsterNPCToken,
+  type ObjectToken,
+} from "../types"; // Import all necessary token types
+import {
+  DEFAULT_TOKEN_IMAGE, // Importar a imagem padrão
+  DEFAULT_TOKEN_DATA, // Importar os dados padrão do token
+} from "../constants/tokenSheetDefaults"; // Ajustar o caminho da importação
 import { generateUniqueId } from "../utils/id/idUtils"; // Importar a função
 
 export interface TokensState {
@@ -32,73 +36,12 @@ export interface TokensState {
 }
 
 export const useTokensState = (): TokensState => {
-  const initialTokens: Token[] = [ // Changed from PlayerToken[]
+  const initialTokens: Token[] = [
     {
+      ...DEFAULT_TOKEN_DATA,
       id: generateUniqueId(),
-      name: "Aventureiro Padrão",
-      type: TokenType.PLAYER,
-      color: "#008000", // Verde
-      size: "1x1",
-      currentHp: 10,
-      maxHp: 10,
-      notes: "Um aventureiro genérico para começar.",
-      species: "Humano",
-      charClass: "Guerreiro",
-      subclass: "",
-      level: 1,
-      background: "Herói do Povo",
-      inspiration: false,
-      armorClass: 12,
-      shieldEquipped: false,
-      tempHp: 0,
-      hitDiceUsed: 0,
-      hitDiceMax: 1,
-      deathSavesSuccesses: 0,
-      deathSavesFailures: 0,
-      xp: 0,
-      initiative: 0,
-      speed: 30,
-      attributes: {
-        strength: 10,
-        dexterity: 10,
-        constitution: 10,
-        intelligence: 10,
-        wisdom: 10,
-        charisma: 10,
-      },
-      proficiencies: {
-        savingThrows: {
-          strength: false,
-          dexterity: false,
-          constitution: false,
-          intelligence: false,
-          wisdom: false,
-          charisma: false,
-        },
-        skills: {
-          acrobatics: false,
-          animalHandling: false,
-          arcana: false,
-          athletics: false,
-          deception: false,
-          history: false,
-          insight: false,
-          intimidation: false,
-          investigation: false,
-          medicine: false,
-          nature: false,
-          perception: false,
-          performance: false,
-          persuasion: false,
-          religion: false,
-          sleightOfHand: false,
-          stealth: false,
-          survival: false,
-        },
-      },
-      attacks: [],
-      featuresAndTraits: [],
-    } as PlayerToken, // Assert as PlayerToken to ensure all properties are present
+      name: "Aventureiro Padrão", // Sobrescrever o nome padrão para o exemplo inicial
+    } as PlayerToken, // Assegurar que é um PlayerToken para o exemplo inicial
   ];
 
   const [tokens, setTokens] = useState<Token[]>(initialTokens); // Changed from PlayerToken[]
@@ -115,90 +58,68 @@ export const useTokensState = (): TokensState => {
     return counts;
   }, [gridInstances]);
 
-  const addToken = useCallback(
-    (tokenData: Omit<Token, "id">): Token => { // Changed parameter and return type
-      console.log("addToken chamado com:", tokenData);
-      let newToken: Token; // Declare as Token
+  const addToken = useCallback((tokenData: Omit<Token, "id">): Token => {
+    console.log("addToken chamado com:", tokenData);
+    const newId = generateUniqueId();
 
-      const commonProps = {
+    let newToken: Token;
+
+    if (tokenData.type === TokenType.PLAYER) {
+      newToken = {
+        ...DEFAULT_TOKEN_DATA, // Começa com os defaults de PlayerToken
+        ...tokenData, // Sobrescreve com os dados fornecidos
+        id: newId, // Garante um novo ID
+        image: tokenData.image ?? DEFAULT_TOKEN_IMAGE, // Garante a imagem padrão se não fornecida
+      } as PlayerToken;
+    } else if (tokenData.type === TokenType.MONSTER_NPC) {
+      newToken = {
+        id: newId,
+        name: tokenData.name,
+        type: TokenType.MONSTER_NPC,
+        image: tokenData.image ?? DEFAULT_TOKEN_IMAGE,
+        size: tokenData.size ?? DEFAULT_TOKEN_DATA.size,
+        currentHp: tokenData.currentHp ?? DEFAULT_TOKEN_DATA.currentHp,
+        maxHp: tokenData.maxHp ?? DEFAULT_TOKEN_DATA.maxHp,
+        notes: tokenData.notes ?? DEFAULT_TOKEN_DATA.notes,
+        challengeRating: (tokenData as MonsterNPCToken).challengeRating ?? 0, // Default para Monster/NPC
+      } as MonsterNPCToken;
+    } else if (tokenData.type === TokenType.OBJECT) {
+      newToken = {
+        id: newId,
+        name: tokenData.name,
+        type: TokenType.OBJECT,
+        image: tokenData.image ?? DEFAULT_TOKEN_IMAGE,
+        size: tokenData.size ?? DEFAULT_TOKEN_DATA.size,
+        currentHp: tokenData.currentHp ?? DEFAULT_TOKEN_DATA.currentHp,
+        maxHp: tokenData.maxHp ?? DEFAULT_TOKEN_DATA.maxHp,
+        notes: tokenData.notes ?? DEFAULT_TOKEN_DATA.notes,
+        isInteractive: (tokenData as ObjectToken).isInteractive ?? false, // Default para Object
+      } as ObjectToken;
+    } else {
+      // Fallback para qualquer outro TokenType, embora nossa união deva cobrir todos os casos
+      newToken = {
+        id: newId,
         name: tokenData.name,
         type: tokenData.type,
-        color: tokenData.color ?? DEFAULT_TOKEN_COLOR,
-        size: tokenData.size ?? DEFAULT_TOKEN_SIZE,
-        currentHp: tokenData.currentHp ?? DEFAULT_TOKEN_HP,
-        maxHp: tokenData.maxHp ?? DEFAULT_TOKEN_HP,
-        notes: tokenData.notes ?? "",
-      };
+        image: tokenData.image ?? DEFAULT_TOKEN_IMAGE,
+        size: tokenData.size ?? DEFAULT_TOKEN_DATA.size,
+        currentHp: tokenData.currentHp ?? DEFAULT_TOKEN_DATA.currentHp,
+        maxHp: tokenData.maxHp ?? DEFAULT_TOKEN_DATA.maxHp,
+        notes: tokenData.notes ?? DEFAULT_TOKEN_DATA.notes,
+      } as Token;
+    }
 
-      if (tokenData.type === TokenType.PLAYER) {
-        newToken = {
-          ...commonProps,
-          species: (tokenData as Omit<PlayerToken, "id">).species || "",
-          charClass: (tokenData as Omit<PlayerToken, "id">).charClass || "",
-          subclass: (tokenData as Omit<PlayerToken, "id">).subclass || "",
-          level:
-            (tokenData as Omit<PlayerToken, "id">).level !== undefined
-              ? (tokenData as Omit<PlayerToken, "id">).level
-              : DEFAULT_PLAYER_LEVEL,
-          background: (tokenData as Omit<PlayerToken, "id">).background || "",
-          inspiration:
-            (tokenData as Omit<PlayerToken, "id">).inspiration !== undefined
-              ? (tokenData as Omit<PlayerToken, "id">).inspiration
-              : DEFAULT_PLAYER_INSPIRATION,
-          armorClass: (tokenData as Omit<PlayerToken, "id">).armorClass ?? 10,
-          shieldEquipped: (tokenData as Omit<PlayerToken, "id">).shieldEquipped ?? false,
-          tempHp: (tokenData as Omit<PlayerToken, "id">).tempHp ?? 0,
-          hitDiceUsed: (tokenData as Omit<PlayerToken, "id">).hitDiceUsed ?? 0,
-          hitDiceMax: (tokenData as Omit<PlayerToken, "id">).hitDiceMax ?? 1,
-          deathSavesSuccesses: (tokenData as Omit<PlayerToken, "id">).deathSavesSuccesses ?? 0,
-          deathSavesFailures: (tokenData as Omit<PlayerToken, "id">).deathSavesFailures ?? 0,
-          xp: (tokenData as Omit<PlayerToken, "id">).xp ?? 0,
-          initiative: (tokenData as Omit<PlayerToken, "id">).initiative ?? 0,
-          speed: (tokenData as Omit<PlayerToken, "id">).speed ?? 30,
-          attributes: (tokenData as Omit<PlayerToken, "id">).attributes ?? {
-            strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10
-          },
-          proficiencies: (tokenData as Omit<PlayerToken, "id">).proficiencies ?? {
-            savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
-            skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false }
-          },
-          attacks: (tokenData as Omit<PlayerToken, "id">).attacks ?? [],
-          equipment: (tokenData as Omit<PlayerToken, "id">).equipment ?? [],
-          featuresAndTraits: (tokenData as Omit<PlayerToken, "id">).featuresAndTraits ?? [],
-          id: generateUniqueId(),
-        } as PlayerToken; // Assert as PlayerToken
-      } else if (tokenData.type === TokenType.MONSTER_NPC) {
-        newToken = {
-          ...commonProps,
-          challengeRating: (tokenData as Omit<MonsterNPCToken, "id">).challengeRating ?? 0,
-          id: generateUniqueId(),
-        } as MonsterNPCToken; // Assert as MonsterNPCToken
-      } else if (tokenData.type === TokenType.OBJECT) {
-        newToken = {
-          ...commonProps,
-          isInteractive: (tokenData as Omit<ObjectToken, "id">).isInteractive ?? false,
-          id: generateUniqueId(),
-        } as ObjectToken; // Assert as ObjectToken
-      } else {
-        // Fallback for any other TokenType, though our union should cover all cases
-        newToken = {
-          ...commonProps,
-          id: generateUniqueId(),
-        } as Token; // Assert as generic Token
-      }
+    setTokens((prevTokens) => {
+      console.log("Tokens antes da atualização:", prevTokens);
+      const updatedTokens = [...prevTokens, newToken];
+      console.log("Tokens depois da atualização:", updatedTokens);
+      return updatedTokens;
+    });
+    return newToken;
+  }, []);
 
-      setTokens((prevTokens) => {
-        console.log("Tokens antes da atualização:", prevTokens);
-        const updatedTokens = [...prevTokens, newToken];
-        console.log("Tokens depois da atualização:", updatedTokens);
-        return updatedTokens;
-      });
-      return newToken;
-    },
-    []
-  );
-
-  const deleteToken = useCallback((tokenId: string) => { // Changed parameter name
+  const deleteToken = useCallback((tokenId: string) => {
+    // Changed parameter name
     setTokens((prevTokens) =>
       prevTokens.filter((token) => token.id !== tokenId)
     );
@@ -208,7 +129,8 @@ export const useTokensState = (): TokensState => {
   }, []);
 
   const updateToken = useCallback(
-    (tokenId: string, updates: Partial<Token>) => { // Changed parameter type and name
+    (tokenId: string, updates: Partial<Token>) => {
+      // Changed parameter type and name
       setTokens((prevTokens) =>
         prevTokens.map((token) =>
           token.id === tokenId ? { ...token, ...updates } : token
@@ -219,10 +141,9 @@ export const useTokensState = (): TokensState => {
   );
 
   const addGridInstance = useCallback(
-    (tokenId: string, gridX: number, gridY: number): GridInstance => { // Changed parameter name
-      const parentTokenExists = tokens.some(
-        (token) => token.id === tokenId
-      );
+    (tokenId: string, gridX: number, gridY: number): GridInstance => {
+      // Changed parameter name
+      const parentTokenExists = tokens.some((token) => token.id === tokenId);
       if (!parentTokenExists) {
         const stillReferencedByInstances =
           (gridInstanceCounts.get(tokenId) || 0) > 0;
@@ -273,13 +194,11 @@ export const useTokensState = (): TokensState => {
   );
 
   const duplicateToken = useCallback(
-    (tokenId: string): Token | null => { // Changed return type and parameter name
+    (tokenId: string): Token | null => {
+      // Changed return type and parameter name
       const originalToken = tokens.find((token) => token.id === tokenId);
       if (!originalToken) {
-        console.error(
-          "TokenInfo não encontrado para duplicação:",
-          tokenId
-        );
+        console.error("TokenInfo não encontrado para duplicação:", tokenId);
         return null;
       }
 
@@ -316,7 +235,8 @@ export const useTokensState = (): TokensState => {
   );
 
   const makeGridInstanceIndependent = useCallback(
-    (instanceId: string): Token | null => { // Changed return type
+    (instanceId: string): Token | null => {
+      // Changed return type
       const targetInstance = gridInstances.find(
         (inst) => inst.instanceId === instanceId
       );
@@ -329,16 +249,14 @@ export const useTokensState = (): TokensState => {
         (token) => token.id === targetInstance.tokenInfoId
       );
       if (!originalTokenInfo) {
-        console.error(
-          "Original Token not found for instance:",
-          instanceId
-        );
+        console.error("Original Token not found for instance:", instanceId);
         return null;
       }
 
       const copiedTokenInfoData = JSON.parse(JSON.stringify(originalTokenInfo));
 
-      const newIndependentToken: Token = { // Changed type
+      const newIndependentToken: Token = {
+        // Changed type
         ...copiedTokenInfoData,
         id: generateUniqueId(),
         name: `${originalTokenInfo.name} (Cópia)`,

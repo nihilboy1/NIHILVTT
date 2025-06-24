@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { type PlayerToken, TokenType, type Attack } from "../types/index"; // Ajustar o caminho do tipo
 import {
-  DEFAULT_TOKEN_COLOR,
   DEFAULT_TOKEN_SIZE,
   DEFAULT_TOKEN_HP,
   DEFAULT_PLAYER_LEVEL,
@@ -12,13 +11,14 @@ import {
   defaultAttributes,
   defaultSavingThrows,
   defaultSkills,
+  DEFAULT_TOKEN_IMAGE, // Importar a imagem padrão
 } from "../constants/tokenSheetDefaults"; // Importar as constantes
 
 export interface UseTokenSheetFormReturn {
   editingTokenName: string;
   setEditingTokenName: React.Dispatch<React.SetStateAction<string>>;
-  editingTokenColor: string;
-  setEditingTokenColor: React.Dispatch<React.SetStateAction<string>>;
+  editingTokenImage: string; // Nova propriedade para a imagem
+  setEditingTokenImage: React.Dispatch<React.SetStateAction<string>>; // Novo setter
   editingTokenSize: string;
   setEditingTokenSize: React.Dispatch<React.SetStateAction<string>>;
   editingTokenType: TokenType | null;
@@ -96,8 +96,7 @@ export const useTokenSheetForm = ({
   onSave,
 }: UseTokenSheetFormProps): UseTokenSheetFormReturn => {
   const [editingTokenName, setEditingTokenName] = useState("");
-  const [editingTokenColor, setEditingTokenColor] =
-    useState(DEFAULT_TOKEN_COLOR);
+  const [editingTokenImage, setEditingTokenImage] = useState(DEFAULT_TOKEN_IMAGE); // Inicializar com a imagem padrão
   const [editingTokenSize, setEditingTokenSize] = useState(DEFAULT_TOKEN_SIZE);
   const [editingTokenType, setEditingTokenType] = useState<TokenType | null>(
     null
@@ -146,7 +145,7 @@ export const useTokenSheetForm = ({
   useEffect(() => {
     if (initialTokenData) {
       setEditingTokenName(initialTokenData.name);
-      setEditingTokenColor(initialTokenData.color);
+      setEditingTokenImage(initialTokenData.image); // Usar a imagem do token
       setEditingTokenSize(initialTokenData.size);
       setEditingTokenType(initialTokenData.type);
       setEditingCurrentHp(
@@ -199,7 +198,7 @@ export const useTokenSheetForm = ({
     changed = changed || editingTokenName !== (initialTokenData.name || "");
     changed =
       changed ||
-      editingTokenColor !== (initialTokenData.color || DEFAULT_TOKEN_COLOR);
+      editingTokenImage !== (initialTokenData.image || DEFAULT_TOKEN_IMAGE); // Comparar com a imagem
     changed =
       changed ||
       editingTokenSize !== (initialTokenData.size || DEFAULT_TOKEN_SIZE);
@@ -294,7 +293,7 @@ export const useTokenSheetForm = ({
     setHasTokenSheetChanged(changed);
   }, [
     editingTokenName,
-    editingTokenColor,
+    editingTokenImage, // Adicionar ao array de dependências
     editingTokenSize,
     editingTokenType,
     editingCurrentHp,
@@ -325,7 +324,7 @@ export const useTokenSheetForm = ({
   ]);
 
   const handleSave = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => { // Tornar a função assíncrona
       e.preventDefault();
       if (!initialTokenData || editingTokenType === null) {
         alert("Erro ao identificar o token ou tipo para atualização.");
@@ -335,6 +334,32 @@ export const useTokenSheetForm = ({
         alert("O nome do token não pode estar vazio.");
         return;
       }
+
+      // Validação de imagem
+      const MAX_IMAGE_DIMENSION = 500; // Limite de 500x500 pixels
+      if (editingTokenImage.trim() !== '' && editingTokenImage !== DEFAULT_TOKEN_IMAGE) {
+        try {
+          const img = new Image();
+          img.src = editingTokenImage;
+
+          await new Promise<void>((resolve, reject) => {
+            img.onload = () => {
+              if (img.width > MAX_IMAGE_DIMENSION || img.height > MAX_IMAGE_DIMENSION) {
+                reject(new Error(`A imagem é muito grande. Dimensões máximas permitidas: ${MAX_IMAGE_DIMENSION}x${MAX_IMAGE_DIMENSION} pixels.`));
+              } else {
+                resolve();
+              }
+            };
+            img.onerror = () => {
+              reject(new Error("Não foi possível carregar a imagem. Verifique a URL."));
+            };
+          });
+        } catch (error) {
+          alert(`Erro na validação da imagem: ${error instanceof Error ? error.message : "Erro desconhecido."}`);
+          return;
+        }
+      }
+
       const currentHpNum = parseInt(editingCurrentHp, 10);
       const maxHpNum = parseInt(editingMaxHp, 10);
 
@@ -409,7 +434,7 @@ export const useTokenSheetForm = ({
 
       const updatedTokenPartialData: Partial<PlayerToken> = {
         name: editingTokenName.trim(),
-        color: editingTokenColor,
+        image: editingTokenImage.trim() === '' ? DEFAULT_TOKEN_IMAGE : editingTokenImage, // Lógica de fallback para imagem
         size: editingTokenSize,
         currentHp: currentHpNum,
         maxHp: maxHpNum,
@@ -449,7 +474,7 @@ export const useTokenSheetForm = ({
     [
       initialTokenData,
       editingTokenName,
-      editingTokenColor,
+      editingTokenImage, // Substituir editingTokenColor por editingTokenImage
       editingTokenSize,
       editingTokenType,
       editingCurrentHp,
@@ -506,8 +531,8 @@ export const useTokenSheetForm = ({
   return {
     editingTokenName,
     setEditingTokenName,
-    editingTokenColor,
-    setEditingTokenColor,
+    editingTokenImage, // Retornar a imagem
+    setEditingTokenImage, // Retornar o setter
     editingTokenSize,
     setEditingTokenSize,
     editingTokenType,

@@ -112,7 +112,7 @@ export function BoardToken({
     () => ({
       tokenRenderWidth,
       tokenRenderHeight,
-      tokenColor: tokenInfo.color,
+      imageUrl: tokenInfo.image, // Passar a URL da imagem
       strokeColor,
       strokeWidth,
       cornerRadius,
@@ -122,7 +122,7 @@ export function BoardToken({
     [
       tokenRenderWidth,
       tokenRenderHeight,
-      tokenInfo.color,
+      tokenInfo.image, // Adicionar image ao array de dependências
       strokeColor,
       strokeWidth,
       cornerRadius,
