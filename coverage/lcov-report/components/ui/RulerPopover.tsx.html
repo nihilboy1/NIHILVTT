@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>28/28</span>
+                <span class='fraction'>25/25</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>28/28</span>
+                <span class='fraction'>25/25</span>
             </div>
         
             
@@ -186,13 +186,7 @@
 <a name='L121'></a><a href='#L121'>121</a>
 <a name='L122'></a><a href='#L122'>122</a>
 <a name='L123'></a><a href='#L123'>123</a>
-<a name='L124'></a><a href='#L124'>124</a>
-<a name='L125'></a><a href='#L125'>125</a>
-<a name='L126'></a><a href='#L126'>126</a>
-<a name='L127'></a><a href='#L127'>127</a>
-<a name='L128'></a><a href='#L128'>128</a>
-<a name='L129'></a><a href='#L129'>129</a>
-<a name='L130'></a><a href='#L130'>130</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L124'></a><a href='#L124'>124</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -256,12 +250,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
@@ -387,16 +375,10 @@ const RulerPopover: React.FC&lt;RulerPopoverProps&gt; = ({
     return null;
   }
 &nbsp;
-  // Classes CSS para os botões de opção
-  const baseButtonClass = "w-full text-left px-4 py-2 text-sm text-foreground transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-opacity-50";
-  const selectedButtonClass = `bg-accent-primary text-accent-primary-text`;
-  const unselectedButtonClass = `hover:bg-accent-secondary`;
-&nbsp;
-&nbsp;
   return (
     &lt;div
       ref={popoverRef}
-      className="bg-surface-1 fixed border border-border-inactive rounded-md shadow-xl z-[60] w-56" // z-index alto e largura aumentada para o checkbox
+      className="bg-surface-1 fixed border rounded-md shadow-xl z-[60] w-56" // z-index alto e largura aumentada para o checkbox
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
       role="dialog" // Papel semântico para o popover
       aria-label="Opções de Posicionamento da Régua" 
@@ -407,7 +389,7 @@ const RulerPopover: React.FC&lt;RulerPopoverProps&gt; = ({
             onSetMode(RulerPlacementMode.SNAP_TO_CENTER);
             onClose(); // Fecha após a seleção
           }}
-          className={`${baseButtonClass} rounded-t-md ${currentMode === RulerPlacementMode.SNAP_TO_CENTER ? selectedButtonClass : unselectedButtonClass}`}
+          className={`w-full text-left px-4 py-2 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-opacity-50 rounded-t-md ${currentMode === RulerPlacementMode.SNAP_TO_CENTER ? 'bg-accent-primary' : 'hover:bg-accent-secondary'}`}
           aria-pressed={currentMode === RulerPlacementMode.SNAP_TO_CENTER} // Indica se está selecionado
           role="option"
           aria-selected={currentMode === RulerPlacementMode.SNAP_TO_CENTER}
@@ -419,7 +401,7 @@ const RulerPopover: React.FC&lt;RulerPopoverProps&gt; = ({
             onSetMode(RulerPlacementMode.FREE_PLACEMENT);
             onClose(); // Fecha após a seleção
           }}
-          className={`${baseButtonClass} ${currentMode === RulerPlacementMode.FREE_PLACEMENT ? selectedButtonClass : unselectedButtonClass}`}
+          className={`w-full text-left px-4 py-2 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary  ${currentMode === RulerPlacementMode.FREE_PLACEMENT ? 'bg-accent-primary' : 'hover:bg-accent-secondary'}`}
           aria-pressed={currentMode === RulerPlacementMode.FREE_PLACEMENT}
           role="option"
           aria-selected={currentMode === RulerPlacementMode.FREE_PLACEMENT}
@@ -433,14 +415,14 @@ const RulerPopover: React.FC&lt;RulerPopoverProps&gt; = ({
         {/* Opção para persistir o caminho da régua */}
         &lt;label 
           htmlFor="persistRulerPath" 
-          className="flex items-center px-3 py-2 text-sm text-foreground cursor-pointer hover:bg-accent-secondary rounded-b-md"
+          className="flex items-center px-3 py-2 text-sm cursor-pointer hover:bg-accent-secondary rounded-b-md"
         &gt;
           &lt;input
             type="checkbox"
             id="persistRulerPath"
             checked={rulerPersistsPath}
             onChange={onToggleRulerPersistPath}
-            className="mr-2 h-4 w-4 rounded border-border-inactive text-accent-primary focus:ring-accent-primary bg-input-bg"
+            className="mr-2 h-4 w-4 rounded text-accent-primary focus:ring-accent-primary bg-input-bg"
           /&gt;
           Manter marcação ao soltar {/* Traduzido */}
         &lt;/label&gt;
@@ -457,7 +439,7 @@ export default RulerPopover;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-23T01:26:21.824Z
+                at 2025-06-24T01:05:47.583Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

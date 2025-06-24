@@ -776,7 +776,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             x={12 / zoomLevel}
             y={3 / zoomLevel}
             fontSize={10 / zoomLevel}
-            fill={"var(--color-accent-primary)"} // cor do
+            fill="var(--color-accent-primary)" // cor do
             className="select-none"
           >
             0,0
@@ -819,7 +819,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             width={multiSelectBoundingBox.width}
             height={multiSelectBoundingBox.height}
             fill="none"
-            stroke={"var(--color-accent-primary)"}
+            stroke="var(--color-accent-primary)"
             strokeWidth={1.5 / zoomLevel}
             strokeOpacity="0.5"
           />
@@ -828,9 +828,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         {marqueeRectProps && (
           <rect
             {...marqueeRectProps}
-            fill={"var(--color-accent-primary)"} // cor do bloco de seleção
+            fill="var(--color-accent-primary)" // cor do bloco de seleção
             fillOpacity="0.8" /* Equivalente a CC em hexadecimal (204/255) */
-            stroke={"var(--color-accent-primary)"} // cor do tracejado da ferramenta de seleção
+            stroke="var(--color-accent-primary)" // cor do tracejado da ferramenta de seleção
             strokeWidth={1 / zoomLevel}
             strokeDasharray={`${4 / zoomLevel} ${2 / zoomLevel}`}
           />
@@ -849,7 +849,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     y1={prevWp.point.y}
                     x2={wp.point.x}
                     y2={wp.point.y}
-                    stroke={"var(--color-accent-primary)"} // cor da linha fixada da regua
+                    stroke="var(--color-accent-primary)" // cor da linha fixada da regua
                     strokeWidth={rulerLineStrokeWidth}
                   />
                 );
@@ -860,7 +860,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                   cx={wp.point.x}
                   cy={wp.point.y}
                   r={rulerWaypointRadius}
-                  fill={"var(--color-accent-primary)"} // cor da bolinha do ponto fixado da regua
+                  fill="var(--color-accent-primary)" // cor da bolinha do ponto fixado da regua
                   strokeWidth={0.5 / zoomLevel}
                 />
               );
@@ -899,7 +899,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       y={textY - textBgHeight * 0.65}
                       width={textBgWidth}
                       height={textBgHeight}
-                      fill={"var(--color-accent-secondary)"} // cor do background do ponto fixado da regua
+                      fill="var(--color-accent-secondary)" // cor do background do ponto fixado da regua
                       rx={rulerTextBgRx}
                       ry={rulerTextBgRx}
                     />
@@ -907,7 +907,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       x={textX}
                       y={textY}
                       fontSize={rulerTextFontSize}
-                      fill={"var(--color-text-secondary)"} // cor do texto do ponto fixado da regua
+                      fill="var(--color-text-secondary)" // cor do texto do ponto fixado da regua
                       textAnchor="middle"
                       dominantBaseline="middle"
                       className="select-none"
@@ -934,22 +934,21 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     y1={rulerPath.points[rulerPath.points.length - 1].point.y}
                     x2={rulerPath.liveEndPoint.x}
                     y2={rulerPath.liveEndPoint.y}
-                    stroke={"var(--color-accent-primary)"} // cor da linha da regua enquanto arrasta
+                    stroke="var(--color-accent-primary)" // cor da linha da regua enquanto arrasta
                     strokeWidth={rulerLineStrokeWidth}
                     strokeDasharray={`${6 / zoomLevel},${3 / zoomLevel}`}
                   />
                   {(() => {
                     const lastFixedPoint =
                       rulerPath.points[rulerPath.points.length - 1];
-                    const liveSegmentDistance = calculateDistanceInMeters(
-                      lastFixedPoint.point,
-                      rulerPath.liveEndPoint!,
-                      gridSettings.visualCellSize,
-                      gridSettings.metersPerSquare
-                    );
                     const currentTotalDistance =
                       lastFixedPoint.cumulativeDistanceMeters +
-                      liveSegmentDistance;
+                      calculateDistanceInMeters(
+                        lastFixedPoint.point,
+                        rulerPath.liveEndPoint!,
+                        gridSettings.visualCellSize,
+                        gridSettings.metersPerSquare
+                      );
                     const textContent = currentTotalDistance.toFixed(1) + "m";
                     const estimatedTextWidth =
                       textContent.length * rulerTextFontSize * 0.55;
@@ -966,7 +965,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                           y={textY - textBgHeight * 0.65}
                           width={textBgWidth}
                           height={textBgHeight}
-                          fill={"var(--color-accent-primary)"} // background da caixinha de medição da regua enquanto arrasta
+                          fill="var(--color-accent-primary)" // background da caixinha de medição da regua enquanto arrasta
                           rx={rulerTextBgRx}
                           ry={rulerTextBgRx}
                         />
@@ -974,7 +973,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                           x={textX}
                           y={textY}
                           fontSize={rulerTextFontSize}
-                          fill={"var(--color-text-primary)"} // texto da caixinha de medição da regua enquanto arrasta
+                          fill="var(--color-text-primary)" // texto da caixinha de medição da regua enquanto arrasta
                           textAnchor="start"
                           dominantBaseline="middle"
                           className="select-none"

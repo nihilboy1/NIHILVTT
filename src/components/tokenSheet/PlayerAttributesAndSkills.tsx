@@ -37,7 +37,7 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
   proficiencyBonus,
 }) => {
   return (
-    <div className="col-span-1 flex flex-col space-y-2 border border-border-inactive p-2 rounded-md">
+    <div className="col-span-1 flex flex-col space-y-2 border  p-2 rounded-md">
       {(Object.keys(attributes) as Array<keyof typeof attributes>).map(
         (attrName) => {
           const attrLabel = ATTRIBUTE_LABELS[attrName]; // Usar ATTRIBUTE_LABELS
@@ -52,7 +52,7 @@ const PlayerAttributesAndSkills: React.FC<PlayerAttributesAndSkillsProps> = ({
             // Alterar para flex-col para acomodar perícias abaixo
             <div
               key={attrName}
-              className="flex flex-col space-y-1 border border-border-inactive p-1.5 rounded"
+              className="flex flex-col space-y-1 border p-1.5 rounded"
             >
               {/* Grid original para valor, modificador e salvaguarda */}
               <div className="grid grid-cols-3 items-center gap-x-1.5">

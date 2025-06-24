@@ -175,7 +175,7 @@ export function ChatPanel() {
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-accent-primary cursor-pointer hover:bg-accent-primary-hover font-semibold rounded-md transition-colors"
+            className="px-4 py-2 bg-accent-primary cursor-pointer hover:bg-accent-primary-hover font-semibold rounded-md "
           >
             Enviar
           </button>

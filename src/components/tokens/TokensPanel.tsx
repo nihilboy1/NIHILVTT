@@ -48,7 +48,7 @@ export function TokensPanel() {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold text-foreground mb-3 mt-6 pt-4 border-t border-border-inactive">
+        <h3 className="text-lg font-semibold  mb-3 mt-6 pt-4 border-t ">
           Modelos de Token
         </h3>
         {tokens.length === 0 ? (

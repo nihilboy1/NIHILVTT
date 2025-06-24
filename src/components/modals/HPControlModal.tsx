@@ -156,7 +156,7 @@ export function HPControlModal({
       <span className="text-text-secondary text-sm select-none">/</span>
       <span
         data-testid="max-hp-display"
-        className="text-foreground text-sm font-medium min-w-[20px] text-center select-none"
+        className="text-sm font-medium min-w-[20px] text-center select-none"
       >
         {tokenInfo.maxHp ?? "N/A"}
       </span>

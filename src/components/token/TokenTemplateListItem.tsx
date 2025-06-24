@@ -67,7 +67,7 @@ export function TokenTemplateListItem({
 
   return (
     <li
-      className="bg-surface-3 p-3 rounded-md flex justify-between items-center shadow transition-colors duration-150  "
+      className="bg-surface-3 p-3 rounded-md flex justify-between items-center shadow duration-150  "
       title={`Arraste '${tokenInfo.name}' para o tabuleiro para criar uma instância, ou clique para abrir a ficha.`}
       draggable={true}
       onDragStart={(e) => handleDragStart(e, tokenInfo.id)}
@@ -84,14 +84,14 @@ export function TokenTemplateListItem({
       >
         <div 
             style={{ backgroundColor: tokenInfo.color }} 
-            className="w-6 h-6 rounded-sm border border-border-inactive flex-shrink-0 shadow-sm"
+            className="w-6 h-6 rounded-sm border flex-shrink-0 shadow-sm"
             aria-hidden="true"
         ></div>
         <div className="overflow-hidden" id={`token-details-${tokenInfo.id}`}>
           <span className=" font-medium block truncate" title={tokenInfo.name}>{tokenInfo.name}</span>
           <span className="text-xs text-text-secondary block">
             {tokenTypeTranslations[tokenInfo.type]} - {tokenInfo.size}
-            {instanceCount > 0 && <span className="italic text-text-secondary/80"> ({instanceCount} no tabuleiro)</span>}
+            {instanceCount > 0 && <span className="italic text-text-secondary"> ({instanceCount} no tabuleiro)</span>}
           </span>
         </div>
       </div>

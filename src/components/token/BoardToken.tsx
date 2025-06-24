@@ -99,7 +99,7 @@ export function BoardToken({
     ? "var(--color-accent-primary)"
     : isDragging
     ? "var(--color-accent-secondary)"
-    : "var(--color-border-primary)";
+    : "var(--color-border-base)";
 
   // Ajustar fontSize para o nome, pode precisar de mais ajustes dependendo do visual final
   const nameplateFontSize = Math.max(8, 12 / zoomLevel);

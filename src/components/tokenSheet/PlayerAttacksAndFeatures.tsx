@@ -23,7 +23,7 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
   setFeaturesAndTraits,
 }) => {
   return (
-    <div className="col-span-1 flex flex-col space-y-2.5 border border-border-inactive p-2 rounded-md">
+    <div className="col-span-1 flex flex-col space-y-2.5 border  p-2 rounded-md">
       <h3 className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-center uppercase mb-1")}>
         Ataques & Cantrips
       </h3>
@@ -31,7 +31,7 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
         attacks.map((attack) => (
           <div
             key={attack.id}
-            className="grid grid-cols-12 gap-x-1.5 items-center border-b border-border-inactive pb-1.5 mb-1.5"
+            className="grid grid-cols-12 gap-x-1.5 items-center border-b  pb-1.5 mb-1.5"
           >
             <div className="col-span-5">
               <input
@@ -83,7 +83,7 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
         <PlusCircleIcon className="h-4 w-4" />
         <span>Adicionar Ataque</span>
       </button>
-      <div className="border border-border-inactive p-2 rounded-md mt-2 flex-grow flex flex-col">
+      <div className="border  p-2 rounded-md mt-2 flex-grow flex flex-col">
         <h3 className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-center uppercase mb-1")}>
           Características & Talentos
         </h3>

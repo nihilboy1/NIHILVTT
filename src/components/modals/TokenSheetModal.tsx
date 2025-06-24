@@ -145,7 +145,7 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
 
   const tabButtonClass = (tabName: PlayerSheetTab) =>
     cn(
-      "px-4 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2",
+      "px-4 py-2 text-sm font-medium rounded-t-md  border-b-2",
       playerSheetActiveTab === tabName
         ? "border-accent-primary text-accent-primary bg-surface-1"
         : "border-transparent text-text-secondary hover:bg-surface-1 hover:border-accent-primary-hover"
@@ -304,13 +304,13 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-accent-secondary hover:bg-accent-secondary-hover text-text-primary font-semibold rounded-md transition-colors"
+            className="px-4 py-2 bg-accent-secondary hover:bg-accent-secondary-hover text-text-primary font-semibold rounded-md "
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="px-4 py-2  text-text-primary font-semibold rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2  text-text-primary font-semibold rounded-md  disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!hasTokenSheetChanged}
           >
             Salvar

@@ -99,7 +99,7 @@ const RulerPopover: React.FC<RulerPopoverProps> = ({
         </button>
         
         {/* Divisor */}
-        <div className="border-t border-border-inactive my-1"></div>
+        <div className="border-t my-1"></div>
 
         {/* Opção para persistir o caminho da régua */}
         <label 
@@ -111,7 +111,7 @@ const RulerPopover: React.FC<RulerPopoverProps> = ({
             id="persistRulerPath"
             checked={rulerPersistsPath}
             onChange={onToggleRulerPersistPath}
-            className="mr-2 h-4 w-4 rounded text-accent-primary focus:ring-accent-primary bg-input-bg"
+            className="mr-2 h-4 w-4 rounded text-accent-primary focus:ring-accent-primary"
           />
           Manter marcação ao soltar {/* Traduzido */}
         </label>

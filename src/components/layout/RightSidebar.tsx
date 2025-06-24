@@ -19,7 +19,7 @@ export function RightSidebar() {
       <header className="flex items-center  ">
         <button
           onClick={() => setIsRightSidebarVisible(false)}
-          className="h-full border-b-2 p-3 transition-colors focus:outline-none focus:ring-1 focus:ring-inset cursor-pointer"
+          className="h-full border-b-2 p-3 focus:outline-none focus:ring-1 focus:ring-inset cursor-pointer"
           aria-label="Esconder Barra Lateral Direita"
           title="Esconder Barra Lateral"
         >

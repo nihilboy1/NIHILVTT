@@ -44,7 +44,7 @@ export function HealthBar({
   );
 
   return (
-    <g className="token-health-bar" transform={`translate(0, ${healthBarY})`}>
+    <g  transform={`translate(0, ${healthBarY})`}>
       {/* Background da barra de vida */}
       <rect
         x="0"
