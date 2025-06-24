@@ -2,7 +2,7 @@
 import React, { createContext, useContext, type ReactNode } from 'react';
 import { useChatState, type ChatState } from '../hooks/useChatState'; // Import the custom hook
 
-const ChatContext = createContext<ChatState | undefined>(undefined);
+export const ChatContext = createContext<ChatState | undefined>(undefined);
 
 export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const chatState = useChatState(); // Use the custom hook

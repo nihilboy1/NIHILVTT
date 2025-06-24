@@ -3,6 +3,7 @@ import { useChat } from '../contexts/ChatContext';
 
 type RollAndSendMessageFn = ReturnType<typeof useChat>['rollAndSendMessage'];
 type SendMessageFn = ReturnType<typeof useChat>['sendMessage'];
+type ClearMessagesFn = ReturnType<typeof useChat>['clearMessages']; // Adicionar esta linha
 
 /**
  * @interface CommandContext
@@ -12,6 +13,7 @@ type SendMessageFn = ReturnType<typeof useChat>['sendMessage'];
 export interface CommandContext {
   rollAndSendMessage: RollAndSendMessageFn;
   sendMessage: SendMessageFn;
+  clearMessages: ClearMessagesFn; // Adicionar esta linha
   getAllCommands: () => Command[];
 }
 
@@ -90,15 +92,15 @@ const commandsRegistry: Command[] = [
       }
     },
   },
-  // Adicione mais comandos aqui
-  // Exemplo:
-  // {
-  //   name: "/clear",
-  //   description: "Limpa o histórico do chat (não implementado).",
-  //   execute: (args, context) => {
-  //     context.sendMessage("Funcionalidade /clear ainda não implementada.", "Sistema");
-  //   }
-  // }
+  {
+    name: "/clear",
+    description: "Limpa o histórico do chat.",
+    aliases: ["/cls"], // Opcional: adicionar um alias
+    execute: (args: string[], context: CommandContext) => {
+      context.clearMessages();
+      context.sendMessage("Histórico do chat limpo.", "Sistema");
+    },
+  },
 ];
 
 /**

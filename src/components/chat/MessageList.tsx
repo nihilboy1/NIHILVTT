@@ -1,6 +1,6 @@
 import React from "react";
-import { type Message, type DiceRollMessage } from "../../types/index"; 
-import { DEFAULT_PLAYER_NAME } from "../../constants"; 
+import { type Message, type DiceRollMessage } from "../../types/index";
+import { DEFAULT_PLAYER_NAME } from "../../constants";
 
 interface MessageListProps {
   messages: Message[];
@@ -9,16 +9,13 @@ interface MessageListProps {
 
 // chat pripriamente dito, apenas a lista de mensagens
 // Este componente exibe a lista de mensagens, formatando cada mensagem com base no remetente
-export function MessageList({
-  messages,
-  messagesEndRef,
-}: MessageListProps) {
+export function MessageList({ messages, messagesEndRef }: MessageListProps) {
   const formatTimestamp = (date: Date): string => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
-    <div className="flex-grow p-4 space-y-3 overflow-y-scroll">
+    <div className="flex-grow p-4 space-y-3 overflow-y-scroll hide-scrollbar">
       {messages.map((msg) => (
         <div
           key={msg.id}

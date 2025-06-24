@@ -1,10 +1,15 @@
 import { type PageSettings, type GridSettings, type Point } from '../../types/index'; // Ajustar o caminho do tipo
 
 export const parseTokenSize = (sizeString?: string): [number, number] => {
-  if (!sizeString) return [1,1];
-  const parts = sizeString.split('x').map(Number);
-  if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parts[0] > 0 && parts[1] > 0) {
-    return [parts[0], parts[1]];
+  if (!sizeString) return [1, 1];
+  // Usa uma regex para garantir que a string seja exatamente "NxM" onde N e M são números inteiros positivos
+  const match = sizeString.trim().match(/^(\d+)x(\d+)$/);
+  if (match) {
+    const width = parseInt(match[1]);
+    const height = parseInt(match[2]);
+    if (width > 0 && height > 0) {
+      return [width, height];
+    }
   }
   return [1, 1];
 };

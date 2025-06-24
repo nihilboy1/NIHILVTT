@@ -899,7 +899,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       y={textY - textBgHeight * 0.65}
                       width={textBgWidth}
                       height={textBgHeight}
-                      fill="var(--color-accent-secondary)" // cor do background do ponto fixado da regua
+                      fill="var(--color-accent-primary)" // cor do background do ponto fixado da regua
                       rx={rulerTextBgRx}
                       ry={rulerTextBgRx}
                     />
@@ -907,7 +907,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       x={textX}
                       y={textY}
                       fontSize={rulerTextFontSize}
-                      fill="var(--color-text-secondary)" // cor do texto do ponto fixado da regua
+                      fill="var(--color-text-primary)" // cor do texto do ponto fixado da regua
                       textAnchor="middle"
                       dominantBaseline="middle"
                       className="select-none"
@@ -934,7 +934,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     y1={rulerPath.points[rulerPath.points.length - 1].point.y}
                     x2={rulerPath.liveEndPoint.x}
                     y2={rulerPath.liveEndPoint.y}
-                    stroke="var(--color-accent-primary)" // cor da linha da regua enquanto arrasta
+                    stroke="var(--color-accent-secondary)" // cor da linha da regua enquanto arrasta
                     strokeWidth={rulerLineStrokeWidth}
                     strokeDasharray={`${6 / zoomLevel},${3 / zoomLevel}`}
                   />
@@ -965,7 +965,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                           y={textY - textBgHeight * 0.65}
                           width={textBgWidth}
                           height={textBgHeight}
-                          fill="var(--color-accent-primary)" // background da caixinha de medição da regua enquanto arrasta
+                          fill="var(--color-accent-secondary)" // background da caixinha de medição da regua enquanto arrasta
                           rx={rulerTextBgRx}
                           ry={rulerTextBgRx}
                         />

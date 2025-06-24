@@ -1,7 +1,7 @@
-import { SidebarTab } from "../../types/index"; 
-import { ChatBubbleIcon, UsersIcon, ChevronRightIcon } from "../icons"; 
+import { SidebarTab } from "../../types/index";
+import { ChatBubbleIcon, UsersIcon, ChevronRightIcon } from "../icons";
 import { TabButton } from "../ui/TabButton";
-import { useUI } from "../../contexts/UIContext"; 
+import { useUI } from "../../contexts/UIContext";
 import { ChatPanel } from "../chat/ChatPanel";
 import { TokensPanel } from "../tokens/TokensPanel";
 
@@ -19,7 +19,7 @@ export function RightSidebar() {
       <header className="flex items-center  ">
         <button
           onClick={() => setIsRightSidebarVisible(false)}
-          className="h-full border-b-2 p-3 focus:outline-none focus:ring-1 focus:ring-inset cursor-pointer"
+          className="hover:bg-surface-3 h-full border-b-2 p-3 focus:outline-none focus:ring-1 focus:ring-inset cursor-pointer"
           aria-label="Esconder Barra Lateral Direita"
           title="Esconder Barra Lateral"
         >

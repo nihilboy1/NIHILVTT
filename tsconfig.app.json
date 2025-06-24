@@ -15,6 +15,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "esModuleInterop": true, // Adicionado para resolver problemas de importação de módulos
+    "baseUrl": ".", // Necessário para 'paths'
+    "paths": {
+      "@/*": ["./src/*"]
+    }, // Adicionado vírgula aqui
 
     /* Linting */
     "strict": true,

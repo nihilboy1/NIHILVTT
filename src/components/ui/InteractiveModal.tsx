@@ -148,49 +148,43 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
 
         onPositionChange({ x: newX, y: newY });
       } else if (isResizing) {
-        let newWidth = resizeStart.width;
-        let newHeight = resizeStart.height;
+        let newWidth = width as number;
+        let newHeight = height as number;
         let newX = position.x;
         let newY = position.y;
 
-        const dx = event.clientX - resizeStart.x;
-        const dy = event.clientY - resizeStart.y;
+        const currentModalLeft = position.x;
+        const currentModalTop = position.y;
+        const currentModalRight = position.x + (modalRef.current?.offsetWidth || (width as number));
+        const currentModalBottom = position.y + (modalRef.current?.offsetHeight || (height as number));
 
         if (resizeDirection.includes("e")) {
-          newWidth = Math.min(
-            maxWidth,
-            Math.max(minWidth, resizeStart.width + dx)
-          );
+          newWidth = event.clientX - currentModalLeft;
         }
         if (resizeDirection.includes("s")) {
-          newHeight = Math.min(
-            maxHeight,
-            Math.max(minHeight, resizeStart.height + dy)
-          );
+          newHeight = event.clientY - currentModalTop;
         }
         if (resizeDirection.includes("w")) {
-          newWidth = Math.min(
-            maxWidth,
-            Math.max(minWidth, resizeStart.width - dx)
-          );
-          if (newWidth > minWidth && newWidth < maxWidth) {
-            newX = position.x + dx; // Adjust x position when resizing from west
-          }
+          newWidth = currentModalRight - event.clientX;
+          newX = event.clientX;
         }
         if (resizeDirection.includes("n")) {
-          newHeight = Math.min(
-            maxHeight,
-            Math.max(minHeight, resizeStart.height - dy)
-          );
-          if (newHeight > minHeight && newHeight < maxHeight) {
-            newY = position.y + dy; // Adjust y position when resizing from north
-          }
+          newHeight = currentModalBottom - event.clientY;
+          newY = event.clientY;
         }
+
+        // Apply min/max constraints to new dimensions
+        newWidth = Math.min(maxWidth, Math.max(minWidth, newWidth));
+        newHeight = Math.min(maxHeight, Math.max(minHeight, newHeight));
+
+        // Re-clamp newX and newY based on the final clamped dimensions
+        newX = Math.max(0, Math.min(newX, window.innerWidth - newWidth));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - newHeight));
 
         setWidth(newWidth);
         setHeight(newHeight);
         onPositionChange({ x: newX, y: newY });
-        onResize?.(newWidth, newHeight); // Notify parent of resize
+        onResize?.(newWidth, newHeight);
       }
     },
     [
@@ -283,7 +277,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
     >
       {/* Header */}
       <div
-        className={` flex items-center justify-between p-3 border-b ${
+        className={`modal-header flex items-center justify-between p-3 border-b ${
           isDragging ? "cursor-grabbing" : "cursor-grab"
         }`}
       >

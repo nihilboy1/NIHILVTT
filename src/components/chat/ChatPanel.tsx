@@ -12,7 +12,7 @@ import { MessageList } from "./MessageList";
 
 // inclui a caixa do chat, o popover de comandos e o formulário de envio
 export function ChatPanel() {
-  const { messages, sendMessage, rollAndSendMessage } = useChat();
+  const { messages, sendMessage, rollAndSendMessage, clearMessages } = useChat();
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -96,6 +96,7 @@ export function ChatPanel() {
         const commandContext: CommandContext = {
           rollAndSendMessage,
           sendMessage,
+          clearMessages, // Adicionar esta linha
           getAllCommands,
         };
         commandDefinition.execute(args, commandContext);

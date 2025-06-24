@@ -2,7 +2,7 @@
 import React, { createContext, useContext, type ReactNode } from 'react';
 import { useUIState, type UIState } from '../hooks/useUIState'; // Import the custom hook
 
-const UIContext = createContext<UIState | undefined>(undefined);
+export const UIContext = createContext<UIState | undefined>(undefined);
 
 export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const uiState = useUIState(); // Use the custom hook

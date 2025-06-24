@@ -5,20 +5,22 @@ export interface IconProps {
   className?: string;
   width?: string | number;
   height?: string | number;
+  "aria-hidden"?: boolean;
 }
 
-export function DiceIcon({}: IconProps) {
+export function DiceIcon({ "aria-hidden": ariaHidden, className }: IconProps) {
   return (
-    <img className="invert w-5 h-5" src={d20} alt="dado de vinte lados"></img>
+    <img className={`invert w-5 h-5 ${className || ''}`} src={d20} alt="dado de vinte lados" aria-hidden={ariaHidden} data-testid="dice-icon"></img>
   );
 }
 
-export function DetatchIcon({}: IconProps) {
+export function DetatchIcon({ "aria-hidden": ariaHidden, className }: IconProps) {
   return (
     <img
-      className="invert w-3 h-3"
+      className={`invert w-3 h-3 ${className || ''}`}
       src={detatch}
       alt="clip de papel partido ao meio"
+      aria-hidden={ariaHidden}
     ></img>
   );
 }

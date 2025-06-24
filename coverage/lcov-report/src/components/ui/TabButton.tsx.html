@@ -95,28 +95,17 @@
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
 <a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -127,10 +116,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
-import React from 'react';
-import { SidebarTab } from '../../types'; // Assuming SidebarTab is defined in types.ts
-import { IconProps } from '../icons'; // Assuming IconProps is defined in icons.tsx
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from "react";
+import { SidebarTab } from "../../types"; // Assuming SidebarTab is defined in types.ts
+import { type IconProps } from "../icons"; // Assuming IconProps is defined in icons.tsx
+import { cn } from "../../utils/cn";
 &nbsp;
 interface TabButtonProps {
   tab: SidebarTab;
@@ -140,25 +154,32 @@ interface TabButtonProps {
   onClick: () =&gt; void;
 }
 &nbsp;
-const TabButton: React.FC&lt;TabButtonProps&gt; = ({ tab, label, icon, isActive, onClick }) =&gt; (
-  &lt;button
-    onClick={onClick}
-    aria-pressed={isActive}
-    aria-controls={`tabpanel-${tab.toLowerCase()}`} // For ARIA
-    role="tab" // For ARIA
-    id={`tab-${tab.toLowerCase()}`} // For ARIA
-    className={`flex-1 py-3 px-2 flex flex-col items-center justify-center text-xs transition-colors
-                ${isActive
-                  ? `bg-theme-input-bg text-theme-accent-primary border-b-2 border-theme-accent-primary`
-                  : `text-theme-text-secondary hover:text-theme-foreground hover:bg-theme-input-bg`
-                }`}
-  &gt;
-    {React.cloneElement(icon, { className: "w-5 h-5 mb-1" })}
-    {label}
-  &lt;/button&gt;
-);
-&nbsp;
-export default TabButton;
+export function TabButton({
+  tab,
+  label,
+  icon,
+  isActive,
+  onClick,
+}: TabButtonProps) {
+  return (
+    &lt;button
+      onClick={onClick}
+      aria-pressed={isActive}
+      aria-controls={`tabpanel-${tab.toLowerCase()}`} // For ARIA
+      role="tab" // For ARIA
+      id={`tab-${tab.toLowerCase()}`} // For ARIA
+      className={cn(
+        "flex-1 py-3 px-2 flex flex-col items-center justify-center text-xs cursor-pointer border-b-2",
+        isActive
+          ? "border-accent-primary bg-theme-input-bg text-theme-accent-primary"
+          : "bg-surface-0 text-theme-text-secondary hover:text-theme-foreground hover:bg-theme-input-bg"
+      )}
+    &gt;
+      {React.cloneElement(icon, { className: "w-5 h-5 mb-1", "aria-hidden": true })}
+      {label}
+    &lt;/button&gt;
+  );
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -166,7 +187,7 @@ export default TabButton;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-17T11:57:56.559Z
+                at 2025-06-24T02:45:10.008Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

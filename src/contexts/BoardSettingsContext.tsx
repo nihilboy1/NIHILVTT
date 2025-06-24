@@ -2,7 +2,7 @@
 import React, { createContext, useContext, type ReactNode } from 'react';
 import { useBoardSettingsState, type BoardSettingsState } from '../hooks/useBoardSettingsState'; // Import the custom hook
 
-const BoardSettingsContext = createContext<BoardSettingsState | undefined>(undefined);
+export const BoardSettingsContext = createContext<BoardSettingsState | undefined>(undefined);
 
 export const BoardSettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const boardSettingsState = useBoardSettingsState(); // Use the custom hook

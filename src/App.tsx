@@ -443,10 +443,10 @@ export default function App() {
       ) : (
         <button
           onClick={() => setIsToolbarVisible(true)}
-          className={`${showButtonStyle} left-2 cursor-pointer`}
+          className={`${showButtonStyle} left-2 cursor-pointer hover:bg-accent-primary`}
           aria-label="Mostrar Barra de Ferramentas"
         >
-          <ChevronRightIcon className="w-6 h-6 text-text-primary" />
+          <ChevronRightIcon className=" w-6 h-6 text-text-primary" />
         </button>
       )}
 
@@ -474,7 +474,7 @@ export default function App() {
       ) : (
         <button
           onClick={() => setIsRightSidebarVisible(true)}
-          className={`${showButtonStyle} right-2 cursor-pointer`}
+          className={`${showButtonStyle} right-2 cursor-pointer hover:bg-accent-primary`}
           aria-label="Mostrar Barra Lateral Direita"
         >
           <ChevronLeftIcon className="w-6 h-6 text-text-primary" />

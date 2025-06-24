@@ -1,4 +1,3 @@
-
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Tool, SidebarTab } from '../types';
 
@@ -11,6 +10,8 @@ export interface UIState {
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
   isRightSidebarVisible: boolean;
   setIsRightSidebarVisible: Dispatch<SetStateAction<boolean>>;
+  activePopover: "ruler" | "dice" | null;
+  setActivePopover: Dispatch<SetStateAction<"ruler" | "dice" | null>>;
 }
 
 export const useUIState = (): UIState => {
@@ -18,11 +19,13 @@ export const useUIState = (): UIState => {
   const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>(SidebarTab.CHAT);
   const [isToolbarVisible, setIsToolbarVisible] = useState(true);
   const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
+  const [activePopover, setActivePopover] = useState<"ruler" | "dice" | null>(null);
 
   return {
     activeTool, setActiveTool,
     activeSidebarTab, setActiveSidebarTab,
     isToolbarVisible, setIsToolbarVisible,
-    isRightSidebarVisible, setIsRightSidebarVisible
+    isRightSidebarVisible, setIsRightSidebarVisible,
+    activePopover, setActivePopover
   };
 };

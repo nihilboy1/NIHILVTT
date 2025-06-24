@@ -8,18 +8,19 @@ export interface ChatState {
   messages: Message[];
   sendMessage: (content: string | DiceRollDetails, sender?: string) => void;
   rollAndSendMessage: (notation: string) => void;
+  clearMessages: () => void; // Adicionar esta linha
 }
 
 export const useChatState = (): ChatState => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'initial-welcome-' + Date.now(),
-      sender: 'Sistema',
-      text: 'Saudações, nobre aventureiro! Que os deuses da sorte guiem seus dados!',
-      timestamp: new Date(),
-      isDiceRoll: false,
-    } as TextMessage, // Explicitly cast as TextMessage
-  ]);
+  const initialWelcomeMessage: TextMessage = { // Definir a mensagem inicial aqui
+    id: 'initial-welcome-' + Date.now(),
+    sender: 'Sistema',
+    text: 'Saudações, nobre aventureiro! Que os deuses da sorte guiem seus dados!',
+    timestamp: new Date(),
+    isDiceRoll: false,
+  };
+
+  const [messages, setMessages] = useState<Message[]>([initialWelcomeMessage]); // Usar a mensagem inicial
 
   const sendMessage = useCallback(
     (content: string | DiceRollDetails, sender: string = DEFAULT_PLAYER_NAME) => {
@@ -62,5 +63,9 @@ export const useChatState = (): ChatState => {
     }
   }, [sendMessage]); // Removido rollDiceInternal das dependências, pois não é mais um useCallback local
 
-  return { messages, sendMessage, rollAndSendMessage };
+  const clearMessages = useCallback(() => {
+    setMessages([initialWelcomeMessage]); // Limpa as mensagens e adiciona a mensagem inicial novamente
+  }, [initialWelcomeMessage]); // Dependência para useCallback
+
+  return { messages, sendMessage, rollAndSendMessage, clearMessages }; // Retornar clearMessages
 };

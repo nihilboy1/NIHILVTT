@@ -78,7 +78,7 @@ export function Toolbar() {
 
       <ToolbarPopoverButton
         label="Rolar Dados"
-        icon={<DiceIcon className="w-7 h-7" />}
+        icon={<DiceIcon className="w-5 h-5" />}
         isActive={false}
         popoverComponent={DiceRollPopover}
         popoverProps={{

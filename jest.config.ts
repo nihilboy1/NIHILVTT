@@ -1,7 +1,7 @@
 export default {
   preset: 'ts-jest',
   testEnvironment: 'jest-environment-jsdom',
-  // setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'], // Removido ou comentado
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'], // Aponta para o arquivo de setup
   moduleNameMapper: {
     // Handle CSS imports (if you have them)
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',

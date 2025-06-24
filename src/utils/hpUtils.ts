@@ -13,24 +13,35 @@ export const calculateNewHP = (
 ): number | null => {
   const trimmedInput = inputValue.trim();
 
+  // Adicionar verificação explícita para string vazia ou apenas espaços
+  if (trimmedInput === '') {
+    return null;
+  }
+
   let newCalculatedHP: number;
 
   if (trimmedInput.startsWith('+') || trimmedInput.startsWith('-')) {
     const isPositive = trimmedInput.startsWith('+');
     const valueStr = trimmedInput.substring(1);
-    const value = parseInt(valueStr, 10);
+    
+    // Adicionar verificação para string vazia após o sinal
+    if (valueStr === '') {
+      return null; // Ex: "+", "-"
+    }
 
-    if (!isNaN(value) && value >= 0) {
+    const value = Number(valueStr); // Use Number()
+
+    if (!isNaN(value) && Number.isInteger(value) && value >= 0) { // Check for integer
       newCalculatedHP = isPositive ? currentHP + value : currentHP - value;
     } else {
-      return null; // Entrada inválida (ex: "+abc", "-")
+      return null; // Entrada inválida (ex: "+abc", "+5.5") ou decimal
     }
   } else {
-    const value = parseInt(trimmedInput, 10);
-    if (!isNaN(value)) {
+    const value = Number(trimmedInput); // Use Number()
+    if (!isNaN(value) && Number.isInteger(value)) { // Check for integer
       newCalculatedHP = value;
     } else {
-      return null; // Entrada inválida (ex: "abc")
+      return null; // Entrada inválida (ex: "abc") ou decimal
     }
   }
 
