@@ -62,8 +62,8 @@ export function TokensPanel() {
                 key={tokenInfo.id}
                 tokenInfo={tokenInfo}
                 instanceCount={gridInstanceCounts.get(tokenInfo.id) || 0}
-                openTokenSheetModal={() =>
-                  openModal("tokenSheet", { tokenId: tokenInfo.id })
+                openSheetModal={() =>
+                  openModal("sheet", { tokenId: tokenInfo.id })
                 } // Usar openModal
               />
             ))}

@@ -7,7 +7,7 @@ import {
   HP_MODAL_ESTIMATED_HEIGHT,
 } from "./components/modals/HPControlModal"; // Atualizado
 import { SimpleNameModal } from "./components/modals/SimpleNameModal"; // Atualizado
-import { TokenSheetModal } from "./components/modals/TokenSheetModal";
+import { SheetModal } from "./components/modals/SheetModal";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 import {
   Tool,
@@ -24,12 +24,13 @@ import {
   DEFAULT_TOKEN_HP,
   DEFAULT_PLAYER_LEVEL,
   DEFAULT_PLAYER_INSPIRATION,
+  DEFAULT_TOKEN_IMAGE, // Importar DEFAULT_TOKEN_IMAGE
 } from "./constants";
 import { ChevronLeftIcon, ChevronRightIcon } from "./components/icons";
 import { useTokens } from "./contexts/TokensContext";
 import { useUI } from "./contexts/UIContext";
 import { useModal } from "./contexts/ModalContext";
-import { TokenSheetProvider } from "./contexts/TokenSheetContext"; // Importar TokenSheetProvider
+import { SheetProvider } from "./contexts/SheetContext"; // Importar SheetProvider
 
 export default function App() {
   const {
@@ -68,8 +69,8 @@ export default function App() {
   useEffect(() => {
     const currentHPModalInstanceId =
       activeModal === "hpControl" ? modalProps.instanceId : null;
-    const currentTokenSheetId =
-      activeModal === "tokenSheet" ? modalProps.tokenId : null;
+    const currentSheetId =
+      activeModal === "sheet" ? modalProps.tokenId : null;
 
     // Fechar modal de HP se a instância alvo for removida
     if (
@@ -83,9 +84,9 @@ export default function App() {
     }
     // Fechar TokenSheet se o TokenInfo alvo for deletado
     if (
-      activeModal === "tokenSheet" &&
-      currentTokenSheetId &&
-      !tokens.find((t: TokenInfo) => t.id === currentTokenSheetId)
+      activeModal === "sheet" &&
+      currentSheetId &&
+      !tokens.find((t: TokenInfo) => t.id === currentSheetId)
     ) {
       closeModal();
     }
@@ -124,6 +125,31 @@ export default function App() {
     modalProps.tokenId,
   ]);
 
+  useEffect(() => {
+    if (activeModal === "hpControl" && modalProps.instanceId) {
+      const selectedInstance = gridInstances.find(
+        (gi: GridInstance) => gi.instanceId === modalProps.instanceId
+      );
+      const isInstanceBeingDragged =
+        draggingVisuals.instanceId === modalProps.instanceId &&
+        draggingVisuals.visualSVGPoint !== null;
+
+      if (
+        !isInstanceBeingDragged &&
+        (!selectedInstance || activeTool !== Tool.SELECT)
+      ) {
+        closeModal();
+      }
+    }
+  }, [
+    gridInstances,
+    activeTool,
+    activeModal,
+    modalProps,
+    draggingVisuals,
+    closeModal,
+  ]);
+
   const handleSaveNewTokenName = (
     name: string,
     tokenTypeFromModal?: TokenType
@@ -146,6 +172,7 @@ export default function App() {
       newSheetData = {
         name: name,
         type: TokenType.PLAYER,
+        image: DEFAULT_TOKEN_IMAGE,
         color: DEFAULT_TOKEN_COLOR,
         size: DEFAULT_TOKEN_SIZE,
         currentHp: DEFAULT_TOKEN_HP,
@@ -169,6 +196,7 @@ export default function App() {
       newSheetData = {
         name: name,
         type: typeToUse,
+        image: DEFAULT_TOKEN_IMAGE,
         color: DEFAULT_TOKEN_COLOR,
         size: DEFAULT_TOKEN_SIZE,
         currentHp: DEFAULT_TOKEN_HP,
@@ -179,7 +207,7 @@ export default function App() {
     const newTokenInfo = addToken(newSheetData);
     console.log("Novo token criado:", newTokenInfo);
     closeModal();
-    openModal("tokenSheet", { tokenId: newTokenInfo.id });
+    openModal("sheet", { tokenId: newTokenInfo.id });
   };
 
   const calculateHPModalAnchorPoint = (
@@ -272,6 +300,65 @@ export default function App() {
     },
     [activeModal, updateModalProps, modalProps.anchorPoint]
   );
+
+  useEffect(() => {
+    const currentHPModalInstanceId =
+      activeModal === "hpControl" ? modalProps.instanceId : null;
+    const currentSheetId =
+      activeModal === "sheet" ? modalProps.tokenId : null;
+
+    // Fechar modal de HP se a instância alvo for removida
+    if (
+      activeModal === "hpControl" &&
+      currentHPModalInstanceId &&
+      !gridInstances.find(
+        (gi: GridInstance) => gi.instanceId === currentHPModalInstanceId
+      )
+    ) {
+      closeModal();
+    }
+    // Fechar TokenSheet se o TokenInfo alvo for deletado
+    if (
+      activeModal === "sheet" &&
+      currentSheetId &&
+      !tokens.find((t: TokenInfo) => t.id === currentSheetId)
+    ) {
+      closeModal();
+    }
+    // Limpar visuais de arrasto se a instância for removida
+    if (
+      draggingVisuals.instanceId &&
+      !gridInstances.find(
+        (gi: GridInstance) => gi.instanceId === draggingVisuals.instanceId
+      )
+    ) {
+      setDraggingVisuals({ instanceId: null, visualSVGPoint: null });
+    }
+    // Limpar seleção pré-arrasto se a instância for removida
+    if (
+      preDragHPModalInstanceId &&
+      !gridInstances.find(
+        (gi: GridInstance) => gi.instanceId === preDragHPModalInstanceId
+      )
+    ) {
+      setPreDragHPModalInstanceId(null);
+    }
+    // Limpar IDs multi-selecionados se algum deles for removido
+    setMultiSelectedInstanceIds((prev: string[]) =>
+      prev.filter((id: string) =>
+        gridInstances.some((gi: GridInstance) => gi.instanceId === id)
+      )
+    );
+  }, [
+    tokens,
+    gridInstances,
+    activeModal,
+    closeModal,
+    draggingVisuals.instanceId,
+    preDragHPModalInstanceId,
+    modalProps.instanceId,
+    modalProps.tokenId,
+  ]);
 
   useEffect(() => {
     if (activeModal === "hpControl" && modalProps.instanceId) {
@@ -491,8 +578,8 @@ export default function App() {
         />
       )}
 
-      {activeModal === "tokenSheet" && (
-        <TokenSheetProvider
+      {activeModal === "sheet" && (
+        <SheetProvider
           initialTokenData={(() => {
             const foundToken = tokens.find(
               (t: TokenInfo) => t.id === modalProps.tokenId
@@ -508,8 +595,8 @@ export default function App() {
             }
           }}
         >
-          <TokenSheetModal tokenId={modalProps.tokenId} onClose={closeModal} />
-        </TokenSheetProvider>
+          <SheetModal tokenId={modalProps.tokenId} onClose={closeModal} />
+        </SheetProvider>
       )}
 
       {activeModal === "hpControl" &&

@@ -58,8 +58,8 @@ const commandsRegistry: Command[] = [
       }
       return null; // Valid
     },
-    execute: (args: string[], context: CommandContext) => {
-      const notation = args.join(' ');
+    execute: (_args: string[], context: CommandContext) => {
+      const notation = _args.join(' '); // Alterado args para _args
       context.rollAndSendMessage(notation);
     },
   },
@@ -67,10 +67,10 @@ const commandsRegistry: Command[] = [
     name: "/help",
     description: "Mostra informações sobre os comandos disponíveis.",
     usage: "/help [nome-do-comando]",
-    execute: (args: string[], context: CommandContext) => {
+    execute: (_args: string[], context: CommandContext) => { // Alterado args para _args
       const allCommands = context.getAllCommands();
-      if (args.length > 0) {
-        const commandName = args[0].startsWith('/') ? args[0] : `/${args[0]}`;
+      if (_args.length > 0) { // Alterado args para _args
+        const commandName = _args[0].startsWith('/') ? _args[0] : `/${_args[0]}`; // Alterado args para _args
         const foundCommand = allCommands.find(cmd => cmd.name === commandName || cmd.aliases?.includes(commandName));
         if (foundCommand) {
           let helpText = `Ajuda para ${foundCommand.name}:\n`;
@@ -96,7 +96,7 @@ const commandsRegistry: Command[] = [
     name: "/clear",
     description: "Limpa o histórico do chat.",
     aliases: ["/cls"], // Opcional: adicionar um alias
-    execute: (args: string[], context: CommandContext) => {
+    execute: (_args: string[], context: CommandContext) => { // Alterado args para _args
       context.clearMessages();
       context.sendMessage("Histórico do chat limpo.", "Sistema");
     },

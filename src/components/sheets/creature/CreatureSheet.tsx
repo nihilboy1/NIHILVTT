@@ -1,8 +1,8 @@
-import { TokenType } from "../../types";
-import { TOKEN_TYPES_OPTIONS } from "../../constants";
-import { cn } from "../../utils/cn";
+import { TokenType } from "../../../types";
+import { TOKEN_TYPES_OPTIONS } from "../../../constants";
+import { cn } from "../../../utils/cn";
 
-interface GenericTokenSheetProps {
+interface CreatureSheetProps {
   editingTokenName: string;
   setEditingTokenName: (name: string) => void;
   editingTokenType: TokenType | null;
@@ -19,7 +19,7 @@ interface GenericTokenSheetProps {
   setEditingTokenSize: (size: string) => void;
 }
 
-export function GenericTokenSheet({
+export function CreatureSheet({
   editingTokenName,
   setEditingTokenName,
   editingTokenType,
@@ -34,7 +34,7 @@ export function GenericTokenSheet({
   setEditingTokenImage, // Usar o setter da imagem
   editingTokenSize,
   setEditingTokenSize,
-}: GenericTokenSheetProps) {
+}: CreatureSheetProps) {
   return (
     <div className="p-0.5 space-y-3 overflow-y-auto max-h-[calc(100vh-200px)]">
       <div>
@@ -49,7 +49,7 @@ export function GenericTokenSheet({
           type="text"
           value={editingTokenName}
           onChange={(e) => setEditingTokenName(e.target.value)}
-          className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
+          className="w-full p-0 bg-surface-1 border border-red-500 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           required
           maxLength={35}
         />
@@ -136,7 +136,10 @@ export function GenericTokenSheet({
         />
       </div>
       <div>
-        <label htmlFor="editingTokenImage" className="block text-[11px] font-medium text-accent-primary mb-px">
+        <label
+          htmlFor="editingTokenImage"
+          className="block text-[11px] font-medium text-accent-primary mb-px"
+        >
           URL da Imagem do Token
         </label>
         <input
@@ -145,7 +148,9 @@ export function GenericTokenSheet({
           value={editingTokenImage}
           onChange={(e) => setEditingTokenImage(e.target.value)}
           placeholder="Cole a URL da imagem aqui"
-          className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary")}
+          className={cn(
+            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
+          )}
         />
       </div>
       <div>

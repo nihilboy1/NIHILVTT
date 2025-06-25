@@ -31,7 +31,7 @@ describe('HPControlModal', () => {
     ac: 15,
     initiative: 10,
     speed: 30,
-    tokenImageUrl: '',
+    image: '', // Alterado de tokenImageUrl para image
     sheet: {
       basicInfo: {
         name: 'Hero',
@@ -69,7 +69,7 @@ describe('HPControlModal', () => {
 
   const defaultProps = {
     instanceId: 'instance-1',
-    tokenInfo: defaultTokenInfo,
+    tokenInfo: { ...defaultTokenInfo, image: 'test-image.png' }, // Adicionado image para o mock
     anchorPoint: { x: 100, y: 100 },
     isOpen: true,
     onClose: mockOnClose,

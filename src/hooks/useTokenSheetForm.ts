@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { type PlayerToken, TokenType, type Attack } from "../types/index"; // Ajustar o caminho do tipo
+import { type PlayerToken, TokenType, type Attack } from "../types/index";
 import {
   DEFAULT_TOKEN_SIZE,
   DEFAULT_TOKEN_HP,
@@ -11,14 +11,15 @@ import {
   defaultAttributes,
   defaultSavingThrows,
   defaultSkills,
-  DEFAULT_TOKEN_IMAGE, // Importar a imagem padrão
-} from "../constants/tokenSheetDefaults"; // Importar as constantes
+  DEFAULT_TOKEN_IMAGE,
+} from "../constants/sheetDefaults";
+import { calculateProficiencyBonus } from "../utils/sheetUtils"; // Importar a função utilitária
 
 export interface UseTokenSheetFormReturn {
   editingTokenName: string;
   setEditingTokenName: React.Dispatch<React.SetStateAction<string>>;
-  editingTokenImage: string; // Nova propriedade para a imagem
-  setEditingTokenImage: React.Dispatch<React.SetStateAction<string>>; // Novo setter
+  editingTokenImage: string;
+  setEditingTokenImage: React.Dispatch<React.SetStateAction<string>>;
   editingTokenSize: string;
   setEditingTokenSize: React.Dispatch<React.SetStateAction<string>>;
   editingTokenType: TokenType | null;
@@ -55,8 +56,7 @@ export interface UseTokenSheetFormReturn {
   setEditingDeathSavesSuccesses: React.Dispatch<React.SetStateAction<number>>;
   editingDeathSavesFailures: number;
   setEditingDeathSavesFailures: React.Dispatch<React.SetStateAction<number>>;
-  editingExp: string;
-  setEditingExp: React.Dispatch<React.SetStateAction<string>>;
+  proficiencyBonus: number; // Alterado para number e não editável
   editingInitiative: string;
   setEditingInitiative: React.Dispatch<React.SetStateAction<string>>;
   editingSpeed: string;
@@ -96,7 +96,7 @@ export const useTokenSheetForm = ({
   onSave,
 }: UseTokenSheetFormProps): UseTokenSheetFormReturn => {
   const [editingTokenName, setEditingTokenName] = useState("");
-  const [editingTokenImage, setEditingTokenImage] = useState(DEFAULT_TOKEN_IMAGE); // Inicializar com a imagem padrão
+  const [editingTokenImage, setEditingTokenImage] = useState(DEFAULT_TOKEN_IMAGE);
   const [editingTokenSize, setEditingTokenSize] = useState(DEFAULT_TOKEN_SIZE);
   const [editingTokenType, setEditingTokenType] = useState<TokenType | null>(
     null
@@ -125,7 +125,7 @@ export const useTokenSheetForm = ({
   const [editingDeathSavesSuccesses, setEditingDeathSavesSuccesses] =
     useState(0);
   const [editingDeathSavesFailures, setEditingDeathSavesFailures] = useState(0);
-  const [editingExp, setEditingExp] = useState(String(0));
+  // Removido editingProficiency como estado, será calculado
   const [editingInitiative, setEditingInitiative] = useState(String(0));
   const [editingSpeed, setEditingSpeed] = useState(String(30));
 
@@ -141,11 +141,14 @@ export const useTokenSheetForm = ({
   const [hasTokenSheetChanged, setHasTokenSheetChanged] =
     useState<boolean>(false);
 
+  // Calcula o bônus de proficiência com base no nível
+  const proficiencyBonus = calculateProficiencyBonus(parseInt(editingLevel, 10));
+
   // Inicializa os estados com os dados do token
   useEffect(() => {
     if (initialTokenData) {
       setEditingTokenName(initialTokenData.name);
-      setEditingTokenImage(initialTokenData.image); // Usar a imagem do token
+      setEditingTokenImage(initialTokenData.image);
       setEditingTokenSize(initialTokenData.size);
       setEditingTokenType(initialTokenData.type);
       setEditingCurrentHp(
@@ -170,7 +173,7 @@ export const useTokenSheetForm = ({
         setEditingHitDiceMax(String(initialTokenData.hitDiceMax ?? 1));
         setEditingDeathSavesSuccesses(initialTokenData.deathSavesSuccesses ?? 0);
         setEditingDeathSavesFailures(initialTokenData.deathSavesFailures ?? 0);
-        setEditingExp(String(initialTokenData.xp ?? 0));
+        // Removido setEditingProficiency
         setEditingInitiative(String(initialTokenData.initiative ?? 0));
         setEditingSpeed(String(initialTokenData.speed ?? 30));
         setAttributes(initialTokenData.attributes ?? defaultAttributes);
@@ -183,7 +186,7 @@ export const useTokenSheetForm = ({
         setAttacks(initialTokenData.attacks ?? []);
         setFeaturesAndTraits(initialTokenData.featuresAndTraits ?? []);
       }
-      setHasTokenSheetChanged(false); // Resetar o estado de mudança após carregar os dados
+      setHasTokenSheetChanged(false);
     }
   }, [initialTokenData]);
 
@@ -198,7 +201,7 @@ export const useTokenSheetForm = ({
     changed = changed || editingTokenName !== (initialTokenData.name || "");
     changed =
       changed ||
-      editingTokenImage !== (initialTokenData.image || DEFAULT_TOKEN_IMAGE); // Comparar com a imagem
+      editingTokenImage !== (initialTokenData.image || DEFAULT_TOKEN_IMAGE);
     changed =
       changed ||
       editingTokenSize !== (initialTokenData.size || DEFAULT_TOKEN_SIZE);
@@ -253,7 +256,7 @@ export const useTokenSheetForm = ({
         changed ||
         editingDeathSavesFailures !==
           (initialTokenData.deathSavesFailures ?? 0);
-      changed = changed || editingExp !== String(initialTokenData.xp ?? 0);
+      // Removido editingProficiency da comparação
       changed =
         changed ||
         editingInitiative !== String(initialTokenData.initiative ?? 0);
@@ -293,7 +296,7 @@ export const useTokenSheetForm = ({
     setHasTokenSheetChanged(changed);
   }, [
     editingTokenName,
-    editingTokenImage, // Adicionar ao array de dependências
+    editingTokenImage,
     editingTokenSize,
     editingTokenType,
     editingCurrentHp,
@@ -312,7 +315,7 @@ export const useTokenSheetForm = ({
     editingHitDiceMax,
     editingDeathSavesSuccesses,
     editingDeathSavesFailures,
-    editingExp,
+    // Removido editingProficiency
     editingInitiative,
     editingSpeed,
     attributes,
@@ -324,7 +327,7 @@ export const useTokenSheetForm = ({
   ]);
 
   const handleSave = useCallback(
-    async (e: React.FormEvent) => { // Tornar a função assíncrona
+    async (e: React.FormEvent) => {
       e.preventDefault();
       if (!initialTokenData || editingTokenType === null) {
         alert("Erro ao identificar o token ou tipo para atualização.");
@@ -336,7 +339,7 @@ export const useTokenSheetForm = ({
       }
 
       // Validação de imagem
-      const MAX_IMAGE_DIMENSION = 500; // Limite de 500x500 pixels
+      const MAX_IMAGE_DIMENSION = 500;
       if (editingTokenImage.trim() !== '' && editingTokenImage !== DEFAULT_TOKEN_IMAGE) {
         try {
           const img = new Image();
@@ -381,7 +384,7 @@ export const useTokenSheetForm = ({
       let tempHpNum = 0;
       let hitDiceUsedNum = 0;
       let hitDiceMaxNum = 1;
-      let expNum = 0;
+      // Removido proficiencyNum como variável de estado
       let initiativeNum = 0;
       let speedNum = 30;
 
@@ -415,11 +418,7 @@ export const useTokenSheetForm = ({
           alert("Valores de Dados de Vida inválidos.");
           return;
         }
-        expNum = parseInt(editingExp, 10);
-        if (isNaN(expNum) || expNum < 0) {
-          alert("EXP inválido. Deve ser um número não negativo.");
-          return;
-        }
+        // Removida validação de proficiencyNum
         initiativeNum = parseInt(editingInitiative, 10);
         if (isNaN(initiativeNum)) {
           alert("Iniciativa inválida. Deve ser um número.");
@@ -434,7 +433,7 @@ export const useTokenSheetForm = ({
 
       const updatedTokenPartialData: Partial<PlayerToken> = {
         name: editingTokenName.trim(),
-        image: editingTokenImage.trim() === '' ? DEFAULT_TOKEN_IMAGE : editingTokenImage, // Lógica de fallback para imagem
+        image: editingTokenImage.trim() === '' ? DEFAULT_TOKEN_IMAGE : editingTokenImage,
         size: editingTokenSize,
         currentHp: currentHpNum,
         maxHp: maxHpNum,
@@ -442,7 +441,7 @@ export const useTokenSheetForm = ({
       };
 
       if (editingTokenType === TokenType.PLAYER) {
-        updatedTokenPartialData.type = editingTokenType; // Adicionar a propriedade 'type' aqui
+        updatedTokenPartialData.type = editingTokenType;
         updatedTokenPartialData.species = editingSpecies;
         updatedTokenPartialData.charClass = editingCharClass;
         updatedTokenPartialData.subclass = editingSubclass;
@@ -457,7 +456,7 @@ export const useTokenSheetForm = ({
         updatedTokenPartialData.deathSavesSuccesses =
           editingDeathSavesSuccesses;
         updatedTokenPartialData.deathSavesFailures = editingDeathSavesFailures;
-        updatedTokenPartialData.xp = expNum;
+        updatedTokenPartialData.proficiencyBonus = proficiencyBonus; // Usar o valor calculado
         updatedTokenPartialData.initiative = initiativeNum;
         updatedTokenPartialData.speed = speedNum;
         updatedTokenPartialData.attributes = attributes;
@@ -474,7 +473,7 @@ export const useTokenSheetForm = ({
     [
       initialTokenData,
       editingTokenName,
-      editingTokenImage, // Substituir editingTokenColor por editingTokenImage
+      editingTokenImage,
       editingTokenSize,
       editingTokenType,
       editingCurrentHp,
@@ -493,7 +492,7 @@ export const useTokenSheetForm = ({
       editingHitDiceMax,
       editingDeathSavesSuccesses,
       editingDeathSavesFailures,
-      editingExp,
+      proficiencyBonus, // Adicionado ao array de dependências
       editingInitiative,
       editingSpeed,
       attributes,
@@ -531,8 +530,8 @@ export const useTokenSheetForm = ({
   return {
     editingTokenName,
     setEditingTokenName,
-    editingTokenImage, // Retornar a imagem
-    setEditingTokenImage, // Retornar o setter
+    editingTokenImage,
+    setEditingTokenImage,
     editingTokenSize,
     setEditingTokenSize,
     editingTokenType,
@@ -569,8 +568,7 @@ export const useTokenSheetForm = ({
     setEditingDeathSavesSuccesses,
     editingDeathSavesFailures,
     setEditingDeathSavesFailures,
-    editingExp,
-    setEditingExp,
+    proficiencyBonus, // Retornar o bônus de proficiência calculado
     editingInitiative,
     setEditingInitiative,
     editingSpeed,
@@ -590,9 +588,9 @@ export const useTokenSheetForm = ({
     handleAddAttack,
     handleRemoveAttack,
     handleAttackChange,
-    SKILLS_CONFIG, // Exportar para ser usado nos componentes de UI
-    defaultAttributes, // Exportar para ser usado nos componentes de UI
-    defaultSavingThrows, // Exportar para ser usado nos componentes de UI
-    defaultSkills, // Exportar para ser usado nos componentes de UI
+    SKILLS_CONFIG,
+    defaultAttributes,
+    defaultSavingThrows,
+    defaultSkills,
   };
 };

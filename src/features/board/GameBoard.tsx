@@ -15,7 +15,7 @@ import {
   type DraggingVisuals,
   type GridInstance,
   type MarqueeSelectionState,
-} from "../../types/index"; // Ajustar o caminho do tipo
+} from "../../types"; // Ajustar o caminho do tipo
 import { PageConfigIcon } from "../../components/icons"; // Ajustar o caminho do componente
 import { PageSettingsModal } from "../../components/modals/PageSettingsModal"; // Ajustar o caminho do componente
 import { BoardToken } from "../../components/token/BoardToken"; // Ajustar o caminho do componente
@@ -385,27 +385,23 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       ) {
         let finalPointsArray = [...rulerPath.points];
         if (rulerPath.liveEndPoint && rulerPath.points.length > 0) {
-          const lastFixedPoint = rulerPath.points[rulerPath.points.length - 1];
-          if (
-            rulerPath.liveEndPoint.x !== lastFixedPoint.point.x ||
-            rulerPath.liveEndPoint.y !== lastFixedPoint.point.y ||
-            (rulerPath.points.length === 1 &&
-              rulerPath.points[0].point.x === lastFixedPoint.point.x &&
-              rulerPath.points[0].point.y === lastFixedPoint.point.y)
-          ) {
-            const distanceToFinalPoint = calculateDistanceInMeters(
-              lastFixedPoint.point,
-              rulerPath.liveEndPoint,
-              gridSettings.visualCellSize,
-              gridSettings.metersPerSquare
-            );
-            const cumulativeAtFinalPoint =
-              lastFixedPoint.cumulativeDistanceMeters + distanceToFinalPoint;
-            finalPointsArray.push({
-              point: rulerPath.liveEndPoint,
-              cumulativeDistanceMeters: cumulativeAtFinalPoint,
-            });
-          }
+          const lastFixedPointData =
+            rulerPath.points[rulerPath.points.length - 1];
+          const distanceToWaypoint = calculateDistanceInMeters(
+            lastFixedPointData.point,
+            rulerPath.liveEndPoint,
+            gridSettings.visualCellSize,
+            gridSettings.metersPerSquare
+          );
+          const newCumulativeDistance =
+            lastFixedPointData.cumulativeDistanceMeters + distanceToWaypoint;
+          finalPointsArray.push({
+            point: rulerPath.liveEndPoint,
+            cumulativeDistanceMeters: newCumulativeDistance,
+          });
+          // If the ruler is active and the last point is the same as the live end point,
+          // it means the user clicked to finalize a segment at the current live end point.
+          // In this case, we should not add a duplicate point.
         } else if (rulerPath.liveEndPoint && rulerPath.points.length === 0) {
           finalPointsArray = [
             { point: rulerPath.liveEndPoint, cumulativeDistanceMeters: 0 },
@@ -570,8 +566,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       "application/vtt-token-info-id"
     );
     if (tokenInfoId) {
-      const tokenSheet = tokens.find((t) => t.id === tokenInfoId);
-      if (!tokenSheet) return;
+      const sheet = tokens.find((t) => t.id === tokenInfoId);
+      if (!sheet) return;
 
       const dropPoint = getSVGPoint(event.clientX, event.clientY);
       const cellSize = gridSettings.visualCellSize;
@@ -586,7 +582,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         return;
 
       const [sizeMultiplierX, sizeMultiplierY] = parseTokenSize(
-        tokenSheet.size
+        sheet.size
       );
       let gridX = Math.floor(dropPoint.x / cellSize);
       let gridY = Math.floor(dropPoint.y / cellSize);

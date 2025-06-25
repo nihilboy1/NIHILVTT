@@ -1,7 +1,7 @@
 import React from "react";
-import { TokenType } from "../../types";
-import { tokenTypeTranslations } from "../../constants";
-import { cn } from "../../utils/cn";
+import { TokenType } from "../../../../types";
+import { tokenTypeTranslations } from "../../../../constants";
+import { cn } from "../../../../utils/cn";
 
 interface PlayerSheetConfigTabProps {
   editingTokenImage: string;
@@ -19,7 +19,10 @@ const PlayerSheetConfigTab: React.FC<PlayerSheetConfigTabProps> = ({
   return (
     <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-200px)]">
       <div>
-        <label htmlFor="pjSheetEditingTokenImage" className="block text-[11px] font-medium text-accent-primary mb-px">
+        <label
+          htmlFor="pjSheetEditingTokenImage"
+          className="block text-[11px] font-medium text-accent-primary mb-px"
+        >
           URL da Imagem do Token
         </label>
         <input
@@ -28,11 +31,16 @@ const PlayerSheetConfigTab: React.FC<PlayerSheetConfigTabProps> = ({
           value={editingTokenImage}
           onChange={(e) => setEditingTokenImage(e.target.value)}
           placeholder="Cole a URL da imagem aqui"
-          className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary")}
+          className={cn(
+            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
+          )}
         />
       </div>
       <div>
-        <label htmlFor="pjSheetEditingTokenSize" className="block text-[11px] font-medium text-accent-primary mb-px">
+        <label
+          htmlFor="pjSheetEditingTokenSize"
+          className="block text-[11px] font-medium text-accent-primary mb-px"
+        >
           Tamanho do Token (Tabuleiro)
         </label>
         <select
@@ -48,11 +56,16 @@ const PlayerSheetConfigTab: React.FC<PlayerSheetConfigTabProps> = ({
         </select>
       </div>
       <div>
-        <label className="block text-[11px] font-medium text-accent-primary mb-px">Tipo do Token</label>
+        <label className="block text-[11px] font-medium text-accent-primary mb-px">
+          Tipo do Token
+        </label>
         <input
           type="text"
           value={tokenTypeTranslations[TokenType.PLAYER]}
-          className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "bg-surface-1 opacity-70 cursor-not-allowed")}
+          className={cn(
+            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
+            "bg-surface-1 opacity-70 cursor-not-allowed"
+          )}
           readOnly
           disabled
         />

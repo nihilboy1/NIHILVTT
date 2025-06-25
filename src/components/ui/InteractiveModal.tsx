@@ -155,8 +155,10 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
 
         const currentModalLeft = position.x;
         const currentModalTop = position.y;
-        const currentModalRight = position.x + (modalRef.current?.offsetWidth || (width as number));
-        const currentModalBottom = position.y + (modalRef.current?.offsetHeight || (height as number));
+        const currentModalRight =
+          position.x + (modalRef.current?.offsetWidth || (width as number));
+        const currentModalBottom =
+          position.y + (modalRef.current?.offsetHeight || (height as number));
 
         if (resizeDirection.includes("e")) {
           newWidth = event.clientX - currentModalLeft;
@@ -267,7 +269,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
     <div
       ref={modalRef}
       style={style}
-      className={`bg-surface-0 rounded-lg shadow-xl flex flex-col overflow-hidden border   ${
+      className={`bg-surface-0 rounded-lg shadow-xl flex flex-col overflow-hidden border border-red-600   ${
         isDragging ? "cursor-grabbing" : ""
       }`}
       onMouseDown={handleMouseDown}
@@ -281,10 +283,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
           isDragging ? "cursor-grabbing" : "cursor-grab"
         }`}
       >
-        <h2
-          id={`modal-title-${id}`}
-          className="text-lg font-semibold truncate"
-        >
+        <h2 id={`modal-title-${id}`} className="text-lg font-semibold truncate">
           {title}
         </h2>
         <div className="flex items-center space-x-2">
@@ -306,9 +305,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-4 overflow-y-auto flex-grow ">
-        {children}
-      </div>
+      <div className="p-3 overflow-y-auto flex-grow ">{children}</div>
 
       {/* Resize Handles */}
       <div className="resize-handle resize-s" />

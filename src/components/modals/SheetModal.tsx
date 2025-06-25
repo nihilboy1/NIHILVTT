@@ -3,10 +3,10 @@ import { useTokens } from "../../contexts/TokensContext";
 import { TokenType, type Point, type PlayerToken } from "../../types"; // Added PlayerToken
 import InteractiveModal from "../ui/InteractiveModal";
 import { useTokenSheetForm } from "../../hooks/useTokenSheetForm";
-import PlayerSheetPrincipalTab from "../tokenSheet/PlayerSheetPrincipalTab";
-import PlayerSheetDetailsTab from "../tokenSheet/PlayerSheetDetailsTab";
-import PlayerSheetConfigTab from "../tokenSheet/PlayerSheetConfigTab";
-import { GenericTokenSheet } from "../tokenSheet/GenericTokenSheet";
+import PrincipalTab from "../sheets/player/principalTab/PrincipalTab";
+import PlayerSheetDetailsTab from "../sheets/player/detailsTab/PlayerSheetDetailsTab";
+import PlayerSheetConfigTab from "../sheets/player/configTab/PlayerSheetConfigTab";
+import { CreatureSheet } from "../sheets/creature/CreatureSheet";
 import { cn } from "../../utils/cn"; // Importar o utilitário cn
 
 type PlayerSheetTab = "principal" | "detalhes" | "configuracoes";
@@ -17,7 +17,7 @@ interface TokenSheetModalProps {
   onClose: () => void;
 }
 
-export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
+export function SheetModal({ tokenId, onClose }: TokenSheetModalProps) {
   const { tokens, updateToken } = useTokens();
   const initialTokenData = tokenId
     ? tokens.find((t) => t.id === tokenId) || null
@@ -64,8 +64,6 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
     setEditingDeathSavesSuccesses,
     editingDeathSavesFailures,
     setEditingDeathSavesFailures,
-    editingExp,
-    setEditingExp,
     editingInitiative,
     setEditingInitiative,
     editingSpeed,
@@ -210,7 +208,7 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
 
         {editingTokenType === TokenType.PLAYER ? (
           playerSheetActiveTab === "principal" ? (
-            <PlayerSheetPrincipalTab
+            <PrincipalTab
               editingTokenName={editingTokenName}
               setEditingTokenName={setEditingTokenName}
               editingCharClass={editingCharClass}
@@ -223,8 +221,11 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
               setEditingSpecies={setEditingSpecies}
               editingSubclass={editingSubclass}
               setEditingSubclass={setEditingSubclass}
-              editingExp={editingExp}
-              setEditingExp={setEditingExp}
+              proficiencyBonus={
+                initialTokenData && initialTokenData.type === TokenType.PLAYER
+                  ? (initialTokenData as PlayerToken).proficiencyBonus ?? 0
+                  : 0
+              }
               editingArmorClass={editingArmorClass}
               setEditingArmorClass={setEditingArmorClass}
               editingInitiative={editingInitiative}
@@ -260,11 +261,6 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
               featuresAndTraits={featuresAndTraits}
               setFeaturesAndTraits={setFeaturesAndTraits}
               SKILLS_CONFIG={SKILLS_CONFIG}
-              proficiencyBonus={
-                initialTokenData && initialTokenData.type === TokenType.PLAYER
-                  ? (initialTokenData as PlayerToken).proficiencyBonus ?? 0
-                  : 0
-              }
             />
           ) : playerSheetActiveTab === "detalhes" ? (
             <PlayerSheetDetailsTab
@@ -282,7 +278,7 @@ export function TokenSheetModal({ tokenId, onClose }: TokenSheetModalProps) {
             />
           )
         ) : (
-          <GenericTokenSheet
+          <CreatureSheet
             editingTokenName={editingTokenName}
             setEditingTokenName={setEditingTokenName}
             editingTokenType={editingTokenType}

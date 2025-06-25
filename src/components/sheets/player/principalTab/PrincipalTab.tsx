@@ -1,9 +1,9 @@
 import React from "react";
-import { type PlayerToken, type Attack } from "../../types"; // Importar Attack
-import PlayerBasicInfo from "./PlayerBasicInfo";
-import PlayerAttributesAndSkills from "./PlayerAttributesAndSkills";
-import PlayerHealthAndCombat from "./PlayerHealthAndCombat";
-import PlayerAttacksAndFeatures from "./PlayerAttacksAndFeatures";
+import { type PlayerToken, type Attack } from "../../../../types"; // Importar Attack
+import { PrincipalHeader } from "./PrincipalHeader";
+import PlayerAttributesAndSkills from "./PrincipalAttributesAndSkills";
+import PlayerHealthAndCombat from "./PrincipalHealthAndCombat";
+import PlayerAttacksAndFeatures from "./PrincipalAttacksAndFeatures";
 
 interface PlayerSheetPrincipalTabProps {
   editingTokenName: string;
@@ -18,8 +18,7 @@ interface PlayerSheetPrincipalTabProps {
   setEditingSpecies: (species: string) => void;
   editingSubclass: string;
   setEditingSubclass: (subclass: string) => void;
-  editingExp: string;
-  setEditingExp: (exp: string) => void;
+  proficiencyBonus: number;
   editingArmorClass: string;
   setEditingArmorClass: (value: string) => void;
   editingInitiative: string;
@@ -71,7 +70,6 @@ interface PlayerSheetPrincipalTabProps {
     label: string;
     parentAttribute: keyof NonNullable<PlayerToken["attributes"]>;
   }[];
-  proficiencyBonus: number;
 }
 
 const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
@@ -87,8 +85,7 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
   setEditingSpecies,
   editingSubclass,
   setEditingSubclass,
-  editingExp,
-  setEditingExp,
+  proficiencyBonus,
   editingArmorClass,
   setEditingArmorClass,
   editingInitiative,
@@ -124,11 +121,10 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
   featuresAndTraits,
   setFeaturesAndTraits,
   SKILLS_CONFIG,
-  proficiencyBonus,
 }) => {
   return (
-    <div className="grid grid-cols-3 gap-2.5 p-0.5 overflow-y-auto max-h-[calc(100vh-200px)] hide-scrollbar">
-      <PlayerBasicInfo
+    <div className="flex flex-col p-0.5 overflow-y-auto max-h-[calc(100vh-12rem)] hide-scrollbar">
+      <PrincipalHeader
         editingTokenName={editingTokenName}
         setEditingTokenName={setEditingTokenName}
         editingCharClass={editingCharClass}
@@ -141,54 +137,55 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
         setEditingSpecies={setEditingSpecies}
         editingSubclass={editingSubclass}
         setEditingSubclass={setEditingSubclass}
-        editingExp={editingExp}
-        setEditingExp={setEditingExp}
-      />
-
-      <PlayerAttributesAndSkills
-        attributes={attributes}
-        setAttributes={setAttributes}
-        savingThrowProficiencies={savingThrowProficiencies}
-        setSavingThrowProficiencies={setSavingThrowProficiencies}
-        skillProficiencies={skillProficiencies}
-        setSkillProficiencies={setSkillProficiencies}
-        SKILLS_CONFIG={SKILLS_CONFIG}
         proficiencyBonus={proficiencyBonus}
       />
 
-      <PlayerHealthAndCombat
-        editingArmorClass={editingArmorClass}
-        setEditingArmorClass={setEditingArmorClass}
-        editingInitiative={editingInitiative}
-        setEditingInitiative={setEditingInitiative}
-        editingSpeed={editingSpeed}
-        setEditingSpeed={setEditingSpeed}
-        editingShieldEquipped={editingShieldEquipped}
-        setEditingShieldEquipped={setEditingShieldEquipped}
-        editingCurrentHp={editingCurrentHp}
-        setEditingCurrentHp={setEditingCurrentHp}
-        editingTempHp={editingTempHp}
-        setEditingTempHp={setEditingTempHp}
-        editingMaxHp={editingMaxHp}
-        setEditingMaxHp={setEditingMaxHp}
-        editingHitDiceUsed={editingHitDiceUsed}
-        setEditingHitDiceUsed={setEditingHitDiceUsed}
-        editingHitDiceMax={editingHitDiceMax}
-        setEditingHitDiceMax={setEditingHitDiceMax}
-        editingDeathSavesSuccesses={editingDeathSavesSuccesses}
-        setEditingDeathSavesSuccesses={setEditingDeathSavesSuccesses}
-        editingDeathSavesFailures={editingDeathSavesFailures}
-        setEditingDeathSavesFailures={setEditingDeathSavesFailures}
-      />
+      <div className="flex gap-3 ">
+        <PlayerAttributesAndSkills
+          attributes={attributes}
+          setAttributes={setAttributes}
+          savingThrowProficiencies={savingThrowProficiencies}
+          setSavingThrowProficiencies={setSavingThrowProficiencies}
+          skillProficiencies={skillProficiencies}
+          setSkillProficiencies={setSkillProficiencies}
+          SKILLS_CONFIG={SKILLS_CONFIG}
+          proficiencyBonus={proficiencyBonus}
+        />
 
-      <PlayerAttacksAndFeatures
-        attacks={attacks}
-        handleAddAttack={handleAddAttack}
-        handleRemoveAttack={handleRemoveAttack}
-        handleAttackChange={handleAttackChange}
-        featuresAndTraits={featuresAndTraits}
-        setFeaturesAndTraits={setFeaturesAndTraits}
-      />
+        <PlayerHealthAndCombat
+          editingArmorClass={editingArmorClass}
+          setEditingArmorClass={setEditingArmorClass}
+          editingInitiative={editingInitiative}
+          setEditingInitiative={setEditingInitiative}
+          editingSpeed={editingSpeed}
+          setEditingSpeed={setEditingSpeed}
+          editingShieldEquipped={editingShieldEquipped}
+          setEditingShieldEquipped={setEditingShieldEquipped}
+          editingCurrentHp={editingCurrentHp}
+          setEditingCurrentHp={setEditingCurrentHp}
+          editingTempHp={editingTempHp}
+          setEditingTempHp={setEditingTempHp}
+          editingMaxHp={editingMaxHp}
+          setEditingMaxHp={setEditingMaxHp}
+          editingHitDiceUsed={editingHitDiceUsed}
+          setEditingHitDiceUsed={setEditingHitDiceUsed}
+          editingHitDiceMax={editingHitDiceMax}
+          setEditingHitDiceMax={setEditingHitDiceMax}
+          editingDeathSavesSuccesses={editingDeathSavesSuccesses}
+          setEditingDeathSavesSuccesses={setEditingDeathSavesSuccesses}
+          editingDeathSavesFailures={editingDeathSavesFailures}
+          setEditingDeathSavesFailures={setEditingDeathSavesFailures}
+        />
+
+        <PlayerAttacksAndFeatures
+          attacks={attacks}
+          handleAddAttack={handleAddAttack}
+          handleRemoveAttack={handleRemoveAttack}
+          handleAttackChange={handleAttackChange}
+          featuresAndTraits={featuresAndTraits}
+          setFeaturesAndTraits={setFeaturesAndTraits}
+        />
+      </div>
     </div>
   );
 };

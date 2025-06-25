@@ -1,7 +1,10 @@
 import React from "react";
-import { type Attack, type PlayerToken as TokenInfo } from "../../types/index"; // Caminho corrigido
-import { PlusCircleIcon, TrashIcon } from "../icons"; // Caminho corrigido
-import { cn } from "../../utils/cn";
+import {
+  type Attack,
+  type PlayerToken as TokenInfo,
+} from "../../../../types/index"; // Caminho corrigido
+import { PlusCircleIcon, TrashIcon } from "../../../icons"; // Caminho corrigido
+import { cn } from "../../../../utils/cn";
 
 interface PlayerAttacksAndFeaturesProps {
   attacks: Attack[];
@@ -24,7 +27,12 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
 }) => {
   return (
     <div className="col-span-1 flex flex-col space-y-2.5 border  p-2 rounded-md">
-      <h3 className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-center uppercase mb-1")}>
+      <h3
+        className={cn(
+          "block text-[11px] font-medium text-accent-primary mb-px",
+          "text-center uppercase mb-1"
+        )}
+      >
         Ataques & Cantrips
       </h3>
       {attacks &&
@@ -41,7 +49,10 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
                 onChange={(e) =>
                   handleAttackChange(attack.id, "name", e.target.value)
                 }
-                className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-xs")}
+                className={cn(
+                  "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
+                  "text-xs"
+                )}
               />
             </div>
             <div className="col-span-3">
@@ -52,7 +63,10 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
                 onChange={(e) =>
                   handleAttackChange(attack.id, "attackBonus", e.target.value)
                 }
-                className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-xs text-center")}
+                className={cn(
+                  "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
+                  "text-xs text-center"
+                )}
               />
             </div>
             <div className="col-span-3">
@@ -63,7 +77,10 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
                 onChange={(e) =>
                   handleAttackChange(attack.id, "damage", e.target.value)
                 }
-                className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-xs")}
+                className={cn(
+                  "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
+                  "text-xs"
+                )}
               />
             </div>
             <button
@@ -84,7 +101,12 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
         <span>Adicionar Ataque</span>
       </button>
       <div className="border  p-2 rounded-md mt-2 flex-grow flex flex-col">
-        <h3 className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-center uppercase mb-1")}>
+        <h3
+          className={cn(
+            "block text-[11px] font-medium text-accent-primary mb-px",
+            "text-center uppercase mb-1"
+          )}
+        >
           Características & Talentos
         </h3>
         <textarea
@@ -119,7 +141,10 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
             setFeaturesAndTraits(newFeaturesArray);
           }}
           placeholder="Descreva características de classe, espécie, talentos, etc."
-          className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "min-h-[150px] flex-grow text-xs")}
+          className={cn(
+            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
+            "min-h-[150px] flex-grow text-xs"
+          )}
         />
       </div>
     </div>

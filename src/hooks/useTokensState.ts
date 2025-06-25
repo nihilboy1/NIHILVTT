@@ -10,7 +10,7 @@ import {
 import {
   DEFAULT_TOKEN_IMAGE, // Importar a imagem padrão
   DEFAULT_TOKEN_DATA, // Importar os dados padrão do token
-} from "../constants/tokenSheetDefaults"; // Ajustar o caminho da importação
+} from "../constants/sheetDefaults"; // Ajustar o caminho da importação
 import { generateUniqueId } from "../utils/id/idUtils"; // Importar a função
 
 export interface TokensState {

@@ -10,13 +10,13 @@ import { tokenTypeTranslations } from '../../constants'; // Manter importação 
 interface TokenTemplateListItemProps {
   tokenInfo: TokenInfo;
   instanceCount: number;
-  openTokenSheetModal: (tokenInfoId: string) => void;
+  openSheetModal: (tokenInfoId: string) => void;
 }
 
 export function TokenTemplateListItem({ 
   tokenInfo, 
   instanceCount, 
-  openTokenSheetModal 
+  openSheetModal 
 }: TokenTemplateListItemProps) {
   const { deleteToken, duplicateToken } = useTokens();
   const { openModal, closeModal } = useModal();
@@ -76,10 +76,10 @@ export function TokenTemplateListItem({
     >
       <div
         className="hover:bg-surface-0 flex items-center space-x-3 flex-grow cursor-pointer rounded -ml-1 pl-5 -my-1 py-1"
-        onClick={() => openTokenSheetModal(tokenInfo.id)}
+        onClick={() => openSheetModal(tokenInfo.id)}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openTokenSheetModal(tokenInfo.id); }}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openSheetModal(tokenInfo.id); }}
         aria-describedby={`token-details-${tokenInfo.id}`}
       >
         <img
