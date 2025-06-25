@@ -56,14 +56,12 @@ export function SheetModal({ tokenId, onClose }: TokenSheetModalProps) {
     setEditingShieldEquipped,
     editingTempHp,
     setEditingTempHp,
-    editingHitDiceUsed,
-    setEditingHitDiceUsed,
-    editingHitDiceMax,
-    setEditingHitDiceMax,
     editingDeathSavesSuccesses,
     setEditingDeathSavesSuccesses,
     editingDeathSavesFailures,
     setEditingDeathSavesFailures,
+    editingHitDiceEntries,
+    setEditingHitDiceEntries,
     editingInitiative,
     setEditingInitiative,
     editingSpeed,
@@ -240,14 +238,12 @@ export function SheetModal({ tokenId, onClose }: TokenSheetModalProps) {
               setEditingTempHp={setEditingTempHp}
               editingMaxHp={editingMaxHp}
               setEditingMaxHp={setEditingMaxHp}
-              editingHitDiceUsed={editingHitDiceUsed}
-              setEditingHitDiceUsed={setEditingHitDiceUsed}
-              editingHitDiceMax={editingHitDiceMax}
-              setEditingHitDiceMax={setEditingHitDiceMax}
               editingDeathSavesSuccesses={editingDeathSavesSuccesses}
               setEditingDeathSavesSuccesses={setEditingDeathSavesSuccesses}
               editingDeathSavesFailures={editingDeathSavesFailures}
               setEditingDeathSavesFailures={setEditingDeathSavesFailures}
+              editingHitDiceEntries={editingHitDiceEntries}
+              setEditingHitDiceEntries={setEditingHitDiceEntries}
               attributes={attributes}
               setAttributes={setAttributes}
               savingThrowProficiencies={savingThrowProficiencies}

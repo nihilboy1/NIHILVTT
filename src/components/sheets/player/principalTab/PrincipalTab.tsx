@@ -1,9 +1,9 @@
 import React from "react";
-import { type PlayerToken, type Attack } from "../../../../types"; // Importar Attack
+import { type PlayerToken, type Attack, type HitDiceEntry } from "../../../../types";
 import { PrincipalHeader } from "./PrincipalHeader";
 import PlayerAttributesAndSkills from "./PrincipalAttributesAndSkills";
-import PlayerHealthAndCombat from "./PrincipalHealthAndCombat";
 import PlayerAttacksAndFeatures from "./PrincipalAttacksAndFeatures";
+import { PrincipalHealthAndCombat } from "./PrincipalHealthAndCombat";
 
 interface PlayerSheetPrincipalTabProps {
   editingTokenName: string;
@@ -33,10 +33,8 @@ interface PlayerSheetPrincipalTabProps {
   setEditingTempHp: (value: string) => void;
   editingMaxHp: string;
   setEditingMaxHp: (value: string) => void;
-  editingHitDiceUsed: string;
-  setEditingHitDiceUsed: (value: string) => void;
-  editingHitDiceMax: string;
-  setEditingHitDiceMax: (value: string) => void;
+  editingHitDiceEntries: HitDiceEntry[];
+  setEditingHitDiceEntries: (value: HitDiceEntry[]) => void;
   editingDeathSavesSuccesses: number;
   setEditingDeathSavesSuccesses: (value: number) => void;
   editingDeathSavesFailures: number;
@@ -100,10 +98,8 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
   setEditingTempHp,
   editingMaxHp,
   setEditingMaxHp,
-  editingHitDiceUsed,
-  setEditingHitDiceUsed,
-  editingHitDiceMax,
-  setEditingHitDiceMax,
+  editingHitDiceEntries,
+  setEditingHitDiceEntries,
   editingDeathSavesSuccesses,
   setEditingDeathSavesSuccesses,
   editingDeathSavesFailures,
@@ -123,7 +119,7 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
   SKILLS_CONFIG,
 }) => {
   return (
-    <div className="flex flex-col p-0.5 overflow-y-auto max-h-[calc(100vh-12rem)] hide-scrollbar">
+    <div className="flex flex-col p-0.5 overflow-y-auto max-h-[calc(100vh-12rem)] hide-scrollbar border">
       <PrincipalHeader
         editingTokenName={editingTokenName}
         setEditingTokenName={setEditingTokenName}
@@ -140,7 +136,7 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
         proficiencyBonus={proficiencyBonus}
       />
 
-      <div className="flex gap-3 ">
+      <div className="flex justify-between flex-wrap gap-2">
         <PlayerAttributesAndSkills
           attributes={attributes}
           setAttributes={setAttributes}
@@ -152,7 +148,7 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
           proficiencyBonus={proficiencyBonus}
         />
 
-        <PlayerHealthAndCombat
+        <PrincipalHealthAndCombat
           editingArmorClass={editingArmorClass}
           setEditingArmorClass={setEditingArmorClass}
           editingInitiative={editingInitiative}
@@ -167,10 +163,8 @@ const PlayerSheetPrincipalTab: React.FC<PlayerSheetPrincipalTabProps> = ({
           setEditingTempHp={setEditingTempHp}
           editingMaxHp={editingMaxHp}
           setEditingMaxHp={setEditingMaxHp}
-          editingHitDiceUsed={editingHitDiceUsed}
-          setEditingHitDiceUsed={setEditingHitDiceUsed}
-          editingHitDiceMax={editingHitDiceMax}
-          setEditingHitDiceMax={setEditingHitDiceMax}
+          editingHitDiceEntries={editingHitDiceEntries}
+          setEditingHitDiceEntries={setEditingHitDiceEntries}
           editingDeathSavesSuccesses={editingDeathSavesSuccesses}
           setEditingDeathSavesSuccesses={setEditingDeathSavesSuccesses}
           editingDeathSavesFailures={editingDeathSavesFailures}

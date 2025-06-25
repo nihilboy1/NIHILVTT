@@ -74,6 +74,7 @@ export interface PlayerToken extends BaseToken {
   hitDiceMax?: number;
   deathSavesSuccesses?: number;
   deathSavesFailures?: number;
+  hitDiceEntries?: HitDiceEntry[];
 
   // Campos D&D 5.5
   attributes?: {
@@ -156,6 +157,12 @@ export interface EquipmentItem {
   description?: string;
   weight?: number;
   equipped?: boolean; // Para itens como armaduras, escudos, armas
+}
+
+export interface HitDiceEntry {
+  id: string;
+  type: "d4" | "d6" | "d8" | "d10" | "d12" | "d20";
+  quantity: number;
 }
 
 export interface FeatureOrTrait {

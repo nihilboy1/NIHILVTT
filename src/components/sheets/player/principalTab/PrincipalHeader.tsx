@@ -30,11 +30,11 @@ export function PrincipalHeader({
   proficiencyBonus,
 }: PrincipalHeaderProps) {
   return (
-    <div className="flex w-full rounded-md  gap-10 mb-2 items-center">
-      <div id="name" className="flex flex-col h-full">
+    <div className="flex w-full rounded-md  gap-10 mb-2 items-center bg-surface-1 p-2">
+      <div id="name" className="flex flex-col ">
         <label
           htmlFor="editingTokenName"
-          className="block text-[1.2rem] font-medium w-full"
+          className=" text-[1.2rem] font-medium  -mt-1 w-[15rem]"
         >
           NOME DO PERSONAGEM
         </label>
@@ -114,7 +114,7 @@ export function PrincipalHeader({
         </div>
       </div>
 
-      <div id="levelAndProficiency" className="flex flex-col ">
+      <div id="levelAndProficiency" className="flex flex-col  w-[5rem]">
         <div>
           <label
             htmlFor="editingLevel"
@@ -130,7 +130,7 @@ export function PrincipalHeader({
               const val = e.target.value;
               if (val.length <= 2) setEditingLevel(val);
             }}
-            className="hide-arrows w-[2rem] pl-1.5 bg-surface-1 border border-surface-2 rounded-md text-[0.8rem] "
+            className="hide-arrows w-full pl-1.5 bg-surface-1 border border-surface-2 rounded-md text-[0.8rem] "
             min="1"
             max="99"
             step="1"
@@ -146,7 +146,7 @@ export function PrincipalHeader({
           </label>
           <span
             id="proficiencyBonus"
-            className="w-[2rem]  bg-surface-1 border border-surface-2 rounded-md text-[0.8rem] flex items-center justify-center "
+            className="block hide-arrows  pl-1.5 bg-surface-1 border border-surface-2 rounded-md text-[0.8rem] "
           >
             +{proficiencyBonus}
           </span>

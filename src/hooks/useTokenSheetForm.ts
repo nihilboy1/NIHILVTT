@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { type PlayerToken, TokenType, type Attack } from "../types/index";
+import { type PlayerToken, TokenType, type Attack, type HitDiceEntry } from "../types/index";
 import {
   DEFAULT_TOKEN_SIZE,
   DEFAULT_TOKEN_HP,
@@ -48,14 +48,12 @@ export interface UseTokenSheetFormReturn {
   setEditingShieldEquipped: React.Dispatch<React.SetStateAction<boolean>>;
   editingTempHp: string;
   setEditingTempHp: React.Dispatch<React.SetStateAction<string>>;
-  editingHitDiceUsed: string;
-  setEditingHitDiceUsed: React.Dispatch<React.SetStateAction<string>>;
-  editingHitDiceMax: string;
-  setEditingHitDiceMax: React.Dispatch<React.SetStateAction<string>>;
   editingDeathSavesSuccesses: number;
   setEditingDeathSavesSuccesses: React.Dispatch<React.SetStateAction<number>>;
   editingDeathSavesFailures: number;
   setEditingDeathSavesFailures: React.Dispatch<React.SetStateAction<number>>;
+  editingHitDiceEntries: HitDiceEntry[];
+  setEditingHitDiceEntries: React.Dispatch<React.SetStateAction<HitDiceEntry[]>>;
   proficiencyBonus: number; // Alterado para number e não editável
   editingInitiative: string;
   setEditingInitiative: React.Dispatch<React.SetStateAction<string>>;
@@ -120,11 +118,10 @@ export const useTokenSheetForm = ({
   const [editingArmorClass, setEditingArmorClass] = useState(String(10));
   const [editingShieldEquipped, setEditingShieldEquipped] = useState(false);
   const [editingTempHp, setEditingTempHp] = useState(String(0));
-  const [editingHitDiceUsed, setEditingHitDiceUsed] = useState(String(0));
-  const [editingHitDiceMax, setEditingHitDiceMax] = useState(String(1));
   const [editingDeathSavesSuccesses, setEditingDeathSavesSuccesses] =
     useState(0);
   const [editingDeathSavesFailures, setEditingDeathSavesFailures] = useState(0);
+  const [editingHitDiceEntries, setEditingHitDiceEntries] = useState<HitDiceEntry[]>([{ id: crypto.randomUUID(), type: "d6", quantity: 1 }]);
   // Removido editingProficiency como estado, será calculado
   const [editingInitiative, setEditingInitiative] = useState(String(0));
   const [editingSpeed, setEditingSpeed] = useState(String(30));
@@ -169,10 +166,13 @@ export const useTokenSheetForm = ({
         setEditingArmorClass(String(initialTokenData.armorClass ?? 10));
         setEditingShieldEquipped(initialTokenData.shieldEquipped ?? false);
         setEditingTempHp(String(initialTokenData.tempHp ?? 0));
-        setEditingHitDiceUsed(String(initialTokenData.hitDiceUsed ?? 0));
-        setEditingHitDiceMax(String(initialTokenData.hitDiceMax ?? 1));
         setEditingDeathSavesSuccesses(initialTokenData.deathSavesSuccesses ?? 0);
         setEditingDeathSavesFailures(initialTokenData.deathSavesFailures ?? 0);
+        setEditingHitDiceEntries(
+          initialTokenData.hitDiceEntries && initialTokenData.hitDiceEntries.length > 0
+            ? initialTokenData.hitDiceEntries
+            : [{ id: crypto.randomUUID(), type: "d6", quantity: 1 }]
+        );
         // Removido setEditingProficiency
         setEditingInitiative(String(initialTokenData.initiative ?? 0));
         setEditingSpeed(String(initialTokenData.speed ?? 30));
@@ -244,12 +244,6 @@ export const useTokenSheetForm = ({
         changed || editingTempHp !== String(initialTokenData.tempHp ?? 0);
       changed =
         changed ||
-        editingHitDiceUsed !== String(initialTokenData.hitDiceUsed ?? 0);
-      changed =
-        changed ||
-        editingHitDiceMax !== String(initialTokenData.hitDiceMax ?? 1);
-      changed =
-        changed ||
         editingDeathSavesSuccesses !==
           (initialTokenData.deathSavesSuccesses ?? 0);
       changed =
@@ -311,10 +305,9 @@ export const useTokenSheetForm = ({
     editingArmorClass,
     editingShieldEquipped,
     editingTempHp,
-    editingHitDiceUsed,
-    editingHitDiceMax,
     editingDeathSavesSuccesses,
     editingDeathSavesFailures,
+    editingHitDiceEntries,
     // Removido editingProficiency
     editingInitiative,
     editingSpeed,
@@ -382,8 +375,6 @@ export const useTokenSheetForm = ({
       let levelNum = DEFAULT_PLAYER_LEVEL;
       let armorClassNum = 10;
       let tempHpNum = 0;
-      let hitDiceUsedNum = 0;
-      let hitDiceMaxNum = 1;
       // Removido proficiencyNum como variável de estado
       let initiativeNum = 0;
       let speedNum = 30;
@@ -404,18 +395,6 @@ export const useTokenSheetForm = ({
         tempHpNum = parseInt(editingTempHp, 10);
         if (isNaN(tempHpNum) || tempHpNum < 0) {
           alert("Vida Temporária inválida. Deve ser um número não negativo.");
-          return;
-        }
-        hitDiceUsedNum = parseInt(editingHitDiceUsed, 10);
-        hitDiceMaxNum = parseInt(editingHitDiceMax, 10);
-        if (
-          isNaN(hitDiceUsedNum) ||
-          hitDiceUsedNum < 0 ||
-          isNaN(hitDiceMaxNum) ||
-          hitDiceMaxNum < 0 ||
-          hitDiceUsedNum > hitDiceMaxNum
-        ) {
-          alert("Valores de Dados de Vida inválidos.");
           return;
         }
         // Removida validação de proficiencyNum
@@ -451,8 +430,7 @@ export const useTokenSheetForm = ({
         updatedTokenPartialData.armorClass = armorClassNum;
         updatedTokenPartialData.shieldEquipped = editingShieldEquipped;
         updatedTokenPartialData.tempHp = tempHpNum;
-        updatedTokenPartialData.hitDiceUsed = hitDiceUsedNum;
-        updatedTokenPartialData.hitDiceMax = hitDiceMaxNum;
+        updatedTokenPartialData.hitDiceEntries = editingHitDiceEntries;
         updatedTokenPartialData.deathSavesSuccesses =
           editingDeathSavesSuccesses;
         updatedTokenPartialData.deathSavesFailures = editingDeathSavesFailures;
@@ -488,10 +466,9 @@ export const useTokenSheetForm = ({
       editingArmorClass,
       editingShieldEquipped,
       editingTempHp,
-      editingHitDiceUsed,
-      editingHitDiceMax,
       editingDeathSavesSuccesses,
       editingDeathSavesFailures,
+      editingHitDiceEntries,
       proficiencyBonus, // Adicionado ao array de dependências
       editingInitiative,
       editingSpeed,
@@ -560,14 +537,12 @@ export const useTokenSheetForm = ({
     setEditingShieldEquipped,
     editingTempHp,
     setEditingTempHp,
-    editingHitDiceUsed,
-    setEditingHitDiceUsed,
-    editingHitDiceMax,
-    setEditingHitDiceMax,
     editingDeathSavesSuccesses,
     setEditingDeathSavesSuccesses,
     editingDeathSavesFailures,
     setEditingDeathSavesFailures,
+    editingHitDiceEntries,
+    setEditingHitDiceEntries,
     proficiencyBonus, // Retornar o bônus de proficiência calculado
     editingInitiative,
     setEditingInitiative,
