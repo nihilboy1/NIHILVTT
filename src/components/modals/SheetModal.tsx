@@ -16,9 +16,10 @@ const ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT = 700;
 interface TokenSheetModalProps {
   tokenId: string | null;
   onClose: () => void;
+  zIndex?: number; // Adicionado zIndex
 }
 
-export function SheetModal({ tokenId, onClose }: TokenSheetModalProps) {
+export function SheetModal({ tokenId, onClose, zIndex }: TokenSheetModalProps) {
   const { tokens, updateToken } = useTokens();
   const initialTokenData = tokenId
     ? tokens.find((t) => t.id === tokenId) || null
@@ -131,7 +132,7 @@ export function SheetModal({ tokenId, onClose }: TokenSheetModalProps) {
       minHeight={MIN_SHEET_HEIGHT}
       maxWidth={MAX_SHEET_WIDTH}
       maxHeight={MAX_SHEET_HEIGHT}
-      zIndex={51}
+      zIndex={zIndex} // Passar zIndex para o InteractiveModal
     >
       <form onSubmit={handleSave} className="space-y-0.5 bg-surface-0 ">
         {editingTokenType === TokenType.PLAYER && (

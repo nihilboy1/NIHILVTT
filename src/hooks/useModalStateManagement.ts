@@ -1,9 +1,13 @@
 import { useState, useCallback } from 'react';
 
-export interface ModalState {
-  activeModal: string | null;
+export interface ModalEntry {
+  name: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  modalProps: Record<string, any>;
+  props: Record<string, any>;
+}
+
+export interface ModalState {
+  modalStack: ModalEntry[];
 }
 
 export interface UseModalStateManagementReturn extends ModalState {
@@ -16,25 +20,35 @@ export interface UseModalStateManagementReturn extends ModalState {
 
 export const useModalStateManagement = (): UseModalStateManagementReturn => {
   const [modalState, setModalState] = useState<ModalState>({
-    activeModal: null,
-    modalProps: {},
+    modalStack: [],
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const openModal = useCallback((modalName: string, props: Record<string, any> = {}) => {
-    setModalState({ activeModal: modalName, modalProps: props });
+    setModalState(prevState => ({
+      modalStack: [...prevState.modalStack, { name: modalName, props }],
+    }));
   }, []);
 
   const closeModal = useCallback(() => {
-    setModalState({ activeModal: null, modalProps: {} });
+    setModalState(prevState => ({
+      modalStack: prevState.modalStack.slice(0, -1), // Remove o último modal da pilha
+    }));
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateModalProps = useCallback((partialProps: Record<string, any>) => {
-    setModalState(prevState => ({
-      ...prevState,
-      modalProps: { ...prevState.modalProps, ...partialProps },
-    }));
+    setModalState(prevState => {
+      const newModalStack = [...prevState.modalStack];
+      if (newModalStack.length > 0) {
+        const topModalIndex = newModalStack.length - 1;
+        newModalStack[topModalIndex] = {
+          ...newModalStack[topModalIndex],
+          props: { ...newModalStack[topModalIndex].props, ...partialProps },
+        };
+      }
+      return { modalStack: newModalStack };
+    });
   }, []);
 
   return {

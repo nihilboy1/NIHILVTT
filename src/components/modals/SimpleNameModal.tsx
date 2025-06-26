@@ -9,6 +9,7 @@ interface SimpleNameModalProps {
   title: string;
   currentName?: string;
   tokenType?: TokenType; // Adicionado tokenType como prop
+  zIndex?: number; // Adicionado zIndex
 }
 
 export function SimpleNameModal({
@@ -18,6 +19,7 @@ export function SimpleNameModal({
   title,
   currentName = "",
   tokenType, // Receber tokenType
+  zIndex, // Receber zIndex
 }: SimpleNameModalProps) {
   const [name, setName] = useState(currentName);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,6 +46,7 @@ export function SimpleNameModal({
       title={title}
       onConfirm={handleSaveClick} // Passa a função de salvar para o modal base
       confirmText="Salvar" // Define o texto do botão de confirmação
+      zIndex={zIndex} // Passar zIndex para o Modal base
     >
       <div>
         {" "}

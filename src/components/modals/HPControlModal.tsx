@@ -13,6 +13,7 @@ interface HPControlModalProps {
   onHPChange: (newHP: number) => void; // Will update HP on the linked TokenInfo
   onRemoveFromBoard: (instanceId: string) => void; // Removes the GridInstance
   onMakeIndependent: (instanceId: string) => void; // Makes the GridInstance independent
+  zIndex?: number; // Adicionado zIndex
 }
 
 export const HP_MODAL_ESTIMATED_HEIGHT_REM = 2.5; // Converted from 40px
@@ -26,6 +27,7 @@ export function HPControlModal({
   onHPChange,
   onRemoveFromBoard,
   onMakeIndependent,
+  zIndex,
 }: HPControlModalProps) {
   const [editableHP, setEditableHP] = useState<string>("");
   const modalRef = useRef<HTMLDivElement>(null);
@@ -125,7 +127,7 @@ export function HPControlModal({
     position: "fixed",
     top: `${anchorPoint.y}px`,
     left: `${anchorPoint.x}px`,
-    zIndex: 100,
+    zIndex: zIndex, // Aplicar zIndex
     height: `${HP_MODAL_ESTIMATED_HEIGHT_REM}rem`,
   };
 

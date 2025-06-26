@@ -10,6 +10,7 @@ interface ModalProps {
   confirmText?: string; // Texto do botão de confirmação
   cancelText?: string; // Texto do botão de cancelar
   hideFooter?: boolean; // Oculta o rodapé com os botões
+  zIndex?: number; // Adicionado zIndex
 }
 
 export function Modal({
@@ -21,6 +22,7 @@ export function Modal({
   confirmText = "Confirmar", // Texto padrão para o botão de confirmação
   cancelText = "Cancelar", // Texto padrão para o botão de cancelar
   hideFooter = false, // Por padrão, o rodapé é visível
+  zIndex, // Receber zIndex
 }: ModalProps) {
   useEffect(() => {
     // Manipulador para fechar o modal com a tecla 'Escape'
@@ -47,6 +49,7 @@ export function Modal({
       role="dialog" // Semântica para acessibilidade
       aria-modal="true" // Indica que o conteúdo fora do modal está inerte
       aria-labelledby="modal-title" // Associa o título ao modal para acessibilidade
+      style={{ zIndex: zIndex }} // Aplicar zIndex
     >
       <div
         className="bg-surface-0 p-6 rounded-lg shadow-xl max-w-md w-full" // Container do conteúdo do modal
@@ -87,4 +90,3 @@ export function Modal({
     </div>
   );
 }
-

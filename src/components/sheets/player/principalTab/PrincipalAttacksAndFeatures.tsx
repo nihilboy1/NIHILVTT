@@ -1,36 +1,23 @@
-import React from "react";
-import {
-  type Attack,
-  type PlayerToken as TokenInfo,
-} from "../../../../types/index"; // Caminho corrigido
-import { PlusCircleIcon, TrashIcon } from "../../../icons"; // Caminho corrigido
+import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
+import { DeleteIcon, PlusCircleIcon } from "../../../icons";
 import { cn } from "../../../../utils/cn";
 import { generateUniqueId } from '../../../../utils/id/idUtils';
 
-interface PlayerAttacksAndFeaturesProps {
-  attacks: Attack[];
-  handleAddAttack: () => void;
-  handleRemoveAttack: (id: string) => void;
-  handleAttackChange: (id: string, field: keyof Attack, value: string) => void;
-  featuresAndTraits: TokenInfo["featuresAndTraits"];
-  setFeaturesAndTraits: React.Dispatch<
-    React.SetStateAction<TokenInfo["featuresAndTraits"]>
-  >;
-}
+export function PrincipalAttacksAndFeatures() {
+  const {
+    attacks,
+    handleAddAttack,
+    handleRemoveAttack,
+    handleAttackChange,
+    featuresAndTraits,
+    setFeaturesAndTraits,
+  } = usePlayerSheet();
 
-const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
-  attacks,
-  handleAddAttack,
-  handleRemoveAttack,
-  handleAttackChange,
-  featuresAndTraits,
-  setFeaturesAndTraits,
-}) => {
   return (
     <div className="col-span-1 flex flex-col space-y-2.5 border  p-2 rounded-md">
       <h3
         className={cn(
-          "block text-[11px] font-medium text-accent-primary mb-px",
+          "block text-[0.6875rem] font-medium text-accent-primary mb-px", // Converted from 11px
           "text-center uppercase mb-1"
         )}
       >
@@ -89,7 +76,7 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
               onClick={() => handleRemoveAttack(attack.id)}
               className="col-span-1  justify-self-center"
             >
-              <TrashIcon className="h-4 w-4" />
+              <DeleteIcon className="h-4 w-4" />
             </button>
           </div>
         ))}
@@ -104,7 +91,7 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
       <div className="border  p-2 rounded-md mt-2 flex-grow flex flex-col">
         <h3
           className={cn(
-            "block text-[11px] font-medium text-accent-primary mb-px",
+            "block text-[0.6875rem] font-medium text-accent-primary mb-px", // Converted from 11px
             "text-center uppercase mb-1"
           )}
         >
@@ -150,6 +137,4 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
       </div>
     </div>
   );
-};
-
-export default PlayerAttacksAndFeatures;
+}

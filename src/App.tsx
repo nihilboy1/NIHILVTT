@@ -50,7 +50,7 @@ export default function App() {
     activeTool,
   } = useUI();
 
-  const { activeModal, modalProps, openModal, closeModal, updateModalProps } =
+  const { modalStack, openModal, closeModal, updateModalProps } =
     useModal();
 
   const gameBoardRef = useRef<HTMLDivElement>(null);
@@ -66,15 +66,20 @@ export default function App() {
     string[]
   >([]);
 
+  // Helper para obter o modal ativo e suas props
+  const activeModalEntry = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
+  const activeModalName = activeModalEntry?.name;
+  const activeModalProps = activeModalEntry?.props;
+
   useEffect(() => {
     const currentHPModalInstanceId =
-      activeModal === "hpControl" ? modalProps.instanceId : null;
+      activeModalName === "hpControl" ? activeModalProps?.instanceId : null;
     const currentSheetId =
-      activeModal === "sheet" ? modalProps.tokenId : null;
+      activeModalName === "sheet" ? activeModalProps?.tokenId : null;
 
     // Fechar modal de HP se a instância alvo for removida
     if (
-      activeModal === "hpControl" &&
+      activeModalName === "hpControl" &&
       currentHPModalInstanceId &&
       !gridInstances.find(
         (gi: GridInstance) => gi.instanceId === currentHPModalInstanceId
@@ -84,7 +89,7 @@ export default function App() {
     }
     // Fechar TokenSheet se o TokenInfo alvo for deletado
     if (
-      activeModal === "sheet" &&
+      activeModalName === "sheet" &&
       currentSheetId &&
       !tokens.find((t: TokenInfo) => t.id === currentSheetId)
     ) {
@@ -117,21 +122,21 @@ export default function App() {
   }, [
     tokens,
     gridInstances,
-    activeModal,
+    activeModalName,
     closeModal,
     draggingVisuals.instanceId,
     preDragHPModalInstanceId,
-    modalProps.instanceId,
-    modalProps.tokenId,
+    activeModalProps?.instanceId,
+    activeModalProps?.tokenId,
   ]);
 
   useEffect(() => {
-    if (activeModal === "hpControl" && modalProps.instanceId) {
+    if (activeModalName === "hpControl" && activeModalProps?.instanceId) {
       const selectedInstance = gridInstances.find(
-        (gi: GridInstance) => gi.instanceId === modalProps.instanceId
+        (gi: GridInstance) => gi.instanceId === activeModalProps.instanceId
       );
       const isInstanceBeingDragged =
-        draggingVisuals.instanceId === modalProps.instanceId &&
+        draggingVisuals.instanceId === activeModalProps.instanceId &&
         draggingVisuals.visualSVGPoint !== null;
 
       if (
@@ -144,8 +149,8 @@ export default function App() {
   }, [
     gridInstances,
     activeTool,
-    activeModal,
-    modalProps,
+    activeModalName,
+    activeModalProps,
     draggingVisuals,
     closeModal,
   ]);
@@ -159,7 +164,7 @@ export default function App() {
       tokenTypeFromModal,
     });
     // Usar o tokenType vindo diretamente do modal, que é mais confiável
-    const typeToUse = tokenTypeFromModal || modalProps.tokenType; // Mantendo o fallback para modalProps.tokenType por segurança, embora modalProps.type seja o correto agora.
+    const typeToUse = tokenTypeFromModal || activeModalProps?.tokenType; // Mantendo o fallback para activeModalProps?.tokenType por segurança, embora activeModalProps?.type seja o correto agora.
 
     if (!typeToUse) {
       console.error("handleSaveNewTokenName: tokenType is missing.");
@@ -258,14 +263,14 @@ export default function App() {
   const handleRemoveInstanceFromBoard = useCallback(
     (instanceId: string) => {
       removeGridInstance(instanceId);
-      if (activeModal === "hpControl" && modalProps.instanceId === instanceId) {
+      if (activeModalName === "hpControl" && activeModalProps?.instanceId === instanceId) {
         closeModal();
       }
       setMultiSelectedInstanceIds((prev: string[]) =>
         prev.filter((id: string) => id !== instanceId)
       );
     },
-    [removeGridInstance, activeModal, modalProps, closeModal]
+    [removeGridInstance, activeModalName, activeModalProps, closeModal]
   );
 
   const handleMakeInstanceIndependent = useCallback(
@@ -282,8 +287,8 @@ export default function App() {
     (_instanceId: string, newScreenRect: DOMRect | null) => {
       const newAnchor = calculateHPModalAnchorPoint(newScreenRect);
 
-      if (activeModal === "hpControl") {
-        const currentAnchor = modalProps.anchorPoint as AppPoint | null;
+      if (activeModalName === "hpControl") {
+        const currentAnchor = activeModalProps?.anchorPoint as AppPoint | null;
 
         // Só atualiza se o anchor realmente mudou de valor ou de null para valor / valor para null
         if (
@@ -298,18 +303,18 @@ export default function App() {
         }
       }
     },
-    [activeModal, updateModalProps, modalProps.anchorPoint]
+    [activeModalName, updateModalProps, activeModalProps?.anchorPoint]
   );
 
   useEffect(() => {
     const currentHPModalInstanceId =
-      activeModal === "hpControl" ? modalProps.instanceId : null;
+      activeModalName === "hpControl" ? activeModalProps?.instanceId : null;
     const currentSheetId =
-      activeModal === "sheet" ? modalProps.tokenId : null;
+      activeModalName === "sheet" ? activeModalProps?.tokenId : null;
 
     // Fechar modal de HP se a instância alvo for removida
     if (
-      activeModal === "hpControl" &&
+      activeModalName === "hpControl" &&
       currentHPModalInstanceId &&
       !gridInstances.find(
         (gi: GridInstance) => gi.instanceId === currentHPModalInstanceId
@@ -319,7 +324,7 @@ export default function App() {
     }
     // Fechar TokenSheet se o TokenInfo alvo for deletado
     if (
-      activeModal === "sheet" &&
+      activeModalName === "sheet" &&
       currentSheetId &&
       !tokens.find((t: TokenInfo) => t.id === currentSheetId)
     ) {
@@ -352,21 +357,21 @@ export default function App() {
   }, [
     tokens,
     gridInstances,
-    activeModal,
+    activeModalName,
     closeModal,
     draggingVisuals.instanceId,
     preDragHPModalInstanceId,
-    modalProps.instanceId,
-    modalProps.tokenId,
+    activeModalProps?.instanceId,
+    activeModalProps?.tokenId,
   ]);
 
   useEffect(() => {
-    if (activeModal === "hpControl" && modalProps.instanceId) {
+    if (activeModalName === "hpControl" && activeModalProps?.instanceId) {
       const selectedInstance = gridInstances.find(
-        (gi: GridInstance) => gi.instanceId === modalProps.instanceId
+        (gi: GridInstance) => gi.instanceId === activeModalProps.instanceId
       );
       const isInstanceBeingDragged =
-        draggingVisuals.instanceId === modalProps.instanceId &&
+        draggingVisuals.instanceId === activeModalProps.instanceId &&
         draggingVisuals.visualSVGPoint !== null;
 
       if (
@@ -379,22 +384,22 @@ export default function App() {
   }, [
     gridInstances,
     activeTool,
-    activeModal,
-    modalProps,
+    activeModalName,
+    activeModalProps,
     draggingVisuals,
     closeModal,
   ]);
 
   const handleGridInstanceDragStart = useCallback(
     (instanceId: string) => {
-      if (activeModal === "hpControl" && modalProps.instanceId === instanceId) {
+      if (activeModalName === "hpControl" && activeModalProps?.instanceId === instanceId) {
         setPreDragHPModalInstanceId(instanceId);
         closeModal();
       }
       setDraggingVisuals((prev: DraggingVisuals) => ({ ...prev, instanceId }));
       handleClearMultiSelection(); // Clear multi-selection when dragging a token
     },
-    [activeModal, modalProps, closeModal, handleClearMultiSelection]
+    [activeModalName, activeModalProps, closeModal, handleClearMultiSelection]
   );
 
   const handleGridInstanceDragMove = useCallback(
@@ -472,8 +477,8 @@ export default function App() {
             removeGridInstance(id)
           );
           handleClearMultiSelection();
-        } else if (activeModal === "hpControl" && modalProps.instanceId) {
-          removeGridInstance(modalProps.instanceId);
+        } else if (activeModalName === "hpControl" && activeModalProps?.instanceId) {
+          removeGridInstance(activeModalProps.instanceId);
           closeModal(); // HP modal will close due to other useEffect
         }
       }
@@ -484,8 +489,8 @@ export default function App() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [
-    activeModal,
-    modalProps,
+    activeModalName,
+    activeModalProps,
     multiSelectedInstanceIds,
     removeGridInstance,
     handleClearMultiSelection,
@@ -496,9 +501,9 @@ export default function App() {
     "fixed top-1/2 -translate-y-1/2 z-30 p-2 bg-surface-1 hover:bg-border-base rounded-md shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-border-strong";
 
   const selectedGridInstance =
-    activeModal === "hpControl" && modalProps.instanceId
+    activeModalName === "hpControl" && activeModalProps?.instanceId
       ? gridInstances.find(
-          (gi: GridInstance) => gi.instanceId === modalProps.instanceId
+          (gi: GridInstance) => gi.instanceId === activeModalProps.instanceId
         )
       : null;
   const tokenInfoForHPModal = selectedGridInstance
@@ -541,7 +546,7 @@ export default function App() {
         onGridInstanceSelectForHPModal={handleGridInstanceSelectForHPModal}
         onBackgroundClick={handleBoardBackgroundClick}
         activeHPModalInstanceId={
-          activeModal === "hpControl" ? modalProps.instanceId : null
+          activeModalName === "hpControl" ? activeModalProps?.instanceId : null
         }
         onHPModalAnchorShouldUpdate={handleHPModalAnchorShouldUpdate}
         draggingVisuals={draggingVisuals}
@@ -568,68 +573,96 @@ export default function App() {
         </button>
       )}
 
-      {activeModal === "simpleName" && (
-        <SimpleNameModal
-          isOpen={true}
-          onClose={closeModal}
-          onSave={handleSaveNewTokenName}
-          title={modalProps.title}
-          tokenType={modalProps.type as TokenType} // Corrigido para usar modalProps.type
-        />
-      )}
+      {modalStack.map((modalEntry, index) => {
+        const { name, props } = modalEntry;
+        const isTopModal = index === modalStack.length - 1;
 
-      {activeModal === "sheet" && (
-        <SheetProvider
-          initialTokenData={(() => {
-            const foundToken = tokens.find(
-              (t: TokenInfo) => t.id === modalProps.tokenId
+        switch (name) {
+          case "simpleName":
+            return (
+              <SimpleNameModal
+                key={name} // Usar o nome como chave, ou um ID único se houver múltiplos do mesmo tipo
+                isOpen={isTopModal} // Apenas o modal do topo é "aberto" no sentido de ser interativo
+                onClose={closeModal}
+                onSave={handleSaveNewTokenName}
+                title={props.title}
+                tokenType={props.type as TokenType}
+                zIndex={100 + index} // Adicionar zIndex
+              />
             );
-            return foundToken && foundToken.type === TokenType.PLAYER
-              ? (foundToken as PlayerToken)
+          case "sheet":
+            const foundToken = tokens.find(
+              (t: TokenInfo) => t.id === props.tokenId
+            );
+            const initialTokenData =
+              foundToken && foundToken.type === TokenType.PLAYER
+                ? (foundToken as PlayerToken)
+                : null;
+
+            return (
+              <SheetProvider
+                key={name}
+                initialTokenData={initialTokenData}
+                onSave={(updatedData: Partial<TokenInfo>) => {
+                  if (props.tokenId) {
+                    updateToken(props.tokenId, updatedData);
+                    closeModal();
+                  }
+                }}
+              >
+                <SheetModal tokenId={props.tokenId} onClose={closeModal} zIndex={100 + index} /> {/* Adicionar zIndex */}
+              </SheetProvider>
+            );
+          case "hpControl":
+            const selectedGridInstanceForHP = gridInstances.find(
+              (gi: GridInstance) => gi.instanceId === props.instanceId
+            );
+            const tokenInfoForHPModal = selectedGridInstanceForHP
+              ? tokens.find(
+                  (t: TokenInfo) => t.id === selectedGridInstanceForHP.tokenInfoId
+                )
               : null;
-          })()}
-          onSave={(updatedData: Partial<TokenInfo>) => {
-            if (modalProps.tokenId) {
-              updateToken(modalProps.tokenId, updatedData);
-              closeModal();
-            }
-          }}
-        >
-          <SheetModal tokenId={modalProps.tokenId} onClose={closeModal} />
-        </SheetProvider>
-      )}
 
-      {activeModal === "hpControl" &&
-        modalProps.instanceId &&
-        tokenInfoForHPModal &&
-        modalProps.anchorPoint && (
-          <HPControlModal
-            instanceId={modalProps.instanceId}
-            tokenInfo={tokenInfoForHPModal}
-            anchorPoint={modalProps.anchorPoint}
-            isOpen={true}
-            onClose={closeModal}
-            onHPChange={(newHP) => {
-              if (modalProps.instanceId) {
-                handleHPChangeFromModal(modalProps.instanceId, newHP);
-              }
-            }}
-            onRemoveFromBoard={handleRemoveInstanceFromBoard}
-            onMakeIndependent={handleMakeInstanceIndependent}
-          />
-        )}
-
-      {activeModal === "confirmationModal" && (
-        <ConfirmationModal
-          isOpen={true}
-          title={modalProps.title}
-          content={modalProps.content}
-          confirmText={modalProps.confirmText}
-          cancelText={modalProps.cancelText}
-          onConfirm={modalProps.onConfirm}
-          onCancel={modalProps.onCancel}
-        />
-      )}
+            return (
+              props.instanceId &&
+              tokenInfoForHPModal &&
+              props.anchorPoint && (
+                <HPControlModal
+                  key={name}
+                  instanceId={props.instanceId}
+                  tokenInfo={tokenInfoForHPModal}
+                  anchorPoint={props.anchorPoint}
+                  isOpen={isTopModal}
+                  onClose={closeModal}
+                  onHPChange={(newHP) => {
+                    if (props.instanceId) {
+                      handleHPChangeFromModal(props.instanceId, newHP);
+                    }
+                  }}
+                  onRemoveFromBoard={handleRemoveInstanceFromBoard}
+                  onMakeIndependent={handleMakeInstanceIndependent}
+                  zIndex={100 + index} // Adicionar zIndex
+                />
+              )
+            );
+          case "confirmationModal":
+            return (
+              <ConfirmationModal
+                key={name}
+                isOpen={isTopModal}
+                title={props.title}
+                content={props.content}
+                confirmText={props.confirmText}
+                cancelText={props.cancelText}
+                onConfirm={props.onConfirm}
+                onCancel={props.onCancel}
+                zIndex={100 + index} // Adicionar zIndex
+              />
+            );
+          default:
+            return null;
+        }
+      })}
     </div>
   );
 }

@@ -8,6 +8,7 @@ interface ConfirmationModalProps {
   cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  zIndex?: number; // Adicionado zIndex
 }
 
 export function ConfirmationModal({
@@ -18,6 +19,7 @@ export function ConfirmationModal({
   cancelText,
   onConfirm,
   onCancel,
+  zIndex, // Receber zIndex
 }: ConfirmationModalProps) {
   return (
     <Modal
@@ -27,6 +29,7 @@ export function ConfirmationModal({
       onConfirm={onConfirm}
       confirmText={confirmText}
       cancelText={cancelText}
+      zIndex={zIndex} // Passar zIndex para o Modal base
     >
       <div className="p-4">
         <p>{content}</p>

@@ -1,6 +1,8 @@
 import { cn } from "../../../../utils/cn";
 import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
-import { generateUniqueId } from '../../../../utils/id/idUtils';
+import { generateUniqueId } from "../../../../utils/id/idUtils";
+import { DeleteIcon, PlusCircleIcon } from "../../../icons";
+import { useModal } from "../../../../contexts/ModalContext";
 
 export function PrincipalHealthAndCombat() {
   const {
@@ -22,6 +24,8 @@ export function PrincipalHealthAndCombat() {
     setEditingHitDiceEntries,
   } = usePlayerSheet();
 
+  const { openModal, closeModal } = useModal();
+
   const handleAddHitDice = () => {
     setEditingHitDiceEntries([
       ...editingHitDiceEntries,
@@ -33,6 +37,18 @@ export function PrincipalHealthAndCombat() {
     setEditingHitDiceEntries(
       editingHitDiceEntries.filter((entry) => entry.id !== id)
     );
+  };
+
+  const handleDeleteConfirmation = (id: string) => {
+    openModal("confirmationModal", {
+      title: "Confirmar Exclusão",
+      content: "Você tem certeza que deseja remover esta linha de dados de vida?",
+      onConfirm: () => {
+        handleRemoveHitDice(id);
+        closeModal();
+      },
+      onCancel: closeModal,
+    });
   };
 
   const handleUpdateHitDice = (
@@ -209,77 +225,76 @@ export function PrincipalHealthAndCombat() {
               </div>
             </div>
           </div>
-        </fieldset>
+          <fieldset className="flex-1  rounded  bg-surface-1 relative">
+            <button
+              type="button"
+              onClick={handleAddHitDice}
+              title="Adicionar novo dado de vida"
+              className="flex items-center justify-center -bottom-5.5 w-6 h-6 right-[50%] translate-x-1/2 absolute text-xl  font-bold bg-accent-primary text-white rounded-[10rem]  hover:bg-accent-secondary "
+            >
+              <PlusCircleIcon />
+            </button>
+            <legend className=" bg-surface-1  rounded text-sm font-bold ">
+              Dados de Vida
+            </legend>
 
-        <fieldset className="flex-1 p-1.5 rounded mt-2 bg-surface-1 relative">
-          <button
-            type="button"
-            onClick={handleAddHitDice}
-            title="Adicionar novo dado de vida"
-            className="top-[-2.5rem] right-0 absolute text-xl mt-2 p-0.5 px-2 pb-1 font-bold bg-accent-primary text-white rounded-md hover:bg-accent-secondary "
-          >
-            +
-          </button>
-          <legend className=" bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
-            Dados de Vida
-          </legend>
-
-          <ul className="flex flex-col space-y-1.5">
-            {editingHitDiceEntries.map((entry) => (
-              <li key={entry.id} className="flex items-center space-x-1.5">
-                <label
-                  htmlFor={`hit-dice-type-${entry.id}`}
-                  className="sr-only"
-                >
-                  Tipo de Dado de Vida para {entry.id}
-                </label>
-                <select
-                  id={`hit-dice-type-${entry.id}`}
-                  value={entry.type}
-                  onChange={(e) =>
-                    handleUpdateHitDice(entry.id, "type", e.target.value)
-                  }
-                  className={cn(
-                    "p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary",
-                    "w-20"
-                  )}
-                >
-                  <option value="d4">d4</option>
-                  <option value="d6">d6</option>
-                  <option value="d8">d8</option>
-                  <option value="d10">d10</option>
-                  <option value="d12">d12</option>
-                  <option value="d20">d20</option>
-                </select>
-                <label
-                  htmlFor={`hit-dice-quantity-${entry.id}`}
-                  className="sr-only"
-                >
-                  Quantidade de Dados de Vida {entry.type}
-                </label>
-                <input
-                  id={`hit-dice-quantity-${entry.id}`}
-                  type="number"
-                  value={entry.quantity}
-                  onChange={(e) =>
-                    handleUpdateHitDice(entry.id, "quantity", e.target.value)
-                  }
-                  className={cn(
-                    "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-                    "text-center hide-number-spinners"
-                  )}
-                  min="1"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveHitDice(entry.id)}
-                  className="p-1 bg-red-600 text-white rounded-md hover:bg-red-700 w-8 h-8 flex items-center justify-center text-sm font-bold"
-                >
-                  X
-                </button>
-              </li>
-            ))}
-          </ul>
+            <ul className="flex flex-col">
+              {editingHitDiceEntries.map((entry) => (
+                <li key={entry.id} className="flex items-center space-x-2 mb-2">
+                  <label
+                    htmlFor={`hit-dice-type-${entry.id}`}
+                    className="sr-only"
+                  >
+                    Tipo de Dado de Vida para {entry.id}
+                  </label>
+                  <select
+                    id={`hit-dice-type-${entry.id}`}
+                    value={entry.type}
+                    onChange={(e) =>
+                      handleUpdateHitDice(entry.id, "type", e.target.value)
+                    }
+                    className={cn(
+                      "p-1  bg-surface-1 border font-bold border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary",
+                      "w-20"
+                    )}
+                  >
+                    <option value="D4">D4</option>
+                    <option value="D6">D6</option>
+                    <option value="D8">D8</option>
+                    <option value="D10">D10</option>
+                    <option value="D12">D12</option>
+                    <option value="D20">D20</option>
+                  </select>
+                  <label
+                    htmlFor={`hit-dice-quantity-${entry.id}`}
+                    className="sr-only"
+                  >
+                    Quantidade de Dados de Vida {entry.type}
+                  </label>
+                  <input
+                    id={`hit-dice-quantity-${entry.id}`}
+                    type="number"
+                    value={entry.quantity}
+                    onChange={(e) =>
+                      handleUpdateHitDice(entry.id, "quantity", e.target.value)
+                    }
+                    className={cn(
+                      "w-full p-1 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
+                      "text-center hide-number-spinners"
+                    )}
+                    min="1"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteConfirmation(entry.id)}
+                    className="p-2 t hover:text-surface-0 bg-feedback-negative rounded-md hover:bg-feedback-negative-hover  flex items-center justify-center text-sm font-bold"
+                  >
+                    <DeleteIcon className="w-10 h-5" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </fieldset>
         </fieldset>
       </form>
     </section>

@@ -3,7 +3,7 @@ import { ATTRIBUTE_LABELS } from "../../../../constants/sheetDefaults";
 import { cn } from "../../../../utils/cn";
 import { type PlayerToken } from "../../../../types"; // Importar PlayerToken para tipagem interna
 
-export function PlayerAttributesAndSkills() {
+export function PrincipalAttributesAndSkills() {
   const {
     attributes,
     setAttributes,
