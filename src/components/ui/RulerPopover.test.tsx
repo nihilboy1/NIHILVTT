@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import RulerPopover from './RulerPopover';
+import { RulerPopover } from './RulerPopover';
 import { RulerPlacementMode } from '../../types/index';
 
 describe('RulerPopover', () => {

@@ -1,34 +1,22 @@
-interface PrincipalHeaderProps {
-  editingTokenName: string;
-  setEditingTokenName: (name: string) => void;
-  editingCharClass: string;
-  setEditingCharClass: (charClass: string) => void;
-  editingLevel: string;
-  setEditingLevel: (level: string) => void;
-  editingBackground: string;
-  setEditingBackground: (background: string) => void;
-  editingSpecies: string;
-  setEditingSpecies: (species: string) => void;
-  editingSubclass: string;
-  setEditingSubclass: (subclass: string) => void;
-  proficiencyBonus: number;
-}
+import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
 
-export function PrincipalHeader({
-  editingTokenName,
-  setEditingTokenName,
-  editingCharClass,
-  setEditingCharClass,
-  editingLevel,
-  setEditingLevel,
-  editingBackground,
-  setEditingBackground,
-  editingSpecies,
-  setEditingSpecies,
-  editingSubclass,
-  setEditingSubclass,
-  proficiencyBonus,
-}: PrincipalHeaderProps) {
+export function PrincipalHeader() {
+  const {
+    editingTokenName,
+    setEditingTokenName,
+    editingCharClass,
+    setEditingCharClass,
+    editingLevel,
+    setEditingLevel,
+    editingBackground,
+    setEditingBackground,
+    editingSpecies,
+    setEditingSpecies,
+    editingSubclass,
+    setEditingSubclass,
+    proficiencyBonus,
+  } = usePlayerSheet();
+
   return (
     <div className="flex w-full rounded-md  gap-10 mb-2 items-center bg-surface-1 p-2">
       <div id="name" className="flex flex-col ">

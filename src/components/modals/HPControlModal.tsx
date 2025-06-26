@@ -15,7 +15,7 @@ interface HPControlModalProps {
   onMakeIndependent: (instanceId: string) => void; // Makes the GridInstance independent
 }
 
-export const HP_MODAL_ESTIMATED_HEIGHT = 40;
+export const HP_MODAL_ESTIMATED_HEIGHT_REM = 2.5; // Converted from 40px
 
 export function HPControlModal({
   instanceId,
@@ -126,7 +126,7 @@ export function HPControlModal({
     top: `${anchorPoint.y}px`,
     left: `${anchorPoint.x}px`,
     zIndex: 100,
-    height: `${HP_MODAL_ESTIMATED_HEIGHT}px`,
+    height: `${HP_MODAL_ESTIMATED_HEIGHT_REM}rem`,
   };
 
   const showMakeIndependentButton = true;
@@ -156,7 +156,7 @@ export function HPControlModal({
       <span className="text-text-secondary text-sm select-none">/</span>
       <span
         data-testid="max-hp-display"
-        className="text-sm font-medium min-w-[20px] text-center select-none"
+        className="text-sm font-medium min-w-[1.25rem] text-center select-none" // Converted from 20px
       >
         {tokenInfo.maxHp ?? "N/A"}
       </span>
@@ -164,7 +164,7 @@ export function HPControlModal({
       {showMakeIndependentButton && (
         <button
           onClick={handleMakeIndependentClick}
-          className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-6 h-6"
+          className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem]" // Converted from 6x6
           title="Tornar Token Independente"
           aria-label="Tornar instância independente"
         >
@@ -174,7 +174,7 @@ export function HPControlModal({
 
       <button
         onClick={handleRemoveClick}
-        className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-6 h-6"
+        className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem]" // Converted from 6x6
         title="Remover do Tabuleiro"
         aria-label="Remover instância do tabuleiro"
       >

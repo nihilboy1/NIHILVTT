@@ -5,6 +5,7 @@ import {
 } from "../../../../types/index"; // Caminho corrigido
 import { PlusCircleIcon, TrashIcon } from "../../../icons"; // Caminho corrigido
 import { cn } from "../../../../utils/cn";
+import { generateUniqueId } from '../../../../utils/id/idUtils';
 
 interface PlayerAttacksAndFeaturesProps {
   attacks: Attack[];
@@ -133,7 +134,7 @@ const PlayerAttacksAndFeatures: React.FC<PlayerAttacksAndFeaturesProps> = ({
                   description = textBlock.substring(firstLineEnd + 2);
                 }
                 return {
-                  id: String(Date.now() + index),
+                  id: generateUniqueId(),
                   name,
                   description,
                 };

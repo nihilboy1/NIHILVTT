@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">11.36% </span>
+                <span class="strong">10.86% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/44</span>
+                <span class='fraction'>5/46</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">7.89% </span>
+                <span class="strong">7.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/38</span>
+                <span class='fraction'>3/40</span>
             </div>
         
             
@@ -188,7 +188,11 @@
 <a name='L123'></a><a href='#L123'>123</a>
 <a name='L124'></a><a href='#L124'>124</a>
 <a name='L125'></a><a href='#L125'>125</a>
-<a name='L126'></a><a href='#L126'>126</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -285,8 +289,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -318,6 +322,7 @@ import { useChat } from '../contexts/ChatContext';
 &nbsp;
 type RollAndSendMessageFn = ReturnType&lt;typeof useChat&gt;['rollAndSendMessage'];
 type SendMessageFn = ReturnType&lt;typeof useChat&gt;['sendMessage'];
+type ClearMessagesFn = ReturnType&lt;typeof useChat&gt;['clearMessages']; // Adicionar esta linha
 &nbsp;
 /**
  * @interface CommandContext
@@ -327,6 +332,7 @@ type SendMessageFn = ReturnType&lt;typeof useChat&gt;['sendMessage'];
 export interface CommandContext {
   rollAndSendMessage: RollAndSendMessageFn;
   sendMessage: SendMessageFn;
+  clearMessages: ClearMessagesFn; // Adicionar esta linha
   getAllCommands: () =&gt; Command[];
 }
 &nbsp;
@@ -371,8 +377,8 @@ const commandsRegistry: Command[] = [
       }
 <span class="cstat-no" title="statement not covered" >      return null; </span>// Valid
     },
-    execute: <span class="fstat-no" title="function not covered" >(a</span>rgs: string[], context: CommandContext) =&gt; {
-      const notation = <span class="cstat-no" title="statement not covered" >args.join(' ');</span>
+    execute: <span class="fstat-no" title="function not covered" >(_</span>args: string[], context: CommandContext) =&gt; {
+      const notation = <span class="cstat-no" title="statement not covered" >_args.join(' ');</span> // Alterado args para _args
 <span class="cstat-no" title="statement not covered" >      context.rollAndSendMessage(notation);</span>
     },
   },
@@ -380,10 +386,10 @@ const commandsRegistry: Command[] = [
     name: "/help",
     description: "Mostra informações sobre os comandos disponíveis.",
     usage: "/help [nome-do-comando]",
-    execute: <span class="fstat-no" title="function not covered" >(a</span>rgs: string[], context: CommandContext) =&gt; {
+    execute: <span class="fstat-no" title="function not covered" >(_</span>args: string[], context: CommandContext) =&gt; { // Alterado args para _args
       const allCommands = <span class="cstat-no" title="statement not covered" >context.getAllCommands();</span>
-<span class="cstat-no" title="statement not covered" >      if (args.length &gt; 0) {</span>
-        const commandName = <span class="cstat-no" title="statement not covered" >args[0].startsWith('/') ? args[0] : `/${args[0]}`;</span>
+<span class="cstat-no" title="statement not covered" >      if (_args.length &gt; 0) { // Alterado args para _args</span>
+        const commandName = <span class="cstat-no" title="statement not covered" >_args[0].startsWith('/') ? _args[0] : `/${_args[0]}`;</span> // Alterado args para _args
         const foundCommand = <span class="cstat-no" title="statement not covered" >allCommands.find(<span class="fstat-no" title="function not covered" >cmd </span>=&gt; <span class="cstat-no" title="statement not covered" >cmd.name === commandName || cmd.aliases?.includes(commandName))</span>;</span>
 <span class="cstat-no" title="statement not covered" >        if (foundCommand) {</span>
           let helpText = <span class="cstat-no" title="statement not covered" >`Ajuda para ${foundCommand.name}:\n`;</span>
@@ -405,15 +411,15 @@ const commandsRegistry: Command[] = [
       }
     },
   },
-  // Adicione mais comandos aqui
-  // Exemplo:
-  // {
-  //   name: "/clear",
-  //   description: "Limpa o histórico do chat (não implementado).",
-  //   execute: (args, context) =&gt; {
-  //     context.sendMessage("Funcionalidade /clear ainda não implementada.", "Sistema");
-  //   }
-  // }
+  {
+    name: "/clear",
+    description: "Limpa o histórico do chat.",
+    aliases: ["/cls"], // Opcional: adicionar um alias
+    execute: <span class="fstat-no" title="function not covered" >(_</span>args: string[], context: CommandContext) =&gt; { // Alterado args para _args
+<span class="cstat-no" title="statement not covered" >      context.clearMessages();</span>
+<span class="cstat-no" title="statement not covered" >      context.sendMessage("Histórico do chat limpo.", "Sistema");</span>
+    },
+  },
 ];
 &nbsp;
 /**
@@ -445,7 +451,7 @@ export const getAllCommands = <span class="fstat-no" title="function not covered
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-24T02:45:10.008Z
+                at 2025-06-26T00:33:23.102Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

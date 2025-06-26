@@ -8,7 +8,7 @@ import {
 } from "../../types/index"; // Caminho corrigido
 import { useTokenDrag } from "../../hooks/useTokenDrag"; // Caminho corrigido
 import { HealthBar } from "./HealthBar"; // Já está correto
-import TokenVisual, { type TokenMetrics } from "./TokenVisual"; // Já está correto
+import {TokenVisual, type TokenMetrics } from "./TokenVisual"; // Já está correto
 import { parseSize } from "../../utils/tokenUtils"; // Caminho corrigido
 import { getFirstName } from "../../utils/nameUtils"; // Caminho corrigido
 

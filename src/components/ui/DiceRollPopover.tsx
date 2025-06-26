@@ -60,7 +60,7 @@ export function DiceRollPopover({
     <div
       ref={popoverRef}
       className="fixed bg-surface-1 border rounded-md shadow-xl z-[60] p-2 grid grid-cols-2 gap-2"
-      style={{ top: `${position.top}px`, left: `${position.left}px`, minWidth: '160px' }}
+      style={{ top: `${position.top}px`, left: `${position.left}px`, minWidth: '10rem' }} // Converted from 160px
       role="dialog"
       aria-label="Opções de Rolagem de Dados"
     >

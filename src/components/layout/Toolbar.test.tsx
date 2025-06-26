@@ -20,8 +20,7 @@ jest.mock('../../hooks/useUIState');
 jest.mock('../../hooks/useBoardSettingsState');
 jest.mock('../../hooks/useChatState');
 jest.mock('../ui/RulerPopover', () => ({
-  __esModule: true,
-  default: jest.fn(() => null), // Mock RulerPopover to return null
+  RulerPopover: jest.fn(() => null), // Mock RulerPopover to return null
 }));
 jest.mock('../ui/DiceRollPopover', () => ({
   DiceRollPopover: jest.fn(() => null), // Mock DiceRollPopover to return null
@@ -97,7 +96,6 @@ describe('Toolbar', () => {
     expect(screen.getByLabelText('Ferramenta de Seleção')).toBeInTheDocument();
     expect(screen.getByLabelText('Mover Mapa')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Ferramenta de Régua' })).toBeInTheDocument();
-    // Removido o teste para 'Configurações da Página' pois o botão não existe no componente Toolbar
   });
 
   test('deve mudar a ferramenta selecionada ao clicar no botão "Selecionar"', () => {
@@ -115,7 +113,7 @@ describe('Toolbar', () => {
   });
 
   test('deve abrir o popover da régua ao clicar no botão "Medir Distância"', async () => {
-    const RulerPopover = require('../ui/RulerPopover').default;
+    const { RulerPopover } = require('../ui/RulerPopover');
     renderToolbar();
     const rulerButton = screen.getByRole('button', { name: 'Ferramenta de Régua' });
     fireEvent.click(rulerButton);

@@ -1,4 +1,4 @@
-import React from "react";
+
 import { cn } from "../../utils/cn"; // Importar utilitário de classes
 
 interface DeathSaveCheckboxGroupProps {
@@ -8,16 +8,16 @@ interface DeathSaveCheckboxGroupProps {
   label: string;
 }
 
-const DeathSaveCheckboxGroup: React.FC<DeathSaveCheckboxGroupProps> = ({
+export function DeathSaveCheckboxGroup({
   count,
   onChange,
   type,
   label,
-}) => {
+}: DeathSaveCheckboxGroupProps) {
   return (
     <div className="flex flex-col items-center">
       <label
-        className={cn("block text-[11px] font-medium text-accent-primary mb-px", "text-[10px] text-center uppercase")}
+        className={cn("block text-[0.6875rem] font-medium text-accent-primary mb-px", "text-[0.625rem] text-center uppercase")} // Converted from 11px and 10px
       >
         {label}
       </label>
@@ -41,6 +41,4 @@ const DeathSaveCheckboxGroup: React.FC<DeathSaveCheckboxGroupProps> = ({
       </div>
     </div>
   );
-};
-
-export default DeathSaveCheckboxGroup;
+}

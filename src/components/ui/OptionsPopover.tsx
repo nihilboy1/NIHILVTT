@@ -8,7 +8,7 @@ interface OptionsPopoverProps {
 }
 
 // popover gennérico para opções (apenas para opções do token na aba de tokens)
-export default function OptionsPopover({
+export function OptionsPopover({
   isOpen,
   onClose,
   targetRef,

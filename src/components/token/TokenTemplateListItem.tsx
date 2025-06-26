@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { type Token as TokenInfo } from '../../types/index'; // Caminho corrigido
 import { EllipsisVerticalIcon } from '../icons'; // Caminho corrigido
 import { useTokens } from '../../contexts/TokensContext'; // Caminho corrigido
-import OptionsPopover from '../ui/OptionsPopover'; // Caminho corrigido
+import {OptionsPopover} from '../ui/OptionsPopover'; // Caminho corrigido
 import { useModal } from '../../contexts/ModalContext'; // Caminho corrigido
 import { tokenTypeTranslations } from '../../constants'; // Manter importação se ainda for usada para o texto do tipo
 

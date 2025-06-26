@@ -22,11 +22,11 @@ interface InteractiveModalProps {
   zIndex?: number;
 }
 
-const MINIMIZED_HEIGHT = 40; // px
-const MINIMIZED_WIDTH = 250; // px
-const HEADER_HEIGHT = 48; // Approximate px height of the header for y clamping
+const MINIMIZED_HEIGHT_REM = 2.5; // 40px / 16 = 2.5rem
+const MINIMIZED_WIDTH_REM = 15.625; // 250px / 16 = 15.625rem
+const HEADER_HEIGHT_REM = 3; // 48px / 16 = 3rem
 
-const InteractiveModal: React.FC<InteractiveModalProps> = ({
+export function InteractiveModal({
   id,
   title,
   isOpen,
@@ -45,7 +45,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
   maxWidth = window.innerWidth, // Default max width
   maxHeight = window.innerHeight, // Default max height
   zIndex = 50,
-}) => {
+}: InteractiveModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(initialWidth);
   const [height, setHeight] = useState(initialHeight);
@@ -125,8 +125,11 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
   const handleMouseMove = useCallback(
     (event: MouseEvent) => {
       if (isDragging) {
-        let newX = event.clientX - dragStartOffset.x;
-        let newY = event.clientY - dragStartOffset.y;
+        const dx = event.clientX - dragStartOffset.x;
+        const dy = event.clientY - dragStartOffset.y;
+
+        let newX = position.x + dx;
+        let newY = position.y + dy;
 
         // Clamp position to viewport
         const modalCurrentWidth = modalRef.current?.offsetWidth || width;
@@ -144,7 +147,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
         );
 
         // Ensure header is always visible for y-axis
-        newY = Math.max(0, Math.min(newY, window.innerHeight - HEADER_HEIGHT));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - HEADER_HEIGHT_REM * 16)); // Convert rem to px for clamping
 
         onPositionChange({ x: newX, y: newY });
       } else if (isResizing) {
@@ -225,22 +228,37 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
     };
   }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
+  const handleResizeMouseDown = useCallback(
+    (e: React.MouseEvent, handle: string) => {
+      e.stopPropagation(); // Evita que o evento de arrastar do header seja acionado
+      setIsResizing(true);
+      setResizeDirection(handle);
+      setResizeStart({
+        x: e.clientX,
+        y: e.clientY,
+        width: width as number,
+        height: height as number,
+      });
+    },
+    [width, height]
+  );
+
   if (!isOpen) return null;
 
   const style: React.CSSProperties = {
     position: "fixed",
     top: isMinimized ? undefined : `${position.y}px`,
-    left: isMinimized ? "20px" : `${position.x}px`, // Minimized to bottom-left
-    bottom: isMinimized ? "20px" : undefined,
-    width: `${isMinimized ? MINIMIZED_WIDTH : width}px`,
+    left: isMinimized ? `${MINIMIZED_WIDTH_REM}rem` : `${position.x}px`, // Minimized to bottom-left
+    bottom: isMinimized ? `${MINIMIZED_HEIGHT_REM}rem` : undefined,
+    width: `${isMinimized ? MINIMIZED_WIDTH_REM : width / 16}rem`, // Convert px to rem
     height:
       typeof height === "number"
-        ? `${isMinimized ? MINIMIZED_HEIGHT : height}px`
+        ? `${isMinimized ? MINIMIZED_HEIGHT_REM : height / 16}rem` // Convert px to rem
         : isMinimized
-        ? `${MINIMIZED_HEIGHT}px`
+        ? `${MINIMIZED_HEIGHT_REM}rem`
         : height,
     zIndex,
-    minHeight: isMinimized ? `${MINIMIZED_HEIGHT}px` : undefined, // Enforce min height for minimized state
+    minHeight: isMinimized ? `${MINIMIZED_HEIGHT_REM}rem` : undefined, // Enforce min height for minimized state
   };
 
   if (isMinimized) {
@@ -308,16 +326,14 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
       <div className="p-3 overflow-y-auto flex-grow ">{children}</div>
 
       {/* Resize Handles */}
-      <div className="resize-handle resize-s" />
-      <div className="resize-handle resize-e" />
-      <div className="resize-handle resize-n" />
-      <div className="resize-handle resize-w" />
-      <div className="resize-handle resize-se" />
-      <div className="resize-handle resize-sw" />
-      <div className="resize-handle resize-ne" />
-      <div className="resize-handle resize-nw" />
+      <div className="resize-handle resize-s" onMouseDown={(e) => handleResizeMouseDown(e, "s")} />
+      <div className="resize-handle resize-e" onMouseDown={(e) => handleResizeMouseDown(e, "e")} />
+      <div className="resize-handle resize-n" onMouseDown={(e) => handleResizeMouseDown(e, "n")} />
+      <div className="resize-handle resize-w" onMouseDown={(e) => handleResizeMouseDown(e, "w")} />
+      <div className="resize-handle resize-se" onMouseDown={(e) => handleResizeMouseDown(e, "se")} />
+      <div className="resize-handle resize-sw" onMouseDown={(e) => handleResizeMouseDown(e, "sw")} />
+      <div className="resize-handle resize-ne" onMouseDown={(e) => handleResizeMouseDown(e, "ne")} />
+      <div className="resize-handle resize-nw" onMouseDown={(e) => handleResizeMouseDown(e, "nw")} />
     </div>
   );
-};
-
-export default InteractiveModal;
+}

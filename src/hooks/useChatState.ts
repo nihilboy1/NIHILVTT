@@ -2,7 +2,8 @@
 import { useState, useCallback } from 'react';
 import { type Message, type TextMessage, type DiceRollMessage, type DiceRollDetails } from '../types';
 import { DEFAULT_PLAYER_NAME } from '../constants';
-import { rollDiceInternal } from '../utils/dice/diceUtils'; // Importar a função
+import { rollDiceInternal } from '../utils/dice/diceUtils';
+import { generateUniqueId } from '../utils/id/idUtils';
 
 export interface ChatState {
   messages: Message[];
@@ -12,8 +13,8 @@ export interface ChatState {
 }
 
 export const useChatState = (): ChatState => {
-  const initialWelcomeMessage: TextMessage = { // Definir a mensagem inicial aqui
-    id: 'initial-welcome-' + Date.now(),
+  const initialWelcomeMessage: TextMessage = {
+    id: generateUniqueId(),
     sender: 'Sistema',
     text: 'Saudações, nobre aventureiro! Que os deuses da sorte guiem seus dados!',
     timestamp: new Date(),
@@ -25,7 +26,7 @@ export const useChatState = (): ChatState => {
   const sendMessage = useCallback(
     (content: string | DiceRollDetails, sender: string = DEFAULT_PLAYER_NAME) => {
       const baseMessage = {
-        id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+        id: generateUniqueId(),
         sender,
         timestamp: new Date(),
       };
@@ -46,7 +47,7 @@ export const useChatState = (): ChatState => {
           ...baseMessage,
           isDiceRoll: true,
           diceRollDetails: { ...content },
-          text: summary, // O campo 'text' ainda é útil para um resumo da rolagem
+          text: summary,
         };
         setMessages(prevMessages => [...prevMessages, newMessage]);
       }

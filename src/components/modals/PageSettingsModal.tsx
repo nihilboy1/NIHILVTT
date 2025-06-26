@@ -161,7 +161,7 @@ export function PageSettingsModal({
             htmlFor="visualCellSize"
             className="block text-sm font-medium text-accent-primary mb-1"
           >
-            Tamanho da Célula (px)
+            Tamanho da Célula
           </label>
           <input
             id="visualCellSize"

@@ -7,7 +7,7 @@ import {
   RulerIcon,
   ChevronLeftIcon,
 } from "../icons";
-import RulerPopover from "../ui/RulerPopover";
+import { RulerPopover } from "../ui/RulerPopover";
 import { DiceRollPopover } from "../ui/DiceRollPopover";
 import { useChat } from "../../contexts/ChatContext";
 import { useBoardSettings } from "../../contexts/BoardSettingsContext";

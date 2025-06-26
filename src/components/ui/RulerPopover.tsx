@@ -13,7 +13,7 @@ interface RulerPopoverProps {
   targetRef: React.RefObject<HTMLButtonElement | null>; // Referência ao botão que aciona o popover
 }
 
-const RulerPopover: React.FC<RulerPopoverProps> = ({
+export function RulerPopover({
   isOpen,
   onClose,
   currentMode,
@@ -21,7 +21,7 @@ const RulerPopover: React.FC<RulerPopoverProps> = ({
   rulerPersistsPath,
   onToggleRulerPersistPath,
   targetRef,
-}) => {
+}: RulerPopoverProps) {
   const popoverRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 }); // Posição do popover
 
@@ -118,6 +118,4 @@ const RulerPopover: React.FC<RulerPopoverProps> = ({
       </div>
     </div>
   );
-};
-
-export default RulerPopover;
+}

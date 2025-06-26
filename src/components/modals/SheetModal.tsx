@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTokens } from "../../contexts/TokensContext";
 import { TokenType, type Point, type PlayerToken } from "../../types"; // Added PlayerToken
-import InteractiveModal from "../ui/InteractiveModal";
+import {InteractiveModal} from "../ui/InteractiveModal";
 import { useTokenSheetForm } from "../../hooks/useTokenSheetForm";
-import PrincipalTab from "../sheets/player/principalTab/PrincipalTab";
-import PlayerSheetDetailsTab from "../sheets/player/detailsTab/PlayerSheetDetailsTab";
-import PlayerSheetConfigTab from "../sheets/player/configTab/PlayerSheetConfigTab";
+import { PrincipalTab } from "../sheets/player/principalTab/PrincipalTab";
+import {PlayerSheetDetailsTab} from "../sheets/player/detailsTab/PlayerSheetDetailsTab";
+import {PlayerSheetConfigTab} from "../sheets/player/configTab/PlayerSheetConfigTab";
 import { CreatureSheet } from "../sheets/creature/CreatureSheet";
 import { cn } from "../../utils/cn"; // Importar o utilitário cn
+import { PlayerSheetProvider } from "../../contexts/PlayerSheetContext"; // Importar o PlayerSheetProvider
 
 type PlayerSheetTab = "principal" | "detalhes" | "configuracoes";
 const ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT = 700;
@@ -24,65 +25,20 @@ export function SheetModal({ tokenId, onClose }: TokenSheetModalProps) {
     : null;
 
   const {
-    editingTokenName,
-    setEditingTokenName,
     editingTokenImage, // Adicionado para a imagem
     setEditingTokenImage, // Adicionado para o setter da imagem
     editingTokenSize,
     setEditingTokenSize,
     editingTokenType,
     setEditingTokenType,
-    editingCurrentHp,
-    setEditingCurrentHp,
-    editingMaxHp,
-    setEditingMaxHp,
     editingTokenNotes,
     setEditingTokenNotes,
-    editingSpecies,
-    setEditingSpecies,
-    editingCharClass,
-    setEditingCharClass,
-    editingSubclass,
-    setEditingSubclass,
-    editingLevel,
-    setEditingLevel,
-    editingBackground,
-    setEditingBackground,
     editingInspiration,
     setEditingInspiration,
-    editingArmorClass,
-    setEditingArmorClass,
-    editingShieldEquipped,
-    setEditingShieldEquipped,
-    editingTempHp,
-    setEditingTempHp,
-    editingDeathSavesSuccesses,
-    setEditingDeathSavesSuccesses,
-    editingDeathSavesFailures,
-    setEditingDeathSavesFailures,
-    editingHitDiceEntries,
-    setEditingHitDiceEntries,
-    editingInitiative,
-    setEditingInitiative,
-    editingSpeed,
-    setEditingSpeed,
-    attributes,
-    setAttributes,
-    savingThrowProficiencies,
-    setSavingThrowProficiencies,
-    skillProficiencies,
-    setSkillProficiencies,
-    attacks,
-    featuresAndTraits,
-    setFeaturesAndTraits,
     hasTokenSheetChanged,
     handleSave,
-    handleAddAttack,
-    handleRemoveAttack,
-    handleAttackChange,
-    SKILLS_CONFIG,
   } = useTokenSheetForm({
-    initialTokenData: initialTokenData as PlayerToken | null, // Unsafe cast to satisfy hook signature
+    initialTokenData: initialTokenData,
     onSave: (updatedData) => {
       if (tokenId) {
         updateToken(tokenId, updatedData);
@@ -154,8 +110,8 @@ export function SheetModal({ tokenId, onClose }: TokenSheetModalProps) {
 
   const modalTitle =
     editingTokenType === TokenType.PLAYER
-      ? `Ficha de Personagem - ${editingTokenName}`
-      : `Ficha de ${editingTokenName}`;
+      ? `Ficha de Personagem - ${initialTokenData?.name || ""}`
+      : `Ficha de ${initialTokenData?.name || ""}`;
 
   return (
     <InteractiveModal
@@ -204,85 +160,61 @@ export function SheetModal({ tokenId, onClose }: TokenSheetModalProps) {
           </div>
         )}
 
-        {editingTokenType === TokenType.PLAYER ? (
-          playerSheetActiveTab === "principal" ? (
-            <PrincipalTab
-              editingTokenName={editingTokenName}
-              setEditingTokenName={setEditingTokenName}
-              editingCharClass={editingCharClass}
-              setEditingCharClass={setEditingCharClass}
-              editingLevel={editingLevel}
-              setEditingLevel={setEditingLevel}
-              editingBackground={editingBackground}
-              setEditingBackground={setEditingBackground}
-              editingSpecies={editingSpecies}
-              setEditingSpecies={setEditingSpecies}
-              editingSubclass={editingSubclass}
-              setEditingSubclass={setEditingSubclass}
-              proficiencyBonus={
-                initialTokenData && initialTokenData.type === TokenType.PLAYER
-                  ? (initialTokenData as PlayerToken).proficiencyBonus ?? 0
-                  : 0
+        {editingTokenType === TokenType.PLAYER && initialTokenData?.type === TokenType.PLAYER ? (
+          <PlayerSheetProvider
+            initialToken={initialTokenData as PlayerToken}
+            setToken={(updatedPlayerToken) => {
+              if (tokenId) {
+                updateToken(tokenId, updatedPlayerToken);
               }
-              editingArmorClass={editingArmorClass}
-              setEditingArmorClass={setEditingArmorClass}
-              editingInitiative={editingInitiative}
-              setEditingInitiative={setEditingInitiative}
-              editingSpeed={editingSpeed}
-              setEditingSpeed={setEditingSpeed}
-              editingShieldEquipped={editingShieldEquipped}
-              setEditingShieldEquipped={setEditingShieldEquipped}
-              editingCurrentHp={editingCurrentHp}
-              setEditingCurrentHp={setEditingCurrentHp}
-              editingTempHp={editingTempHp}
-              setEditingTempHp={setEditingTempHp}
-              editingMaxHp={editingMaxHp}
-              setEditingMaxHp={setEditingMaxHp}
-              editingDeathSavesSuccesses={editingDeathSavesSuccesses}
-              setEditingDeathSavesSuccesses={setEditingDeathSavesSuccesses}
-              editingDeathSavesFailures={editingDeathSavesFailures}
-              setEditingDeathSavesFailures={setEditingDeathSavesFailures}
-              editingHitDiceEntries={editingHitDiceEntries}
-              setEditingHitDiceEntries={setEditingHitDiceEntries}
-              attributes={attributes}
-              setAttributes={setAttributes}
-              savingThrowProficiencies={savingThrowProficiencies}
-              setSavingThrowProficiencies={setSavingThrowProficiencies}
-              skillProficiencies={skillProficiencies}
-              setSkillProficiencies={setSkillProficiencies}
-              attacks={attacks}
-              handleAddAttack={handleAddAttack}
-              handleRemoveAttack={handleRemoveAttack}
-              handleAttackChange={handleAttackChange}
-              featuresAndTraits={featuresAndTraits}
-              setFeaturesAndTraits={setFeaturesAndTraits}
-              SKILLS_CONFIG={SKILLS_CONFIG}
-            />
-          ) : playerSheetActiveTab === "detalhes" ? (
-            <PlayerSheetDetailsTab
-              editingTokenNotes={editingTokenNotes}
-              setEditingTokenNotes={setEditingTokenNotes}
-              editingInspiration={editingInspiration}
-              setEditingInspiration={setEditingInspiration}
-            />
-          ) : (
-            <PlayerSheetConfigTab
-              editingTokenImage={editingTokenImage} // Passar a imagem
-              setEditingTokenImage={setEditingTokenImage} // Passar o setter da imagem
-              editingTokenSize={editingTokenSize}
-              setEditingTokenSize={setEditingTokenSize}
-            />
-          )
+            }}
+          >
+            {playerSheetActiveTab === "principal" ? (
+              <PrincipalTab />
+            ) : playerSheetActiveTab === "detalhes" ? (
+              <PlayerSheetDetailsTab
+                editingTokenNotes={editingTokenNotes}
+                setEditingTokenNotes={setEditingTokenNotes}
+                editingInspiration={editingInspiration}
+                setEditingInspiration={setEditingInspiration}
+              />
+            ) : (
+              <PlayerSheetConfigTab
+                editingTokenImage={editingTokenImage} // Passar a imagem
+                setEditingTokenImage={setEditingTokenImage} // Passar o setter da imagem
+                editingTokenSize={editingTokenSize}
+                setEditingTokenSize={setEditingTokenSize}
+              />
+            )}
+          </PlayerSheetProvider>
         ) : (
           <CreatureSheet
-            editingTokenName={editingTokenName}
-            setEditingTokenName={setEditingTokenName}
+            editingTokenName={initialTokenData?.name || ""}
+            setEditingTokenName={(name) => {
+              if (initialTokenData) {
+                updateToken(initialTokenData.id, { ...initialTokenData, name });
+              }
+            }}
             editingTokenType={editingTokenType}
             setEditingTokenType={setEditingTokenType}
-            editingCurrentHp={editingCurrentHp}
-            setEditingCurrentHp={setEditingCurrentHp}
-            editingMaxHp={editingMaxHp}
-            setEditingMaxHp={setEditingMaxHp}
+            editingCurrentHp={initialTokenData?.currentHp?.toString() || ""}
+            setEditingCurrentHp={(hp) => {
+              if (initialTokenData) {
+                updateToken(initialTokenData.id, {
+                  ...initialTokenData,
+                  currentHp: parseInt(hp),
+                });
+              }
+            }}
+            editingMaxHp={initialTokenData?.maxHp?.toString() || ""}
+            setEditingMaxHp={(hp) => {
+              if (initialTokenData) {
+                updateToken(initialTokenData.id, {
+                  ...initialTokenData,
+                  maxHp: parseInt(hp),
+                });
+              }
+            }}
             editingTokenNotes={editingTokenNotes}
             setEditingTokenNotes={setEditingTokenNotes}
             editingTokenImage={editingTokenImage} // Passar a imagem

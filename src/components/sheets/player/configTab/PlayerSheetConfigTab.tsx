@@ -10,18 +10,18 @@ interface PlayerSheetConfigTabProps {
   setEditingTokenSize: (size: string) => void;
 }
 
-const PlayerSheetConfigTab: React.FC<PlayerSheetConfigTabProps> = ({
+export function PlayerSheetConfigTab({
   editingTokenImage,
   setEditingTokenImage,
   editingTokenSize,
   setEditingTokenSize,
-}) => {
+}: PlayerSheetConfigTabProps) {
   return (
-    <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-200px)]">
+    <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]"> {/* Converted 200px to 12.5rem */}
       <div>
         <label
           htmlFor="pjSheetEditingTokenImage"
-          className="block text-[11px] font-medium text-accent-primary mb-px"
+          className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
           URL da Imagem do Token
         </label>
@@ -39,7 +39,7 @@ const PlayerSheetConfigTab: React.FC<PlayerSheetConfigTabProps> = ({
       <div>
         <label
           htmlFor="pjSheetEditingTokenSize"
-          className="block text-[11px] font-medium text-accent-primary mb-px"
+          className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
           Tamanho do Token (Tabuleiro)
         </label>
@@ -56,7 +56,7 @@ const PlayerSheetConfigTab: React.FC<PlayerSheetConfigTabProps> = ({
         </select>
       </div>
       <div>
-        <label className="block text-[11px] font-medium text-accent-primary mb-px">
+        <label className="block text-[0.6875rem] font-medium text-accent-primary mb-px"> {/* Converted from 11px */}
           Tipo do Token
         </label>
         <input
@@ -72,6 +72,4 @@ const PlayerSheetConfigTab: React.FC<PlayerSheetConfigTabProps> = ({
       </div>
     </div>
   );
-};
-
-export default PlayerSheetConfigTab;
+}

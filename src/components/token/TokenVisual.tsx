@@ -30,5 +30,3 @@ export function TokenVisual({ metrics }: TokenVisualProps) {
     />
   );
 }
-
-export default React.memo(TokenVisual);

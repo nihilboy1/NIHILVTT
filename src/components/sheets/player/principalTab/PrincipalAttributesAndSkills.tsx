@@ -1,59 +1,33 @@
-import React from "react";
-import { type PlayerToken } from "../../../../types";
+import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
 import { ATTRIBUTE_LABELS } from "../../../../constants/sheetDefaults";
 import { cn } from "../../../../utils/cn";
+import { type PlayerToken } from "../../../../types"; // Importar PlayerToken para tipagem interna
 
-interface PrincipalAttributesAndSkillsProps {
-  attributes: NonNullable<PlayerToken["attributes"]>;
-  setAttributes: React.Dispatch<
-    React.SetStateAction<NonNullable<PlayerToken["attributes"]>>
-  >;
-  savingThrowProficiencies: NonNullable<
-    PlayerToken["proficiencies"]
-  >["savingThrows"];
-  setSavingThrowProficiencies: React.Dispatch<
-    React.SetStateAction<
-      NonNullable<PlayerToken["proficiencies"]>["savingThrows"]
-    >
-  >;
-  skillProficiencies: NonNullable<PlayerToken["proficiencies"]>["skills"];
-  setSkillProficiencies: React.Dispatch<
-    React.SetStateAction<NonNullable<PlayerToken["proficiencies"]>["skills"]>
-  >;
-  SKILLS_CONFIG: {
-    key: string;
-    label: string;
-    parentAttribute: keyof NonNullable<PlayerToken["attributes"]>;
-  }[];
-  proficiencyBonus: number;
-}
+export function PlayerAttributesAndSkills() {
+  const {
+    attributes,
+    setAttributes,
+    savingThrowProficiencies,
+    setSavingThrowProficiencies,
+    skillProficiencies,
+    setSkillProficiencies,
+    SKILLS_CONFIG,
+    proficiencyBonus,
+  } = usePlayerSheet();
 
-const PlayerAttributesAndSkills: React.FC<
-  PrincipalAttributesAndSkillsProps
-> = ({
-  attributes,
-  setAttributes,
-  savingThrowProficiencies,
-  setSavingThrowProficiencies,
-  skillProficiencies,
-  setSkillProficiencies,
-  SKILLS_CONFIG,
-  proficiencyBonus,
-}) => {
   return (
     <div className="flex flex-col space-y-2 rounded-md">
       {(Object.keys(attributes) as Array<keyof typeof attributes>).map(
         (attrName) => {
           const attrLabel =
-            ATTRIBUTE_LABELS[attrName as keyof typeof ATTRIBUTE_LABELS]; // Usar ATTRIBUTE_LABELS
+            ATTRIBUTE_LABELS[attrName as keyof typeof ATTRIBUTE_LABELS];
           const modifier = Math.floor((attributes[attrName] - 10) / 2);
 
-          // Filtrar perícias para o atributo atual
           const savingThrowSkill = {
             key: `${attrName}SavingThrow`,
             label: "Salvaguarda",
             parentAttribute: attrName,
-            isSavingThrow: true, // Adicionar uma flag para identificar a salvaguarda
+            isSavingThrow: true,
           };
 
           const parentAttributeSkills = [
@@ -64,12 +38,10 @@ const PlayerAttributesAndSkills: React.FC<
           ];
 
           return (
-            // Alterar para flex-col para acomodar perícias abaixo
             <div
               key={attrName}
               className="flex flex-col space-y-2 p-3 rounded bg-surface-1"
             >
-              {/* Grid original para valor e modificador */}
               <div className="flex justify-between w-[10rem]">
                 <div className="flex flex-col ">
                   <label
@@ -114,13 +86,11 @@ const PlayerAttributesAndSkills: React.FC<
                     {modifier >= 0 ? `+${modifier}` : modifier}
                   </span>
                 </div>
-              </div>{" "}
-              {/* Fim da grid original */}
-              {/* Nova seção para perícias aninhadas */}
+              </div>
               {parentAttributeSkills.length > 0 && (
                 <div className="mt-1.5  space-y-0.5">
                   {parentAttributeSkills.map((skillInfo) => {
-                    const isSavingThrow = (skillInfo as any).isSavingThrow; // Verificar a flag
+                    const isSavingThrow = (skillInfo as any).isSavingThrow;
                     const skillKey = isSavingThrow
                       ? (attrName as keyof NonNullable<
                           PlayerToken["proficiencies"]
@@ -186,7 +156,7 @@ const PlayerAttributesAndSkills: React.FC<
                           htmlFor={`skill-prof-${String(
                             skillInfo.key
                           )}-${String(attrName)}`}
-                          className="text-xs font-bold text-accent-primary w-max-[6px] text-right flex-shrink-0"
+                          className="text-xs font-bold text-accent-primary w-max-[0.375rem] text-right flex-shrink-0"
                         >
                           {totalBonus >= 0 ? `+${totalBonus}` : totalBonus}
                         </label>
@@ -207,9 +177,6 @@ const PlayerAttributesAndSkills: React.FC<
           );
         }
       )}
-      {/* O bloco de Perícias separado foi removido */}
     </div>
   );
-};
-
-export default PlayerAttributesAndSkills;
+}

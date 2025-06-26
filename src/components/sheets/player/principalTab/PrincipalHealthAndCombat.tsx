@@ -1,51 +1,31 @@
 import { cn } from "../../../../utils/cn";
-import { HitDiceEntry } from "../../../../types";
+import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
+import { generateUniqueId } from '../../../../utils/id/idUtils';
 
-interface PrincipalHealthAndCombatProps {
-  editingArmorClass: string;
-  setEditingArmorClass: (value: string) => void;
-  editingInitiative: string;
-  setEditingInitiative: (value: string) => void;
-  editingSpeed: string;
-  setEditingSpeed: (value: string) => void;
-  editingShieldEquipped: boolean;
-  setEditingShieldEquipped: (value: boolean) => void;
-  editingCurrentHp: string;
-  setEditingCurrentHp: (value: string) => void;
-  editingTempHp: string;
-  setEditingTempHp: (value: string) => void;
-  editingMaxHp: string;
-  setEditingMaxHp: (value: string) => void;
-  editingDeathSavesSuccesses: number; // Estes dois não estão sendo usados no HTML, mas mantive na interface
-  setEditingDeathSavesSuccesses: (value: number) => void; // Estes dois não estão sendo usados no HTML, mas mantive na interface
-  editingDeathSavesFailures: number; // Estes dois não estão sendo usados no HTML, mas mantive na interface
-  setEditingDeathSavesFailures: (value: number) => void; // Estes dois não estão sendo usados no HTML, mas mantive na interface
-  editingHitDiceEntries: HitDiceEntry[];
-  setEditingHitDiceEntries: (value: HitDiceEntry[]) => void;
-}
+export function PrincipalHealthAndCombat() {
+  const {
+    editingArmorClass,
+    setEditingArmorClass,
+    editingInitiative,
+    setEditingInitiative,
+    editingSpeed,
+    setEditingSpeed,
+    editingShieldEquipped,
+    setEditingShieldEquipped,
+    editingCurrentHp,
+    setEditingCurrentHp,
+    editingTempHp,
+    setEditingTempHp,
+    editingMaxHp,
+    setEditingMaxHp,
+    editingHitDiceEntries,
+    setEditingHitDiceEntries,
+  } = usePlayerSheet();
 
-export function PrincipalHealthAndCombat({
-  editingArmorClass,
-  setEditingArmorClass,
-  editingInitiative,
-  setEditingInitiative,
-  editingSpeed,
-  setEditingSpeed,
-  editingShieldEquipped,
-  setEditingShieldEquipped,
-  editingCurrentHp,
-  setEditingCurrentHp,
-  editingTempHp,
-  setEditingTempHp,
-  editingMaxHp,
-  setEditingMaxHp,
-  editingHitDiceEntries,
-  setEditingHitDiceEntries,
-}: PrincipalHealthAndCombatProps) {
   const handleAddHitDice = () => {
     setEditingHitDiceEntries([
       ...editingHitDiceEntries,
-      { id: crypto.randomUUID(), type: "d6", quantity: 1 },
+      { id: generateUniqueId(), type: "d6", quantity: 1 },
     ]);
   };
 
@@ -71,10 +51,8 @@ export function PrincipalHealthAndCombat({
 
   return (
     <section className="flex flex-col space-y-2.5 w-[15rem]">
-      <h2 className="sr-only">Dados de Saúde e Combate do Personagem</h2>{" "}
-      {/* Título oculto para acessibilidade */}
+      <h2 className="sr-only">Dados de Saúde e Combate do Personagem</h2>
       <form>
-        {/* Agrupamento de Armadura, Iniciativa e Deslocamento */}
         <fieldset className="p-2 rounded-md bg-surface-1">
           <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
             Armadura e Combate
@@ -158,7 +136,6 @@ export function PrincipalHealthAndCombat({
           </div>
         </fieldset>
 
-        {/* Agrupamento de Pontos de Vida */}
         <fieldset className="flex flex-col space-y-1.5  p-2 rounded-md bg-surface-1 mt-2">
           <legend className=" bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
             Pontos de Vida
@@ -186,11 +163,7 @@ export function PrincipalHealthAndCombat({
               />
             </div>
             <div className="flex space-x-1.5 mt-1.5">
-              {" "}
-              {/* Adicionado margin-top para espaçamento */}
               <div className="flex-1">
-                {" "}
-                {/* Usado flex-1 para preencher o espaço disponível */}
                 <label
                   htmlFor="editingTempHp"
                   className={cn(
@@ -213,8 +186,6 @@ export function PrincipalHealthAndCombat({
                 />
               </div>
               <div className="flex-1">
-                {" "}
-                {/* Usado flex-1 para preencher o espaço disponível */}
                 <label
                   htmlFor="editingMaxHp"
                   className={cn(
@@ -240,7 +211,6 @@ export function PrincipalHealthAndCombat({
           </div>
         </fieldset>
 
-        {/* Agrupamento de Dados de Vida */}
         <fieldset className="flex-1 p-1.5 rounded mt-2 bg-surface-1 relative">
           <button
             type="button"

@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import DeathSaveCheckboxGroup from './DeathSaveCheckboxGroup';
+import '@testing-library/jest-dom';
+import { DeathSaveCheckboxGroup } from './DeathSaveCheckboxGroup';
 
 describe('DeathSaveCheckboxGroup', () => {
   const defaultProps = {

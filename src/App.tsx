@@ -4,7 +4,7 @@ import { GameBoard } from "./features/board/GameBoard"; // Atualizado
 import { RightSidebar } from "./components/layout/RightSidebar"; // Atualizado
 import {
   HPControlModal,
-  HP_MODAL_ESTIMATED_HEIGHT,
+  HP_MODAL_ESTIMATED_HEIGHT_REM,
 } from "./components/modals/HPControlModal"; // Atualizado
 import { SimpleNameModal } from "./components/modals/SimpleNameModal"; // Atualizado
 import { SheetModal } from "./components/modals/SheetModal";
@@ -216,7 +216,7 @@ export default function App() {
     if (!tokenScreenRect) return null;
     const modalXOffset = 5;
     const modalYOffset =
-      -(HP_MODAL_ESTIMATED_HEIGHT / 2) + tokenScreenRect.height / 2 - 15;
+      -(HP_MODAL_ESTIMATED_HEIGHT_REM * 16 / 2) + tokenScreenRect.height / 2 - 15; // Convertendo rem para px (1rem = 16px)
     return {
       x: tokenScreenRect.right + modalXOffset,
       y: tokenScreenRect.top + modalYOffset,
