@@ -62,6 +62,14 @@ interface PlayerSheetContextType {
   handleAddAction: () => void;
   handleRemoveAction: (id: string) => void;
   handleActionChange: (id: string, field: keyof Action, value: string) => void;
+  attacks: NonNullable<PlayerToken["attacks"]>; // Adicionado
+  handleAddAttack: () => void; // Adicionado
+  handleRemoveAttack: (id: string) => void; // Adicionado
+  handleAttackChange: (
+    id: string,
+    field: keyof NonNullable<PlayerToken["attacks"]>[number],
+    value: string
+  ) => void; // Adicionado
   featuresAndTraits: PlayerToken["featuresAndTraits"];
   setFeaturesAndTraits: React.Dispatch<
     React.SetStateAction<PlayerToken["featuresAndTraits"]>
@@ -71,7 +79,7 @@ interface PlayerSheetContextType {
     label: string;
     parentAttribute: keyof NonNullable<PlayerToken["attributes"]>;
   }[];
-  getUpdatedPlayerToken: () => PlayerToken; // Adicionar a nova função
+  getUpdatedPlayerToken: () => PlayerToken;
 }
 
 const PlayerSheetContext = createContext<PlayerSheetContextType | undefined>(
@@ -87,7 +95,6 @@ interface PlayerSheetProviderProps {
 export function PlayerSheetProvider({
   children,
   initialToken,
-  setToken, // Destructure setToken from props
 }: PlayerSheetProviderProps) {
   const [editingTokenName, setEditingTokenName] = useState(
     initialToken.name || ""
@@ -193,6 +200,9 @@ export function PlayerSheetProvider({
   const [actions, setActions] = useState<NonNullable<PlayerToken["actions"]>>(
     initialToken.actions || []
   );
+  const [attacks, setAttacks] = useState<NonNullable<PlayerToken["attacks"]>>(
+    initialToken.attacks || []
+  ); // Adicionado
   const [featuresAndTraits, setFeaturesAndTraits] = useState<
     PlayerToken["featuresAndTraits"]
   >(initialToken.featuresAndTraits || []);
@@ -262,6 +272,7 @@ export function PlayerSheetProvider({
       }
     );
     setActions(initialToken.actions || []);
+    setAttacks(initialToken.attacks || []); // Adicionado
     setFeaturesAndTraits(initialToken.featuresAndTraits || []);
   }, [initialToken]);
 
@@ -282,6 +293,33 @@ export function PlayerSheetProvider({
       setActions((prev) =>
         prev.map((action) =>
           action.id === id ? { ...action, [field]: value } : action
+        )
+      );
+    },
+    []
+  );
+
+  // Handlers for attacks
+  const handleAddAttack = useCallback(() => {
+    setAttacks((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), name: "", attackBonus: "", damage: "" },
+    ]);
+  }, []);
+
+  const handleRemoveAttack = useCallback((id: string) => {
+    setAttacks((prev) => prev.filter((attack) => attack.id !== id));
+  }, []);
+
+  const handleAttackChange = useCallback(
+    (
+      id: string,
+      field: keyof NonNullable<PlayerToken["attacks"]>[number],
+      value: string
+    ) => {
+      setAttacks((prev) =>
+        prev.map((attack) =>
+          attack.id === id ? { ...attack, [field]: value } : attack
         )
       );
     },
@@ -314,6 +352,7 @@ export function PlayerSheetProvider({
         skills: skillProficiencies,
       },
       actions: actions,
+      attacks: attacks, // Adicionado
       featuresAndTraits: featuresAndTraits,
       // Outras propriedades do token que podem ser gerenciadas pelo PlayerSheetContext
     };
@@ -339,6 +378,7 @@ export function PlayerSheetProvider({
     savingThrowProficiencies,
     skillProficiencies,
     actions,
+    attacks, // Adicionado
     featuresAndTraits,
   ]);
 
@@ -386,10 +426,14 @@ export function PlayerSheetProvider({
     handleAddAction,
     handleRemoveAction,
     handleActionChange,
+    attacks, // Adicionado
+    handleAddAttack, // Adicionado
+    handleRemoveAttack, // Adicionado
+    handleAttackChange, // Adicionado
     featuresAndTraits,
     setFeaturesAndTraits,
     SKILLS_CONFIG,
-    getUpdatedPlayerToken, // Adicionar a nova função ao contexto
+    getUpdatedPlayerToken,
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { usePlayerSheet } from "../../contexts/PlayerSheetContext";
 import { PrincipalTab } from "../sheets/player/principalTab/PrincipalTab";
 import { PlayerSheetDetailsTab } from "../sheets/player/detailsTab/PlayerSheetDetailsTab";
@@ -12,7 +12,6 @@ type PlayerSheetTab = "principal" | "detalhes" | "configuracoes";
 
 interface PlayerSheetContentProps {
   tokenId: string;
-  initialTokenData: PlayerToken;
   updateToken: (tokenId: string, updates: Partial<PlayerToken>) => void;
   onClose: () => void;
   editingTokenImage: string;
@@ -24,12 +23,10 @@ interface PlayerSheetContentProps {
   editingInspiration: boolean;
   setEditingInspiration: (inspiration: boolean) => void;
   hasTokenSheetChanged: boolean;
-  handleSave: (e: React.FormEvent) => void; // Receber o handleSave do useTokenSheetForm
 }
 
 export function PlayerSheetContent({
   tokenId,
-  initialTokenData,
   updateToken,
   onClose,
   editingTokenImage,
@@ -41,7 +38,6 @@ export function PlayerSheetContent({
   editingInspiration,
   setEditingInspiration,
   hasTokenSheetChanged,
-  handleSave, // Receber o handleSave
 }: PlayerSheetContentProps) {
   const { getUpdatedPlayerToken } = usePlayerSheet();
   const { modalStack, closeModal } = useModal(); // Importar useModal

@@ -122,6 +122,7 @@ export interface PlayerToken extends BaseToken {
   };
 
   actions?: Action[];
+  attacks?: Attack[]; // Adicionado
   equipment?: EquipmentItem[];
   featuresAndTraits?: FeatureOrTrait[];
 }
@@ -148,6 +149,13 @@ export interface Action {
   bonus?: string;
   damage?: string;
   notes?: string;
+}
+
+export interface Attack {
+  id: string;
+  name: string;
+  attackBonus?: string;
+  damage?: string;
 }
 
 export interface EquipmentItem {

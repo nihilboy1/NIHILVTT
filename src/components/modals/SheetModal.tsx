@@ -1,26 +1,18 @@
-import { useState } from "react";
 import { useTokens } from "../../contexts/TokensContext";
-import { TokenType, type PlayerToken, type Action } from "../../types"; // Added PlayerToken and Action
+import { TokenType, type PlayerToken } from "../../types";
 import { InteractiveModal } from "../ui/InteractiveModal";
 import { useTokenSheetForm } from "../../hooks/useTokenSheetForm";
-import { PrincipalTab } from "../sheets/player/principalTab/PrincipalTab";
-import { PlayerSheetDetailsTab } from "../sheets/player/detailsTab/PlayerSheetDetailsTab";
-import { PlayerSheetConfigTab } from "../sheets/player/configTab/PlayerSheetConfigTab";
 import { CreatureSheet } from "../sheets/creature/CreatureSheet";
-import { cn } from "../../utils/cn"; // Importar o utilitário cn
-import { PlayerSheetProvider } from "../../contexts/PlayerSheetContext"; // Importar o PlayerSheetProvider
-import { ActionEditModal } from "./ActionEditModal"; // Importar ActionEditModal
-import { PlayerSheetContent } from "./PlayerSheetContent"; // Importar o novo componente
+import { PlayerSheetProvider } from "../../contexts/PlayerSheetContext";
+import { PlayerSheetContent } from "./PlayerSheetContent";
 
-type PlayerSheetTab = "principal" | "detalhes" | "configuracoes";
 const ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT = 700;
 
 interface TokenSheetModalProps {
   tokenId: string | null;
-  isOpen: boolean; // Adicionado para controlar a visibilidade
+  isOpen: boolean;
   onClose: () => void;
   zIndex?: number;
-  containerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function SheetModal({
@@ -28,7 +20,6 @@ export function SheetModal({
   isOpen,
   onClose,
   zIndex,
-  containerRef,
 }: TokenSheetModalProps) {
   const { tokens, updateToken } = useTokens();
   const initialTokenData = tokenId
@@ -36,8 +27,8 @@ export function SheetModal({
     : null;
 
   const {
-    editingTokenImage, // Adicionado para a imagem
-    setEditingTokenImage, // Adicionado para o setter da imagem
+    editingTokenImage,
+    setEditingTokenImage,
     editingTokenSize,
     setEditingTokenSize,
     editingTokenType,
@@ -52,8 +43,6 @@ export function SheetModal({
     initialTokenData: initialTokenData,
     onSave: (updatedData) => {
       if (tokenId) {
-        // A atualização do token agora será feita no PlayerSheetProvider
-        // Apenas para tokens que não são PLAYER, ou para dados que não são gerenciados pelo PlayerSheetContext
         if (initialTokenData?.type !== TokenType.PLAYER) {
           updateToken(tokenId, updatedData);
           onClose();
@@ -61,9 +50,6 @@ export function SheetModal({
       }
     },
   });
-
-  const [playerSheetActiveTab, setPlayerSheetActiveTab] =
-    useState<PlayerSheetTab>("principal");
 
   // Estados para controlar as dimensões do modal
   const MIN_SHEET_WIDTH = 400;
@@ -81,16 +67,7 @@ export function SheetModal({
   const initialModalWidth = initialTokenData?.type === TokenType.PLAYER ? 750 : 450;
   const initialModalHeight = initialTokenData?.type === TokenType.PLAYER ? ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT : 620;
 
-  const tabButtonClass = (tabName: PlayerSheetTab) =>
-    cn(
-      "px-4 py-2 text-sm font-medium rounded-t-md  border-b-2",
-      playerSheetActiveTab === tabName
-        ? "border-accent-primary text-accent-primary bg-surface-1"
-        : "border-transparent text-text-secondary hover:bg-surface-1 hover:border-accent-primary-hover"
-    );
-
   if (!tokenId || editingTokenType === null || !isOpen) {
-    // Adicionado null check para editingTokenType e isOpen
     return null;
   }
 
@@ -99,14 +76,14 @@ export function SheetModal({
       ? `${initialTokenData?.name || ""}`
       : `Ficha de ${initialTokenData?.name || ""}`;
 
-  const minimizedModalTitle = initialTokenData?.name || ""; // Apenas o nome do personagem
+  const minimizedModalTitle = initialTokenData?.name || "";
 
   return (
     <InteractiveModal
       id={`sheet-${tokenId}`}
       title={modalTitle}
       minimizedTitle={minimizedModalTitle}
-      isOpen={isOpen} // Usar a prop isOpen diretamente
+      isOpen={isOpen}
       onClose={onClose}
       initialPosition={initialPosition}
       initialWidth={initialModalWidth}
@@ -122,16 +99,13 @@ export function SheetModal({
           <PlayerSheetProvider
             initialToken={initialTokenData as PlayerToken}
             setToken={(updatedPlayerToken) => {
-              // Esta função setToken agora é usada apenas para sincronização interna do PlayerSheetProvider
-              // A atualização real do token no TokensContext ocorrerá no PlayerSheetContent
               if (tokenId) {
-                updateToken(tokenId, updatedPlayerToken); // Manter para compatibilidade se necessário, mas o principal é o handleSave
+                updateToken(tokenId, updatedPlayerToken);
               }
             }}
           >
             <PlayerSheetContent
               tokenId={tokenId}
-              initialTokenData={initialTokenData as PlayerToken}
               updateToken={updateToken}
               onClose={onClose}
               editingTokenImage={editingTokenImage}
@@ -143,7 +117,6 @@ export function SheetModal({
               editingInspiration={editingInspiration}
               setEditingInspiration={setEditingInspiration}
               hasTokenSheetChanged={hasTokenSheetChanged}
-              handleSave={handleSave} // Passar o handleSave do useTokenSheetForm
             />
           </PlayerSheetProvider>
         ) : (
@@ -176,8 +149,8 @@ export function SheetModal({
             }}
             editingTokenNotes={editingTokenNotes}
             setEditingTokenNotes={setEditingTokenNotes}
-            editingTokenImage={editingTokenImage} // Passar a imagem
-            setEditingTokenImage={setEditingTokenImage} // Passar o setter da imagem
+            editingTokenImage={editingTokenImage}
+            setEditingTokenImage={setEditingTokenImage}
             editingTokenSize={editingTokenSize}
             setEditingTokenSize={setEditingTokenSize}
           />

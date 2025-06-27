@@ -9,7 +9,6 @@ import {
 import { SimpleNameModal } from "./components/modals/SimpleNameModal"; // Atualizado
 import { SheetModal } from "./components/modals/SheetModal";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
-import { ActionEditModal } from "./components/modals/ActionEditModal";
 import {
   Tool,
   TokenType,
@@ -32,7 +31,6 @@ import { useTokens } from "./contexts/TokensContext";
 import { useUI } from "./contexts/UIContext";
 import { useModal } from "./contexts/ModalContext";
 import { SheetProvider } from "./contexts/SheetContext"; // Importar SheetProvider
-import { PlayerSheetProvider } from "./contexts/PlayerSheetContext";
 
 export default function App() {
   const {
@@ -629,7 +627,6 @@ export default function App() {
                   isOpen={true}
                   onClose={closeModal}
                   zIndex={100 + index} // Ficha com zIndex base
-                  containerRef={gameBoardRef as React.RefObject<HTMLDivElement>}
                 />
               </SheetProvider>
             );

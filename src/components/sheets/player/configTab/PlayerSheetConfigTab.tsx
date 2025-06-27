@@ -1,4 +1,3 @@
-import React from "react";
 import { TokenType } from "../../../../types";
 import { tokenTypeTranslations } from "../../../../constants";
 import { cn } from "../../../../utils/cn";

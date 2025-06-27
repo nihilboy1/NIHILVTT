@@ -25,8 +25,6 @@ export function PrincipalHealthAndCombat() {
     setEditingHitDiceEntries,
     actions,
     handleAddAction,
-    handleRemoveAction,
-    handleActionChange,
   } = usePlayerSheet();
 
   const { openModal, closeModal } = useModal();
