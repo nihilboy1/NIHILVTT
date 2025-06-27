@@ -49,7 +49,7 @@ export function CreatureSheet({
           type="text"
           value={editingTokenName}
           onChange={(e) => setEditingTokenName(e.target.value)}
-          className="w-full p-0 bg-surface-1 border border-red-500 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
+          className="w-full p-0 bg-surface-1  rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           required
           maxLength={35}
         />

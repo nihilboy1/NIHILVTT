@@ -1,5 +1,5 @@
 import { SidebarTab } from "../../types/index";
-import { ChatBubbleIcon, UsersIcon, ChevronRightIcon } from "../icons";
+import { ChatBubbleIcon, ChevronRightIcon, IdentificationCardIcon } from "../icons";
 import { TabButton } from "../ui/TabButton";
 import { useUI } from "../../contexts/UIContext";
 import { ChatPanel } from "../chat/ChatPanel";
@@ -35,7 +35,7 @@ export function RightSidebar() {
         <TabButton
           tab={SidebarTab.TOKENS}
           label="Tokens"
-          icon={<UsersIcon />}
+          icon={<IdentificationCardIcon />}
           isActive={activeSidebarTab === SidebarTab.TOKENS}
           onClick={() => setActiveSidebarTab(SidebarTab.TOKENS)}
         />

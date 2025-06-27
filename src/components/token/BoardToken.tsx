@@ -29,6 +29,7 @@ interface BoardTokenProps {
   onGridInstanceDragMove: (instanceId: string, visualSVGPoint: Point) => void; // Changed SVGPoint to Point
   onGridInstanceDragEnd: (instanceId: string) => void;
   isMultiSelected: boolean;
+  onTokenDoubleClick: (instanceId: string, altKey: boolean) => void; // Nova prop para double click
 }
 
 export function BoardToken({
@@ -45,6 +46,7 @@ export function BoardToken({
   onGridInstanceDragMove,
   onGridInstanceDragEnd,
   isMultiSelected,
+  onTokenDoubleClick, // Adicionar nova prop
 }: BoardTokenProps) {
   const tokenGroupRef = useRef<SVGGElement>(null);
 
@@ -69,6 +71,13 @@ export function BoardToken({
       }
     },
     [onGridInstanceSelectForHPModal]
+  );
+
+  const handleDoubleClick = useCallback(
+    (event: React.MouseEvent<SVGGElement>) => {
+      onTokenDoubleClick(gridInstance.instanceId, event.altKey);
+    },
+    [gridInstance.instanceId, onTokenDoubleClick]
   );
 
   const { isDragging, displayPosition, dragHandlers } = useTokenDrag({
@@ -146,6 +155,7 @@ export function BoardToken({
       className="board-token-group"
       style={{ cursor: cursorStyle }}
       {...dragHandlers} // Attach onMouseDown from the hook
+      onDoubleClick={handleDoubleClick} // Adicionar o handler de double click
       filter={isDragging ? "url(#tokenDragShadow)" : "none"}
       data-instance-id={gridInstance.instanceId}
     >

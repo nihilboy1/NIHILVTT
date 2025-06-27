@@ -22,6 +22,7 @@ import { BoardToken } from "../../components/token/BoardToken"; // Ajustar o cam
 import { useTokens } from "../../contexts/TokensContext"; // Ajustar o caminho do contexto
 import { useBoardSettings } from "../../contexts/BoardSettingsContext"; // Ajustar o caminho do contexto
 import { useUI } from "../../contexts/UIContext"; // Ajustar o caminho do contexto
+import { useModal } from "../../contexts/ModalContext"; // Importar o hook useModal
 import {
   parseTokenSize,
   calculateInitialViewBox,
@@ -66,6 +67,23 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const { gridSettings, pageSettings, rulerPlacementMode, rulerPersists } =
     useBoardSettings();
   const { activeTool } = useUI();
+  const { openModal } = useModal(); // Obter openModal do contexto
+
+  const handleTokenDoubleClick = useCallback(
+    (instanceId: string, altKey: boolean) => {
+      if (altKey) {
+        const instance = gridInstances.find(
+          (gi) => gi.instanceId === instanceId
+        );
+        if (instance) {
+          openModal("sheet", { tokenId: instance.tokenInfoId });
+        } else {
+          console.error("Instance not found for double-click:", instanceId);
+        }
+      }
+    },
+    [openModal, gridInstances]
+  );
 
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewBox, setViewBox] = useState({
@@ -804,6 +822,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               isMultiSelected={multiSelectedInstanceIds.includes(
                 instance.instanceId
               )}
+              onTokenDoubleClick={handleTokenDoubleClick} // Passar a nova prop
             />
           );
         })}

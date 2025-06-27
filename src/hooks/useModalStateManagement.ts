@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 
 export interface ModalEntry {
+  id: string; // Adicionar ID única para cada entrada de modal
   name: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props: Record<string, any>;
@@ -25,9 +26,29 @@ export const useModalStateManagement = (): UseModalStateManagementReturn => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const openModal = useCallback((modalName: string, props: Record<string, any> = {}) => {
-    setModalState(prevState => ({
-      modalStack: [...prevState.modalStack, { name: modalName, props }],
-    }));
+    setModalState(prevState => {
+
+      // se um modal de ficha já estiver aberto, não abra outro.
+      if (modalName === 'sheet') {
+        const isSheetAlreadyOpen = prevState.modalStack.some(
+          (modal) => modal.name === 'sheet'
+        );
+        if (isSheetAlreadyOpen) {
+          return prevState; // não faz nada se a ficha já estiver aberta
+        }
+      }
+
+      const newModalEntry: ModalEntry = {
+        id: `${modalName}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, // Gerar ID única
+        name: modalName,
+        props,
+      };
+
+      const newModalStack = [...prevState.modalStack, newModalEntry];
+      return {
+        modalStack: newModalStack,
+      };
+    });
   }, []);
 
   const closeModal = useCallback(() => {

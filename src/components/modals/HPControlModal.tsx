@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { type Token as TokenInfo, type Point } from "../../types"; // TokenInfo might be needed if HP is directly on instance
-import { DetatchIcon, EjectIcon } from "../icons"; // BranchIcon removed
+import { DetatchIcon, XMarkIcon } from "../icons"; // BranchIcon removed
 import { calculateNewHP } from "../../utils/hpUtils";
 import useDismissable from "../../hooks/useDismissable";
 
@@ -14,6 +14,7 @@ interface HPControlModalProps {
   onRemoveFromBoard: (instanceId: string) => void; // Removes the GridInstance
   onMakeIndependent: (instanceId: string) => void; // Makes the GridInstance independent
   zIndex?: number; // Adicionado zIndex
+  containerRef?: React.RefObject<HTMLDivElement | null>; // Adicionado containerRef
 }
 
 export const HP_MODAL_ESTIMATED_HEIGHT_REM = 2.5; // Converted from 40px
@@ -180,7 +181,7 @@ export function HPControlModal({
         title="Remover do Tabuleiro"
         aria-label="Remover instância do tabuleiro"
       >
-        <EjectIcon className="w-4 h-4" />
+        <XMarkIcon className="w-4 h-4" />
       </button>
     </div>
   );

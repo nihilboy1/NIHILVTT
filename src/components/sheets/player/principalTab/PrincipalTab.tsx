@@ -6,7 +6,7 @@ import { PrincipalHealthAndCombat } from "./PrincipalHealthAndCombat";
 
 export function PrincipalTab() {
   return (
-    <div className="flex flex-col p-0.5 overflow-y-auto max-h-[calc(100vh-12rem)] hide-scrollbar border">
+    <div className="flex flex-col p-0.5 overflow-y-auto max-h-[calc(100vh-12rem)] hide-scrollbar">
       <PrincipalHeader />
 
       <div className="flex justify-between flex-wrap gap-2">

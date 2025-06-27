@@ -123,9 +123,18 @@ export function useTokenSheetForm({
   const handleSave = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!initialTokenData || editingTokenType === null) {
-        alert("Erro ao identificar o token ou tipo para atualização.");
+      // Se initialTokenData é nulo, estamos criando um novo token.
+      // A validação aqui é para garantir que o tipo do token foi selecionado.
+      if (editingTokenType === null) {
+        alert("Erro: O tipo do token deve ser selecionado.");
         return;
+      }
+      // Se estamos editando um token existente e initialTokenData é nulo por algum motivo,
+      // isso indica um erro de estado, mas o caso de criação já foi tratado acima.
+      if (!initialTokenData && editingTokenType !== null) {
+        // Isso pode acontecer se o hook for usado para criar um token,
+        // mas o initialTokenData é nulo. Não precisamos de um alerta aqui,
+        // pois o tipo já foi validado.
       }
       if (!editingTokenName.trim()) {
         alert("O nome do token não pode estar vazio.");

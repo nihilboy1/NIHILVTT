@@ -17,7 +17,6 @@ export const DEFAULT_PAGE_SETTINGS: PageSettings = {
 export const DEFAULT_TOKEN_COLOR = '#875cad'; // Previously THEME_COLORS.ACCENT_PRIMARY; Corresponds to 'accent-primary' in Tailwind config
 export const DEFAULT_TOKEN_SIZE = "1x1";
 export const DEFAULT_TOKEN_HP = 10;
-export const DEFAULT_TOKEN_IMAGE = "/defaultToken.png"; // Caminho para a imagem padrão do token
 
 // Cor da linha da grade, correspondente a 'grid-line' no tailwind.config.ts
 export const GRID_LINE_COLOR = '#000';

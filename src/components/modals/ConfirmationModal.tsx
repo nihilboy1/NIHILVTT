@@ -9,6 +9,7 @@ interface ConfirmationModalProps {
   onConfirm: () => void;
   onCancel: () => void;
   zIndex?: number; // Adicionado zIndex
+  containerRef?: React.RefObject<HTMLDivElement | null>; // Adicionado containerRef
 }
 
 export function ConfirmationModal({

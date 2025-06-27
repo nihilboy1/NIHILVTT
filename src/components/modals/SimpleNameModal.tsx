@@ -10,6 +10,7 @@ interface SimpleNameModalProps {
   currentName?: string;
   tokenType?: TokenType; // Adicionado tokenType como prop
   zIndex?: number; // Adicionado zIndex
+  containerRef?: React.RefObject<HTMLDivElement>; // Adicionado containerRef
 }
 
 export function SimpleNameModal({

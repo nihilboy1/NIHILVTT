@@ -11,6 +11,7 @@ interface ModalProps {
   cancelText?: string; // Texto do botão de cancelar
   hideFooter?: boolean; // Oculta o rodapé com os botões
   zIndex?: number; // Adicionado zIndex
+  modalClassName?: string; // Adicionado para classes CSS adicionais no container do modal
 }
 
 export function Modal({
@@ -23,6 +24,7 @@ export function Modal({
   cancelText = "Cancelar", // Texto padrão para o botão de cancelar
   hideFooter = false, // Por padrão, o rodapé é visível
   zIndex, // Receber zIndex
+  modalClassName = "", // Valor padrão vazio
 }: ModalProps) {
   useEffect(() => {
     // Manipulador para fechar o modal com a tecla 'Escape'
@@ -49,10 +51,10 @@ export function Modal({
       role="dialog" // Semântica para acessibilidade
       aria-modal="true" // Indica que o conteúdo fora do modal está inerte
       aria-labelledby="modal-title" // Associa o título ao modal para acessibilidade
-      style={{ zIndex: zIndex }} // Aplicar zIndex
+      style={{ zIndex: zIndex }} // Aplicar zIndex no overlay
     >
       <div
-        className="bg-surface-0 p-6 rounded-lg shadow-xl max-w-md w-full" // Container do conteúdo do modal
+        className={`bg-surface-0 p-6 rounded-lg shadow-xl max-w-md w-full ${modalClassName}`} // Container do conteúdo do modal com classes adicionais
         onClick={(e) => e.stopPropagation()} // Impede que o clique dentro do modal feche-o
       >
         <div className="flex justify-between items-center mb-6">

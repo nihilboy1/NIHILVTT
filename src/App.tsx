@@ -9,6 +9,7 @@ import {
 import { SimpleNameModal } from "./components/modals/SimpleNameModal"; // Atualizado
 import { SheetModal } from "./components/modals/SheetModal";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
+import { ActionEditModal } from "./components/modals/ActionEditModal";
 import {
   Tool,
   TokenType,
@@ -24,13 +25,14 @@ import {
   DEFAULT_TOKEN_HP,
   DEFAULT_PLAYER_LEVEL,
   DEFAULT_PLAYER_INSPIRATION,
-  DEFAULT_TOKEN_IMAGE, // Importar DEFAULT_TOKEN_IMAGE
 } from "./constants";
+import { DEFAULT_TOKEN_IMAGE } from "./constants/sheetDefaults"; // Importar DEFAULT_TOKEN_IMAGE do local correto
 import { ChevronLeftIcon, ChevronRightIcon } from "./components/icons";
 import { useTokens } from "./contexts/TokensContext";
 import { useUI } from "./contexts/UIContext";
 import { useModal } from "./contexts/ModalContext";
 import { SheetProvider } from "./contexts/SheetContext"; // Importar SheetProvider
+import { PlayerSheetProvider } from "./contexts/PlayerSheetContext";
 
 export default function App() {
   const {
@@ -159,10 +161,6 @@ export default function App() {
     name: string,
     tokenTypeFromModal?: TokenType
   ) => {
-    console.log("handleSaveNewTokenName chamado com:", {
-      name,
-      tokenTypeFromModal,
-    });
     // Usar o tokenType vindo diretamente do modal, que é mais confiável
     const typeToUse = tokenTypeFromModal || activeModalProps?.tokenType; // Mantendo o fallback para activeModalProps?.tokenType por segurança, embora activeModalProps?.type seja o correto agora.
 
@@ -210,7 +208,6 @@ export default function App() {
       } as Omit<TokenInfo, "id">; // Assert as Omit<BaseToken, "id"> which is compatible with Omit<TokenInfo, "id">
     }
     const newTokenInfo = addToken(newSheetData);
-    console.log("Novo token criado:", newTokenInfo);
     closeModal();
     openModal("sheet", { tokenId: newTokenInfo.id });
   };
@@ -234,11 +231,22 @@ export default function App() {
 
   const handleGridInstanceSelectForHPModal = useCallback(
     (instanceId: string, tokenScreenRect: DOMRect | null) => {
+      // Verificar se um modal de HP para este token já está aberto
+      const isHpControlAlreadyOpenForToken = modalStack.some(
+        (modal) =>
+          modal.name === 'hpControl' &&
+          modal.props.instanceId === instanceId
+      );
+
+      if (isHpControlAlreadyOpenForToken) {
+        return; // Não faz nada se o modal já estiver aberto
+      }
+
       const anchor = calculateHPModalAnchorPoint(tokenScreenRect);
       openModal("hpControl", { instanceId, anchorPoint: anchor });
       handleClearMultiSelection(); // Clear multi-selection when single selecting
     },
-    [openModal, handleClearMultiSelection]
+    [openModal, handleClearMultiSelection, modalStack] // Adicionar modalStack às dependências
   );
 
   const handleHPChangeFromModal = useCallback(
@@ -497,19 +505,24 @@ export default function App() {
     closeModal,
   ]);
 
+  // Prevent default behavior for Alt key to avoid browser menu focus
+  useEffect(() => {
+    const handleAltKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Alt") {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener("keydown", handleAltKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleAltKeyDown);
+    };
+  }, []);
+
   const showButtonStyle =
     "fixed top-1/2 -translate-y-1/2 z-30 p-2 bg-surface-1 hover:bg-border-base rounded-md shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-border-strong";
 
-  const selectedGridInstance =
-    activeModalName === "hpControl" && activeModalProps?.instanceId
-      ? gridInstances.find(
-          (gi: GridInstance) => gi.instanceId === activeModalProps.instanceId
-        )
-      : null;
-  const tokenInfoForHPModal = selectedGridInstance
-    ? tokens.find((t: TokenInfo) => t.id === selectedGridInstance.tokenInfoId)
-    : null;
-
+ 
   const handleBoardBackgroundClick = () => {
     closeModal(); // Fechar qualquer modal aberto
     handleClearMultiSelection();
@@ -527,7 +540,7 @@ export default function App() {
 
   return (
     <div
-      className="flex h-screen w-screen bg-surface-0 overflow-hidden"
+      className="flex h-screen w-screen bg-surface-0 overflow-hidden relative" // Adicionado 'relative' para ser o offsetParent
       ref={gameBoardRef}
     >
       {isToolbarVisible ? (
@@ -581,13 +594,14 @@ export default function App() {
           case "simpleName":
             return (
               <SimpleNameModal
-                key={name} // Usar o nome como chave, ou um ID único se houver múltiplos do mesmo tipo
-                isOpen={isTopModal} // Apenas o modal do topo é "aberto" no sentido de ser interativo
+                key={modalEntry.id} // Usar o ID único
+                isOpen={isTopModal}
                 onClose={closeModal}
                 onSave={handleSaveNewTokenName}
                 title={props.title}
                 tokenType={props.type as TokenType}
-                zIndex={100 + index} // Adicionar zIndex
+                zIndex={100 + index}
+                containerRef={gameBoardRef as React.RefObject<HTMLDivElement>}
               />
             );
           case "sheet":
@@ -601,7 +615,7 @@ export default function App() {
 
             return (
               <SheetProvider
-                key={name}
+                key={props.tokenId} // Usar tokenId como chave para forçar a remontagem
                 initialTokenData={initialTokenData}
                 onSave={(updatedData: Partial<TokenInfo>) => {
                   if (props.tokenId) {
@@ -610,9 +624,18 @@ export default function App() {
                   }
                 }}
               >
-                <SheetModal tokenId={props.tokenId} onClose={closeModal} zIndex={100 + index} /> {/* Adicionar zIndex */}
+                <SheetModal
+                  tokenId={props.tokenId}
+                  isOpen={true}
+                  onClose={closeModal}
+                  zIndex={100 + index} // Ficha com zIndex base
+                  containerRef={gameBoardRef as React.RefObject<HTMLDivElement>}
+                />
               </SheetProvider>
             );
+          case "actionEdit":
+            // ActionEditModal será renderizado dentro de PlayerSheetContent
+            return null;
           case "hpControl":
             const selectedGridInstanceForHP = gridInstances.find(
               (gi: GridInstance) => gi.instanceId === props.instanceId
@@ -628,7 +651,7 @@ export default function App() {
               tokenInfoForHPModal &&
               props.anchorPoint && (
                 <HPControlModal
-                  key={name}
+                  key={modalEntry.id} // Usar o ID único
                   instanceId={props.instanceId}
                   tokenInfo={tokenInfoForHPModal}
                   anchorPoint={props.anchorPoint}
@@ -641,22 +664,24 @@ export default function App() {
                   }}
                   onRemoveFromBoard={handleRemoveInstanceFromBoard}
                   onMakeIndependent={handleMakeInstanceIndependent}
-                  zIndex={100 + index} // Adicionar zIndex
+                  zIndex={100 + index} // HPControlModal pode ficar com zIndex base ou ajustado se necessário
+                  containerRef={gameBoardRef as React.RefObject<HTMLDivElement>}
                 />
               )
             );
           case "confirmationModal":
             return (
               <ConfirmationModal
-                key={name}
-                isOpen={isTopModal}
+                key={modalEntry.id} // Usar o ID único
+                isOpen={true} // Manter o modal de confirmação visível
                 title={props.title}
                 content={props.content}
                 confirmText={props.confirmText}
                 cancelText={props.cancelText}
                 onConfirm={props.onConfirm}
                 onCancel={props.onCancel}
-                zIndex={100 + index} // Adicionar zIndex
+                zIndex={200 + index} // ConfirmationModal acima de todos
+                containerRef={gameBoardRef as React.RefObject<HTMLDivElement>}
               />
             );
           default:

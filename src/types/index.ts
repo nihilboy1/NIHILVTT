@@ -121,7 +121,7 @@ export interface PlayerToken extends BaseToken {
     };
   };
 
-  attacks?: Attack[];
+  actions?: Action[];
   equipment?: EquipmentItem[];
   featuresAndTraits?: FeatureOrTrait[];
 }
@@ -142,11 +142,11 @@ export interface ObjectToken extends BaseToken {
 export type Token = PlayerToken | MonsterNPCToken | ObjectToken;
 
 // Interfaces auxiliares para D&D 5.5
-export interface Attack {
-  id: string; // ID único para o ataque
+export interface Action {
+  id: string;
   name: string;
-  attackBonus?: string; // Ex: "+5" ou "Str+Prof"
-  damage?: string; // Ex: "1d8+3 slashing"
+  bonus?: string;
+  damage?: string;
   notes?: string;
 }
 

@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { type Token as TokenInfo } from '../../types/index'; // Caminho corrigido
-import { EllipsisVerticalIcon } from '../icons'; // Caminho corrigido
+import { DotsThreeVerticalIcon } from '../icons'; // Caminho corrigido
 import { useTokens } from '../../contexts/TokensContext'; // Caminho corrigido
 import {OptionsPopover} from '../ui/OptionsPopover'; // Caminho corrigido
 import { useModal } from '../../contexts/ModalContext'; // Caminho corrigido
@@ -85,12 +85,12 @@ export function TokenTemplateListItem({
         <img
             src={tokenInfo.image}
             alt={`Imagem do token ${tokenInfo.name}`}
-            className="w-8 h-8 rounded-sm flex-shrink-0 shadow-sm object-cover" // Adicionado object-cover para garantir que a imagem preencha o espaço
+            className="w-10 h-10 rounded-sm flex-shrink-0 shadow-sm object-cover " // Adicionado object-cover para garantir que a imagem preencha o espaço
             aria-hidden="true"
         />
         <div className="overflow-hidden" id={`token-details-${tokenInfo.id}`}>
-          <span className=" font-medium block truncate" title={tokenInfo.name}>{tokenInfo.name}</span>
-          <span className="text-xs text-text-secondary block">
+          <span className=" font-bold block " title={tokenInfo.name}>{tokenInfo.name}</span>
+          <span className="text-xs text-text-secondary block mb-1">
             {tokenTypeTranslations[tokenInfo.type]} - {tokenInfo.size}
             {instanceCount > 0 && <span className="italic text-text-secondary"> ({instanceCount} no tabuleiro)</span>}
           </span>
@@ -103,7 +103,7 @@ export function TokenTemplateListItem({
         aria-label={`Mais opções para o modelo de token ${tokenInfo.name}`}
         title={`Mais opções para o modelo de token ${tokenInfo.name}`}
       >
-        <EllipsisVerticalIcon />
+        <DotsThreeVerticalIcon />
       </button>
 
       <OptionsPopover

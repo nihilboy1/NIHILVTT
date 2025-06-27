@@ -1,8 +1,9 @@
 import { cn } from "../../../../utils/cn";
 import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
 import { generateUniqueId } from "../../../../utils/id/idUtils";
-import { DeleteIcon, PlusCircleIcon } from "../../../icons";
+import { DeleteIcon, EditIcon, PlusCircleIcon } from "../../../icons";
 import { useModal } from "../../../../contexts/ModalContext";
+import { type Action } from "../../../../types";
 
 export function PrincipalHealthAndCombat() {
   const {
@@ -22,9 +23,17 @@ export function PrincipalHealthAndCombat() {
     setEditingMaxHp,
     editingHitDiceEntries,
     setEditingHitDiceEntries,
+    actions,
+    handleAddAction,
+    handleRemoveAction,
+    handleActionChange,
   } = usePlayerSheet();
 
   const { openModal, closeModal } = useModal();
+
+  const handleOpenEditModal = (action: Action) => {
+    openModal("actionEdit", { actionId: action.id }); // Passar actionId em vez do objeto action completo
+  };
 
   const handleAddHitDice = () => {
     setEditingHitDiceEntries([
@@ -42,7 +51,8 @@ export function PrincipalHealthAndCombat() {
   const handleDeleteConfirmation = (id: string) => {
     openModal("confirmationModal", {
       title: "Confirmar Exclusão",
-      content: "Você tem certeza que deseja remover esta linha de dados de vida?",
+      content:
+        "Você tem certeza que deseja remover esta linha de dados de vida?",
       onConfirm: () => {
         handleRemoveHitDice(id);
         closeModal();
@@ -65,10 +75,11 @@ export function PrincipalHealthAndCombat() {
     );
   };
 
+
   return (
-    <section className="flex flex-col space-y-2.5 w-[15rem]">
+    <section className="flex flex-col space-y-2.5 w-[16rem]">
       <h2 className="sr-only">Dados de Saúde e Combate do Personagem</h2>
-      <form>
+      <div>
         <fieldset className="p-2 rounded-md bg-surface-1">
           <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
             Armadura e Combate
@@ -152,9 +163,12 @@ export function PrincipalHealthAndCombat() {
           </div>
         </fieldset>
 
-        <fieldset className="flex flex-col space-y-1.5  p-2 rounded-md bg-surface-1 mt-2">
-          <legend className=" bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
-            Pontos de Vida
+        <fieldset
+          id="pontos de vida"
+          className="flex flex-col space-y-1.5  p-2 rounded-md bg-surface-1 mt-2"
+        >
+          <legend className=" bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold ">
+            PONTOS DE VIDA
           </legend>
           <div>
             <div>
@@ -230,7 +244,7 @@ export function PrincipalHealthAndCombat() {
               type="button"
               onClick={handleAddHitDice}
               title="Adicionar novo dado de vida"
-              className="flex items-center justify-center -bottom-5.5 w-6 h-6 right-[50%] translate-x-1/2 absolute text-xl  font-bold bg-accent-primary text-white rounded-[10rem]  hover:bg-accent-secondary "
+              className="flex items-center justify-center -bottom-5.5 w-6 h-6 right-[50%] translate-x-1/2 absolute text-xl  font-bold bg-accent-primary text-text-primary rounded-[10rem]  hover:bg-accent-secondary "
             >
               <PlusCircleIcon />
             </button>
@@ -286,8 +300,10 @@ export function PrincipalHealthAndCombat() {
                   />
                   <button
                     type="button"
+                    title="Remover dado de vida"
                     onClick={() => handleDeleteConfirmation(entry.id)}
-                    className="p-2 t hover:text-surface-0 bg-feedback-negative rounded-md hover:bg-feedback-negative-hover  flex items-center justify-center text-sm font-bold"
+                    disabled={editingHitDiceEntries.length === 1}
+                    className="p-2 t hover:text-surface-0 bg-feedback-negative rounded-md hover:bg-feedback-negative-hover  flex items-center justify-center text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <DeleteIcon className="w-10 h-5" />
                   </button>
@@ -296,7 +312,52 @@ export function PrincipalHealthAndCombat() {
             </ul>
           </fieldset>
         </fieldset>
-      </form>
+        <fieldset
+          id="Ações"
+          className="relative flex flex-col space-y-1.5 mt-4  p-2 rounded-md bg-surface-1 pb-5 "
+        >
+          <legend className=" bg-surface-1  p-1 pl-2 pr-3 rounded text-sm font-bold ">
+            AÇÕES
+          </legend>
+          {actions.map((action) => (
+            <div key={action.id} className="relative group">
+              <button
+                type="button"
+                title="Realizar ação"
+                className="w-full grid grid-cols-6 gap-2 text-[0.70rem] rounded bg-accent-primary hover:bg-surface-4 text-start hover:bg-accent-primary-hover hover:shadow-md"
+              >
+                <span className="border col-span-3  border-surface-2 rounded-md p-1 my-1 ml-1">
+                  {action.name || "-"}
+                </span>
+                <span className="border  border-surface-2 rounded-md p-1 my-1">
+                  {action.bonus || "-"}
+                </span>
+                <span className="border col-span-2  border-surface-2 rounded-md p-1 my-1 mr-1">
+                  {action.damage || "-"}
+                </span>
+              </button>
+              <div className="absolute -top-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  type="button"
+                  onClick={() => handleOpenEditModal(action)}
+                  className="flex items-center justify-center w-5 h-5 text-xl font-bold rounded bg-accent-primary hover:bg-accent-primary-hover"
+                  title="Editar ação"
+                >
+                  <EditIcon height={4} width={4} />
+                </button>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddAction}
+            title="Adicionar nova ação"
+            className="absolute -bottom-3.5  right-[50%] translate-x-1/2 flex items-center justify-center w-6 h-6  text-xl font-bold bg-accent-primary text-text-primary rounded-[10rem] hover:bg-accent-secondary "
+          >
+            <PlusCircleIcon />
+          </button>
+        </fieldset>
+      </div>
     </section>
   );
 }

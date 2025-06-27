@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
-import { type PlayerToken, type Attack, type HitDiceEntry } from "../types";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
+import { type PlayerToken, type Action, type HitDiceEntry } from "../types";
 import { SKILLS_CONFIG } from "../constants/sheetDefaults";
 
 interface PlayerSheetContextType {
@@ -52,10 +58,10 @@ interface PlayerSheetContextType {
   setSkillProficiencies: React.Dispatch<
     React.SetStateAction<NonNullable<PlayerToken["proficiencies"]>["skills"]>
   >;
-  attacks: NonNullable<PlayerToken["attacks"]>;
-  handleAddAttack: () => void;
-  handleRemoveAttack: (id: string) => void;
-  handleAttackChange: (id: string, field: keyof Attack, value: string) => void;
+  actions: NonNullable<PlayerToken["actions"]>;
+  handleAddAction: () => void;
+  handleRemoveAction: (id: string) => void;
+  handleActionChange: (id: string, field: keyof Action, value: string) => void;
   featuresAndTraits: PlayerToken["featuresAndTraits"];
   setFeaturesAndTraits: React.Dispatch<
     React.SetStateAction<PlayerToken["featuresAndTraits"]>
@@ -65,6 +71,7 @@ interface PlayerSheetContextType {
     label: string;
     parentAttribute: keyof NonNullable<PlayerToken["attributes"]>;
   }[];
+  getUpdatedPlayerToken: () => PlayerToken; // Adicionar a nova função
 }
 
 const PlayerSheetContext = createContext<PlayerSheetContextType | undefined>(
@@ -80,7 +87,7 @@ interface PlayerSheetProviderProps {
 export function PlayerSheetProvider({
   children,
   initialToken,
-  setToken,
+  setToken, // Destructure setToken from props
 }: PlayerSheetProviderProps) {
   const [editingTokenName, setEditingTokenName] = useState(
     initialToken.name || ""
@@ -100,9 +107,7 @@ export function PlayerSheetProvider({
   const [editingSubclass, setEditingSubclass] = useState(
     initialToken.subclass || ""
   );
-  const [proficiencyBonus, setProficiencyBonus] = useState(
-    initialToken.proficiencyBonus || 2
-  );
+  const [proficiencyBonus] = useState(initialToken.proficiencyBonus || 2);
   const [editingArmorClass, setEditingArmorClass] = useState(
     initialToken.armorClass?.toString() || ""
   );
@@ -126,7 +131,11 @@ export function PlayerSheetProvider({
   );
   const [editingHitDiceEntries, setEditingHitDiceEntries] = useState<
     HitDiceEntry[]
-  >(initialToken.hitDiceEntries || []);
+  >(
+    initialToken.hitDiceEntries && initialToken.hitDiceEntries.length > 0
+      ? initialToken.hitDiceEntries
+      : [{ id: crypto.randomUUID(), type: "d6", quantity: 1 }]
+  );
   const [editingDeathSavesSuccesses, setEditingDeathSavesSuccesses] = useState(
     initialToken.deathSavesSuccesses || 0
   );
@@ -181,36 +190,157 @@ export function PlayerSheetProvider({
       survival: false,
     }
   );
-  const [attacks, setAttacks] = useState<NonNullable<PlayerToken["attacks"]>>(
-    initialToken.attacks || []
+  const [actions, setActions] = useState<NonNullable<PlayerToken["actions"]>>(
+    initialToken.actions || []
   );
   const [featuresAndTraits, setFeaturesAndTraits] = useState<
     PlayerToken["featuresAndTraits"]
   >(initialToken.featuresAndTraits || []);
 
-  // Handlers for attacks
-  const handleAddAttack = useCallback(() => {
-    setAttacks((prev) => [
+  // Efeito para sincronizar o estado interno com as props do token inicial
+  useEffect(() => {
+    setEditingTokenName(initialToken.name || "");
+    setEditingCharClass(initialToken.charClass || "");
+    setEditingLevel(initialToken.level?.toString() || "");
+    setEditingBackground(initialToken.background || "");
+    setEditingSpecies(initialToken.species || "");
+    setEditingSubclass(initialToken.subclass || "");
+    setEditingArmorClass(initialToken.armorClass?.toString() || "");
+    setEditingInitiative(initialToken.initiative?.toString() || "");
+    setEditingSpeed(initialToken.speed?.toString() || "");
+    setEditingShieldEquipped(initialToken.shieldEquipped || false);
+    setEditingCurrentHp(initialToken.currentHp?.toString() || "");
+    setEditingTempHp(initialToken.tempHp?.toString() || "");
+    setEditingMaxHp(initialToken.maxHp?.toString() || "");
+    setEditingHitDiceEntries(
+      initialToken.hitDiceEntries && initialToken.hitDiceEntries.length > 0
+        ? initialToken.hitDiceEntries
+        : [{ id: crypto.randomUUID(), type: "d6", quantity: 1 }]
+    );
+    setEditingDeathSavesSuccesses(initialToken.deathSavesSuccesses || 0);
+    setEditingDeathSavesFailures(initialToken.deathSavesFailures || 0);
+    setAttributes(
+      initialToken.attributes || {
+        strength: 10,
+        dexterity: 10,
+        constitution: 10,
+        intelligence: 10,
+        wisdom: 10,
+        charisma: 10,
+      }
+    );
+    setSavingThrowProficiencies(
+      initialToken.proficiencies?.savingThrows || {
+        strength: false,
+        dexterity: false,
+        constitution: false,
+        intelligence: false,
+        wisdom: false,
+        charisma: false,
+      }
+    );
+    setSkillProficiencies(
+      initialToken.proficiencies?.skills || {
+        acrobatics: false,
+        animalHandling: false,
+        arcana: false,
+        athletics: false,
+        deception: false,
+        history: false,
+        insight: false,
+        intimidation: false,
+        investigation: false,
+        medicine: false,
+        nature: false,
+        perception: false,
+        performance: false,
+        persuasion: false,
+        religion: false,
+        sleightOfHand: false,
+        stealth: false,
+        survival: false,
+      }
+    );
+    setActions(initialToken.actions || []);
+    setFeaturesAndTraits(initialToken.featuresAndTraits || []);
+  }, [initialToken]);
+
+  // Handlers for actions
+  const handleAddAction = useCallback(() => {
+    setActions((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), name: "", attackBonus: "", damage: "" },
+      { id: crypto.randomUUID(), name: "", bonus: "", damage: "" },
     ]);
   }, []);
 
-  const handleRemoveAttack = useCallback((id: string) => {
-    setAttacks((prev) => prev.filter((attack) => attack.id !== id));
+  const handleRemoveAction = useCallback((id: string) => {
+    setActions((prev) => prev.filter((action) => action.id !== id));
   }, []);
 
-  const handleAttackChange = useCallback(
-    (id: string, field: keyof Attack, value: string) => {
-      setAttacks((prev) =>
-        prev.map((attack) => (attack.id === id ? { ...attack, [field]: value } : attack))
+  const handleActionChange = useCallback(
+    (id: string, field: keyof Action, value: string) => {
+      setActions((prev) =>
+        prev.map((action) =>
+          action.id === id ? { ...action, [field]: value } : action
+        )
       );
     },
     []
   );
 
-  // TODO: Adicionar um useEffect para atualizar o token pai quando os estados internos mudarem.
-  // Isso será feito após a refatoração inicial para evitar loops de renderização.
+  // Nova função para obter o token atualizado com base nos estados internos
+  const getUpdatedPlayerToken = useCallback((): PlayerToken => {
+    return {
+      ...initialToken, // Começa com o token inicial para manter propriedades não gerenciadas pelo contexto
+      name: editingTokenName,
+      charClass: editingCharClass,
+      level: Number(editingLevel),
+      background: editingBackground,
+      species: editingSpecies,
+      subclass: editingSubclass,
+      armorClass: Number(editingArmorClass),
+      initiative: Number(editingInitiative),
+      speed: Number(editingSpeed),
+      shieldEquipped: editingShieldEquipped,
+      currentHp: Number(editingCurrentHp),
+      tempHp: Number(editingTempHp),
+      maxHp: Number(editingMaxHp),
+      hitDiceEntries: editingHitDiceEntries,
+      deathSavesSuccesses: editingDeathSavesSuccesses,
+      deathSavesFailures: editingDeathSavesFailures,
+      attributes: attributes,
+      proficiencies: {
+        savingThrows: savingThrowProficiencies,
+        skills: skillProficiencies,
+      },
+      actions: actions,
+      featuresAndTraits: featuresAndTraits,
+      // Outras propriedades do token que podem ser gerenciadas pelo PlayerSheetContext
+    };
+  }, [
+    initialToken,
+    editingTokenName,
+    editingCharClass,
+    editingLevel,
+    editingBackground,
+    editingSpecies,
+    editingSubclass,
+    editingArmorClass,
+    editingInitiative,
+    editingSpeed,
+    editingShieldEquipped,
+    editingCurrentHp,
+    editingTempHp,
+    editingMaxHp,
+    editingHitDiceEntries,
+    editingDeathSavesSuccesses,
+    editingDeathSavesFailures,
+    attributes,
+    savingThrowProficiencies,
+    skillProficiencies,
+    actions,
+    featuresAndTraits,
+  ]);
 
   const value = {
     editingTokenName,
@@ -252,13 +382,14 @@ export function PlayerSheetProvider({
     setSavingThrowProficiencies,
     skillProficiencies,
     setSkillProficiencies,
-    attacks,
-    handleAddAttack,
-    handleRemoveAttack,
-    handleAttackChange,
+    actions,
+    handleAddAction,
+    handleRemoveAction,
+    handleActionChange,
     featuresAndTraits,
     setFeaturesAndTraits,
     SKILLS_CONFIG,
+    getUpdatedPlayerToken, // Adicionar a nova função ao contexto
   };
 
   return (

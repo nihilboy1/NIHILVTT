@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 import {
   type Token,
   TokenType,
@@ -46,20 +46,9 @@ export const useTokensState = (): TokensState => {
 
   const [tokens, setTokens] = useState<Token[]>(initialTokens); // Changed from PlayerToken[]
   const [gridInstances, setGridInstances] = useState<GridInstance[]>([]);
-
-  const gridInstanceCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    gridInstances.forEach((instance) => {
-      counts.set(
-        instance.tokenInfoId,
-        (counts.get(instance.tokenInfoId) || 0) + 1
-      );
-    });
-    return counts;
-  }, [gridInstances]);
+  const [gridInstanceCounts, setGridInstanceCounts] = useState<Map<string, number>>(new Map());
 
   const addToken = useCallback((tokenData: Omit<Token, "id">): Token => {
-    console.log("addToken chamado com:", tokenData);
     const newId = generateUniqueId();
 
     let newToken: Token;
@@ -110,9 +99,7 @@ export const useTokensState = (): TokensState => {
     }
 
     setTokens((prevTokens) => {
-      console.log("Tokens antes da atualização:", prevTokens);
       const updatedTokens = [...prevTokens, newToken];
-      console.log("Tokens depois da atualização:", updatedTokens);
       return updatedTokens;
     });
     return newToken;
@@ -126,6 +113,11 @@ export const useTokensState = (): TokensState => {
     setGridInstances((prevInstances) =>
       prevInstances.filter((instance) => instance.tokenInfoId !== tokenId)
     );
+    setGridInstanceCounts(prevCounts => {
+        const newCounts = new Map(prevCounts);
+        newCounts.delete(tokenId);
+        return newCounts;
+    });
   }, []);
 
   const updateToken = useCallback(
@@ -160,6 +152,11 @@ export const useTokensState = (): TokensState => {
         gridY,
       };
       setGridInstances((prevInstances) => [...prevInstances, newInstance]);
+      setGridInstanceCounts(prevCounts => {
+          const newCounts = new Map(prevCounts);
+          newCounts.set(tokenId, (newCounts.get(tokenId) || 0) + 1);
+          return newCounts;
+      });
       return newInstance;
     },
     [tokens, gridInstanceCounts]
@@ -172,22 +169,34 @@ export const useTokensState = (): TokensState => {
       );
       if (!instanceToRemove) return;
 
+      const { tokenInfoId } = instanceToRemove;
+
       setGridInstances((prevInstances) =>
         prevInstances.filter((instance) => instance.instanceId !== instanceId)
       );
 
-      const associatedTokenInfo = tokens.find(
-        (token) => token.id === instanceToRemove.tokenInfoId
-      );
-      if (associatedTokenInfo && associatedTokenInfo.name.includes("(Cópia)")) {
-        const countForCopiedSheet =
-          (gridInstanceCounts.get(associatedTokenInfo.id) || 0) - 1;
+      setGridInstanceCounts(prevCounts => {
+          const newCounts = new Map(prevCounts);
+          const currentCount = newCounts.get(tokenInfoId) || 0;
+          if (currentCount <= 1) {
+              newCounts.delete(tokenInfoId);
+          } else {
+              newCounts.set(tokenInfoId, currentCount - 1);
+          }
+          return newCounts;
+      });
 
-        if (countForCopiedSheet <= 0) {
-          setTokens((prevTokens) =>
-            prevTokens.filter((token) => token.id !== associatedTokenInfo.id)
-          );
-        }
+      const associatedTokenInfo = tokens.find(
+        (token) => token.id === tokenInfoId
+      );
+
+      if (associatedTokenInfo && associatedTokenInfo.name.includes("(Cópia)")) {
+          const currentCount = gridInstanceCounts.get(tokenInfoId) || 0;
+          if (currentCount <= 1) {
+              setTokens((prevTokens) =>
+                  prevTokens.filter((token) => token.id !== tokenInfoId)
+              );
+          }
       }
     },
     [gridInstances, tokens, gridInstanceCounts]
