@@ -1,5 +1,5 @@
-import { useEffect, useCallback } from "react";
-import { Tool, Point } from "../shared/types";
+import { useCallback, useEffect } from "react";
+import { Point, Tool } from "../shared/api/types";
 
 interface UseGameBoardEventsProps {
   svgRef: React.RefObject<SVGSVGElement | null>;
@@ -17,7 +17,6 @@ interface UseGameBoardEventsProps {
   handleMarqueeMouseUp: (event: MouseEvent) => void;
   onBackgroundClick: (() => void) | undefined;
   onClearMultiSelection: () => void;
-  activeHPModalInstanceId: string | null;
 }
 
 export const useGameBoardEvents = ({
@@ -43,7 +42,7 @@ export const useGameBoardEvents = ({
       const targetElement = event.target as SVGElement;
       const isTokenClick = targetElement.closest(".board-token-group");
 
-      // If it's a token click, let useTokenDrag handle it.
+      // If it's a token click, let useBoardTokenDrag handle it.
       if (isTokenClick) return;
 
       // If it's a background click (not on a token)
@@ -75,7 +74,7 @@ export const useGameBoardEvents = ({
     },
     [
       activeTool,
-      onBackgroundClick, // Now always called
+      onBackgroundClick,
       handleMarqueeMouseDown,
       handlePanStart,
       handleRulerMouseDown,
@@ -136,9 +135,6 @@ export const useGameBoardEvents = ({
       } else if (activeTool === Tool.PAN) {
         svgRef.current.classList.add("cursor-grab");
       } else if (activeTool === Tool.SELECT) {
-        // Marquee selection state is managed by useMarqueeSelection,
-        // so we need to pass it here or derive it. For now, assume
-        // if SELECT is active, it might be crosshair.
         svgRef.current.classList.add("cursor-crosshair");
       } else if (activeTool === Tool.RULER) {
         svgRef.current.classList.add("cursor-crosshair");

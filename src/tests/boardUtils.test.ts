@@ -1,14 +1,14 @@
 import {
-  parseTokenSize,
-  calculateInitialViewBox,
   calculateDistanceInMeters,
-} from "../utils/board/boardUtils";
+  calculateInitialViewBox,
+  parseTokenSize,
+} from "../shared/lib/utils/board/boardUtils";
 
 import {
-  type PageSettings,
   type GridSettings,
+  type PageSettings,
   type Point,
-} from "../shared/types";
+} from "../shared/api/types";
 
 describe("parseTokenSize", () => {
   test("deve retornar as dimensões corretas para uma string de tamanho válida", () => {

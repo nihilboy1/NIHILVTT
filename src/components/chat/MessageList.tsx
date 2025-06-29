@@ -1,13 +1,13 @@
 import React from "react";
-import { type Message, type DiceRollMessage } from "../../shared/types/index";
-import { DEFAULT_PLAYER_NAME } from "../../constants";
+import { type DiceRollMessage, type Message } from "../../shared/api/types";
+import { DEFAULT_PLAYER_NAME } from "../../shared/config/constants";
 
 interface MessageListProps {
   messages: Message[];
   messagesEndRef: React.RefObject<HTMLDivElement>;
 }
 
-// chat pripriamente dito, apenas a lista de mensagens
+// chat propriamente dito, apenas a lista de mensagens
 // Este componente exibe a lista de mensagens, formatando cada mensagem com base no remetente
 export function MessageList({ messages, messagesEndRef }: MessageListProps) {
   const formatTimestamp = (date: Date): string => {

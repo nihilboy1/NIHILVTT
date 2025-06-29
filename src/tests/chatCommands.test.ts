@@ -1,4 +1,4 @@
-import { findCommand, getAllCommands, CommandContext } from '../lib/chatCommands';
+import { findCommand, getAllCommands, CommandContext } from '@/components/chat/lib/chatCommands';
 
 describe('chatCommands', () => {
   let mockRollAndSendMessage: jest.Mock;

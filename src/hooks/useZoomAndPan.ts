@@ -1,13 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { GridSettings, PageSettings, Point } from "../shared/api/types";
 import {
   INITIAL_ZOOM_LEVEL,
-  MIN_ZOOM_LEVEL,
   MAX_ZOOM_LEVEL,
+  MIN_ZOOM_LEVEL,
   ZOOM_SENSITIVITY,
-} from "../constants";
-import { Point } from "../shared/types";
-import { calculateInitialViewBox } from "../utils/board/boardUtils";
-import { GridSettings, PageSettings } from "../shared/types";
+} from "../shared/config/constants";
+import { calculateInitialViewBox } from "../shared/lib/utils/board/boardUtils";
 
 interface UseZoomAndPanProps {
   svgRef: React.RefObject<SVGSVGElement | null>;

@@ -1,23 +1,17 @@
 import React from "react";
-import { PageConfigIcon } from "../../components/icons";
 import { PageSettingsModal } from "../../components/modals/PageSettingsModal";
-import { MIN_ZOOM_LEVEL, MAX_ZOOM_LEVEL } from "../../constants";
+import { useGameBoard } from "../../contexts/GameBoardContext";
+import { MAX_ZOOM_LEVEL, MIN_ZOOM_LEVEL } from "../../shared/config/constants";
+import { PageConfigIcon } from "../../shared/ui/Icons";
 
-interface GameBoardUIProps {
-  zoomLevel: number;
-  handleZoomIn: () => void;
-  handleZoomOut: () => void;
-  isPageAndGridSettingsModalOpen: boolean;
-  setIsPageAndGridSettingsModalOpen: (isOpen: boolean) => void;
-}
-
-export const GameBoardUI: React.FC<GameBoardUIProps> = ({
-  zoomLevel,
-  handleZoomIn,
-  handleZoomOut,
-  isPageAndGridSettingsModalOpen,
-  setIsPageAndGridSettingsModalOpen,
-}) => {
+export const GameBoardUI: React.FC = () => {
+  const {
+    zoomLevel,
+    handleZoomIn,
+    handleZoomOut,
+    isPageAndGridSettingsModalOpen,
+    setIsPageAndGridSettingsModalOpen,
+  } = useGameBoard();
   return (
     <div className="border bg-surface-0 absolute top-2 right-2 flex flex-col items-end space-y-2 rounded">
       <button

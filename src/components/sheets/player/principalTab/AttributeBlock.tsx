@@ -1,13 +1,13 @@
 import React from "react";
-import { cn } from "../../../../utils/cn";
 import { ATTRIBUTE_LABELS } from "../../../../constants/sheetDefaults";
-import { PlayerToken } from "../../../../shared/types";
+import { PlayerCharacter } from "../../../../shared/api/types";
+import { cn } from "../../../../shared/lib/utils/cn";
 
 interface AttributeBlockProps {
-  attrName: keyof NonNullable<PlayerToken["attributes"]>;
+  attrName: keyof NonNullable<PlayerCharacter["attributes"]>;
   attrValue: number;
   onAttributeChange: (
-    attrName: keyof NonNullable<PlayerToken["attributes"]>,
+    attrName: keyof NonNullable<PlayerCharacter["attributes"]>,
     value: number | ""
   ) => void;
 }
@@ -17,20 +17,20 @@ export const AttributeBlock: React.FC<AttributeBlockProps> = ({
   attrValue,
   onAttributeChange,
 }) => {
-  const attrLabel = ATTRIBUTE_LABELS[attrName];
+  const attrLabel = ATTRIBUTE_LABELS[attrName as keyof typeof ATTRIBUTE_LABELS];
   const modifier = Math.floor((attrValue - 10) / 2);
 
   return (
     <div className="flex justify-between w-[10rem]">
       <div className="flex flex-col ">
         <label
-          htmlFor={`attr-${attrName}`}
+          htmlFor={`attr-${String(attrName)}`}
           className={cn("block text-xs font-bold mb-0.5", "text-xs uppercase")}
         >
           {attrLabel}
         </label>
         <input
-          id={`attr-${attrName}`}
+          id={`attr-${String(attrName)}`}
           type="number"
           value={attrValue}
           onChange={(e) => {

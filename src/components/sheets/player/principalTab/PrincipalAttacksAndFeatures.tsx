@@ -1,4 +1,4 @@
-import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
+import { usePlayerSheet } from "../../../../contexts/CharacterSheetContext"; // Renomeado
 import { AttackList } from "./AttackList";
 import { FeaturesAndTraits } from "./FeaturesAndTraits";
 

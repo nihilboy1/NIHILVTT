@@ -1,7 +1,7 @@
 import React from "react";
-import { cn } from "../../../../utils/cn";
-import { generateUniqueId } from "../../../../utils/id/idUtils";
-import { FeatureOrTrait } from "../../../../shared/types"; // Certifique-se de que o tipo FeatureTrait está definido em types/index.ts
+import { FeatureOrTrait } from "../../../../shared/api/types"; // Certifique-se de que o tipo FeatureTrait está definido em types/index.ts
+import { cn } from "../../../../shared/lib/utils/cn";
+import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
 
 interface FeaturesAndTraitsProps {
   featuresAndTraits: FeatureOrTrait[];

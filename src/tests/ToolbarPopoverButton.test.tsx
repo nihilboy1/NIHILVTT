@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { ToolbarPopoverButton } from "../components/ui/ToolbarPopoverButton";
-import React from "react"; // Manter React para o mock do useRef
-import { Tool } from "../shared/types/index";
 import "@testing-library/jest-dom"; // Adicionado para estender matchers
+import { fireEvent, render, screen } from "@testing-library/react";
+import React from "react"; // Manter React para o mock do useRef
+import { Tool } from "../shared/api/types";
+import { ToolbarPopoverButton } from "../shared/ui/ToolbarPopoverButton";
 
 // Mock do PopoverComponent para verificar sua renderização e props
 const MockPopoverComponent = ({

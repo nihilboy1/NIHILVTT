@@ -1,9 +1,10 @@
-import { type PlayerToken } from "../shared/types/index"; // Ajustar o caminho do tipo
+import defaultTokenImage from "../shared/assets/defaultToken.png"; // Importar a imagem diretamente
+import { CharacterType, type PlayerCharacter } from "../shared/api/types"; // Ajustar o caminho do tipo
 
 export const SKILLS_CONFIG: {
   key: string;
   label: string;
-  parentAttribute: keyof NonNullable<PlayerToken["attributes"]>;
+  parentAttribute: keyof NonNullable<PlayerCharacter["attributes"]>;
 }[] = [
   { key: "acrobatics", label: "Acrobacia", parentAttribute: "dexterity" },
   {
@@ -38,7 +39,7 @@ export const SKILLS_CONFIG: {
 ];
 
 export const ATTRIBUTE_LABELS: Record<
-  keyof NonNullable<PlayerToken["attributes"]>,
+  keyof NonNullable<PlayerCharacter["attributes"]>,
   string
 > = {
   strength: "FORÇA",
@@ -49,7 +50,7 @@ export const ATTRIBUTE_LABELS: Record<
   charisma: "CARISMA",
 };
 
-export const defaultAttributes: NonNullable<PlayerToken["attributes"]> = {
+export const defaultAttributes: NonNullable<PlayerCharacter["attributes"]> = {
   strength: 10,
   dexterity: 10,
   constitution: 10,
@@ -58,7 +59,7 @@ export const defaultAttributes: NonNullable<PlayerToken["attributes"]> = {
   charisma: 10,
 };
 export const defaultSavingThrows: NonNullable<
-  PlayerToken["proficiencies"]
+  PlayerCharacter["proficiencies"]
 >["savingThrows"] = {
   strength: false,
   dexterity: false,
@@ -67,13 +68,11 @@ export const defaultSavingThrows: NonNullable<
   wisdom: false,
   charisma: false,
 };
-import { TokenType } from "../shared/types/index";
-import defaultTokenImage from "../assets/defaultToken.png"; // Importar a imagem diretamente
 
 export const DEFAULT_TOKEN_IMAGE = defaultTokenImage; // Usar a URL processada pelo Vite
 
 export const defaultSkills: NonNullable<
-  PlayerToken["proficiencies"]
+  PlayerCharacter["proficiencies"]
 >["skills"] = {
   acrobatics: false,
   animalHandling: false,
@@ -95,13 +94,12 @@ export const defaultSkills: NonNullable<
   survival: false,
 };
 
-export const DEFAULT_TOKEN_DATA = {
-  name: "Novo Token",
-  type: TokenType.PLAYER,
+export const DEFAULT_CHARACTER_DATA = {
+  name: "Novo Personagem",
+  type: CharacterType.PLAYER,
   image: DEFAULT_TOKEN_IMAGE,
   size: "medium",
-  currentHp: 10,
-  maxHp: 10,
+  maxHp: 10, // currentHp removido
   notes: "",
   attributes: defaultAttributes,
   proficiencyBonus: 2,

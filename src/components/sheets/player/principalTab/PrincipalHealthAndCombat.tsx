@@ -1,9 +1,9 @@
-import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
+import { useModal } from "../../../../app/providers/ModalProvider";
+import { usePlayerSheet } from "../../../../contexts/CharacterSheetContext"; // Renomeado
+import { type Action } from "../../../../shared/api/types";
+import { EditIcon, PlusCircleIcon } from "../../../../shared/ui/Icons";
 import { CombatStats } from "./CombatStats";
 import { HealthSection } from "./HealthSection";
-import { EditIcon, PlusCircleIcon } from "../../../icons";
-import { useModal } from "../../../../contexts/ModalContext";
-import { type Action } from "../../../../shared/types";
 
 export function PrincipalHealthAndCombat() {
   const {
@@ -15,12 +15,10 @@ export function PrincipalHealthAndCombat() {
     setEditingSpeed,
     editingShieldEquipped,
     setEditingShieldEquipped,
-    editingCurrentHp,
-    setEditingCurrentHp,
-    editingTempHp,
-    setEditingTempHp,
     editingMaxHp,
     setEditingMaxHp,
+    editingTempHp,
+    setEditingTempHp,
     editingHitDiceEntries,
     setEditingHitDiceEntries,
     actions,
@@ -48,12 +46,10 @@ export function PrincipalHealthAndCombat() {
           setEditingShieldEquipped={setEditingShieldEquipped}
         />
         <HealthSection
-          editingCurrentHp={editingCurrentHp}
-          setEditingCurrentHp={setEditingCurrentHp}
-          editingTempHp={editingTempHp}
-          setEditingTempHp={setEditingTempHp}
           editingMaxHp={editingMaxHp}
           setEditingMaxHp={setEditingMaxHp}
+          editingTempHp={editingTempHp}
+          setEditingTempHp={setEditingTempHp}
           editingHitDiceEntries={editingHitDiceEntries}
           setEditingHitDiceEntries={setEditingHitDiceEntries}
         />
@@ -64,7 +60,7 @@ export function PrincipalHealthAndCombat() {
           <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold ">
             AÇÕES
           </legend>
-          {actions.map((action) => (
+          {actions.map((action: Action) => ( // Adicionado tipagem para action
             <div key={action.id} className="relative group">
               <button
                 type="button"
@@ -85,7 +81,7 @@ export function PrincipalHealthAndCombat() {
                 <button
                   type="button"
                   onClick={() => handleOpenEditModal(action)}
-                  className="flex items-center justify-center w-5 h-5 text-xl font-bold rounded bg-accent-primary hover:bg-accent-primary-hover"
+                  className="flex items-center justify-center w-5 h-5 text-xl font-bold bg-accent-primary hover:bg-accent-primary-hover"
                   title="Editar ação"
                 >
                   <EditIcon height={4} width={4} />

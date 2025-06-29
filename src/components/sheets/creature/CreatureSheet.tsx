@@ -1,39 +1,35 @@
-import { TokenType } from "../../../shared/types";
-import { TOKEN_TYPES_OPTIONS } from "../../../constants";
-import { cn } from "../../../utils/cn";
+import { CharacterType } from "../../../shared/api/types";
+import { CHARACTER_TYPES_OPTIONS } from "../../../shared/config/constants";
+import { cn } from "../../../shared/lib/utils/cn";
 
 interface CreatureSheetProps {
-  editingTokenName: string;
-  setEditingTokenName: (name: string) => void;
-  editingTokenType: TokenType | null;
-  setEditingTokenType: (type: TokenType) => void;
-  editingCurrentHp: string;
-  setEditingCurrentHp: (hp: string) => void;
+  editingCharacterName: string;
+  setEditingCharacterName: (name: string) => void;
+  editingCharacterType: CharacterType | null;
+  setEditingCharacterType: (type: CharacterType) => void;
   editingMaxHp: string;
   setEditingMaxHp: (hp: string) => void;
-  editingTokenNotes: string;
-  setEditingTokenNotes: (notes: string) => void;
-  editingTokenImage: string; // Nova propriedade para a imagem
-  setEditingTokenImage: (image: string) => void; // Novo setter
-  editingTokenSize: string;
-  setEditingTokenSize: (size: string) => void;
+  editingCharacterNotes: string;
+  setEditingCharacterNotes: (notes: string) => void;
+  editingCharacterImage: string; // Nova propriedade para a imagem
+  setEditingCharacterImage: (image: string) => void; // Novo setter
+  editingCharacterSize: string;
+  setEditingCharacterSize: (size: string) => void;
 }
 
 export function CreatureSheet({
-  editingTokenName,
-  setEditingTokenName,
-  editingTokenType,
-  setEditingTokenType,
-  editingCurrentHp,
-  setEditingCurrentHp,
+  editingCharacterName,
+  setEditingCharacterName,
+  editingCharacterType,
+  setEditingCharacterType,
   editingMaxHp,
   setEditingMaxHp,
-  editingTokenNotes,
-  setEditingTokenNotes,
-  editingTokenImage, // Usar a imagem
-  setEditingTokenImage, // Usar o setter da imagem
-  editingTokenSize,
-  setEditingTokenSize,
+  editingCharacterNotes,
+  setEditingCharacterNotes,
+  editingCharacterImage, // Usar a imagem
+  setEditingCharacterImage, // Usar o setter da imagem
+  editingCharacterSize,
+  setEditingCharacterSize,
 }: CreatureSheetProps) {
   return (
     <div className="p-0.5 space-y-3 overflow-y-auto max-h-[calc(100vh-12.5rem)]">
@@ -41,16 +37,16 @@ export function CreatureSheet({
       {/* Converted 200px to 12.5rem */}
       <div>
         <label
-          htmlFor="editingTokenName"
+          htmlFor="editingCharacterName"
           className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
-          Nome do Token
+          Nome do Personagem
         </label>
         <input
-          id="editingTokenName"
+          id="editingCharacterName"
           type="text"
-          value={editingTokenName}
-          onChange={(e) => setEditingTokenName(e.target.value)}
+          value={editingCharacterName}
+          onChange={(e) => setEditingCharacterName(e.target.value)}
           className="w-full p-0 bg-surface-1  rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           required
           maxLength={35}
@@ -58,79 +54,56 @@ export function CreatureSheet({
       </div>
       <div>
         <label
-          htmlFor="editingTokenType"
+          htmlFor="editingCharacterType"
           className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
           Tipo
         </label>
         <select
-          id="editingTokenType"
-          value={editingTokenType || ""}
-          onChange={(e) => setEditingTokenType(e.target.value as TokenType)}
+          id="editingCharacterType"
+          value={editingCharacterType || ""}
+          onChange={(e) => setEditingCharacterType(e.target.value as CharacterType)}
           className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
         >
-          {TOKEN_TYPES_OPTIONS.map((option) => (
+          {CHARACTER_TYPES_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </div>
-      <div className="grid grid-cols-2 gap-x-2">
-        <div className="flex-1">
-          <label
-            htmlFor="editingCurrentHp"
-            className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
-          >
-            Vida Atual
-          </label>
-          <input
-            id="editingCurrentHp"
-            type="number"
-            value={editingCurrentHp}
-            onChange={(e) => setEditingCurrentHp(e.target.value)}
-            className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-              "hide-number-spinners"
-            )}
-            min="0"
-            step="1"
-            required
-          />
-        </div>
-        <div className="flex-1">
-          <label
-            htmlFor="editingMaxHp"
-            className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
-          >
-            Vida Máxima
-          </label>
-          <input
-            id="editingMaxHp"
-            type="number"
-            value={editingMaxHp}
-            onChange={(e) => setEditingMaxHp(e.target.value)}
-            className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-              "hide-number-spinners"
-            )}
-            min="1"
-            step="1"
-            required
-          />
-        </div>
+      <div>
+        <label
+          htmlFor="editingMaxHp"
+          className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
+        >
+          Vida Máxima
+        </label>
+        <input
+          id="editingMaxHp"
+          type="number"
+          value={editingMaxHp}
+          onChange={(e) => setEditingMaxHp(e.target.value)}
+          className={cn(
+            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
+            "hide-number-spinners"
+          )}
+          min="1"
+          step="1"
+          required
+        />
       </div>
       <div>
         <label
-          htmlFor="editingTokenNotes"
+          htmlFor="editingCharacterNotes"
           className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
           Notas
         </label>
         <textarea
-          id="editingTokenNotes"
-          value={editingTokenNotes}
-          onChange={(e) => setEditingTokenNotes(e.target.value)}
+          id="editingCharacterNotes"
+          value={editingCharacterNotes}
+          onChange={(e) => setEditingCharacterNotes(e.target.value)}
           className={cn(
             "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
             "min-h-[6.25rem]" // Converted from 100px
@@ -139,16 +112,16 @@ export function CreatureSheet({
       </div>
       <div>
         <label
-          htmlFor="editingTokenImage"
+          htmlFor="editingCharacterImage"
           className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
-          URL da Imagem do Token
+          URL da Imagem do Personagem
         </label>
         <input
-          id="editingTokenImage"
+          id="editingCharacterImage"
           type="text"
-          value={editingTokenImage}
-          onChange={(e) => setEditingTokenImage(e.target.value)}
+          value={editingCharacterImage}
+          onChange={(e) => setEditingCharacterImage(e.target.value)}
           placeholder="Cole a URL da imagem aqui"
           className={cn(
             "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
@@ -157,15 +130,15 @@ export function CreatureSheet({
       </div>
       <div>
         <label
-          htmlFor="editingTokenSize"
+          htmlFor="editingCharacterSize"
           className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
           Tamanho
         </label>
         <select
-          id="editingTokenSize"
-          value={editingTokenSize}
-          onChange={(e) => setEditingTokenSize(e.target.value)}
+          id="editingCharacterSize"
+          value={editingCharacterSize}
+          onChange={(e) => setEditingCharacterSize(e.target.value)}
           className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
         >
           <option value="1x1">1x1 (Padrão)</option>

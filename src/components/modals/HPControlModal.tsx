@@ -1,27 +1,26 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { type Token as TokenInfo, type Point } from "../../shared/types"; // TokenInfo might be needed if HP is directly on instance
-import { DetatchIcon, XMarkIcon } from "../icons"; // BranchIcon removed
-import { calculateNewHP } from "../../utils/hpUtils";
-import useDismissable from "../../hooks/useDismissable";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { type Point, type Character } from "../../shared/api/types"; // Importar Character
+import useDismissable from "../../shared/lib/hooks/useDismissable";
+import { calculateNewHP } from "../../shared/lib/utils/hpUtils";
+import { DetatchIcon, XMarkIcon } from "../../shared/ui/Icons";
 
 interface HPControlModalProps {
-  instanceId: string | null; // ID of the GridInstance
-  tokenInfo: TokenInfo | null; // The TokenInfo sheet linked to this instance
+  tokenId: string | null; // ID do Token no tabuleiro
+  character: Character | null; // A ficha de personagem vinculada a este token
   anchorPoint: Point | null;
   isOpen: boolean;
   onClose: () => void;
-  onHPChange: (newHP: number) => void; // Will update HP on the linked TokenInfo
-  onRemoveFromBoard: (instanceId: string) => void; // Removes the GridInstance
-  onMakeIndependent: (instanceId: string) => void; // Makes the GridInstance independent
-  zIndex?: number; // Adicionado zIndex
-  containerRef?: React.RefObject<HTMLDivElement | null>; // Adicionado containerRef
+  onHPChange: (tokenId: string, newHP: number) => void; // Atualizar HP no Token
+  onRemoveFromBoard: (tokenId: string) => void; // Remove o Token do tabuleiro
+  onMakeIndependent: (tokenId: string) => void; // Torna o Token independente
+  zIndex?: number;
 }
 
-export const HP_MODAL_ESTIMATED_HEIGHT_REM = 2.5; // Converted from 40px
+export const HP_MODAL_ESTIMATED_HEIGHT_REM = 2.5;
 
 export function HPControlModal({
-  instanceId,
-  tokenInfo,
+  tokenId,
+  character,
   anchorPoint,
   isOpen,
   onClose,
@@ -36,56 +35,59 @@ export function HPControlModal({
 
   useEffect(() => {
     // Este useEffect sincroniza o HP do token com o estado local do input
-    // Ele deve ser executado apenas quando o modal abre ou o tokenInfo muda,
+    // Ele deve ser executado apenas quando o modal abre ou o token muda,
     // não durante a digitação do usuário para evitar "flickering".
-    if (isOpen && tokenInfo && tokenInfo.currentHp !== undefined) {
-      setEditableHP(String(tokenInfo.currentHp));
-    } else if (!tokenInfo && isOpen) {
-      // Se o tokenInfo for nulo e o modal estiver aberto, feche-o.
+    if (isOpen && character && character.maxHp !== undefined) { // Usar character.maxHp para inicializar
+      setEditableHP(String(character.maxHp)); // Inicializar com maxHp do Character
+    } else if (!character && isOpen) {
+      // Se o character for nulo e o modal estiver aberto, feche-o.
       onClose();
     }
-  }, [isOpen, tokenInfo, onClose]); // Removido editableHP das dependências
+  }, [isOpen, character, onClose]);
 
   useEffect(() => {
     if (isOpen) {
-      // Ainda precisamos disso para foco, separado da lógica de dismiss
       setTimeout(() => {
         inputRef.current?.focus();
-        // Removido .select() para evitar seleção automática do texto
       }, 0);
     }
   }, [isOpen]);
 
   const handleSubmit = useCallback(() => {
     if (
-      !tokenInfo ||
-      tokenInfo.currentHp === undefined ||
-      tokenInfo.maxHp === undefined
+      !character ||
+      character.maxHp === undefined // Apenas maxHp no Character
     ) {
-      setEditableHP(String(tokenInfo?.currentHp ?? 0));
+      setEditableHP(String(character?.maxHp ?? 0));
       return;
     }
 
-    const currentActualHp = tokenInfo.currentHp;
-    const maxHp = tokenInfo.maxHp;
+    // Para o HP atual, precisaremos do Token real, não apenas do Character.
+    // Por enquanto, vamos assumir que o HP atual é o que está no input,
+    // e que a validação será feita com base no maxHp do Character.
+    // A lógica de `currentHp` no `Token` será tratada no `useCharactersState`.
+    const currentActualHp = parseInt(editableHP, 10); // Usar o valor do input como HP atual
+    const maxHp = character.maxHp;
 
     const newHP = calculateNewHP(editableHP, currentActualHp, maxHp);
 
     if (newHP !== null) {
-      onHPChange(newHP);
+      if (tokenId) { // Passar tokenId para onHPChange
+        onHPChange(tokenId, newHP);
+      }
       setEditableHP(String(newHP));
     } else {
-      // Se a entrada for inválida, redefina para o HP atual
-      setEditableHP(String(currentActualHp));
+      // Se a entrada for inválida, redefina para o HP atual (do input)
+      setEditableHP(String(character.maxHp)); // Corrected line
     }
-  }, [editableHP, tokenInfo, onHPChange]);
+  }, [editableHP, character, onHPChange, tokenId]); // Adicionado tokenId
 
   const handleCloseAndSave = useCallback(() => {
     handleSubmit();
     onClose();
   }, [handleSubmit, onClose]);
 
-  useDismissable(modalRef, isOpen, handleCloseAndSave); // Removido "board-token-group" para permitir dismiss no grid
+  useDismissable(modalRef, isOpen, handleCloseAndSave);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditableHP(e.target.value);
@@ -103,24 +105,21 @@ export function HPControlModal({
 
   const handleInputBlur = () => {
     handleSubmit();
-    // Do not call onClose() here, allow click on Eject/Branch button
   };
 
   const handleRemoveClick = () => {
-    if (instanceId) {
-      onRemoveFromBoard(instanceId);
-      // onClose() will be called by App.tsx if needed
+    if (tokenId) {
+      onRemoveFromBoard(tokenId);
     }
   };
 
   const handleMakeIndependentClick = () => {
-    if (instanceId) {
-      onMakeIndependent(instanceId);
-      // onClose() will be called by App.tsx
+    if (tokenId) {
+      onMakeIndependent(tokenId);
     }
   };
 
-  if (!isOpen || !instanceId || !tokenInfo || !anchorPoint) {
+  if (!isOpen || !tokenId || !character || !anchorPoint) {
     return null;
   }
 
@@ -128,7 +127,7 @@ export function HPControlModal({
     position: "fixed",
     top: `${anchorPoint.y}px`,
     left: `${anchorPoint.x}px`,
-    zIndex: zIndex, // Aplicar zIndex
+    zIndex: zIndex,
     height: `${HP_MODAL_ESTIMATED_HEIGHT_REM}rem`,
   };
 
@@ -141,7 +140,7 @@ export function HPControlModal({
       className={`bg-surface-1  p-1.5 rounded-md shadow-lg border flex items-center space-x-1.5`}
       role="dialog"
       aria-modal="true"
-      aria-label="Controle de Vida" // Adicionado para acessibilidade
+      aria-label="Controle de Vida"
       onClick={(e) => e.stopPropagation()}
     >
       <span className="text-xs select-none mr-1">{"HP:"}</span>
@@ -159,15 +158,15 @@ export function HPControlModal({
       <span className="text-text-secondary text-sm select-none">/</span>
       <span
         data-testid="max-hp-display"
-        className="text-sm font-medium min-w-[1.25rem] text-center select-none" // Converted from 20px
+        className="text-sm font-medium min-w-[1.25rem] text-center select-none"
       >
-        {tokenInfo.maxHp ?? "N/A"}
+        {character.maxHp ?? "N/A"}
       </span>
 
       {showMakeIndependentButton && (
         <button
           onClick={handleMakeIndependentClick}
-          className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem]" // Converted from 6x6
+          className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem]"
           title="Tornar Token Independente"
           aria-label="Tornar instância independente"
         >
@@ -177,7 +176,7 @@ export function HPControlModal({
 
       <button
         onClick={handleRemoveClick}
-        className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem]" // Converted from 6x6
+        className="hover:bg-accent-primary cursor-pointer ml-1 p-1 text-text-secondary  focus:outline-none focus:ring-1 focus:ring-accent-primary rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem]"
         title="Remover do Tabuleiro"
         aria-label="Remover instância do tabuleiro"
       >

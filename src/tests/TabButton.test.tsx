@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { TabButton } from "../components/ui/TabButton";
-import { DiceIcon } from "../components/icons"; // Importe um ícone de exemplo
-import { SidebarTab } from "../shared/types";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { SidebarTab } from "../shared/api/types";
+import { DiceIcon } from "../shared/ui/Icons"; // Importe um ícone de exemplo
+import { TabButton } from "../shared/ui/TabButton";
 
 describe("TabButton", () => {
   const mockOnClick = jest.fn();

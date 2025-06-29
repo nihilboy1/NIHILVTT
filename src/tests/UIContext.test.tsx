@@ -1,11 +1,11 @@
-import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { UIProvider, useUI } from "../contexts/UIContext";
-import { useUIState } from "../hooks/useUIState";
-import { Tool, SidebarTab } from "../shared/types";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { SidebarTab, Tool } from "../shared/api/types";
+import { useUIState } from "../app/providers/useUIState";
+import { UIProvider, useUI } from "../app/providers/UIProvider";
 
 // Mock the useUIState hook
-jest.mock("../hooks/useUIState", () => ({
+jest.mock("../app/providers/useUIState", () => ({
   useUIState: jest.fn(),
 }));
 

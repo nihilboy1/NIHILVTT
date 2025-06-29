@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Tool } from "../shared/types";
+import { useEffect, useState } from "react";
+import { Tool } from "../shared/api/types";
 
 interface UseToolbarStateProps {
   activeTool: Tool;

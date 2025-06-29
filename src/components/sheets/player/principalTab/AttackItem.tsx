@@ -1,7 +1,7 @@
 import React from "react";
-import { DeleteIcon } from "../../../icons";
-import { cn } from "../../../../utils/cn";
-import { Attack } from "../../../../shared/types"; // Certifique-se de que o tipo Attack está definido em types/index.ts
+import { Attack } from "../../../../shared/api/types"; // Certifique-se de que o tipo Attack está definido em types/index.ts
+import { cn } from "../../../../shared/lib/utils/cn";
+import { DeleteIcon } from "../../../../shared/ui/Icons";
 
 interface AttackItemProps {
   attack: Attack;

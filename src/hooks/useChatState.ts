@@ -1,13 +1,13 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
+  type DiceRollDetails,
+  type DiceRollMessage,
   type Message,
   type TextMessage,
-  type DiceRollMessage,
-  type DiceRollDetails,
-} from "../shared/types";
-import { DEFAULT_PLAYER_NAME } from "../constants";
-import { rollDiceInternal } from "../utils/dice/diceUtils";
-import { generateUniqueId } from "../utils/id/idUtils";
+} from "../shared/api/types";
+import { DEFAULT_PLAYER_NAME } from "../shared/config/constants";
+import { rollDiceInternal } from "../shared/lib/utils/dice/diceUtils";
+import { generateUniqueId } from "../shared/lib/utils/id/idUtils";
 
 export interface ChatState {
   messages: Message[];

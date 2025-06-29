@@ -1,9 +1,9 @@
-import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
+import { usePlayerSheet } from "../../../../contexts/CharacterSheetContext";
 
 export function PrincipalHeader() {
   const {
-    editingTokenName,
-    setEditingTokenName,
+    editingCharacterName,
+    setEditingCharacterName,
     editingCharClass,
     setEditingCharClass,
     editingLevel,
@@ -21,16 +21,16 @@ export function PrincipalHeader() {
     <div className="flex w-full rounded-md  gap-10 mb-2 items-center bg-surface-1 p-2">
       <div id="name" className="flex flex-col ">
         <label
-          htmlFor="editingTokenName"
+          htmlFor="editingCharacterName"
           className=" text-[1.2rem] font-medium  -mt-1 w-[15rem]"
         >
           NOME DO PERSONAGEM
         </label>
         <input
-          id="editingTokenName"
+          id="editingCharacterName"
           type="text"
-          value={editingTokenName}
-          onChange={(e) => setEditingTokenName(e.target.value)}
+          value={editingCharacterName}
+          onChange={(e) => setEditingCharacterName(e.target.value)}
           className=" w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-[1rem] "
           required
           maxLength={28}

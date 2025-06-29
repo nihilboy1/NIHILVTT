@@ -1,13 +1,11 @@
 import React from "react";
-import { cn } from "../../../../utils/cn";
-import { generateUniqueId } from "../../../../utils/id/idUtils";
-import { DeleteIcon, PlusCircleIcon } from "../../../icons";
-import { useModal } from "../../../../contexts/ModalContext";
-import { HitDiceEntry } from "../../../../shared/types";
+import { HitDiceEntry } from "../../../../shared/api/types";
+import { cn } from "../../../../shared/lib/utils/cn";
+import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
+import { DeleteIcon, PlusCircleIcon } from "../../../../shared/ui/Icons";
+import { useModal } from "../../../../app/providers/ModalProvider";
 
 interface HealthSectionProps {
-  editingCurrentHp: string;
-  setEditingCurrentHp: (value: string) => void;
   editingTempHp: string;
   setEditingTempHp: (value: string) => void;
   editingMaxHp: string;
@@ -17,8 +15,6 @@ interface HealthSectionProps {
 }
 
 export const HealthSection: React.FC<HealthSectionProps> = ({
-  editingCurrentHp,
-  setEditingCurrentHp,
   editingTempHp,
   setEditingTempHp,
   editingMaxHp,
@@ -79,7 +75,7 @@ export const HealthSection: React.FC<HealthSectionProps> = ({
       <div>
         <div>
           <label
-            htmlFor="editingCurrentHp"
+            htmlFor="editingMaxHp"
             className={cn(
               "block text-[0.8rem] font-medium mb-px",
               "text-[10px] text-center block"
@@ -88,10 +84,10 @@ export const HealthSection: React.FC<HealthSectionProps> = ({
             ATUAL
           </label>
           <input
-            id="editingCurrentHp"
+            id="editingMaxHp"
             type="number"
-            value={editingCurrentHp}
-            onChange={(e) => setEditingCurrentHp(e.target.value)}
+            value={editingMaxHp}
+            onChange={(e) => setEditingMaxHp(e.target.value)}
             className={cn(
               "w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary placeholder-text-secondary",
               "text-center hide-number-spinners"

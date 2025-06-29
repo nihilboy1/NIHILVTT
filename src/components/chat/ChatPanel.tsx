@@ -1,18 +1,19 @@
-import React, { useState, useRef, useEffect } from "react";
-import { DEFAULT_PLAYER_NAME } from "../../constants";
+import React, { useEffect, useRef, useState } from "react";
 import { useChat } from "../../contexts/ChatContext";
 import { useCommandHistory } from "../../hooks/useCommandHistory";
+import { DEFAULT_PLAYER_NAME } from "../../shared/config/constants";
+import { ChatInput } from "./ChatInput"; // Importar o novo componente
 import {
   findCommand,
   getAllCommands,
   type CommandContext,
-} from "../../lib/chatCommands";
+} from "./lib/chatCommands";
 import { MessageList } from "./MessageList";
-import { ChatInput } from "./ChatInput"; // Importar o novo componente
 
 // inclui a caixa do chat, o popover de comandos e o formulário de envio
 export function ChatPanel() {
-  const { messages, sendMessage, rollAndSendMessage, clearMessages } = useChat();
+  const { messages, sendMessage, rollAndSendMessage, clearMessages } =
+    useChat();
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

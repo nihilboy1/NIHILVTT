@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useModalStateManagement } from '../hooks/useModalStateManagement';
+import { useModalStateManagement } from '../app/providers/useModalStateManagement';
 
 describe('useModalStateManagement', () => {
   it('deve inicializar com uma pilha de modais vazia', () => {

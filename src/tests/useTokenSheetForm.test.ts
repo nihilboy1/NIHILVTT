@@ -1,8 +1,8 @@
-import { renderHook, act } from "@testing-library/react";
-import { useTokenSheetForm } from "@/hooks/useTokenSheetForm";
-import { TokenType } from "@/shared/types";
-import { DEFAULT_TOKEN_HP, DEFAULT_TOKEN_SIZE } from "@/constants";
+import { DEFAULT_TOKEN_HP, DEFAULT_TOKEN_SIZE } from "@/shared/config/constants";
 import { DEFAULT_TOKEN_IMAGE } from "@/constants/sheetDefaults";
+import { useCharacterSheetForm } from "@/hooks/useCharacterSheetForm";
+import { CharacterType } from "@/shared/api/types";
+import { act, renderHook } from "@testing-library/react";
 
 // Mock para a classe Image, para evitar erros de ambiente de teste
 const mockImage = {
@@ -17,7 +17,7 @@ Object.defineProperty(global, "Image", {
   value: jest.fn(() => mockImage),
 });
 
-describe("useTokenSheetForm", () => {
+describe("useCharacterSheetForm", () => {
   const mockOnSave = jest.fn();
 
   beforeEach(() => {
@@ -29,132 +29,130 @@ describe("useTokenSheetForm", () => {
     mockImage.height = 0;
   });
 
-  it("deve inicializar com valores padrão quando initialTokenData é nulo", () => {
+  it("deve inicializar com valores padrão quando initialCharacterData é nulo", () => {
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: null, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: null, onSave: mockOnSave })
     );
 
-    expect(result.current.editingTokenName).toBe("");
-    expect(result.current.editingTokenImage).toBe(DEFAULT_TOKEN_IMAGE);
-    expect(result.current.editingTokenSize).toBe(DEFAULT_TOKEN_SIZE);
-    expect(result.current.editingTokenType).toBeNull();
-    expect(result.current.editingCurrentHp).toBe(String(DEFAULT_TOKEN_HP));
+    expect(result.current.editingCharacterName).toBe("");
+    expect(result.current.editingCharacterImage).toBe(DEFAULT_TOKEN_IMAGE);
+    expect(result.current.editingCharacterSize).toBe(DEFAULT_TOKEN_SIZE);
+    expect(result.current.editingCharacterType).toBeNull();
     expect(result.current.editingMaxHp).toBe(String(DEFAULT_TOKEN_HP));
-    expect(result.current.editingTokenNotes).toBe("");
+    expect(result.current.editingCharacterNotes).toBe("");
     expect(result.current.editingInspiration).toBe(false);
-    expect(result.current.hasTokenSheetChanged).toBe(false);
+    expect(result.current.hasCharacterSheetChanged).toBe(false);
   });
 
-  it("deve inicializar com os dados do token fornecidos", () => {
-    const initialToken = {
+  it("deve inicializar com os dados do personagem fornecidos", () => {
+    const initialCharacter = {
       id: "123",
-      name: "Test Token",
+      name: "Test Character",
       image: "http://example.com/image.png",
       size: "2x2",
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Some notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
 
-    expect(result.current.editingTokenName).toBe("Test Token");
-    expect(result.current.editingTokenImage).toBe(
+    expect(result.current.editingCharacterName).toBe("Test Character");
+    expect(result.current.editingCharacterImage).toBe(
       "http://example.com/image.png"
     );
-    expect(result.current.editingTokenSize).toBe("2x2");
-    expect(result.current.editingTokenType).toBe(TokenType.MONSTER_NPC);
-    expect(result.current.editingCurrentHp).toBe("50");
+    expect(result.current.editingCharacterSize).toBe("2x2");
+    expect(result.current.editingCharacterType).toBe(CharacterType.MONSTER_NPC);
     expect(result.current.editingMaxHp).toBe("100");
-    expect(result.current.editingTokenNotes).toBe("Some notes");
+    expect(result.current.editingCharacterNotes).toBe("Some notes");
     expect(result.current.editingInspiration).toBe(false); // Monster/NPC não tem inspiração
-    expect(result.current.hasTokenSheetChanged).toBe(false);
+    expect(result.current.hasCharacterSheetChanged).toBe(false);
   });
 
-  it("deve inicializar inspiration corretamente para PlayerToken", () => {
-    const playerToken = {
+  it("deve inicializar inspiration corretamente para PlayerCharacter", () => {
+    const playerCharacter = {
       id: "player1",
       name: "Player One",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.PLAYER,
+      type: CharacterType.PLAYER,
       currentHp: 20,
       maxHp: 20,
       notes: "",
       inspiration: true,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: playerToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: playerCharacter, onSave: mockOnSave })
     );
     expect(result.current.editingInspiration).toBe(true);
 
-    const playerTokenNoInspiration = { ...playerToken, inspiration: false };
+    const playerCharacterNoInspiration = { ...playerCharacter, inspiration: false };
     const { result: result2 } = renderHook(() =>
-      useTokenSheetForm({
-        initialTokenData: playerTokenNoInspiration,
+      useCharacterSheetForm({
+        initialCharacterData: playerCharacterNoInspiration,
         onSave: mockOnSave,
       })
     );
     expect(result2.current.editingInspiration).toBe(false);
   });
 
-  it("deve atualizar hasTokenSheetChanged quando os campos são alterados", () => {
-    const initialToken = {
+  it("deve atualizar hasCharacterSheetChanged quando os campos são alterados", () => {
+    const initialCharacter = {
       id: "123",
-      name: "Test Token",
+      name: "Test Character",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Some notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
 
-    expect(result.current.hasTokenSheetChanged).toBe(false);
+    expect(result.current.hasCharacterSheetChanged).toBe(false);
 
     act(() => {
-      result.current.setEditingTokenName("New Name");
+      result.current.setEditingCharacterName("New Name");
     });
-    expect(result.current.hasTokenSheetChanged).toBe(true);
+    expect(result.current.hasCharacterSheetChanged).toBe(true);
 
     act(() => {
-      result.current.setEditingTokenName("Test Token"); // Volta ao original
+      result.current.setEditingCharacterName("Test Character"); // Volta ao original
     });
-    expect(result.current.hasTokenSheetChanged).toBe(false);
+    expect(result.current.hasCharacterSheetChanged).toBe(false);
 
     act(() => {
-      result.current.setEditingCurrentHp("40");
+      result.current.setEditingMaxHp("40");
     });
-    expect(result.current.hasTokenSheetChanged).toBe(true);
+    expect(result.current.hasCharacterSheetChanged).toBe(true);
   });
 
-  it("deve chamar onSave com os dados atualizados para um token existente", async () => {
-    const initialToken = {
+  it("deve chamar onSave com os dados atualizados para um personagem existente", async () => {
+    const initialCharacter = {
       id: "123",
       name: "Old Name",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
 
     act(() => {
-      result.current.setEditingTokenName("New Name");
-      result.current.setEditingCurrentHp("45");
-      result.current.setEditingTokenNotes("New notes");
+      result.current.setEditingCharacterName("New Name");
+      result.current.setEditingMaxHp("45");
+      result.current.setEditingCharacterNotes("New notes");
     });
 
     await act(async () => {
@@ -168,22 +166,20 @@ describe("useTokenSheetForm", () => {
       name: "New Name",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
-      currentHp: 45,
-      maxHp: 100,
+      type: CharacterType.MONSTER_NPC,
+      maxHp: 45,
       notes: "New notes",
     });
   });
 
-  it("deve chamar onSave com os dados para um novo token (initialTokenData nulo)", async () => {
+  it("deve chamar onSave com os dados para um novo personagem (initialCharacterData nulo)", async () => {
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: null, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: null, onSave: mockOnSave })
     );
 
     act(() => {
-      result.current.setEditingTokenName("New Token");
-      result.current.setEditingTokenType(TokenType.PLAYER);
-      result.current.setEditingCurrentHp("10");
+      result.current.setEditingCharacterName("New Character");
+      result.current.setEditingCharacterType(CharacterType.PLAYER);
       result.current.setEditingMaxHp("10");
     });
 
@@ -195,35 +191,34 @@ describe("useTokenSheetForm", () => {
 
     expect(mockOnSave).toHaveBeenCalledTimes(1);
     expect(mockOnSave).toHaveBeenCalledWith({
-      name: "New Token",
+      name: "New Character",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.PLAYER,
-      currentHp: 10,
+      type: CharacterType.PLAYER,
       maxHp: 10,
       notes: "",
-      inspiration: false, // Padrão para novo PlayerToken
+      inspiration: false, // Padrão para novo PlayerCharacter
     });
   });
 
-  it("não deve chamar onSave se o nome do token estiver vazio", async () => {
-    const initialToken = {
+  it("não deve chamar onSave se o nome do personagem estiver vazio", async () => {
+    const initialCharacter = {
       id: "123",
       name: "Old Name",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
 
     act(() => {
-      result.current.setEditingTokenName("");
+      result.current.setEditingCharacterName("");
     });
 
     // Mock alert para evitar que ele apareça durante o teste
@@ -237,19 +232,19 @@ describe("useTokenSheetForm", () => {
 
     expect(mockOnSave).not.toHaveBeenCalled();
     expect(alertMock).toHaveBeenCalledWith(
-      "O nome do token não pode estar vazio."
+      "O nome do personagem não pode estar vazio."
     );
     alertMock.mockRestore();
   });
 
-  it("não deve chamar onSave se initialTokenData for nulo e editingTokenType for nulo", async () => {
+  it("não deve chamar onSave se initialCharacterData for nulo e editingCharacterType for nulo", async () => {
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: null, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: null, onSave: mockOnSave })
     );
 
     act(() => {
-      result.current.setEditingTokenName("New Token");
-      // editingTokenType permanece nulo
+      result.current.setEditingCharacterName("New Character");
+      // editingCharacterType permanece nulo
     });
 
     const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
@@ -262,25 +257,25 @@ describe("useTokenSheetForm", () => {
 
     expect(mockOnSave).not.toHaveBeenCalled();
     expect(alertMock).toHaveBeenCalledWith(
-      "Erro: O tipo do token deve ser selecionado."
+      "Erro: O tipo do personagem deve ser selecionado."
     );
     alertMock.mockRestore();
   });
 
   it("não deve chamar onSave com valores de HP inválidos", async () => {
-    const initialToken = {
+    const initialCharacter = {
       id: "123",
-      name: "Test Token",
+      name: "Test Character",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
     const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
 
@@ -295,61 +290,29 @@ describe("useTokenSheetForm", () => {
     });
     expect(mockOnSave).not.toHaveBeenCalled();
     expect(alertMock).toHaveBeenCalledWith(
-      "Valores de HP inválidos. Vida Máxima deve ser > 0 e Vida Atual entre 0 e Vida Máxima."
-    );
-    alertMock.mockClear();
-
-    // Teste: currentHp < 0
-    act(() => {
-      result.current.setEditingMaxHp("100");
-      result.current.setEditingCurrentHp("-10");
-    });
-    await act(async () => {
-      await result.current.handleSave({
-        preventDefault: () => {},
-      } as React.FormEvent);
-    });
-    expect(mockOnSave).not.toHaveBeenCalled();
-    expect(alertMock).toHaveBeenCalledWith(
-      "Valores de HP inválidos. Vida Máxima deve ser > 0 e Vida Atual entre 0 e Vida Máxima."
-    );
-    alertMock.mockClear();
-
-    // Teste: currentHp > maxHp
-    act(() => {
-      result.current.setEditingMaxHp("50");
-      result.current.setEditingCurrentHp("60");
-    });
-    await act(async () => {
-      await result.current.handleSave({
-        preventDefault: () => {},
-      } as React.FormEvent);
-    });
-    expect(mockOnSave).not.toHaveBeenCalled();
-    expect(alertMock).toHaveBeenCalledWith(
-      "Valores de HP inválidos. Vida Máxima deve ser > 0 e Vida Atual entre 0 e Vida Máxima."
+      "Valores de HP inválidos. Vida Máxima deve ser > 0."
     );
     alertMock.mockRestore();
   });
 
   it("deve validar o tamanho da imagem e chamar onSave se for válido", async () => {
-    const initialToken = {
+    const initialCharacter = {
       id: "123",
-      name: "Test Token",
+      name: "Test Character",
       image: "http://example.com/valid-image.png",
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
 
     act(() => {
-      result.current.setEditingTokenImage("http://example.com/valid-image.png");
+      result.current.setEditingCharacterImage("http://example.com/valid-image.png");
     });
 
     // Simula o carregamento bem-sucedido da imagem com dimensões válidas
@@ -375,23 +338,23 @@ describe("useTokenSheetForm", () => {
   });
 
   it("não deve chamar onSave se a imagem for muito grande", async () => {
-    const initialToken = {
+    const initialCharacter = {
       id: "123",
-      name: "Test Token",
+      name: "Test Character",
       image: "http://example.com/large-image.png",
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
 
     act(() => {
-      result.current.setEditingTokenImage("http://example.com/large-image.png");
+      result.current.setEditingCharacterImage("http://example.com/large-image.png");
     });
 
     mockImage.width = 600; // Maior que MAX_IMAGE_DIMENSION (500)
@@ -417,23 +380,23 @@ describe("useTokenSheetForm", () => {
   });
 
   it("não deve chamar onSave se a imagem não puder ser carregada", async () => {
-    const initialToken = {
+    const initialCharacter = {
       id: "123",
-      name: "Test Token",
+      name: "Test Character",
       image: "http://example.com/invalid-image.png",
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
 
     act(() => {
-      result.current.setEditingTokenImage(
+      result.current.setEditingCharacterImage(
         "http://example.com/invalid-image.png"
       );
     });
@@ -458,23 +421,23 @@ describe("useTokenSheetForm", () => {
   });
 
   it("deve usar DEFAULT_TOKEN_IMAGE se a imagem for uma string vazia", async () => {
-    const initialToken = {
+    const initialCharacter = {
       id: "123",
-      name: "Test Token",
+      name: "Test Character",
       image: "http://example.com/image.png",
       size: DEFAULT_TOKEN_SIZE,
-      type: TokenType.MONSTER_NPC,
+      type: CharacterType.MONSTER_NPC,
       currentHp: 50,
       maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useTokenSheetForm({ initialTokenData: initialToken, onSave: mockOnSave })
+      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
     );
 
     act(() => {
-      result.current.setEditingTokenImage("");
+      result.current.setEditingCharacterImage("");
     });
 
     await act(async () => {

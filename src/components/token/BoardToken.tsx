@@ -1,70 +1,66 @@
 import { useCallback, useMemo, useRef } from "react";
+import { useSelectedToken } from "../../contexts/SelectedTokenContext";
+import { useBoardTokenDrag } from "../../hooks/useBoardTokenDrag";
 import {
-  type Token as TokenInfo,
   Tool,
+  type Token,
   type PageSettings,
-  type GridInstance,
   type Point,
-} from "../../shared/types/index"; // Caminho corrigido
-import { useTokenDrag } from "../../hooks/useTokenDrag"; // Caminho corrigido
-import { HealthBar } from "./HealthBar"; // Já está correto
-import { TokenVisual, type TokenMetrics } from "./TokenVisual"; // Já está correto
-import { parseSize } from "../../utils/tokenUtils"; // Caminho corrigido
-import { getFirstName } from "../../utils/nameUtils"; // Caminho corrigido
+  type Character,
+} from "../../shared/api/types";
+import { getFirstName } from "../../shared/lib/utils/nameUtils";
+import { parseCharacterSize } from "../../shared/lib/utils/characterUtils";
+import { HealthBar } from "./HealthBar";
+import { TokenVisual, type TokenVisualMetrics } from "./TokenVisual"; // Renomeado
 
 interface BoardTokenProps {
-  gridInstance: GridInstance;
-  tokenInfo: TokenInfo;
+  token: Token;
+  character: Character;
   cellSize: number;
   zoomLevel: number;
-  onMove: (instanceId: string, newGridX: number, newGridY: number) => void;
+  onMove: (tokenId: string, newPosition: Point) => void;
   activeTool: Tool;
   pageSettings: PageSettings;
-  getSVGPoint: (clientX: number, clientY: number) => Point; // Changed SVGPoint to Point
-  onGridInstanceSelectForHPModal?: (
-    instanceId: string,
+  getSVGPoint: (clientX: number, clientY: number) => Point;
+  onTokenSelectForHPModal?: (
+    tokenId: string,
     tokenScreenRect: DOMRect | null
   ) => void;
-  onGridInstanceDragStart: (instanceId: string) => void;
-  onGridInstanceDragMove: (instanceId: string, visualSVGPoint: Point) => void; // Changed SVGPoint to Point
-  onGridInstanceDragEnd: (instanceId: string) => void;
-  isMultiSelected: boolean; // Manter para compatibilidade com multi-seleção via marquee
-  isTokenSelected: boolean; // Nova prop para seleção única
-  onTokenDoubleClick: (instanceId: string, altKey: boolean) => void; // Nova prop para double click
-  selectedInstanceId: string | null; // Manter para passar para useTokenDrag
-  setSelectedInstanceId: (instanceId: string | null) => void; // Manter para passar para useTokenDrag
+  onTokenDragStart: (tokenId: string) => void;
+  onTokenDragMove: (tokenId: string, visualSVGPoint: Point) => void;
+  onTokenDragEnd: (tokenId: string) => void;
+  isMultiSelected: boolean;
+  onBoardTokenDoubleClick: (tokenId: string, altKey: boolean) => void;
 }
 
 export function BoardToken({
-  gridInstance,
-  tokenInfo,
+  token,
+  character,
   cellSize,
   zoomLevel,
   onMove,
   activeTool,
   pageSettings,
   getSVGPoint,
-  onGridInstanceSelectForHPModal,
-  onGridInstanceDragStart,
-  onGridInstanceDragMove,
-  onGridInstanceDragEnd,
-  isMultiSelected, // Manter para compatibilidade
-  isTokenSelected, // Nova prop
-  onTokenDoubleClick, // Adicionar nova prop
-  setSelectedInstanceId, // Manter para passar para useTokenDrag
+  onTokenSelectForHPModal,
+  onTokenDragStart,
+  onTokenDragMove,
+  onTokenDragEnd,
+  isMultiSelected,
+  onBoardTokenDoubleClick,
 }: BoardTokenProps) {
   const tokenGroupRef = useRef<SVGGElement>(null);
+  const { selectedTokenId, setSelectedTokenId } = useSelectedToken();
 
-  const handleSelectThisInstance = useCallback(
-    (instanceId: string) => {
-      // Apenas selecionar e abrir o popover de HP se a ferramenta for SELECT
+  const handleSelectThisToken = useCallback(
+    (tokenId: string) => {
       if (activeTool !== Tool.SELECT) {
         return;
       }
 
-      setSelectedInstanceId(instanceId); // Definir o token selecionado
+      setSelectedTokenId(tokenId);
 
-      if (onGridInstanceSelectForHPModal && tokenGroupRef.current) {
+      if (onTokenSelectForHPModal && tokenGroupRef.current) {
         const screenRect = tokenGroupRef.current.getBoundingClientRect();
         const plainRect = screenRect
           ? ({
@@ -79,52 +75,50 @@ export function BoardToken({
               toJSON: () => ({}),
             } as DOMRect)
           : null;
-        onGridInstanceSelectForHPModal(instanceId, plainRect);
+        onTokenSelectForHPModal(tokenId, plainRect);
       }
     },
-    [activeTool, setSelectedInstanceId, onGridInstanceSelectForHPModal] // Adicionar activeTool e setSelectedInstanceId
+    [activeTool, setSelectedTokenId, onTokenSelectForHPModal]
   );
 
   const handleDoubleClick = useCallback(
     (event: React.MouseEvent<SVGGElement>) => {
-      onTokenDoubleClick(gridInstance.instanceId, event.altKey);
+      onBoardTokenDoubleClick(token.id, event.altKey);
     },
-    [gridInstance.instanceId, onTokenDoubleClick]
+    [token.id, onBoardTokenDoubleClick]
   );
 
-  const { isDragging, displayPosition, dragHandlers } = useTokenDrag({
-    instanceId: gridInstance.instanceId,
-    initialGridX: gridInstance.gridX,
-    initialGridY: gridInstance.gridY,
-    tokenSize: tokenInfo.size,
+  const { isDragging, displayPosition, dragHandlers } = useBoardTokenDrag({
+    tokenId: token.id,
+    initialPosition: token.position,
+    characterSize: character.size,
     cellSize,
     activeTool,
     pageSettings,
     getSVGPoint,
     onMove,
-    onDragStart: onGridInstanceDragStart,
-    onDragMove: onGridInstanceDragMove,
-    onDragEnd: onGridInstanceDragEnd,
-    onSelectInstance: handleSelectThisInstance, // Voltar a usar handleSelectThisInstance
+    onDragStart: onTokenDragStart,
+    onDragMove: onTokenDragMove,
+    onDragEnd: onTokenDragEnd,
+    onSelectToken: handleSelectThisToken,
   });
 
-  const [sizeMultiplierX, sizeMultiplierY] = parseSize(tokenInfo.size);
+  const [sizeMultiplierX, sizeMultiplierY] = parseCharacterSize(character.size);
   const tokenRenderWidth = sizeMultiplierX * cellSize;
   const tokenRenderHeight = sizeMultiplierY * cellSize;
 
-  const baseStrokeWidth = Math.max(0.5, 1.5 / zoomLevel); // Ensure stroke is visible
-  const isSelected = isTokenSelected || isMultiSelected; // Determinar se o token está selecionado
+  const baseStrokeWidth = Math.max(0.5, 1.5 / zoomLevel);
+  const isSelected = selectedTokenId === token.id || isMultiSelected;
 
   const strokeWidth = isSelected
-    ? baseStrokeWidth + Math.max(0.3, 1 / zoomLevel) // Reverter para largura original, mas com baseStrokeWidth
+    ? baseStrokeWidth + Math.max(0.3, 1 / zoomLevel)
     : baseStrokeWidth;
   const strokeColor = isSelected
-    ? "var(--color-accent-primary)" // Reverter para cor original
+    ? "var(--color-accent-primary)"
     : isDragging
     ? "var(--color-accent-secondary)"
     : "var(--color-border-base)";
 
-  // Ajustar fontSize para o nome, pode precisar de mais ajustes dependendo do visual final
   const nameplateFontSize = Math.max(8, 12 / zoomLevel);
   const cursorStyle =
     activeTool === Tool.SELECT
@@ -133,33 +127,22 @@ export function BoardToken({
         : "pointer"
       : "default";
 
-  const padding = 1 / zoomLevel; // Reduzir o padding para aproximar a borda do token
+  const padding = 1 / zoomLevel;
 
-  const tokenMetrics: TokenMetrics = useMemo(
+  const tokenMetrics: TokenVisualMetrics = useMemo(
     () => ({
       tokenRenderWidth,
       tokenRenderHeight,
-      imageUrl: tokenInfo.image, // Passar a URL da imagem
-      name: tokenInfo.name, // Passar o nome completo para TokenVisual
-      fontSize: nameplateFontSize, // Usar o novo fontSize para o nome
+      imageUrl: character.image,
+      name: character.name,
+      fontSize: nameplateFontSize,
     }),
-    [
-      tokenRenderWidth,
-      tokenRenderHeight,
-      tokenInfo.image, // Adicionar image ao array de dependências
-      tokenInfo.name,
-      nameplateFontSize,
-    ]
+    [tokenRenderWidth, tokenRenderHeight, character.image, character.name, nameplateFontSize]
   );
 
-  const firstName = useMemo(
-    () => getFirstName(tokenInfo.name),
-    [tokenInfo.name]
-  );
-  // Ajustar o deslocamento vertical para que o nome fique diretamente abaixo do token
-  // Considera a altura da fonte e um pequeno espaçamento
+  const firstName = useMemo(() => getFirstName(character.name), [character.name]);
   const nameplateYOffset =
-    tokenRenderHeight + nameplateFontSize / 2 + 5 / zoomLevel; // Aumentar o espaçamento
+    tokenRenderHeight + nameplateFontSize / 2 + 5 / zoomLevel;
 
   return (
     <g
@@ -167,24 +150,21 @@ export function BoardToken({
       transform={`translate(${displayPosition.x}, ${displayPosition.y})`}
       className="board-token-group"
       style={{ cursor: cursorStyle }}
-      {...dragHandlers} // Attach onMouseDown from the hook
-      onDoubleClick={handleDoubleClick} // Adicionar o handler de double click
+      {...dragHandlers}
+      onDoubleClick={handleDoubleClick}
       filter={isDragging ? "url(#tokenDragShadow)" : "none"}
-      data-instance-id={gridInstance.instanceId}
+      data-token-id={token.id}
     >
       <HealthBar
-        currentHp={tokenInfo.currentHp}
-        maxHp={tokenInfo.maxHp}
+        currentHp={token.currentHp}
+        maxHp={character.maxHp}
         tokenRenderWidth={tokenRenderWidth}
         zoomLevel={zoomLevel}
       />
       <TokenVisual metrics={tokenMetrics} />
-      {/* AC-1: Nome acima do token */}
       <text
         x={tokenRenderWidth / 2}
-        y={
-          nameplateYOffset
-        } /* nameplateYOffset já é negativo, posicionando acima */
+        y={nameplateYOffset}
         fontSize={nameplateFontSize}
         textAnchor="middle"
         dominantBaseline="alphabetic"
@@ -195,7 +175,6 @@ export function BoardToken({
       >
         {firstName}
       </text>
-      {/* Retângulo de seleção - agora desenhado por último para ficar por cima */}
       {isSelected && (
         <rect
           x={-padding}
@@ -205,7 +184,6 @@ export function BoardToken({
           fill="none"
           stroke={strokeColor}
           strokeWidth={strokeWidth}
-          // Remover rx e ry para tornar quadrado
         />
       )}
     </g>

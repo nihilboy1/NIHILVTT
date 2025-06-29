@@ -1,13 +1,13 @@
-export interface TokenMetrics {
+export interface TokenVisualMetrics {
   tokenRenderWidth: number;
   tokenRenderHeight: number;
-  imageUrl: string; // Nova propriedade para a URL da imagem
-  name: string; // Adicionado para o nome completo
-  fontSize: number; // Mantido para o novo nome, pode ser ajustado
+  imageUrl: string;
+  name: string;
+  fontSize: number;
 }
 
 interface TokenVisualProps {
-  metrics: TokenMetrics;
+  metrics: TokenVisualMetrics;
 }
 
 export function TokenVisual({ metrics }: TokenVisualProps) {

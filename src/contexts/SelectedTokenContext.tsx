@@ -1,21 +1,21 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface SelectedTokenContextType {
-  selectedInstanceId: string | null;
-  setSelectedInstanceId: (instanceId: string | null) => void;
+  selectedTokenId: string | null;
+  setSelectedTokenId: (tokenId: string | null) => void;
 }
 
 const SelectedTokenContext = createContext<SelectedTokenContextType | undefined>(undefined);
 
 export const SelectedTokenProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [selectedInstanceId, setSelectedInstanceIdState] = useState<string | null>(null);
+  const [selectedTokenId, setSelectedTokenIdState] = useState<string | null>(null);
 
-  const setSelectedInstanceId = useCallback((instanceId: string | null) => {
-    setSelectedInstanceIdState(instanceId);
+  const setSelectedTokenId = useCallback((tokenId: string | null) => {
+    setSelectedTokenIdState(tokenId);
   }, []);
 
   return (
-    <SelectedTokenContext.Provider value={{ selectedInstanceId, setSelectedInstanceId }}>
+    <SelectedTokenContext.Provider value={{ selectedTokenId, setSelectedTokenId }}>
       {children}
     </SelectedTokenContext.Provider>
   );

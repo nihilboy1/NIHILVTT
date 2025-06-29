@@ -1,19 +1,19 @@
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useChatState } from "../hooks/useChatState";
 import {
-  TextMessage,
-  DiceRollMessage,
   DiceRollDetails,
-} from "../shared/types/index";
-import { DEFAULT_PLAYER_NAME } from "../constants";
+  DiceRollMessage,
+  TextMessage,
+} from "../shared/api/types";
+import { DEFAULT_PLAYER_NAME } from "../shared/config/constants";
 
 // Mock para generateUniqueId para garantir IDs consistentes nos testes
-jest.mock("../utils/id/idUtils", () => ({
+jest.mock("../shared/lib/utils/id/idUtils", () => ({
   generateUniqueId: jest.fn(() => "mock-id"),
 }));
 
 // Mock para rollDiceInternal para controlar o resultado das rolagens
-jest.mock("../utils/dice/diceUtils", () => ({
+jest.mock("../shared/lib/utils/dice/diceUtils", () => ({
   rollDiceInternal: jest.fn((notation: string) => {
     if (notation === "1d6") {
       return { notation: "1d6", rolls: [3], finalResult: 3 };

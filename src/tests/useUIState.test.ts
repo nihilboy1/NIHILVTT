@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react";
-import { useUIState } from "../hooks/useUIState";
-import { Tool, SidebarTab } from "../shared/types/index";
+import { act, renderHook } from "@testing-library/react";
+import { SidebarTab, Tool } from "../shared/api/types";
+import { useUIState } from "../app/providers/useUIState";
 
 describe("useUIState", () => {
   it("deve inicializar o estado com valores padrão", () => {

@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { ChatProvider, useChat } from "../contexts/ChatContext";
 import { useChatState } from "../hooks/useChatState";
-import { Message } from "../shared/types";
+import { Message } from "../shared/api/types";
 
 // Mock the useChatState hook
 jest.mock("../hooks/useChatState", () => ({

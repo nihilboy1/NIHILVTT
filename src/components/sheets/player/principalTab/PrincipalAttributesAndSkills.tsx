@@ -1,5 +1,5 @@
-import { usePlayerSheet } from "../../../../contexts/PlayerSheetContext";
-import { type PlayerToken } from "../../../../shared/types";
+import { usePlayerSheet } from "../../../../contexts/CharacterSheetContext"; // Renomeado
+import { type PlayerCharacter } from "../../../../shared/api/types";
 import { AttributeBlock } from "./AttributeBlock";
 import { SkillProficiencyItem } from "./SkillProficiencyItem";
 
@@ -16,10 +16,10 @@ export function PrincipalAttributesAndSkills() {
   } = usePlayerSheet();
 
   const handleAttributeChange = (
-    attrName: keyof NonNullable<PlayerToken["attributes"]>,
+    attrName: keyof NonNullable<PlayerCharacter["attributes"]>,
     value: number | ""
   ) => {
-    setAttributes((prev: NonNullable<PlayerToken["attributes"]>) => ({
+    setAttributes((prev: NonNullable<PlayerCharacter["attributes"]>) => ({
       ...prev,
       [attrName]: value === "" ? 10 : Math.max(1, Math.min(30, value)),
     }));
@@ -32,14 +32,14 @@ export function PrincipalAttributesAndSkills() {
   ) => {
     if (isSavingThrow) {
       setSavingThrowProficiencies(
-        (prev: NonNullable<PlayerToken["proficiencies"]>["savingThrows"]) => ({
+        (prev: NonNullable<PlayerCharacter["proficiencies"]>["savingThrows"]) => ({
           ...prev,
           [skillKey as keyof typeof prev]: checked,
         })
       );
     } else {
       setSkillProficiencies(
-        (prev: NonNullable<PlayerToken["proficiencies"]>["skills"]) => ({
+        (prev: NonNullable<PlayerCharacter["proficiencies"]>["skills"]) => ({
           ...prev,
           [skillKey as keyof typeof prev]: checked,
         })
@@ -50,12 +50,12 @@ export function PrincipalAttributesAndSkills() {
   return (
     <div className="flex flex-col space-y-2 rounded-md">
       {(Object.keys(attributes) as Array<keyof typeof attributes>).map(
-        (attrName) => {
+        (attrName: keyof NonNullable<PlayerCharacter["attributes"]>) => { // Adicionado tipagem para attrName
           const attrValue = attributes[attrName];
           const modifier = Math.floor((attrValue - 10) / 2);
 
           const savingThrowSkill = {
-            key: `${attrName}SavingThrow`,
+            key: String(`${attrName}SavingThrow`), // Adicionado String()
             label: "Salvaguarda",
             parentAttribute: attrName,
             isSavingThrow: true,
@@ -64,17 +64,17 @@ export function PrincipalAttributesAndSkills() {
           const parentAttributeSkills = [
             savingThrowSkill,
             ...SKILLS_CONFIG.filter(
-              (skill) => skill.parentAttribute === attrName
-            ).map((skill) => ({ ...skill, isSavingThrow: false })), // Adiciona isSavingThrow: false para as perícias
+              (skill: { parentAttribute: keyof NonNullable<PlayerCharacter["attributes"]> }) => skill.parentAttribute === attrName // Adicionado tipagem para skill
+            ).map((skill: { key: string; label: string; parentAttribute: keyof NonNullable<PlayerCharacter["attributes"]> }) => ({ ...skill, isSavingThrow: false })), // Adicionado tipagem para skill
           ];
 
           return (
             <div
-              key={attrName}
+              key={String(attrName)} // Adicionado String()
               className="flex flex-col space-y-2 p-3 rounded bg-surface-1"
             >
               <AttributeBlock
-                attrName={attrName}
+                attrName={attrName as keyof NonNullable<PlayerCharacter["attributes"]>} // Adicionado tipagem
                 attrValue={attrValue}
                 onAttributeChange={handleAttributeChange}
               />
@@ -84,10 +84,10 @@ export function PrincipalAttributesAndSkills() {
                     const isSavingThrow = !!skillInfo.isSavingThrow;
                     const skillKey = isSavingThrow
                       ? (attrName as keyof NonNullable<
-                          PlayerToken["proficiencies"]
+                          PlayerCharacter["proficiencies"]
                         >["savingThrows"])
                       : (skillInfo.key as keyof NonNullable<
-                          PlayerToken["proficiencies"]
+                          PlayerCharacter["proficiencies"]
                         >["skills"]);
 
                     const isProficient = isSavingThrow
@@ -110,7 +110,7 @@ export function PrincipalAttributesAndSkills() {
                         isProficient={isProficient}
                         totalBonus={totalBonus}
                         onProficiencyChange={handleProficiencyChange}
-                        attrName={attrName}
+                        attrName={attrName as keyof NonNullable<PlayerCharacter["attributes"]>} // Adicionado tipagem
                       />
                     );
                   })}

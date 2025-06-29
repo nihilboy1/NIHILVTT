@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "../../../../utils/cn";
+import { cn } from "../../../../shared/lib/utils/cn";
 
 interface CombatStatsProps {
   editingArmorClass: string;
@@ -97,9 +97,7 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
             onChange={(e) => setEditingShieldEquipped(e.target.checked)}
             className="h-3.5 w-3.5 rounded-sm focus:ring-accent-primary bg-surface-1"
           />
-          <span
-            className={cn("block text-[0.8rem] font-medium mb-px", "mb-0")}
-          >
+          <span className={cn("block text-[0.8rem] font-medium mb-px", "mb-0")}>
             ESCUDO
           </span>
         </label>

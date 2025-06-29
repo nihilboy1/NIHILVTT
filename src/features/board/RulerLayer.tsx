@@ -1,22 +1,10 @@
 import React from "react";
-import {
-  RulerPathState,
-  RulerPointData,
-  GridSettings,
-} from "../../shared/types";
-import { calculateDistanceInMeters } from "../../utils/board/boardUtils";
+import { useGameBoard } from "../../contexts/GameBoardContext";
+import { RulerPointData } from "../../shared/api/types";
+import { calculateDistanceInMeters } from "../../shared/lib/utils/board/boardUtils";
 
-interface RulerLayerProps {
-  rulerPath: RulerPathState;
-  zoomLevel: number;
-  gridSettings: GridSettings;
-}
-
-export const RulerLayer: React.FC<RulerLayerProps> = ({
-  rulerPath,
-  zoomLevel,
-  gridSettings,
-}) => {
+export const RulerLayer: React.FC = () => {
+  const { rulerPath, zoomLevel, gridSettings } = useGameBoard();
   const rulerLineStrokeWidth = 2.5 / zoomLevel;
   const rulerWaypointRadius = 6 / zoomLevel;
   const rulerTextFontSize = 12 / zoomLevel;

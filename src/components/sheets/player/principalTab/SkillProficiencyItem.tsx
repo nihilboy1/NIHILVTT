@@ -1,11 +1,11 @@
 import React from "react";
-import { PlayerToken } from "../../../../shared/types";
+import { PlayerCharacter } from "../../../../shared/api/types";
 
 interface SkillProficiencyItemProps {
   skillInfo: {
     key: string;
     label: string;
-    parentAttribute: keyof NonNullable<PlayerToken["attributes"]>;
+    parentAttribute: keyof NonNullable<PlayerCharacter["attributes"]>;
     isSavingThrow?: boolean; // Adicionado como opcional
   };
   isProficient: boolean;
@@ -15,7 +15,7 @@ interface SkillProficiencyItemProps {
     isSavingThrow: boolean,
     checked: boolean
   ) => void;
-  attrName: keyof NonNullable<PlayerToken["attributes"]>;
+  attrName: keyof NonNullable<PlayerCharacter["attributes"]>;
 }
 
 export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({

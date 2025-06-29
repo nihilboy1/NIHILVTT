@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 // PageSettings, GridSettings types removed from direct import, will get from context
-import { Modal } from "../ui/Modal";
-import { cn } from "../../utils/cn";
+import { useBoardSettings } from "../../contexts/BoardSettingsContext"; // Import useBoardSettings
 import {
   DEFAULT_METERS_PER_SQUARE,
   GRID_CELL_SIZE,
   GRID_LINE_COLOR,
-} from "../../constants";
-import { useBoardSettings } from "../../contexts/BoardSettingsContext"; // Import useBoardSettings
+} from "../../shared/config/constants";
+import { cn } from "../../shared/lib/utils/cn";
+import { Modal } from "../../shared/ui/Modal";
 
 interface PageAndGridSettingsModalProps {
   isOpen: boolean;
@@ -153,9 +153,7 @@ export function PageSettingsModal({
           </div>
         </div>
 
-        <h3 className="text-lg font-semibold mt-6 mb-3 pt-4 border-t">
-          Grade
-        </h3>
+        <h3 className="text-lg font-semibold mt-6 mb-3 pt-4 border-t">Grade</h3>
         <div>
           <label
             htmlFor="visualCellSize"
@@ -230,6 +228,5 @@ export function PageSettingsModal({
     </Modal>
   );
 }
-
 
 // visto

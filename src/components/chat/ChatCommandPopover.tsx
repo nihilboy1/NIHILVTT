@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
-import { getAllCommands } from "../../lib/chatCommands";
+import { getAllCommands } from "./lib/chatCommands";
 
 interface ChatCommandPopoverProps {
   isOpen: boolean;

@@ -1,32 +1,38 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { Toolbar } from "@/widgets/Toolbar";
 import "@testing-library/jest-dom";
-import { Toolbar } from "../components/layout/Toolbar";
-import { Tool, SidebarTab, RulerPlacementMode } from "../shared/types";
-import {
-  GRID_CELL_SIZE,
-  DEFAULT_METERS_PER_SQUARE,
-  DEFAULT_PAGE_SETTINGS,
-} from "../constants";
-import { type UIState } from "../hooks/useUIState";
-import { type BoardSettingsState } from "../hooks/useBoardSettingsState";
-import { type ChatState } from "../hooks/useChatState";
-import { UIContext } from "../contexts/UIContext";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { BoardSettingsContext } from "../contexts/BoardSettingsContext";
 import { ChatContext } from "../contexts/ChatContext";
+import { type BoardSettingsState } from "../hooks/useBoardSettingsState";
+import { type ChatState } from "../hooks/useChatState";
+import { RulerPlacementMode, SidebarTab, Tool } from "../shared/api/types";
+import {
+  DEFAULT_METERS_PER_SQUARE,
+  DEFAULT_PAGE_SETTINGS,
+  GRID_CELL_SIZE,
+} from "../shared/config/constants";
 
-// Import the actual hooks to be mocked
-import { useUIState } from "../hooks/useUIState";
-import { useBoardSettingsState } from "../hooks/useBoardSettingsState";
-import { useChatState } from "../hooks/useChatState";
+import { UIContext } from "../app/providers/UIProvider";
+import { UIState } from "../app/providers/useUIState";
 
-// Mock the actual hook modules
-jest.mock("../hooks/useUIState");
-jest.mock("../hooks/useBoardSettingsState");
-jest.mock("../hooks/useChatState");
-jest.mock("../components/ui/RulerPopover", () => ({
+// Mock the actual hook modules and their return values
+const mockUseUIState = jest.fn();
+const mockUseBoardSettingsState = jest.fn();
+const mockUseChatState = jest.fn();
+
+jest.mock("../app/providers/useUIState", () => ({
+  useUIState: () => mockUseUIState(),
+}));
+jest.mock("../hooks/useBoardSettingsState", () => ({
+  useBoardSettingsState: () => mockUseBoardSettingsState(),
+}));
+jest.mock("../hooks/useChatState", () => ({
+  useChatState: () => mockUseChatState(),
+}));
+jest.mock("../shared/ui/RulerPopover", () => ({
   RulerPopover: jest.fn(() => null), // Mock RulerPopover to return null
 }));
-jest.mock("../components/ui/DiceRollPopover", () => ({
+jest.mock("../shared/ui/DiceRollPopover", () => ({
   DiceRollPopover: jest.fn(() => null), // Mock DiceRollPopover to return null
 }));
 
@@ -67,19 +73,19 @@ const defaultMockChatState: ChatState = {
 };
 
 const renderToolbar = (
-  uiState: Partial<typeof defaultMockUIState> = {},
-  boardSettingsState: Partial<typeof defaultMockBoardSettingsState> = {},
-  chatState: Partial<typeof defaultMockChatState> = {}
+  uiState: Partial<UIState> = {},
+  boardSettingsState: Partial<BoardSettingsState> = {},
+  chatState: Partial<ChatState> = {}
 ) => {
-  (useUIState as jest.Mock).mockReturnValue({
+  mockUseUIState.mockReturnValue({
     ...defaultMockUIState,
     ...uiState,
   });
-  (useBoardSettingsState as jest.Mock).mockReturnValue({
+  mockUseBoardSettingsState.mockReturnValue({
     ...defaultMockBoardSettingsState,
     ...boardSettingsState,
   });
-  (useChatState as jest.Mock).mockReturnValue({
+  mockUseChatState.mockReturnValue({
     ...defaultMockChatState,
     ...chatState,
   });
@@ -101,9 +107,9 @@ describe("Toolbar", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset mocks before each test
-    (useUIState as jest.Mock).mockClear();
-    (useBoardSettingsState as jest.Mock).mockClear();
-    (useChatState as jest.Mock).mockClear();
+    mockUseUIState.mockClear();
+    mockUseBoardSettingsState.mockClear();
+    mockUseChatState.mockClear();
   });
 
   test("deve renderizar os botões de ferramenta corretos", () => {
@@ -130,7 +136,7 @@ describe("Toolbar", () => {
   });
 
   test('deve abrir o popover da régua ao clicar no botão "Medir Distância"', async () => {
-    const { RulerPopover } = jest.requireMock("../components/ui/RulerPopover");
+    const { RulerPopover } = jest.requireMock("../shared/ui/RulerPopover");
     renderToolbar();
     const rulerButton = screen.getByRole("button", {
       name: "Ferramenta de Régua",

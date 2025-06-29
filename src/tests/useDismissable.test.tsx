@@ -1,7 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useRef, FC } from "react";
-import useDismissable from "../hooks/useDismissable";
+import { FC, useRef } from "react";
+import useDismissable from "../shared/lib/hooks/useDismissable";
 
 // Componente de teste para envolver o hook useDismissable
 interface TestComponentProps {

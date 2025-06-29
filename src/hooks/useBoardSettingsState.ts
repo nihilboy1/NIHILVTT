@@ -1,14 +1,14 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
   type GridSettings,
   type PageSettings,
   RulerPlacementMode,
-} from "../shared/types";
+} from "../shared/api/types";
 import {
-  GRID_CELL_SIZE,
   DEFAULT_METERS_PER_SQUARE,
   DEFAULT_PAGE_SETTINGS,
-} from "../constants";
+  GRID_CELL_SIZE,
+} from "../shared/config/constants";
 
 export interface BoardSettingsState {
   gridSettings: GridSettings;

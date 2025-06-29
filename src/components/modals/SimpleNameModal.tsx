@@ -1,16 +1,15 @@
-import { useState, useEffect, useRef } from "react";
-import { Modal } from "../ui/Modal"; // Usar o componente Modal base
-import { TokenType } from "../../shared/types/index"; // Importar TokenType
+import { useEffect, useRef, useState } from "react";
+import { CharacterType } from "../../shared/api/types"; // Importar CharacterType
+import { Modal } from "../../shared/ui/Modal"; // Usar o componente Modal base
 
 interface SimpleNameModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (name: string, tokenType?: TokenType) => void; // Adicionado tokenType
+  onSave: (name: string, characterType?: CharacterType) => void; // Adicionado characterType
   title: string;
   currentName?: string;
-  tokenType?: TokenType; // Adicionado tokenType como prop
+  characterType?: CharacterType; // Adicionado characterType como prop
   zIndex?: number; // Adicionado zIndex
-  containerRef?: React.RefObject<HTMLDivElement>; // Adicionado containerRef
 }
 
 export function SimpleNameModal({
@@ -19,7 +18,7 @@ export function SimpleNameModal({
   onSave,
   title,
   currentName = "",
-  tokenType, // Receber tokenType
+  characterType, // Receber characterType
   zIndex, // Receber zIndex
 }: SimpleNameModalProps) {
   const [name, setName] = useState(currentName);
@@ -34,7 +33,7 @@ export function SimpleNameModal({
 
   const handleSaveClick = () => {
     if (name.trim()) {
-      onSave(name.trim(), tokenType); // Passa o tokenType recebido como prop
+      onSave(name.trim(), characterType); // Passa o characterType recebido como prop
     } else {
       inputRef.current?.focus();
     }

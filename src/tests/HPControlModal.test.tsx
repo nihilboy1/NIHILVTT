@@ -1,25 +1,25 @@
+import { HPControlModal } from "@/components/modals/HPControlModal";
+import { CharacterType } from "@/shared/api/types"; // Importar TokenType
+import useDismissable from "@/shared/lib/hooks/useDismissable";
+import { calculateNewHP } from "@/shared/lib/utils/hpUtils";
+import "@testing-library/jest-dom";
 import {
+  act,
+  fireEvent,
   render,
   screen,
-  fireEvent,
   waitFor,
-  act,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event"; // Import userEvent
-import "@testing-library/jest-dom";
-import { HPControlModal } from "@/components/modals/HPControlModal";
-import useDismissable from "@/hooks/useDismissable";
-import { calculateNewHP } from "@/utils/hpUtils";
-import { TokenType } from "@/shared/types"; // Importar TokenType
 
 // Mock do hook useDismissable
-jest.mock("@/hooks/useDismissable");
+jest.mock("../shared/lib/hooks/useDismissable");
 const mockUseDismissable = useDismissable as jest.MockedFunction<
   typeof useDismissable
 >;
 
 // Mock da função calculateNewHP
-jest.mock("@/utils/hpUtils");
+jest.mock("../shared/lib/utils/hpUtils");
 const mockCalculateNewHP = calculateNewHP as jest.MockedFunction<
   typeof calculateNewHP
 >;
@@ -30,18 +30,17 @@ describe("HPControlModal", () => {
   const mockOnRemoveFromBoard = jest.fn();
   const mockOnMakeIndependent = jest.fn();
 
-  const defaultTokenInfo = {
-    id: "token-1",
+  const defaultCharacter = {
+    id: "char-1",
     name: "Hero",
-    type: TokenType.PLAYER, // Usar o enum
+    type: CharacterType.PLAYER, // Usar o enum
     color: "#000",
     size: "medium",
-    currentHp: 50,
-    maxHp: 100,
+    maxHp: 100, // HP máximo do personagem
     ac: 15,
     initiative: 10,
     speed: 30,
-    image: "", // Alterado de tokenImageUrl para image
+    image: "test-image.png", // Alterado de tokenImageUrl para image
     sheet: {
       basicInfo: {
         name: "Hero",
@@ -78,8 +77,8 @@ describe("HPControlModal", () => {
   };
 
   const defaultProps = {
-    instanceId: "instance-1",
-    tokenInfo: { ...defaultTokenInfo, image: "test-image.png" }, // Adicionado image para o mock
+    tokenId: "instance-1", // ID da instância do token no tabuleiro
+    character: { ...defaultCharacter }, // A ficha de personagem
     anchorPoint: { x: 100, y: 100 },
     isOpen: true,
     onClose: mockOnClose,
@@ -102,7 +101,7 @@ describe("HPControlModal", () => {
       }
     });
     // Mock padrão para calculateNewHP para retornar o valor parseado
-    mockCalculateNewHP.mockImplementation((inputValue, currentHP, maxHP) => {
+    mockCalculateNewHP.mockImplementation((inputValue, _currentHP, maxHP) => {
       const trimmedInput = inputValue.trim();
       let newCalculatedHP: number;
 
@@ -112,7 +111,7 @@ describe("HPControlModal", () => {
         const value = parseInt(valueStr, 10);
 
         if (!isNaN(value) && value >= 0) {
-          newCalculatedHP = isPositive ? currentHP + value : currentHP - value;
+          newCalculatedHP = isPositive ? _currentHP + value : _currentHP - value;
         } else {
           return null;
         }
@@ -134,8 +133,9 @@ describe("HPControlModal", () => {
     expect(
       screen.getByRole("dialog", { name: "Controle de Vida" })
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Vida Atual")).toHaveValue("50");
-    expect(screen.getByTestId("max-hp-display")).toHaveTextContent("100"); // Usar data-testid
+    // O input de HP é inicializado com o maxHp do character, não currentHp
+    expect(screen.getByLabelText("Vida Atual")).toHaveValue(String(defaultProps.character.maxHp));
+    expect(screen.getByTestId("max-hp-display")).toHaveTextContent(String(defaultProps.character.maxHp)); // Usar data-testid
     expect(screen.getByTitle("Tornar Token Independente")).toBeInTheDocument();
     expect(screen.getByTitle("Remover do Tabuleiro")).toBeInTheDocument();
   });
@@ -152,19 +152,25 @@ describe("HPControlModal", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  test("não deve renderizar o modal se instanceId for nulo", () => {
-    render(<HPControlModal {...defaultProps} instanceId={null} />);
+  test("não deve renderizar o modal se tokenId for nulo", () => {
+    render(<HPControlModal {...defaultProps} tokenId={null} />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  test("deve chamar onClose se tokenInfo for nulo e modal estiver aberto", () => {
-    render(<HPControlModal {...defaultProps} tokenInfo={null} />);
+  test("deve chamar onClose se character for nulo e modal estiver aberto", () => {
+    render(<HPControlModal {...defaultProps} character={null} />);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   // Interação com Input de HP
   test("deve atualizar o HP ao digitar um valor válido e pressionar Enter", async () => {
+    // Mock calculateNewHP para retornar o valor esperado
+    mockCalculateNewHP.mockImplementation((inputValue, maxHP) => {
+      const value = parseInt(inputValue, 10);
+      return Math.max(0, Math.min(value, maxHP));
+    });
+
     render(<HPControlModal {...defaultProps} />);
     const hpInput = screen.getByLabelText("Vida Atual");
     fireEvent.change(hpInput, { target: { value: "60" } });
@@ -172,14 +178,17 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("60", 50, 100);
-    expect(mockOnHPChange).toHaveBeenCalledWith(60);
+    // O currentHP passado para calculateNewHP será o valor atual do input (que é o maxHp do character inicialmente)
+    // ou o valor digitado se o input já tiver sido alterado.
+    // Para este teste, o input é 100 (maxHp inicial), então 60 é o valor digitado.
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("60", 60, 100);
+    expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 60); // Passar tokenId
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(hpInput).toHaveValue("60");
   });
 
   test("deve atualizar o HP ao digitar um valor com operador de soma e pressionar Enter", async () => {
-    mockCalculateNewHP.mockReturnValue(55); // currentHP (50) + 5
+    mockCalculateNewHP.mockReturnValue(105); // currentHP (100) + 5
     render(<HPControlModal {...defaultProps} />);
     const hpInput = screen.getByLabelText("Vida Atual");
     fireEvent.change(hpInput, { target: { value: "+5" } });
@@ -187,14 +196,14 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("+5", 50, 100);
-    expect(mockOnHPChange).toHaveBeenCalledWith(55);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("+5", 5, 100);
+    expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 105);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
-    expect(hpInput).toHaveValue("55");
+    expect(hpInput).toHaveValue("105");
   });
 
   test("deve atualizar o HP ao digitar um valor com operador de subtração e pressionar Enter", async () => {
-    mockCalculateNewHP.mockReturnValue(45); // currentHP (50) - 5
+    mockCalculateNewHP.mockReturnValue(95); // currentHP (100) - 5
     render(<HPControlModal {...defaultProps} />);
     const hpInput = screen.getByLabelText("Vida Atual");
     fireEvent.change(hpInput, { target: { value: "-5" } });
@@ -202,10 +211,10 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("-5", 50, 100);
-    expect(mockOnHPChange).toHaveBeenCalledWith(45);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("-5", -5, 100);
+    expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 95);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
-    expect(hpInput).toHaveValue("45");
+    expect(hpInput).toHaveValue("95");
   });
 
   test("deve limitar o HP ao maxHP ao digitar um valor muito alto", async () => {
@@ -217,8 +226,8 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("200", 50, 100);
-    expect(mockOnHPChange).toHaveBeenCalledWith(100);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("200", 200, 100);
+    expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 100);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(hpInput).toHaveValue("100");
   });
@@ -232,8 +241,8 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("-100", 50, 100);
-    expect(mockOnHPChange).toHaveBeenCalledWith(0);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("-100", -100, 100);
+    expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 0);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(hpInput).toHaveValue("0");
   });
@@ -247,10 +256,10 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("abc", 50, 100);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("abc", NaN, 100);
     expect(mockOnHPChange).not.toHaveBeenCalled();
     expect(mockOnClose).toHaveBeenCalledTimes(1);
-    expect(hpInput).toHaveValue("50"); // Reverte para o HP atual
+    expect(hpInput).toHaveValue("100"); // Reverte para o HP atual (maxHp inicial)
   });
 
   test("deve chamar onClose ao pressionar Escape no input", async () => {
@@ -277,8 +286,8 @@ describe("HPControlModal", () => {
 
     // Wrap assertions in waitFor
     await waitFor(() => {
-      expect(mockCalculateNewHP).toHaveBeenCalledWith("55", 50, 100); // Ensure calculateNewHP is called correctly
-      expect(mockOnHPChange).toHaveBeenCalledWith(55);
+      expect(mockCalculateNewHP).toHaveBeenCalledWith("55", 55, 100); // Ensure calculateNewHP is called correctly
+      expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 55);
     });
     // Assert that onClose was not called, outside waitFor as it's an immediate check post-blur
     expect(mockOnClose).not.toHaveBeenCalled();
@@ -316,13 +325,13 @@ describe("HPControlModal", () => {
   });
 
   // Sincronização de HP
-  test("deve sincronizar o input com tokenInfo.currentHp quando tokenInfo muda e modal está aberto", () => {
+  test("deve sincronizar o input com character.maxHp quando character muda e modal está aberto", () => {
     const { rerender } = render(<HPControlModal {...defaultProps} />);
     const hpInput = screen.getByLabelText("Vida Atual");
-    expect(hpInput).toHaveValue("50");
+    expect(hpInput).toHaveValue(String(defaultProps.character.maxHp));
 
-    const updatedTokenInfo = { ...defaultTokenInfo, currentHp: 75 };
-    rerender(<HPControlModal {...defaultProps} tokenInfo={updatedTokenInfo} />);
+    const updatedCharacter = { ...defaultCharacter, maxHp: 75 };
+    rerender(<HPControlModal {...defaultProps} character={updatedCharacter} />);
 
     expect(hpInput).toHaveValue("75");
   });

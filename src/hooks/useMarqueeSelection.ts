@@ -1,30 +1,30 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
+  Token, // Renomeado de GridInstance
+  GridSettings,
   MarqueeSelectionState,
   Point,
-  GridInstance,
-  Token,
-} from "../shared/types";
-import { parseTokenSize } from "../utils/board/boardUtils";
-import { GridSettings } from "../shared/types";
+  Character, // Renomeado de Token
+} from "../shared/api/types";
+import { parseTokenSize } from "../shared/lib/utils/board/boardUtils";
 
 interface UseMarqueeSelectionProps {
   activeTool: string; // Tool.SELECT
   getSVGPoint: (clientX: number, clientY: number) => Point;
-  gridInstances: GridInstance[];
-  tokens: Token[];
+  tokensOnBoard: Token[]; // Renomeado de gridInstances
+  characters: Character[]; // Renomeado de tokens
   gridSettings: GridSettings;
-  onSetMultiSelectedInstanceIds: (ids: string[]) => void;
+  onSetMultiSelectedTokenIds: (ids: string[]) => void; // Renomeado
   onClearMultiSelection: () => void;
 }
 
 export const useMarqueeSelection = ({
   activeTool,
   getSVGPoint,
-  gridInstances,
-  tokens,
+  tokensOnBoard, // Renomeado
+  characters, // Renomeado
   gridSettings,
-  onSetMultiSelectedInstanceIds,
+  onSetMultiSelectedTokenIds, // Renomeado
   onClearMultiSelection,
 }: UseMarqueeSelectionProps) => {
   const [marqueeSelection, setMarqueeSelection] =
@@ -72,15 +72,15 @@ export const useMarqueeSelection = ({
       const marqueeHeight = Math.abs(startPoint.y - currentPoint.y);
 
       const selectedIds: string[] = [];
-      gridInstances.forEach((instance) => {
-        const tokenInfo = tokens.find((t) => t.id === instance.tokenInfoId);
-        if (!tokenInfo) return;
+      tokensOnBoard.forEach((token) => { // Renomeado
+        const character = characters.find((c) => c.id === token.characterId); // Renomeado
+        if (!character) return;
 
         const [sizeMultiplierX, sizeMultiplierY] = parseTokenSize(
-          tokenInfo.size
+          character.size // Renomeado
         );
-        const tokenSvgX = instance.gridX * gridSettings.visualCellSize;
-        const tokenSvgY = instance.gridY * gridSettings.visualCellSize;
+        const tokenSvgX = token.position.x * gridSettings.visualCellSize; // Renomeado
+        const tokenSvgY = token.position.y * gridSettings.visualCellSize; // Renomeado
         const tokenWidth = sizeMultiplierX * gridSettings.visualCellSize;
         const tokenHeight = sizeMultiplierY * gridSettings.visualCellSize;
 
@@ -92,10 +92,10 @@ export const useMarqueeSelection = ({
         );
 
         if (intersects) {
-          selectedIds.push(instance.instanceId);
+          selectedIds.push(token.id); // Renomeado
         }
       });
-      onSetMultiSelectedInstanceIds(selectedIds);
+      onSetMultiSelectedTokenIds(selectedIds); // Renomeado
       setMarqueeSelection({
         isActive: false,
         startPoint: null,
@@ -105,10 +105,10 @@ export const useMarqueeSelection = ({
   }, [
     marqueeSelection,
     activeTool,
-    gridInstances,
-    tokens,
+    tokensOnBoard, // Renomeado
+    characters, // Renomeado
     gridSettings.visualCellSize,
-    onSetMultiSelectedInstanceIds,
+    onSetMultiSelectedTokenIds, // Renomeado
   ]);
 
   const clearMarquee = useCallback(() => {

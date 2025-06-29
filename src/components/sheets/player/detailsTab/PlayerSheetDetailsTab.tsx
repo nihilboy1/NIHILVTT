@@ -1,20 +1,22 @@
-import { cn } from "../../../../utils/cn";
+import { cn } from "../../../../shared/lib/utils/cn";
 
 interface PlayerSheetDetailsTabProps {
-  editingTokenNotes: string;
-  setEditingTokenNotes: (notes: string) => void;
+  editingCharacterNotes: string;
+  setEditingCharacterNotes: (notes: string) => void;
   editingInspiration: boolean;
   setEditingInspiration: (inspiration: boolean) => void;
 }
 
 export function PlayerSheetDetailsTab({
-  editingTokenNotes,
-  setEditingTokenNotes,
+  editingCharacterNotes,
+  setEditingCharacterNotes,
   editingInspiration,
   setEditingInspiration,
 }: PlayerSheetDetailsTabProps) {
   return (
-    <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]"> {/* Converted 200px to 12.5rem */}
+    <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]">
+      {" "}
+      {/* Converted 200px to 12.5rem */}
       <div>
         <label
           htmlFor="pjSheetEditingTokenNotes"
@@ -23,9 +25,9 @@ export function PlayerSheetDetailsTab({
           Notas do Personagem
         </label>
         <textarea
-          id="pjSheetEditingTokenNotes"
-          value={editingTokenNotes}
-          onChange={(e) => setEditingTokenNotes(e.target.value)}
+          id="pjSheetEditingCharacterNotes"
+          value={editingCharacterNotes}
+          onChange={(e) => setEditingCharacterNotes(e.target.value)}
           className={cn(
             "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
             "min-h-[5rem]" // Converted from 80px

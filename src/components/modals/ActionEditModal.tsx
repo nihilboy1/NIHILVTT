@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { usePlayerSheet } from "../../contexts/PlayerSheetContext";
-import { type Action } from "../../shared/types";
-import { Modal } from "../ui/Modal";
-import { useModal } from "../../contexts/ModalContext";
+import React, { useEffect, useState } from "react";
+import { usePlayerSheet } from "../../contexts/CharacterSheetContext"; // Renomeado
+import { type Action } from "../../shared/api/types";
+import { Modal } from "../../shared/ui/Modal";
+import { useModal } from "../../app/providers/ModalProvider";
 interface ActionEditModalProps {
   isOpen: boolean;
-  actionId: string; // Alterado para receber apenas o ID da ação
+  actionId: string;
   onClose: () => void;
   zIndex?: number;
-  containerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function ActionEditModal({
   isOpen,
-  actionId, // Receber actionId
+  actionId,
   onClose,
-  zIndex, // Receber zIndex
+  zIndex,
 }: ActionEditModalProps) {
   const { actions, handleActionChange, handleRemoveAction } = usePlayerSheet();
   const { openModal, closeModal } = useModal();
@@ -23,7 +22,7 @@ export function ActionEditModal({
   console.log("ActionEditModal: Renderizando com actionId:", actionId);
 
   // Encontrar a ação mais recente do contexto com base no actionId
-  const currentAction = actions.find((a) => a.id === actionId);
+  const currentAction = actions.find((a: Action) => a.id === actionId); // Adicionado tipagem para 'a'
   console.log("ActionEditModal: currentAction do contexto:", currentAction);
 
   // Estado local para a ação editada, inicializado com a ação encontrada ou um fallback
@@ -86,10 +85,9 @@ export function ActionEditModal({
           "ActionEditModal: Confirmando exclusão da ação com ID:",
           actionId
         );
-        handleRemoveAction(actionId); // Usar actionId
-        closeModal(); // Fecha o confirmationModal
-        closeModal(); // Fecha o ActionEditModal
-        // Não chame onClose aqui, pois closeModal já manipula a pilha de modais
+        handleRemoveAction(actionId);
+        closeModal();
+        closeModal();
       },
       onCancel: () => {
         closeModal();
@@ -107,7 +105,7 @@ export function ActionEditModal({
       onConfirm={handleSave}
       confirmText="Salvar"
       cancelText="Cancelar"
-      zIndex={zIndex} // Passar zIndex para o Modal
+      zIndex={zIndex}
     >
       <div className="p-4">
         <div className="mb-4">

@@ -1,19 +1,19 @@
-import { TokenType } from "../../../../shared/types";
-import { tokenTypeTranslations } from "../../../../constants";
-import { cn } from "../../../../utils/cn";
+import { CharacterType } from "../../../../shared/api/types";
+import { characterTypeTranslations } from "../../../../shared/config/constants"; // Renomeado
+import { cn } from "../../../../shared/lib/utils/cn";
 
 interface PlayerSheetConfigTabProps {
-  editingTokenImage: string;
-  setEditingTokenImage: (image: string) => void;
-  editingTokenSize: string;
-  setEditingTokenSize: (size: string) => void;
+  editingCharacterImage: string;
+  setEditingCharacterImage: (image: string) => void;
+  editingCharacterSize: string;
+  setEditingCharacterSize: (size: string) => void;
 }
 
 export function PlayerSheetConfigTab({
-  editingTokenImage,
-  setEditingTokenImage,
-  editingTokenSize,
-  setEditingTokenSize,
+  editingCharacterImage,
+  setEditingCharacterImage,
+  editingCharacterSize,
+  setEditingCharacterSize,
 }: PlayerSheetConfigTabProps) {
   return (
     <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]">
@@ -21,16 +21,16 @@ export function PlayerSheetConfigTab({
       {/* Converted 200px to 12.5rem */}
       <div>
         <label
-          htmlFor="pjSheetEditingTokenImage"
+          htmlFor="pjSheetEditingCharacterImage"
           className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
-          URL da Imagem do Token
+          URL da Imagem do Personagem
         </label>
         <input
-          id="pjSheetEditingTokenImage"
+          id="pjSheetEditingCharacterImage"
           type="text"
-          value={editingTokenImage}
-          onChange={(e) => setEditingTokenImage(e.target.value)}
+          value={editingCharacterImage}
+          onChange={(e) => setEditingCharacterImage(e.target.value)}
           placeholder="Cole a URL da imagem aqui"
           className={cn(
             "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
@@ -39,15 +39,15 @@ export function PlayerSheetConfigTab({
       </div>
       <div>
         <label
-          htmlFor="pjSheetEditingTokenSize"
+          htmlFor="pjSheetEditingCharacterSize"
           className="block text-[0.6875rem] font-medium text-accent-primary mb-px" // Converted from 11px
         >
-          Tamanho do Token (Tabuleiro)
+          Tamanho do Personagem (Tabuleiro)
         </label>
         <select
-          id="pjSheetEditingTokenSize"
-          value={editingTokenSize}
-          onChange={(e) => setEditingTokenSize(e.target.value)}
+          id="pjSheetEditingCharacterSize"
+          value={editingCharacterSize}
+          onChange={(e) => setEditingCharacterSize(e.target.value)}
           className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
         >
           <option value="1x1">1x1 (Padrão)</option>
@@ -60,11 +60,11 @@ export function PlayerSheetConfigTab({
         <label className="block text-[0.6875rem] font-medium text-accent-primary mb-px">
           {" "}
           {/* Converted from 11px */}
-          Tipo do Token
+          Tipo do Personagem
         </label>
         <input
           type="text"
-          value={tokenTypeTranslations[TokenType.PLAYER]}
+          value={characterTypeTranslations[CharacterType.PLAYER]}
           className={cn(
             "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
             "bg-surface-1 opacity-70 cursor-not-allowed"

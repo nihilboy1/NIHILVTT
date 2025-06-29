@@ -1,12 +1,12 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
-  RulerPathState,
-  RulerPointData,
-  Point,
-  RulerPlacementMode,
   GridSettings,
-} from "../shared/types";
-import { calculateDistanceInMeters } from "../utils/board/boardUtils";
+  Point,
+  RulerPathState,
+  RulerPlacementMode,
+  RulerPointData,
+} from "../shared/api/types";
+import { calculateDistanceInMeters } from "../shared/lib/utils/board/boardUtils";
 
 interface UseRulerProps {
   activeTool: string; // Tool.RULER

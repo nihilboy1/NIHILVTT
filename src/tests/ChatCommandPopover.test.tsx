@@ -3,9 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ChatCommandPopover } from '@/components/chat/ChatCommandPopover';
-import * as chatCommands from '@/lib/chatCommands'; 
+import * as chatCommands from '../components/chat/lib/chatCommands'; 
 
-jest.mock('@/lib/chatCommands');
+jest.mock('../components/chat/lib/chatCommands');
 
 const mockGetAllCommands = chatCommands.getAllCommands as jest.Mock;
 
