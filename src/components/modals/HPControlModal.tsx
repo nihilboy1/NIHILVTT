@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { type Token as TokenInfo, type Point } from "../../types"; // TokenInfo might be needed if HP is directly on instance
+import { type Token as TokenInfo, type Point } from "../../shared/types"; // TokenInfo might be needed if HP is directly on instance
 import { DetatchIcon, XMarkIcon } from "../icons"; // BranchIcon removed
 import { calculateNewHP } from "../../utils/hpUtils";
 import useDismissable from "../../hooks/useDismissable";
@@ -186,6 +186,5 @@ export function HPControlModal({
     </div>
   );
 }
-
 
 //visto

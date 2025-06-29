@@ -1,6 +1,6 @@
 
 const HEALTH_BAR_HEIGHT = 4; // Altura fixa da barra de vida
-const HEALTH_BAR_MARGIN_TOP = 2; // Margem entre a barra de vida e o topo do token
+const HEALTH_BAR_MARGIN_TOP = 5; // Margem entre a barra de vida e o topo do token (aumentado para mais distância)
 const HEALTH_BAR_CORNER_RADIUS = 1; // Raio da borda da barra de vida
 
 interface HealthBarProps {

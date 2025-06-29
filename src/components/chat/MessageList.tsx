@@ -1,10 +1,10 @@
 import React from "react";
-import { type Message, type DiceRollMessage } from "../../types/index";
+import { type Message, type DiceRollMessage } from "../../shared/types/index";
 import { DEFAULT_PLAYER_NAME } from "../../constants";
 
 interface MessageListProps {
   messages: Message[];
-  messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  messagesEndRef: React.RefObject<HTMLDivElement>;
 }
 
 // chat pripriamente dito, apenas a lista de mensagens

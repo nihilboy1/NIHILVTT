@@ -6,12 +6,12 @@ import {
   type PlayerToken,
   type MonsterNPCToken,
   type ObjectToken,
-} from "../types"; // Import all necessary token types
+} from "../shared/types"; // Import all necessary token types
 import {
   DEFAULT_TOKEN_IMAGE, // Importar a imagem padrão
   DEFAULT_TOKEN_DATA, // Importar os dados padrão do token
 } from "../constants/sheetDefaults"; // Ajustar o caminho da importação
-import { generateUniqueId } from '../utils/id/idUtils';
+import { generateUniqueId } from "../utils/id/idUtils";
 
 export interface TokensState {
   tokens: Token[]; // Changed from PlayerToken[]
@@ -46,7 +46,9 @@ export const useTokensState = (): TokensState => {
 
   const [tokens, setTokens] = useState<Token[]>(initialTokens); // Changed from PlayerToken[]
   const [gridInstances, setGridInstances] = useState<GridInstance[]>([]);
-  const [gridInstanceCounts, setGridInstanceCounts] = useState<Map<string, number>>(new Map());
+  const [gridInstanceCounts, setGridInstanceCounts] = useState<
+    Map<string, number>
+  >(new Map());
 
   const addToken = useCallback((tokenData: Omit<Token, "id">): Token => {
     const newId = generateUniqueId();
@@ -106,23 +108,21 @@ export const useTokensState = (): TokensState => {
   }, []);
 
   const deleteToken = useCallback((tokenId: string) => {
-    // Changed parameter name
     setTokens((prevTokens) =>
       prevTokens.filter((token) => token.id !== tokenId)
     );
     setGridInstances((prevInstances) =>
       prevInstances.filter((instance) => instance.tokenInfoId !== tokenId)
     );
-    setGridInstanceCounts(prevCounts => {
-        const newCounts = new Map(prevCounts);
-        newCounts.delete(tokenId);
-        return newCounts;
+    setGridInstanceCounts((prevCounts) => {
+      const newCounts = new Map(prevCounts);
+      newCounts.delete(tokenId);
+      return newCounts;
     });
   }, []);
 
   const updateToken = useCallback(
     (tokenId: string, updates: Partial<Token>) => {
-      // Changed parameter type and name
       setTokens((prevTokens) =>
         prevTokens.map((token) =>
           token.id === tokenId ? { ...token, ...updates } : token
@@ -134,7 +134,6 @@ export const useTokensState = (): TokensState => {
 
   const addGridInstance = useCallback(
     (tokenId: string, gridX: number, gridY: number): GridInstance => {
-      // Changed parameter name
       const parentTokenExists = tokens.some((token) => token.id === tokenId);
       if (!parentTokenExists) {
         const stillReferencedByInstances =
@@ -152,14 +151,14 @@ export const useTokensState = (): TokensState => {
         gridY,
       };
       setGridInstances((prevInstances) => [...prevInstances, newInstance]);
-      setGridInstanceCounts(prevCounts => {
-          const newCounts = new Map(prevCounts);
-          newCounts.set(tokenId, (newCounts.get(tokenId) || 0) + 1);
-          return newCounts;
+      setGridInstanceCounts((prevCounts) => {
+        const newCounts = new Map(prevCounts);
+        newCounts.set(tokenId, (newCounts.get(tokenId) || 0) + 1);
+        return newCounts;
       });
       return newInstance;
     },
-    [tokens, gridInstanceCounts]
+    [tokens] // Removed gridInstanceCounts from dependencies
   );
 
   const removeGridInstance = useCallback(
@@ -175,36 +174,33 @@ export const useTokensState = (): TokensState => {
         prevInstances.filter((instance) => instance.instanceId !== instanceId)
       );
 
-      setGridInstanceCounts(prevCounts => {
-          const newCounts = new Map(prevCounts);
-          const currentCount = newCounts.get(tokenInfoId) || 0;
-          if (currentCount <= 1) {
-              newCounts.delete(tokenInfoId);
-          } else {
-              newCounts.set(tokenInfoId, currentCount - 1);
+      setGridInstanceCounts((prevCounts) => {
+        const newCounts = new Map(prevCounts);
+        const currentCount = newCounts.get(tokenInfoId) || 0;
+        if (currentCount <= 1) {
+          newCounts.delete(tokenInfoId);
+          const associatedTokenInfo = tokens.find(
+            (token) => token.id === tokenInfoId
+          );
+          if (
+            associatedTokenInfo &&
+            associatedTokenInfo.name.includes("(Cópia)")
+          ) {
+            setTokens((prevTokens) =>
+              prevTokens.filter((token) => token.id !== tokenInfoId)
+            );
           }
-          return newCounts;
+        } else {
+          newCounts.set(tokenInfoId, currentCount - 1);
+        }
+        return newCounts;
       });
-
-      const associatedTokenInfo = tokens.find(
-        (token) => token.id === tokenInfoId
-      );
-
-      if (associatedTokenInfo && associatedTokenInfo.name.includes("(Cópia)")) {
-          const currentCount = gridInstanceCounts.get(tokenInfoId) || 0;
-          if (currentCount <= 1) {
-              setTokens((prevTokens) =>
-                  prevTokens.filter((token) => token.id !== tokenInfoId)
-              );
-          }
-      }
     },
-    [gridInstances, tokens, gridInstanceCounts]
+    [gridInstances, tokens] // Removed gridInstanceCounts from dependencies
   );
 
   const duplicateToken = useCallback(
     (tokenId: string): Token | null => {
-      // Changed return type and parameter name
       const originalToken = tokens.find((token) => token.id === tokenId);
       if (!originalToken) {
         console.error("TokenInfo não encontrado para duplicação:", tokenId);
@@ -245,7 +241,6 @@ export const useTokensState = (): TokensState => {
 
   const makeGridInstanceIndependent = useCallback(
     (instanceId: string): Token | null => {
-      // Changed return type
       const targetInstance = gridInstances.find(
         (inst) => inst.instanceId === instanceId
       );
@@ -258,14 +253,16 @@ export const useTokensState = (): TokensState => {
         (token) => token.id === targetInstance.tokenInfoId
       );
       if (!originalTokenInfo) {
-        console.error("Original Token not found for instance:", instanceId);
+        console.error(
+          "Original Token not found for instance:",
+          targetInstance.tokenInfoId
+        );
         return null;
       }
 
       const copiedTokenInfoData = JSON.parse(JSON.stringify(originalTokenInfo));
 
       const newIndependentToken: Token = {
-        // Changed type
         ...copiedTokenInfoData,
         id: generateUniqueId(),
         name: `${originalTokenInfo.name} (Cópia)`,
@@ -280,6 +277,27 @@ export const useTokensState = (): TokensState => {
             : instance
         )
       );
+
+      setGridInstanceCounts((prevCounts) => {
+        const newCounts = new Map(prevCounts);
+        const originalTokenId = originalTokenInfo.id;
+        const newIndependentTokenId = newIndependentToken.id;
+
+        const originalCount = newCounts.get(originalTokenId) || 0;
+        if (originalCount <= 1) {
+          newCounts.delete(originalTokenId);
+        } else {
+          newCounts.set(originalTokenId, originalCount - 1);
+        }
+
+        newCounts.set(
+          newIndependentTokenId,
+          (newCounts.get(newIndependentTokenId) || 0) + 1
+        );
+
+        return newCounts;
+      });
+
       return newIndependentToken;
     },
     [gridInstances, tokens]

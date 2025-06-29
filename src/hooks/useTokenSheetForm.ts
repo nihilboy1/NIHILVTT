@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { type Token, TokenType, type PlayerToken } from "../types/index";
-import {
-  DEFAULT_TOKEN_SIZE,
-  DEFAULT_TOKEN_HP,
-} from "../constants";
+import { type Token, TokenType, type PlayerToken } from "../shared/types/index";
+import { DEFAULT_TOKEN_SIZE, DEFAULT_TOKEN_HP } from "../constants";
 import { DEFAULT_TOKEN_IMAGE } from "../constants/sheetDefaults";
 
 export interface UseTokenSheetFormReturn {
@@ -37,7 +34,8 @@ export function useTokenSheetForm({
   onSave,
 }: UseTokenSheetFormProps): UseTokenSheetFormReturn {
   const [editingTokenName, setEditingTokenName] = useState("");
-  const [editingTokenImage, setEditingTokenImage] = useState(DEFAULT_TOKEN_IMAGE);
+  const [editingTokenImage, setEditingTokenImage] =
+    useState(DEFAULT_TOKEN_IMAGE);
   const [editingTokenSize, setEditingTokenSize] = useState(DEFAULT_TOKEN_SIZE);
   const [editingTokenType, setEditingTokenType] = useState<TokenType | null>(
     null
@@ -66,7 +64,9 @@ export function useTokenSheetForm({
       setEditingTokenNotes(initialTokenData.notes || "");
       // Apenas inicializa inspiration se for PlayerToken
       if (initialTokenData.type === TokenType.PLAYER) {
-        setEditingInspiration((initialTokenData as PlayerToken).inspiration ?? false);
+        setEditingInspiration(
+          (initialTokenData as PlayerToken).inspiration ?? false
+        );
       } else {
         setEditingInspiration(false); // Garante que seja false para outros tipos
       }
@@ -89,8 +89,7 @@ export function useTokenSheetForm({
     changed =
       changed ||
       editingTokenSize !== (initialTokenData.size || DEFAULT_TOKEN_SIZE);
-    changed =
-      changed || editingTokenType !== (initialTokenData.type || null);
+    changed = changed || editingTokenType !== (initialTokenData.type || null);
     changed =
       changed ||
       editingCurrentHp !==
@@ -98,13 +97,13 @@ export function useTokenSheetForm({
     changed =
       changed ||
       editingMaxHp !== String(initialTokenData.maxHp ?? DEFAULT_TOKEN_HP);
-    changed =
-      changed || editingTokenNotes !== (initialTokenData.notes || "");
+    changed = changed || editingTokenNotes !== (initialTokenData.notes || "");
 
     if (initialTokenData.type === TokenType.PLAYER) {
       changed =
         changed ||
-        editingInspiration !== ((initialTokenData as PlayerToken).inspiration ?? false);
+        editingInspiration !==
+          ((initialTokenData as PlayerToken).inspiration ?? false);
     }
 
     setHasTokenSheetChanged(changed);
@@ -143,25 +142,43 @@ export function useTokenSheetForm({
 
       // Validação de imagem
       const MAX_IMAGE_DIMENSION = 500;
-      if (editingTokenImage.trim() !== '' && editingTokenImage !== DEFAULT_TOKEN_IMAGE) {
+      if (
+        editingTokenImage.trim() !== "" &&
+        editingTokenImage !== DEFAULT_TOKEN_IMAGE
+      ) {
         try {
           const img = new Image();
           img.src = editingTokenImage;
 
           await new Promise<void>((resolve, reject) => {
             img.onload = () => {
-              if (img.width > MAX_IMAGE_DIMENSION || img.height > MAX_IMAGE_DIMENSION) {
-                reject(new Error(`A imagem é muito grande. Dimensões máximas permitidas: ${MAX_IMAGE_DIMENSION}x${MAX_IMAGE_DIMENSION} pixels.`));
+              if (
+                img.width > MAX_IMAGE_DIMENSION ||
+                img.height > MAX_IMAGE_DIMENSION
+              ) {
+                reject(
+                  new Error(
+                    `A imagem é muito grande. Dimensões máximas permitidas: ${MAX_IMAGE_DIMENSION}x${MAX_IMAGE_DIMENSION} pixels.`
+                  )
+                );
               } else {
                 resolve();
               }
             };
             img.onerror = () => {
-              reject(new Error("Não foi possível carregar a imagem. Verifique a URL."));
+              reject(
+                new Error(
+                  "Não foi possível carregar a imagem. Verifique a URL."
+                )
+              );
             };
           });
         } catch (error) {
-          alert(`Erro na validação da imagem: ${error instanceof Error ? error.message : "Erro desconhecido."}`);
+          alert(
+            `Erro na validação da imagem: ${
+              error instanceof Error ? error.message : "Erro desconhecido."
+            }`
+          );
           return;
         }
       }
@@ -184,7 +201,10 @@ export function useTokenSheetForm({
 
       const updatedTokenPartialData: Partial<Token> = {
         name: editingTokenName.trim(),
-        image: editingTokenImage.trim() === '' ? DEFAULT_TOKEN_IMAGE : editingTokenImage,
+        image:
+          editingTokenImage.trim() === ""
+            ? DEFAULT_TOKEN_IMAGE
+            : editingTokenImage,
         size: editingTokenSize,
         currentHp: currentHpNum,
         maxHp: maxHpNum,
@@ -193,7 +213,8 @@ export function useTokenSheetForm({
       };
 
       if (editingTokenType === TokenType.PLAYER) {
-        (updatedTokenPartialData as Partial<PlayerToken>).inspiration = editingInspiration;
+        (updatedTokenPartialData as Partial<PlayerToken>).inspiration =
+          editingInspiration;
       }
 
       onSave(updatedTokenPartialData);

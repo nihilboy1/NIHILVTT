@@ -7,15 +7,14 @@ import {
   getAllCommands,
   type CommandContext,
 } from "../../lib/chatCommands";
-import { ChatCommandPopover } from "./ChatCommandPopover";
 import { MessageList } from "./MessageList";
+import { ChatInput } from "./ChatInput"; // Importar o novo componente
 
 // inclui a caixa do chat, o popover de comandos e o formulário de envio
 export function ChatPanel() {
   const { messages, sendMessage, rollAndSendMessage, clearMessages } = useChat();
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const [isCommandPopoverOpen, setIsCommandPopoverOpen] = useState(false);
   const [commandError, setCommandError] = useState<string | null>(null);
@@ -37,39 +36,6 @@ export function ChatPanel() {
     setIsCommandPopoverOpen(false);
     setCommandError(null);
     resetHistoryNavigation();
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
-    setInputText(text);
-
-    if (text.startsWith("/")) {
-      setIsCommandPopoverOpen(true);
-    } else {
-      setIsCommandPopoverOpen(false);
-    }
-    if (commandError) {
-      setCommandError(null);
-    }
-    if (text !== inputText) {
-      resetHistoryNavigation();
-    }
-  };
-
-  const handleCommandSelect = (commandString: string) => {
-    setInputText(commandString);
-    setIsCommandPopoverOpen(false);
-    if (inputRef.current) {
-      inputRef.current.focus();
-      setTimeout(
-        () =>
-          inputRef.current?.setSelectionRange(
-            commandString.length,
-            commandString.length
-          ),
-        0
-      );
-    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -96,7 +62,7 @@ export function ChatPanel() {
         const commandContext: CommandContext = {
           rollAndSendMessage,
           sendMessage,
-          clearMessages, // Adicionar esta linha
+          clearMessages,
           getAllCommands,
         };
         commandDefinition.execute(args, commandContext);
@@ -112,84 +78,20 @@ export function ChatPanel() {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (isCommandPopoverOpen) {
-      if (e.key === "Enter") {
-        setIsCommandPopoverOpen(false);
-        return;
-      } else if (["ArrowUp", "ArrowDown", "Escape"].includes(e.key)) {
-        return;
-      }
-    }
-
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      e.preventDefault();
-      const direction = e.key === "ArrowUp" ? "up" : "down";
-      const historyEntry = navigateHistory(direction, inputText);
-      if (historyEntry !== null) {
-        setInputText(historyEntry);
-        setTimeout(
-          () =>
-            inputRef.current?.setSelectionRange(
-              historyEntry.length,
-              historyEntry.length
-            ),
-          0
-        );
-      }
-    } else if (e.key === "Escape") {
-      if (isCommandPopoverOpen) {
-        setIsCommandPopoverOpen(false);
-      }
-    }
-  };
-
   return (
     <>
       <MessageList messages={messages} messagesEndRef={messagesEndRef} />
 
-      <ChatCommandPopover
-        isOpen={isCommandPopoverOpen}
-        onClose={() => setIsCommandPopoverOpen(false)}
-        targetInputRef={inputRef}
-        onCommandSelect={handleCommandSelect}
-        inputValue={inputText}
+      <ChatInput
+        inputText={inputText}
+        setInputText={setInputText}
+        handleSubmit={handleSubmit}
+        isCommandPopoverOpen={isCommandPopoverOpen}
+        setIsCommandPopoverOpen={setIsCommandPopoverOpen}
+        commandError={commandError}
+        resetHistoryNavigation={resetHistoryNavigation}
+        navigateHistory={navigateHistory}
       />
-
-      <form onSubmit={handleSubmit} className="p-4">
-        <div className="flex space-x-2 ">
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputText}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Digite uma mensagem ou /comando..."
-            className="flex-grow p-2 border border-text-secondary rounded-md  "
-            aria-label="Entrada de mensagem do chat"
-            aria-autocomplete="list"
-            aria-expanded={isCommandPopoverOpen}
-            autoComplete="off"
-            aria-controls={
-              isCommandPopoverOpen ? "command-suggestions" : undefined
-            }
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-accent-primary cursor-pointer hover:bg-accent-primary-hover font-semibold rounded-md "
-          >
-            Enviar
-          </button>
-        </div>
-        <p
-          className={` text-xs text-text-secondary mt-1.5  min-h-[3rem] `}
-          role="alert"
-          aria-live="assertive"
-        >
-          {commandError}
-        </p>
-      </form>
     </>
   );
 }
-// ESTILO AJUSTADO

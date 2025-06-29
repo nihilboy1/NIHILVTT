@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { ToolbarButton } from "./ToolbarButton";
-import { Tool } from "../../types";
+import { Tool } from "../../shared/types";
 
 interface ToolbarPopoverButtonProps {
   label: string;
@@ -58,4 +58,4 @@ export function ToolbarPopoverButton({
       )}
     </div>
   );
-};
+}

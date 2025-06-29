@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Modal } from "../ui/Modal"; // Usar o componente Modal base
-import { TokenType } from "../../types/index"; // Importar TokenType
+import { TokenType } from "../../shared/types/index"; // Importar TokenType
 
 interface SimpleNameModalProps {
   isOpen: boolean;
@@ -83,6 +83,5 @@ export function SimpleNameModal({
     </Modal>
   );
 }
-
 
 //visto

@@ -5,10 +5,10 @@ import {
   type PageSettings,
   type GridInstance,
   type Point,
-} from "../../types/index"; // Caminho corrigido
+} from "../../shared/types/index"; // Caminho corrigido
 import { useTokenDrag } from "../../hooks/useTokenDrag"; // Caminho corrigido
 import { HealthBar } from "./HealthBar"; // Já está correto
-import {TokenVisual, type TokenMetrics } from "./TokenVisual"; // Já está correto
+import { TokenVisual, type TokenMetrics } from "./TokenVisual"; // Já está correto
 import { parseSize } from "../../utils/tokenUtils"; // Caminho corrigido
 import { getFirstName } from "../../utils/nameUtils"; // Caminho corrigido
 
@@ -28,8 +28,11 @@ interface BoardTokenProps {
   onGridInstanceDragStart: (instanceId: string) => void;
   onGridInstanceDragMove: (instanceId: string, visualSVGPoint: Point) => void; // Changed SVGPoint to Point
   onGridInstanceDragEnd: (instanceId: string) => void;
-  isMultiSelected: boolean;
+  isMultiSelected: boolean; // Manter para compatibilidade com multi-seleção via marquee
+  isTokenSelected: boolean; // Nova prop para seleção única
   onTokenDoubleClick: (instanceId: string, altKey: boolean) => void; // Nova prop para double click
+  selectedInstanceId: string | null; // Manter para passar para useTokenDrag
+  setSelectedInstanceId: (instanceId: string | null) => void; // Manter para passar para useTokenDrag
 }
 
 export function BoardToken({
@@ -45,13 +48,22 @@ export function BoardToken({
   onGridInstanceDragStart,
   onGridInstanceDragMove,
   onGridInstanceDragEnd,
-  isMultiSelected,
+  isMultiSelected, // Manter para compatibilidade
+  isTokenSelected, // Nova prop
   onTokenDoubleClick, // Adicionar nova prop
+  setSelectedInstanceId, // Manter para passar para useTokenDrag
 }: BoardTokenProps) {
   const tokenGroupRef = useRef<SVGGElement>(null);
 
   const handleSelectThisInstance = useCallback(
     (instanceId: string) => {
+      // Apenas selecionar e abrir o popover de HP se a ferramenta for SELECT
+      if (activeTool !== Tool.SELECT) {
+        return;
+      }
+
+      setSelectedInstanceId(instanceId); // Definir o token selecionado
+
       if (onGridInstanceSelectForHPModal && tokenGroupRef.current) {
         const screenRect = tokenGroupRef.current.getBoundingClientRect();
         const plainRect = screenRect
@@ -70,7 +82,7 @@ export function BoardToken({
         onGridInstanceSelectForHPModal(instanceId, plainRect);
       }
     },
-    [onGridInstanceSelectForHPModal]
+    [activeTool, setSelectedInstanceId, onGridInstanceSelectForHPModal] // Adicionar activeTool e setSelectedInstanceId
   );
 
   const handleDoubleClick = useCallback(
@@ -93,7 +105,7 @@ export function BoardToken({
     onDragStart: onGridInstanceDragStart,
     onDragMove: onGridInstanceDragMove,
     onDragEnd: onGridInstanceDragEnd,
-    onSelectInstance: handleSelectThisInstance,
+    onSelectInstance: handleSelectThisInstance, // Voltar a usar handleSelectThisInstance
   });
 
   const [sizeMultiplierX, sizeMultiplierY] = parseSize(tokenInfo.size);
@@ -101,11 +113,13 @@ export function BoardToken({
   const tokenRenderHeight = sizeMultiplierY * cellSize;
 
   const baseStrokeWidth = Math.max(0.5, 1.5 / zoomLevel); // Ensure stroke is visible
-  const strokeWidth = isMultiSelected
-    ? baseStrokeWidth + Math.max(0.3, 1 / zoomLevel)
+  const isSelected = isTokenSelected || isMultiSelected; // Determinar se o token está selecionado
+
+  const strokeWidth = isSelected
+    ? baseStrokeWidth + Math.max(0.3, 1 / zoomLevel) // Reverter para largura original, mas com baseStrokeWidth
     : baseStrokeWidth;
-  const strokeColor = isMultiSelected
-    ? "var(--color-accent-primary)"
+  const strokeColor = isSelected
+    ? "var(--color-accent-primary)" // Reverter para cor original
     : isDragging
     ? "var(--color-accent-secondary)"
     : "var(--color-border-base)";
@@ -113,18 +127,19 @@ export function BoardToken({
   // Ajustar fontSize para o nome, pode precisar de mais ajustes dependendo do visual final
   const nameplateFontSize = Math.max(8, 12 / zoomLevel);
   const cursorStyle =
-    activeTool === Tool.SELECT ? (isDragging ? "grabbing" : "grab") : "default";
+    activeTool === Tool.SELECT
+      ? isDragging
+        ? "grabbing"
+        : "pointer"
+      : "default";
 
-  const cornerRadius = Math.min(4 / zoomLevel, 4);
+  const padding = 1 / zoomLevel; // Reduzir o padding para aproximar a borda do token
 
   const tokenMetrics: TokenMetrics = useMemo(
     () => ({
       tokenRenderWidth,
       tokenRenderHeight,
       imageUrl: tokenInfo.image, // Passar a URL da imagem
-      strokeColor,
-      strokeWidth,
-      cornerRadius,
       name: tokenInfo.name, // Passar o nome completo para TokenVisual
       fontSize: nameplateFontSize, // Usar o novo fontSize para o nome
     }),
@@ -132,9 +147,6 @@ export function BoardToken({
       tokenRenderWidth,
       tokenRenderHeight,
       tokenInfo.image, // Adicionar image ao array de dependências
-      strokeColor,
-      strokeWidth,
-      cornerRadius,
       tokenInfo.name,
       nameplateFontSize,
     ]
@@ -144,9 +156,10 @@ export function BoardToken({
     () => getFirstName(tokenInfo.name),
     [tokenInfo.name]
   );
-  // Ajustar o deslocamento vertical para que o nome fique diretamente acima do token
+  // Ajustar o deslocamento vertical para que o nome fique diretamente abaixo do token
   // Considera a altura da fonte e um pequeno espaçamento
-  const nameplateYOffset = -(nameplateFontSize + 2 / zoomLevel);
+  const nameplateYOffset =
+    tokenRenderHeight + nameplateFontSize / 2 + 5 / zoomLevel; // Aumentar o espaçamento
 
   return (
     <g
@@ -182,9 +195,19 @@ export function BoardToken({
       >
         {firstName}
       </text>
+      {/* Retângulo de seleção - agora desenhado por último para ficar por cima */}
+      {isSelected && (
+        <rect
+          x={-padding}
+          y={-padding}
+          width={tokenRenderWidth + 2 * padding}
+          height={tokenRenderHeight + 2 * padding}
+          fill="none"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
+          // Remover rx e ry para tornar quadrado
+        />
+      )}
     </g>
   );
 }
-
-
-// visto

@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { Tool } from "../../types/index";
+import { Tool } from "../../shared/types/index";
 import {
   SelectIcon,
   DiceIcon,
@@ -14,6 +13,7 @@ import { useBoardSettings } from "../../contexts/BoardSettingsContext";
 import { useUI } from "../../contexts/UIContext";
 import { ToolbarButton } from "../ui/ToolbarButton";
 import { ToolbarPopoverButton } from "../ui/ToolbarPopoverButton";
+import { useToolbarState } from "../../hooks/useToolbarState"; // Importar o novo hook
 
 // barra lateral esquerda com os botões de ferramentas
 export function Toolbar() {
@@ -26,18 +26,10 @@ export function Toolbar() {
   } = useBoardSettings();
   const { activeTool, setActiveTool, setIsToolbarVisible } = useUI();
 
-  const [activePopover, setActivePopover] = useState<"ruler" | "dice" | null>(
-    null
-  );
-
-  useEffect(() => {
-    if (activeTool !== Tool.RULER && activePopover === "ruler") {
-      setActivePopover(null);
-    }
-  }, [activeTool, activePopover]);
+  const { activePopover, setActivePopover } = useToolbarState({ activeTool });
 
   return (
-    <div className="w-16 flex flex-col border-r shadow-xl py-5 space-y-3  relative">
+    <div className="w-16 flex flex-col border-r shadow-xl py-5 space-y-3 relative">
       <ToolbarButton
         label="Mover Mapa"
         icon={<PanIcon className="w-6 h-6" />}
@@ -103,4 +95,3 @@ export function Toolbar() {
     </div>
   );
 }
-// VISTO

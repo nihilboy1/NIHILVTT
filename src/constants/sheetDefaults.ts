@@ -1,4 +1,4 @@
-import { type PlayerToken } from '../types/index'; // Ajustar o caminho do tipo
+import { type PlayerToken } from "../shared/types/index"; // Ajustar o caminho do tipo
 
 export const SKILLS_CONFIG: {
   key: string;
@@ -37,13 +37,16 @@ export const SKILLS_CONFIG: {
   { key: "survival", label: "Sobrevivência", parentAttribute: "wisdom" },
 ];
 
-export const ATTRIBUTE_LABELS: Record<keyof NonNullable<PlayerToken["attributes"]>, string> = {
-  strength: 'FORÇA',
-  dexterity: 'DESTREZA',
-  constitution: 'CONSTITUIÇÃO',
-  intelligence: 'INTELIGÊNCIA',
-  wisdom: 'SABEDORIA',
-  charisma: 'CARISMA',
+export const ATTRIBUTE_LABELS: Record<
+  keyof NonNullable<PlayerToken["attributes"]>,
+  string
+> = {
+  strength: "FORÇA",
+  dexterity: "DESTREZA",
+  constitution: "CONSTITUIÇÃO",
+  intelligence: "INTELIGÊNCIA",
+  wisdom: "SABEDORIA",
+  charisma: "CARISMA",
 };
 
 export const defaultAttributes: NonNullable<PlayerToken["attributes"]> = {
@@ -64,12 +67,14 @@ export const defaultSavingThrows: NonNullable<
   wisdom: false,
   charisma: false,
 };
-import { TokenType } from '../types/index';
-import defaultTokenImage from '../assets/defaultToken.png'; // Importar a imagem diretamente
+import { TokenType } from "../shared/types/index";
+import defaultTokenImage from "../assets/defaultToken.png"; // Importar a imagem diretamente
 
 export const DEFAULT_TOKEN_IMAGE = defaultTokenImage; // Usar a URL processada pelo Vite
 
-export const defaultSkills: NonNullable<PlayerToken["proficiencies"]>["skills"] = {
+export const defaultSkills: NonNullable<
+  PlayerToken["proficiencies"]
+>["skills"] = {
   acrobatics: false,
   animalHandling: false,
   arcana: false,
@@ -91,13 +96,13 @@ export const defaultSkills: NonNullable<PlayerToken["proficiencies"]>["skills"] 
 };
 
 export const DEFAULT_TOKEN_DATA = {
-  name: 'Novo Token',
+  name: "Novo Token",
   type: TokenType.PLAYER,
   image: DEFAULT_TOKEN_IMAGE,
-  size: 'medium',
+  size: "medium",
   currentHp: 10,
   maxHp: 10,
-  notes: '',
+  notes: "",
   attributes: defaultAttributes,
   proficiencyBonus: 2,
   initiative: 0,

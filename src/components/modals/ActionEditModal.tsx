@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { usePlayerSheet } from "../../contexts/PlayerSheetContext";
-import { type Action } from "../../types";
+import { type Action } from "../../shared/types";
 import { Modal } from "../ui/Modal";
 import { useModal } from "../../contexts/ModalContext";
 interface ActionEditModalProps {
@@ -34,7 +34,10 @@ export function ActionEditModal({
 
   // Sincronizar o estado local com a ação do contexto sempre que ela mudar
   useEffect(() => {
-    console.log("ActionEditModal: useEffect - currentAction mudou:", currentAction);
+    console.log(
+      "ActionEditModal: useEffect - currentAction mudou:",
+      currentAction
+    );
     if (currentAction) {
       setEditedAction(currentAction);
     }
@@ -46,16 +49,31 @@ export function ActionEditModal({
   };
 
   const handleSave = () => {
-    console.log("ActionEditModal: handleSave chamado. editedAction:", editedAction);
+    console.log(
+      "ActionEditModal: handleSave chamado. editedAction:",
+      editedAction
+    );
     // Certifique-se de que editedAction.id não é undefined antes de salvar
     if (editedAction.id) {
-      console.log("ActionEditModal: Salvando ação com ID:", editedAction.id, "Nome:", editedAction.name, "Bônus:", editedAction.bonus, "Dano:", editedAction.damage);
+      console.log(
+        "ActionEditModal: Salvando ação com ID:",
+        editedAction.id,
+        "Nome:",
+        editedAction.name,
+        "Bônus:",
+        editedAction.bonus,
+        "Dano:",
+        editedAction.damage
+      );
       handleActionChange(editedAction.id, "name", editedAction.name);
       handleActionChange(editedAction.id, "bonus", editedAction.bonus || "");
       handleActionChange(editedAction.id, "damage", editedAction.damage || "");
       onClose();
     } else {
-      console.error("ActionEditModal: Erro: ID da ação não encontrado ao tentar salvar.", editedAction);
+      console.error(
+        "ActionEditModal: Erro: ID da ação não encontrado ao tentar salvar.",
+        editedAction
+      );
     }
   };
 
@@ -64,7 +82,10 @@ export function ActionEditModal({
       title: "Confirmar Exclusão",
       content: "Você tem certeza que deseja remover esta ação?",
       onConfirm: () => {
-        console.log("ActionEditModal: Confirmando exclusão da ação com ID:", actionId);
+        console.log(
+          "ActionEditModal: Confirmando exclusão da ação com ID:",
+          actionId
+        );
         handleRemoveAction(actionId); // Usar actionId
         closeModal(); // Fecha o confirmationModal
         closeModal(); // Fecha o ActionEditModal

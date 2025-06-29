@@ -1,11 +1,10 @@
-
-import React, { useState, useRef } from 'react';
-import { type Token as TokenInfo } from '../../types/index'; // Caminho corrigido
-import { DotsThreeVerticalIcon } from '../icons'; // Caminho corrigido
-import { useTokens } from '../../contexts/TokensContext'; // Caminho corrigido
-import {OptionsPopover} from '../ui/OptionsPopover'; // Caminho corrigido
-import { useModal } from '../../contexts/ModalContext'; // Caminho corrigido
-import { tokenTypeTranslations } from '../../constants'; // Manter importação se ainda for usada para o texto do tipo
+import React, { useState, useRef } from "react";
+import { type Token as TokenInfo } from "../../shared/types/index"; // Caminho corrigido
+import { DotsThreeVerticalIcon } from "../icons"; // Caminho corrigido
+import { useTokens } from "../../contexts/TokensContext"; // Caminho corrigido
+import { OptionsPopover } from "../ui/OptionsPopover"; // Caminho corrigido
+import { useModal } from "../../contexts/ModalContext"; // Caminho corrigido
+import { tokenTypeTranslations } from "../../constants"; // Manter importação se ainda for usada para o texto do tipo
 
 interface TokenTemplateListItemProps {
   tokenInfo: TokenInfo;
@@ -13,10 +12,10 @@ interface TokenTemplateListItemProps {
   openSheetModal: (tokenInfoId: string) => void;
 }
 
-export function TokenTemplateListItem({ 
-  tokenInfo, 
-  instanceCount, 
-  openSheetModal 
+export function TokenTemplateListItem({
+  tokenInfo,
+  instanceCount,
+  openSheetModal,
 }: TokenTemplateListItemProps) {
   const { deleteToken, duplicateToken } = useTokens();
   const { openModal, closeModal } = useModal();
@@ -24,14 +23,17 @@ export function TokenTemplateListItem({
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const popoverAnchorRef = useRef<HTMLButtonElement>(null);
 
-  const handleDragStart = (event: React.DragEvent<HTMLLIElement>, tokenInfoId: string) => {
-    event.dataTransfer.setData('application/vtt-token-info-id', tokenInfoId);
-    event.dataTransfer.effectAllowed = 'move';
-    event.currentTarget.style.opacity = '0.5';
+  const handleDragStart = (
+    event: React.DragEvent<HTMLLIElement>,
+    tokenInfoId: string
+  ) => {
+    event.dataTransfer.setData("application/vtt-token-info-id", tokenInfoId);
+    event.dataTransfer.effectAllowed = "move";
+    event.currentTarget.style.opacity = "0.5";
   };
 
   const handleDragEnd = (event: React.DragEvent<HTMLLIElement>) => {
-    event.currentTarget.style.opacity = '1';
+    event.currentTarget.style.opacity = "1";
   };
 
   const handleOpenPopover = (event: React.MouseEvent) => {
@@ -50,18 +52,19 @@ export function TokenTemplateListItem({
 
   const handleDeleteClick = () => {
     handleClosePopover(); // Fecha o popover antes de abrir o modal
-    openModal('confirmationModal', { // Passa o nome do modal e as props separadamente
-      title: 'Confirmar Exclusão',
+    openModal("confirmationModal", {
+      // Passa o nome do modal e as props separadamente
+      title: "Confirmar Exclusão",
       content: `Tem certeza que deseja excluir permanentemente o modelo "${tokenInfo.name}" e todas as suas ${instanceCount} instâncias no tabuleiro? Esta ação não pode ser desfeita.`,
-      confirmText: 'Confirmar',
-      cancelText: 'Cancelar',
+      confirmText: "Confirmar",
+      cancelText: "Cancelar",
       onConfirm: () => {
         deleteToken(tokenInfo.id);
         closeModal();
       },
       onCancel: () => {
         closeModal();
-      }
+      },
     });
   };
 
@@ -72,27 +75,38 @@ export function TokenTemplateListItem({
       draggable={true}
       onDragStart={(e) => handleDragStart(e, tokenInfo.id)}
       onDragEnd={handleDragEnd}
-      aria-label={`Modelo de token ${tokenInfo.name}. Tipo: ${tokenTypeTranslations[tokenInfo.type]}. Tamanho: ${tokenInfo.size}. ${instanceCount} instâncias no tabuleiro.`}
+      aria-label={`Modelo de token ${tokenInfo.name}. Tipo: ${
+        tokenTypeTranslations[tokenInfo.type]
+      }. Tamanho: ${tokenInfo.size}. ${instanceCount} instâncias no tabuleiro.`}
     >
       <div
         className="hover:bg-surface-0 flex items-center space-x-3 flex-grow cursor-pointer rounded -ml-1 pl-5 -my-1 py-1"
         onClick={() => openSheetModal(tokenInfo.id)}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openSheetModal(tokenInfo.id); }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") openSheetModal(tokenInfo.id);
+        }}
         aria-describedby={`token-details-${tokenInfo.id}`}
       >
         <img
-            src={tokenInfo.image}
-            alt={`Imagem do token ${tokenInfo.name}`}
-            className="w-10 h-10 rounded-sm flex-shrink-0 shadow-sm object-cover " // Adicionado object-cover para garantir que a imagem preencha o espaço
-            aria-hidden="true"
+          src={tokenInfo.image}
+          alt={`Imagem do token ${tokenInfo.name}`}
+          className="w-10 h-10 rounded-sm flex-shrink-0 shadow-sm object-cover " // Adicionado object-cover para garantir que a imagem preencha o espaço
+          aria-hidden="true"
         />
         <div className="overflow-hidden" id={`token-details-${tokenInfo.id}`}>
-          <span className=" font-bold block " title={tokenInfo.name}>{tokenInfo.name}</span>
+          <span className=" font-bold block " title={tokenInfo.name}>
+            {tokenInfo.name}
+          </span>
           <span className="text-xs text-text-secondary block mb-1">
             {tokenTypeTranslations[tokenInfo.type]} - {tokenInfo.size}
-            {instanceCount > 0 && <span className="italic text-text-secondary"> ({instanceCount} no tabuleiro)</span>}
+            {instanceCount > 0 && (
+              <span className="italic text-text-secondary">
+                {" "}
+                ({instanceCount} no tabuleiro)
+              </span>
+            )}
           </span>
         </div>
       </div>
@@ -135,6 +149,5 @@ export function TokenTemplateListItem({
     </li>
   );
 }
-
 
 // visto

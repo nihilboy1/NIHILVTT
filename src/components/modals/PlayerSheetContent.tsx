@@ -3,10 +3,10 @@ import { usePlayerSheet } from "../../contexts/PlayerSheetContext";
 import { PrincipalTab } from "../sheets/player/principalTab/PrincipalTab";
 import { PlayerSheetDetailsTab } from "../sheets/player/detailsTab/PlayerSheetDetailsTab";
 import { PlayerSheetConfigTab } from "../sheets/player/configTab/PlayerSheetConfigTab";
-import { cn } from "../../utils/cn";
-import { useModal } from "../../contexts/ModalContext"; // Importar useModal
-import { ActionEditModal } from "./ActionEditModal"; // Importar ActionEditModal
-import { PlayerToken } from "../../types"; // Importar PlayerToken
+import { useModal } from "../../contexts/ModalContext";
+import { ActionEditModal } from "./ActionEditModal";
+import { PlayerToken } from "../../shared/types";
+import { PlayerSheetTabs } from "./PlayerSheetTabs"; // Importar o novo componente
 
 type PlayerSheetTab = "principal" | "detalhes" | "configuracoes";
 
@@ -40,48 +40,22 @@ export function PlayerSheetContent({
   hasTokenSheetChanged,
 }: PlayerSheetContentProps) {
   const { getUpdatedPlayerToken } = usePlayerSheet();
-  const { modalStack, closeModal } = useModal(); // Importar useModal
+  const { modalStack, closeModal } = useModal();
   const [playerSheetActiveTab, setPlayerSheetActiveTab] =
     useState<PlayerSheetTab>("principal");
 
-  const tabButtonClass = (tabName: PlayerSheetTab) =>
-    cn(
-      "px-4 py-2 text-sm font-medium rounded-t-md  border-b-2",
-      playerSheetActiveTab === tabName
-        ? "border-accent-primary text-accent-primary bg-surface-1"
-        : "border-transparent text-text-secondary hover:bg-surface-1 hover:border-accent-primary-hover"
-    );
-
   // Helper para obter o modal ativo e suas props
-  const activeModalEntry = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
+  const activeModalEntry =
+    modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
   const activeModalName = activeModalEntry?.name;
   const activeModalProps = activeModalEntry?.props;
 
   return (
     <>
-      <div className="flex border-b border-surface-2 mb-2.5">
-        <button
-          type="button"
-          onClick={() => setPlayerSheetActiveTab("principal")}
-          className={tabButtonClass("principal")}
-        >
-          Principal
-        </button>
-        <button
-          type="button"
-          onClick={() => setPlayerSheetActiveTab("detalhes")}
-          className={tabButtonClass("detalhes")}
-        >
-          Detalhes
-        </button>
-        <button
-          type="button"
-          onClick={() => setPlayerSheetActiveTab("configuracoes")}
-          className={tabButtonClass("configuracoes")}
-        >
-          Configurações
-        </button>
-      </div>
+      <PlayerSheetTabs
+        activeTab={playerSheetActiveTab}
+        onTabChange={setPlayerSheetActiveTab}
+      />
 
       {playerSheetActiveTab === "principal" ? (
         <PrincipalTab />
@@ -112,13 +86,12 @@ export function PlayerSheetContent({
         <button
           type="submit"
           onClick={(e) => {
-            e.preventDefault(); // Prevenir o submit padrão do formulário
-            // Para PlayerToken, obtenha os dados atualizados do contexto
+            e.preventDefault();
             const updatedPlayerToken = getUpdatedPlayerToken();
             updateToken(tokenId, updatedPlayerToken);
             onClose();
           }}
-          className="px-4 py-2  text-text-primary font-semibold rounded-md  disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 text-text-primary font-semibold rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!hasTokenSheetChanged}
         >
           Salvar
@@ -130,7 +103,7 @@ export function PlayerSheetContent({
           isOpen={true}
           actionId={activeModalProps.actionId}
           onClose={closeModal}
-          zIndex={200} // Um zIndex alto para garantir que fique acima da ficha
+          zIndex={200}
         />
       )}
     </>

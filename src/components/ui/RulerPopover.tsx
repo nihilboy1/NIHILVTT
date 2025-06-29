@@ -1,7 +1,5 @@
-
-
-import React, { useEffect, useRef, useState } from 'react';
-import { RulerPlacementMode } from '../../types/index'; // Caminho corrigido
+import React, { useEffect, useRef, useState } from "react";
+import { RulerPlacementMode } from "../../shared/types/index"; // Caminho corrigido
 
 interface RulerPopoverProps {
   isOpen: boolean;
@@ -36,7 +34,6 @@ export function RulerPopover({
     }
   }, [targetRef, isOpen]);
 
-
   // Fecha o popover ao clicar fora dele
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,13 +49,12 @@ export function RulerPopover({
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen, onClose, targetRef]);
-
 
   if (!isOpen) {
     return null;
@@ -70,15 +66,19 @@ export function RulerPopover({
       className="bg-surface-1 fixed border rounded-md shadow-xl z-[60] w-56" // z-index alto e largura aumentada para o checkbox
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
       role="dialog" // Papel semântico para o popover
-      aria-label="Opções de Posicionamento da Régua" 
+      aria-label="Opções de Posicionamento da Régua"
     >
-      <div > 
+      <div>
         <button
           onClick={() => {
             onSetMode(RulerPlacementMode.SNAP_TO_CENTER);
             onClose(); // Fecha após a seleção
           }}
-          className={`w-full text-left px-4 py-2 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-opacity-50 rounded-t-md ${currentMode === RulerPlacementMode.SNAP_TO_CENTER ? 'bg-accent-primary' : 'hover:bg-accent-secondary'}`}
+          className={`w-full text-left px-4 py-2 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-opacity-50 rounded-t-md ${
+            currentMode === RulerPlacementMode.SNAP_TO_CENTER
+              ? "bg-accent-primary"
+              : "hover:bg-accent-secondary"
+          }`}
           aria-pressed={currentMode === RulerPlacementMode.SNAP_TO_CENTER} // Indica se está selecionado
           role="option"
           aria-selected={currentMode === RulerPlacementMode.SNAP_TO_CENTER}
@@ -90,20 +90,24 @@ export function RulerPopover({
             onSetMode(RulerPlacementMode.FREE_PLACEMENT);
             onClose(); // Fecha após a seleção
           }}
-          className={`w-full text-left px-4 py-2 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary  ${currentMode === RulerPlacementMode.FREE_PLACEMENT ? 'bg-accent-primary' : 'hover:bg-accent-secondary'}`}
+          className={`w-full text-left px-4 py-2 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-primary  ${
+            currentMode === RulerPlacementMode.FREE_PLACEMENT
+              ? "bg-accent-primary"
+              : "hover:bg-accent-secondary"
+          }`}
           aria-pressed={currentMode === RulerPlacementMode.FREE_PLACEMENT}
           role="option"
           aria-selected={currentMode === RulerPlacementMode.FREE_PLACEMENT}
         >
           Posicionamento Livre {/* Traduzido */}
         </button>
-        
+
         {/* Divisor */}
         <div className="border-t my-1"></div>
 
         {/* Opção para persistir o caminho da régua */}
-        <label 
-          htmlFor="persistRulerPath" 
+        <label
+          htmlFor="persistRulerPath"
           className="flex items-center px-3 py-2 text-sm cursor-pointer hover:bg-accent-secondary rounded-b-md"
         >
           <input

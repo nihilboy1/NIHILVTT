@@ -1,4 +1,4 @@
-import { type PageSettings, TokenType } from './types'; // Adicionado TokenType
+import { type PageSettings, TokenType } from "./shared/types"; // Adicionado TokenType
 
 export const GRID_CELL_SIZE = 50; // Tamanho visual padrão de uma célula da grade em pixels com zoom 1.0
 export const INITIAL_ZOOM_LEVEL = 1.0;
@@ -11,15 +11,15 @@ export const DEFAULT_METERS_PER_SQUARE = 1.5;
 export const DEFAULT_PAGE_SETTINGS: PageSettings = {
   widthInUnits: 30, // ex: 30 células de largura
   heightInUnits: 30, // ex: 30 células de altura (alterado de 20 para tornar quadrado)
-  backgroundColor: '#FFFFFF', // Padrão para um fundo de página branco
+  backgroundColor: "#FFFFFF", // Padrão para um fundo de página branco
 };
 
-export const DEFAULT_TOKEN_COLOR = '#875cad'; // Previously THEME_COLORS.ACCENT_PRIMARY; Corresponds to 'accent-primary' in Tailwind config
+export const DEFAULT_TOKEN_COLOR = "#875cad"; // Previously THEME_COLORS.ACCENT_PRIMARY; Corresponds to 'accent-primary' in Tailwind config
 export const DEFAULT_TOKEN_SIZE = "1x1";
 export const DEFAULT_TOKEN_HP = 10;
 
 // Cor da linha da grade, correspondente a 'grid-line' no tailwind.config.ts
-export const GRID_LINE_COLOR = '#000';
+export const GRID_LINE_COLOR = "#000";
 
 // Padrões para Personagens Jogadores (PJ)
 export const DEFAULT_PLAYER_LEVEL = 1;
@@ -35,7 +35,7 @@ export const tokenTypeTranslations: Record<TokenType, string> = {
 
 // O array TOKEN_TYPES não é usado diretamente para exibição na UI, os valores do enum são mapeados no TokensPanel
 // Esta constante pode ser usada para gerar opções em selects se necessário.
-export const TOKEN_TYPES_OPTIONS = Object.values(TokenType).map(type => ({
+export const TOKEN_TYPES_OPTIONS = Object.values(TokenType).map((type) => ({
   value: type,
-  label: tokenTypeTranslations[type]
+  label: tokenTypeTranslations[type],
 }));

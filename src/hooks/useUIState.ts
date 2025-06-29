@@ -1,5 +1,5 @@
-import { useState, type Dispatch, type SetStateAction } from 'react';
-import { Tool, SidebarTab } from '../types';
+import { useState, type Dispatch, type SetStateAction } from "react";
+import { Tool, SidebarTab } from "../shared/types";
 
 export interface UIState {
   activeTool: Tool;
@@ -16,16 +16,25 @@ export interface UIState {
 
 export const useUIState = (): UIState => {
   const [activeTool, setActiveTool] = useState<Tool>(Tool.SELECT);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>(SidebarTab.CHAT);
+  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>(
+    SidebarTab.CHAT
+  );
   const [isToolbarVisible, setIsToolbarVisible] = useState(true);
   const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
-  const [activePopover, setActivePopover] = useState<"ruler" | "dice" | null>(null);
+  const [activePopover, setActivePopover] = useState<"ruler" | "dice" | null>(
+    null
+  );
 
   return {
-    activeTool, setActiveTool,
-    activeSidebarTab, setActiveSidebarTab,
-    isToolbarVisible, setIsToolbarVisible,
-    isRightSidebarVisible, setIsRightSidebarVisible,
-    activePopover, setActivePopover
+    activeTool,
+    setActiveTool,
+    activeSidebarTab,
+    setActiveSidebarTab,
+    isToolbarVisible,
+    setIsToolbarVisible,
+    isRightSidebarVisible,
+    setIsRightSidebarVisible,
+    activePopover,
+    setActivePopover,
   };
 };

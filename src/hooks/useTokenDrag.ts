@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Tool, type PageSettings, type Point } from '../types'; // Changed SVGPoint to Point
+import { useState, useCallback, useEffect } from "react";
+import { Tool, type PageSettings, type Point } from "../shared/types"; // Changed SVGPoint to Point
 
 const CLICK_THRESHOLD_MS = 200;
 
@@ -20,8 +20,14 @@ interface UseTokenDragProps {
 }
 
 const parseTokenSizeForDrag = (sizeString: string): [number, number] => {
-  const parts = sizeString.split('x').map(Number);
-  if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parts[0] > 0 && parts[1] > 0) {
+  const parts = sizeString.split("x").map(Number);
+  if (
+    parts.length === 2 &&
+    !isNaN(parts[0]) &&
+    !isNaN(parts[1]) &&
+    parts[0] > 0 &&
+    parts[1] > 0
+  ) {
     return [parts[0], parts[1]];
   }
   return [1, 1];
@@ -43,9 +49,17 @@ export const useTokenDrag = ({
   onSelectInstance,
 }: UseTokenDragProps) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStartMouseOffset, setDragStartMouseOffset] = useState<{ x: number; y: number } | null>(null);
-  const [currentVisualPosition, setCurrentVisualPosition] = useState<{ x: number; y: number } | null>(null);
-  const [clickStartTimestamp, setClickStartTimestamp] = useState<number | null>(null);
+  const [dragStartMouseOffset, setDragStartMouseOffset] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [currentVisualPosition, setCurrentVisualPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [clickStartTimestamp, setClickStartTimestamp] = useState<number | null>(
+    null
+  );
 
   const handleMouseDown = useCallback(
     (event: React.MouseEvent<SVGGElement>) => {
@@ -72,59 +86,80 @@ export const useTokenDrag = ({
     const handleMouseMove = (event: MouseEvent) => {
       if (!dragStartMouseOffset || !currentVisualPosition) return;
 
-      if (!isDragging) { // First move after mousedown
+      if (!isDragging) {
+        // First move after mousedown
         setIsDragging(true);
         onDragStart(instanceId);
-        document.body.style.cursor = 'grabbing';
+        document.body.style.cursor = "grabbing";
       }
 
       const mouseSVGPoint = getSVGPoint(event.clientX, event.clientY);
       const newVisualX = mouseSVGPoint.x - dragStartMouseOffset.x;
       const newVisualY = mouseSVGPoint.y - dragStartMouseOffset.y;
       const newVisualPos = { x: newVisualX, y: newVisualY };
-      
+
       setCurrentVisualPosition(newVisualPos);
       onDragMove(instanceId, newVisualPos);
     };
 
     const handleMouseUp = (event: MouseEvent) => {
-      const timeSinceClickStart = clickStartTimestamp ? Date.now() - clickStartTimestamp : Infinity;
+      const timeSinceClickStart = clickStartTimestamp
+        ? Date.now() - clickStartTimestamp
+        : Infinity;
       setClickStartTimestamp(null);
 
-      if (document.body.style.cursor === 'grabbing') {
-        document.body.style.cursor = 'default';
+      if (document.body.style.cursor === "grabbing") {
+        document.body.style.cursor = "default";
       }
 
       if (isDragging) {
         if (currentVisualPosition) {
-          const [sizeMultiplierX, sizeMultiplierY] = parseTokenSizeForDrag(tokenSize);
+          const [sizeMultiplierX, sizeMultiplierY] =
+            parseTokenSizeForDrag(tokenSize);
           let finalGridX = Math.round(currentVisualPosition.x / cellSize);
           let finalGridY = Math.round(currentVisualPosition.y / cellSize);
-          
-          finalGridX = Math.max(0, Math.min(finalGridX, pageSettings.widthInUnits - Math.ceil(sizeMultiplierX)));
-          finalGridY = Math.max(0, Math.min(finalGridY, pageSettings.heightInUnits - Math.ceil(sizeMultiplierY)));
+
+          finalGridX = Math.max(
+            0,
+            Math.min(
+              finalGridX,
+              pageSettings.widthInUnits - Math.ceil(sizeMultiplierX)
+            )
+          );
+          finalGridY = Math.max(
+            0,
+            Math.min(
+              finalGridY,
+              pageSettings.heightInUnits - Math.ceil(sizeMultiplierY)
+            )
+          );
           onMove(instanceId, finalGridX, finalGridY);
         }
         onDragEnd(instanceId);
-      } else if (activeTool === Tool.SELECT && timeSinceClickStart < CLICK_THRESHOLD_MS && event.button === 0) {
+      } else if (
+        activeTool === Tool.SELECT &&
+        timeSinceClickStart < CLICK_THRESHOLD_MS &&
+        event.button === 0
+      ) {
+        // Chamar onSelectInstance apenas se a ferramenta for SELECT
         onSelectInstance(instanceId);
       }
 
       setIsDragging(false);
       setDragStartMouseOffset(null);
-      setCurrentVisualPosition(null); 
+      setCurrentVisualPosition(null);
     };
 
     if (dragStartMouseOffset) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      if (document.body.style.cursor === 'grabbing') {
-        document.body.style.cursor = 'default';
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      if (document.body.style.cursor === "grabbing") {
+        document.body.style.cursor = "default";
       }
     };
   }, [

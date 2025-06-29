@@ -7,6 +7,7 @@ import { ChatProvider } from "./contexts/ChatContext";
 import { BoardSettingsProvider } from "./contexts/BoardSettingsContext";
 import { UIProvider } from "./contexts/UIContext";
 import { ModalProvider } from "./contexts/ModalContext"; // Importar ModalProvider
+import { SelectedTokenProvider } from "./contexts/SelectedTokenContext"; // Importar SelectedTokenProvider
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -15,7 +16,9 @@ createRoot(document.getElementById("root")!).render(
         <BoardSettingsProvider>
           <UIProvider>
             <ModalProvider>
-              <App />
+              <SelectedTokenProvider> {/* Envolver App com SelectedTokenProvider */}
+                <App />
+              </SelectedTokenProvider>
             </ModalProvider>
           </UIProvider>
         </BoardSettingsProvider>

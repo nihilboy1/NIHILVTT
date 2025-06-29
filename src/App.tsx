@@ -17,7 +17,7 @@ import {
   type Token as TokenInfo,
   type GridInstance, // Adicionado para tipagem
   type PlayerToken, // Adicionado para tipagem
-} from "./types/index"; // Atualizado
+} from "./shared/types/index"; // Atualizado
 import {
   DEFAULT_TOKEN_COLOR,
   DEFAULT_TOKEN_SIZE,
@@ -31,6 +31,7 @@ import { useTokens } from "./contexts/TokensContext";
 import { useUI } from "./contexts/UIContext";
 import { useModal } from "./contexts/ModalContext";
 import { SheetProvider } from "./contexts/SheetContext"; // Importar SheetProvider
+import { useSelectedToken } from "./contexts/SelectedTokenContext"; // Importar o novo contexto
 
 export default function App() {
   const {
@@ -50,8 +51,7 @@ export default function App() {
     activeTool,
   } = useUI();
 
-  const { modalStack, openModal, closeModal, updateModalProps } =
-    useModal();
+  const { modalStack, openModal, closeModal, updateModalProps } = useModal();
 
   const gameBoardRef = useRef<HTMLDivElement>(null);
 
@@ -64,12 +64,20 @@ export default function App() {
   >(null);
   const [multiSelectedInstanceIds, setMultiSelectedInstanceIds] = useState<
     string[]
-  >([]);
+  >([]); // Manter para marquee selection
 
   // Helper para obter o modal ativo e suas props
-  const activeModalEntry = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
+  const activeModalEntry =
+    modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
   const activeModalName = activeModalEntry?.name;
   const activeModalProps = activeModalEntry?.props;
+
+  const { selectedInstanceId, setSelectedInstanceId } = useSelectedToken(); // Usar o novo hook de contexto
+
+  const handleClearMultiSelection = useCallback(() => {
+    setMultiSelectedInstanceIds([]); // Limpar multi-seleção
+    setSelectedInstanceId(null); // Limpar seleção única
+  }, [setSelectedInstanceId]);
 
   useEffect(() => {
     const currentHPModalInstanceId =
@@ -119,6 +127,15 @@ export default function App() {
         gridInstances.some((gi: GridInstance) => gi.instanceId === id)
       )
     );
+    // Limpar seleção única se o token selecionado for removido
+    if (
+      selectedInstanceId &&
+      !gridInstances.some(
+        (gi: GridInstance) => gi.instanceId === selectedInstanceId
+      )
+    ) {
+      setSelectedInstanceId(null);
+    }
   }, [
     tokens,
     gridInstances,
@@ -128,7 +145,17 @@ export default function App() {
     preDragHPModalInstanceId,
     activeModalProps?.instanceId,
     activeModalProps?.tokenId,
+    selectedInstanceId,
+    setSelectedInstanceId,
   ]);
+
+  // Limpar seleção e fechar modal de HP ao trocar de ferramenta
+  useEffect(() => {
+    if (activeTool !== Tool.SELECT) {
+      handleClearMultiSelection();
+      closeModal();
+    }
+  }, [activeTool, handleClearMultiSelection, closeModal]);
 
   useEffect(() => {
     if (activeModalName === "hpControl" && activeModalProps?.instanceId) {
@@ -214,26 +241,46 @@ export default function App() {
     tokenScreenRect: DOMRect | null
   ): AppPoint | null => {
     if (!tokenScreenRect) return null;
-    const modalXOffset = 5;
-    const modalYOffset =
-      -(HP_MODAL_ESTIMATED_HEIGHT_REM * 16 / 2) + tokenScreenRect.height / 2 - 15; // Convertendo rem para px (1rem = 16px)
+
+    // Ajustar a largura estimada para o modal de HP para centralização mais precisa
+    const HP_MODAL_ESTIMATED_WIDTH_PX = 10 * 16; // Ajustar estimativa para 10rem (160px)
+
+    // Centralizar horizontalmente acima do token
+    const modalX =
+      tokenScreenRect.x +
+      tokenScreenRect.width / 2 -
+      HP_MODAL_ESTIMATED_WIDTH_PX / 2;
+
+    // Posicionar acima do token e acima da barra de HP (que já está acima do token)
+    // A barra de HP tem HEALTH_BAR_HEIGHT + HEALTH_BAR_MARGIN_TOP de altura acima do token.
+    // Ajustar espaçamento para mover levemente para baixo
+    const marginAboveHPBar = 20; // Ajustar margem para 20px
+    const totalOffsetFromTokenTop =
+      HP_MODAL_ESTIMATED_HEIGHT_REM * 16 + marginAboveHPBar;
+
+    const modalY = tokenScreenRect.y - totalOffsetFromTokenTop;
+
     return {
-      x: tokenScreenRect.right + modalXOffset,
-      y: tokenScreenRect.top + modalYOffset,
+      x: modalX,
+      y: modalY,
     };
   };
 
-  const handleClearMultiSelection = useCallback(() => {
-    setMultiSelectedInstanceIds([]);
-  }, []);
-
   const handleGridInstanceSelectForHPModal = useCallback(
     (instanceId: string, tokenScreenRect: DOMRect | null) => {
+      // Apenas selecionar e abrir o popover de HP se a ferramenta for SELECT
+      if (activeTool !== Tool.SELECT) {
+        return;
+      }
+
+      // Definir o token selecionado e limpar multi-seleção
+      setSelectedInstanceId(instanceId);
+      setMultiSelectedInstanceIds([]); // Limpar multi-seleção ao selecionar um único token
+
       // Verificar se um modal de HP para este token já está aberto
       const isHpControlAlreadyOpenForToken = modalStack.some(
         (modal) =>
-          modal.name === 'hpControl' &&
-          modal.props.instanceId === instanceId
+          modal.name === "hpControl" && modal.props.instanceId === instanceId
       );
 
       if (isHpControlAlreadyOpenForToken) {
@@ -242,9 +289,14 @@ export default function App() {
 
       const anchor = calculateHPModalAnchorPoint(tokenScreenRect);
       openModal("hpControl", { instanceId, anchorPoint: anchor });
-      handleClearMultiSelection(); // Clear multi-selection when single selecting
     },
-    [openModal, handleClearMultiSelection, modalStack] // Adicionar modalStack às dependências
+    [
+      activeTool,
+      openModal,
+      modalStack,
+      setSelectedInstanceId,
+      setMultiSelectedInstanceIds,
+    ] // Adicionar setMultiSelectedInstanceIds
   );
 
   const handleHPChangeFromModal = useCallback(
@@ -269,14 +321,28 @@ export default function App() {
   const handleRemoveInstanceFromBoard = useCallback(
     (instanceId: string) => {
       removeGridInstance(instanceId);
-      if (activeModalName === "hpControl" && activeModalProps?.instanceId === instanceId) {
+      if (
+        activeModalName === "hpControl" &&
+        activeModalProps?.instanceId === instanceId
+      ) {
         closeModal();
       }
       setMultiSelectedInstanceIds((prev: string[]) =>
         prev.filter((id: string) => id !== instanceId)
       );
+      if (selectedInstanceId === instanceId) {
+        // Se o token removido era o selecionado
+        setSelectedInstanceId(null); // Limpar a seleção
+      }
     },
-    [removeGridInstance, activeModalName, activeModalProps, closeModal]
+    [
+      removeGridInstance,
+      activeModalName,
+      activeModalProps,
+      closeModal,
+      selectedInstanceId,
+      setSelectedInstanceId,
+    ]
   );
 
   const handleMakeInstanceIndependent = useCallback(
@@ -360,6 +426,15 @@ export default function App() {
         gridInstances.some((gi: GridInstance) => gi.instanceId === id)
       )
     );
+    // Limpar seleção única se o token selecionado for removido
+    if (
+      selectedInstanceId &&
+      !gridInstances.some(
+        (gi: GridInstance) => gi.instanceId === selectedInstanceId
+      )
+    ) {
+      setSelectedInstanceId(null);
+    }
   }, [
     tokens,
     gridInstances,
@@ -369,6 +444,8 @@ export default function App() {
     preDragHPModalInstanceId,
     activeModalProps?.instanceId,
     activeModalProps?.tokenId,
+    selectedInstanceId,
+    setSelectedInstanceId,
   ]);
 
   useEffect(() => {
@@ -398,7 +475,10 @@ export default function App() {
 
   const handleGridInstanceDragStart = useCallback(
     (instanceId: string) => {
-      if (activeModalName === "hpControl" && activeModalProps?.instanceId === instanceId) {
+      if (
+        activeModalName === "hpControl" &&
+        activeModalProps?.instanceId === instanceId
+      ) {
         setPreDragHPModalInstanceId(instanceId);
         closeModal();
       }
@@ -476,14 +556,23 @@ export default function App() {
           // A way to identify hp modal input if needed.
           //return; // Or, more simply, just check if any input/textarea is active
         }
-      }
+      } // Closing brace for the outer if (activeEl && ...)
       if (event.key === "Delete") {
-        if (multiSelectedInstanceIds.length > 0) {
+        if (selectedInstanceId) {
+          // Priorizar a exclusão do token selecionado individualmente
+          removeGridInstance(selectedInstanceId);
+          setSelectedInstanceId(null); // Limpar a seleção após a exclusão
+          closeModal(); // Fechar qualquer modal associado
+        } else if (multiSelectedInstanceIds.length > 0) {
+          // Se não houver seleção única, verificar multi-seleção
           multiSelectedInstanceIds.forEach((id: string) =>
             removeGridInstance(id)
           );
           handleClearMultiSelection();
-        } else if (activeModalName === "hpControl" && activeModalProps?.instanceId) {
+        } else if (
+          activeModalName === "hpControl" &&
+          activeModalProps?.instanceId
+        ) {
           removeGridInstance(activeModalProps.instanceId);
           closeModal(); // HP modal will close due to other useEffect
         }
@@ -520,7 +609,6 @@ export default function App() {
   const showButtonStyle =
     "fixed top-1/2 -translate-y-1/2 z-30 p-2 bg-surface-1 hover:bg-border-base rounded-md shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-border-strong";
 
- 
   const handleBoardBackgroundClick = () => {
     closeModal(); // Fechar qualquer modal aberto
     handleClearMultiSelection();
@@ -528,12 +616,28 @@ export default function App() {
 
   const handleSetMultiSelectedInstanceIds = useCallback(
     (ids: string[]) => {
-      setMultiSelectedInstanceIds(ids);
-      if (ids.length > 0) {
-        closeModal(); // Fechar modal de seleção única de HP se multi-selecionando
+      setMultiSelectedInstanceIds(ids); // Definir a seleção de arrasto
+
+      if (ids.length === 1) {
+        // Se apenas um token foi selecionado via arrasto, tratá-lo como seleção única
+        setSelectedInstanceId(ids[0]);
+        // Abrir o modal de HP para este token
+        const instance = gridInstances.find((gi) => gi.instanceId === ids[0]);
+        if (instance) {
+          const domElement = gameBoardRef.current?.querySelector(
+            `[data-instance-id="${ids[0]}"]`
+          );
+          const screenRect = domElement?.getBoundingClientRect() ?? null;
+          const anchor = calculateHPModalAnchorPoint(screenRect);
+          openModal("hpControl", { instanceId: ids[0], anchorPoint: anchor });
+        }
+      } else {
+        // Se zero ou mais de um token foram selecionados via arrasto
+        setSelectedInstanceId(null); // Limpar seleção única
+        closeModal(); // Fechar qualquer modal aberto
       }
     },
-    [closeModal]
+    [closeModal, setSelectedInstanceId, openModal, gridInstances] // Adicionar gridInstances
   );
 
   return (
@@ -552,7 +656,6 @@ export default function App() {
           <ChevronRightIcon className=" w-6 h-6 text-text-primary" />
         </button>
       )}
-
       <GameBoard
         onGridInstanceSelectForHPModal={handleGridInstanceSelectForHPModal}
         onBackgroundClick={handleBoardBackgroundClick}
@@ -567,6 +670,8 @@ export default function App() {
         multiSelectedInstanceIds={multiSelectedInstanceIds}
         onSetMultiSelectedInstanceIds={handleSetMultiSelectedInstanceIds}
         onClearMultiSelection={handleClearMultiSelection}
+        selectedInstanceId={selectedInstanceId}
+        setSelectedInstanceId={setSelectedInstanceId}
       />
 
       {isRightSidebarVisible ? (
@@ -639,7 +744,8 @@ export default function App() {
             );
             const tokenInfoForHPModal = selectedGridInstanceForHP
               ? tokens.find(
-                  (t: TokenInfo) => t.id === selectedGridInstanceForHP.tokenInfoId
+                  (t: TokenInfo) =>
+                    t.id === selectedGridInstanceForHP.tokenInfoId
                 )
               : null;
 

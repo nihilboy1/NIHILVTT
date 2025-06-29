@@ -1,4 +1,4 @@
-import { TokenType } from "../../types/index"; // Ajustar o caminho do tipo
+import { TokenType } from "../../shared/types/index"; // Ajustar o caminho do tipo
 import { TokenTemplateListItem } from "../token/TokenTemplateListItem"; // Ajustar o caminho do componente
 import { GiAncientSword, GiNinjaHeroicStance } from "react-icons/gi";
 
@@ -11,7 +11,7 @@ export function TokensPanel() {
   const { openModal } = useModal();
 
   return (
-    <div className="flex-grow p-4 overflow-y-scroll space-y-6 ">
+    <div className="flex-grow p-4 overflow-y-scroll space-y-6 hide-scrollbar">
       <div>
         <h3 className="text-lg font-semibold  mb-4">
           Criar Novo Modelo de Token

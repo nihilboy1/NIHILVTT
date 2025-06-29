@@ -1,4 +1,4 @@
-import { TokenType } from "../../../../types";
+import { TokenType } from "../../../../shared/types";
 import { tokenTypeTranslations } from "../../../../constants";
 import { cn } from "../../../../utils/cn";
 
@@ -16,7 +16,9 @@ export function PlayerSheetConfigTab({
   setEditingTokenSize,
 }: PlayerSheetConfigTabProps) {
   return (
-    <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]"> {/* Converted 200px to 12.5rem */}
+    <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]">
+      {" "}
+      {/* Converted 200px to 12.5rem */}
       <div>
         <label
           htmlFor="pjSheetEditingTokenImage"
@@ -55,7 +57,9 @@ export function PlayerSheetConfigTab({
         </select>
       </div>
       <div>
-        <label className="block text-[0.6875rem] font-medium text-accent-primary mb-px"> {/* Converted from 11px */}
+        <label className="block text-[0.6875rem] font-medium text-accent-primary mb-px">
+          {" "}
+          {/* Converted from 11px */}
           Tipo do Token
         </label>
         <input

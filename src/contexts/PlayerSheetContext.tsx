@@ -5,7 +5,12 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import { type PlayerToken, type Action, type HitDiceEntry } from "../types";
+import {
+  type PlayerToken,
+  type Action,
+  type HitDiceEntry,
+  type FeatureOrTrait,
+} from "../shared/types";
 import { SKILLS_CONFIG } from "../constants/sheetDefaults";
 
 interface PlayerSheetContextType {
@@ -70,10 +75,8 @@ interface PlayerSheetContextType {
     field: keyof NonNullable<PlayerToken["attacks"]>[number],
     value: string
   ) => void; // Adicionado
-  featuresAndTraits: PlayerToken["featuresAndTraits"];
-  setFeaturesAndTraits: React.Dispatch<
-    React.SetStateAction<PlayerToken["featuresAndTraits"]>
-  >;
+  featuresAndTraits: FeatureOrTrait[]; // Alterado para garantir que não seja undefined
+  setFeaturesAndTraits: React.Dispatch<React.SetStateAction<FeatureOrTrait[]>>; // Alterado para garantir que não seja undefined
   SKILLS_CONFIG: {
     key: string;
     label: string;
@@ -204,7 +207,7 @@ export function PlayerSheetProvider({
     initialToken.attacks || []
   ); // Adicionado
   const [featuresAndTraits, setFeaturesAndTraits] = useState<
-    PlayerToken["featuresAndTraits"]
+    NonNullable<PlayerToken["featuresAndTraits"]>
   >(initialToken.featuresAndTraits || []);
 
   // Efeito para sincronizar o estado interno com as props do token inicial

@@ -1,4 +1,4 @@
-import { TokenType } from "../../../types";
+import { TokenType } from "../../../shared/types";
 import { TOKEN_TYPES_OPTIONS } from "../../../constants";
 import { cn } from "../../../utils/cn";
 
@@ -36,7 +36,9 @@ export function CreatureSheet({
   setEditingTokenSize,
 }: CreatureSheetProps) {
   return (
-    <div className="p-0.5 space-y-3 overflow-y-auto max-h-[calc(100vh-12.5rem)]"> {/* Converted 200px to 12.5rem */}
+    <div className="p-0.5 space-y-3 overflow-y-auto max-h-[calc(100vh-12.5rem)]">
+      {" "}
+      {/* Converted 200px to 12.5rem */}
       <div>
         <label
           htmlFor="editingTokenName"

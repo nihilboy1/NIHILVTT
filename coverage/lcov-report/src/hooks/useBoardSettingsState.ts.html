@@ -116,10 +116,33 @@
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
 <a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -139,8 +162,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -151,14 +191,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -169,10 +201,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
-import { useState, useCallback } from 'react';
-import { type GridSettings, type PageSettings, RulerPlacementMode } from '../types';
-import { GRID_CELL_SIZE, DEFAULT_METERS_PER_SQUARE, DEFAULT_PAGE_SETTINGS } from '../constants';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useState, useCallback } from "react";
+import {
+  type GridSettings,
+  type PageSettings,
+  RulerPlacementMode,
+} from "../shared/types";
+import {
+  GRID_CELL_SIZE,
+  DEFAULT_METERS_PER_SQUARE,
+  DEFAULT_PAGE_SETTINGS,
+} from "../constants";
 &nbsp;
 export interface BoardSettingsState {
   gridSettings: GridSettings;
@@ -188,20 +227,29 @@ export interface BoardSettingsState {
 export const useBoardSettingsState = (): BoardSettingsState =&gt; {
   const [gridSettings, setGridSettingsState] = useState&lt;GridSettings&gt;({
     visualCellSize: GRID_CELL_SIZE,
-    lineColor: '#788475', // Corresponds to 'grid-line' in Tailwind config
+    lineColor: "#788475", // Corresponds to 'grid-line' in Tailwind config
     metersPerSquare: DEFAULT_METERS_PER_SQUARE,
   });
-  const [pageSettings, setPageSettingsState] = useState&lt;PageSettings&gt;(DEFAULT_PAGE_SETTINGS);
-  const [rulerPlacementMode, setRulerPlacementModeState] = useState&lt;RulerPlacementMode&gt;(RulerPlacementMode.SNAP_TO_CENTER);
+  const [pageSettings, setPageSettingsState] = useState&lt;PageSettings&gt;(
+    DEFAULT_PAGE_SETTINGS
+  );
+  const [rulerPlacementMode, setRulerPlacementModeState] =
+    useState&lt;RulerPlacementMode&gt;(RulerPlacementMode.SNAP_TO_CENTER);
   const [rulerPersists, setRulerPersistsState] = useState&lt;boolean&gt;(false);
 &nbsp;
-  const updateGridSettings = useCallback((newSettings: Partial&lt;GridSettings&gt;) =&gt; {
-    setGridSettingsState(prev =&gt; ({ ...prev, ...newSettings }));
-  }, []);
+  const updateGridSettings = useCallback(
+    (newSettings: Partial&lt;GridSettings&gt;) =&gt; {
+      setGridSettingsState((prev) =&gt; ({ ...prev, ...newSettings }));
+    },
+    []
+  );
 &nbsp;
-  const updatePageSettings = useCallback((newSettings: Partial&lt;PageSettings&gt;) =&gt; {
-    setPageSettingsState(prev =&gt; ({ ...prev, ...newSettings }));
-  }, []);
+  const updatePageSettings = useCallback(
+    (newSettings: Partial&lt;PageSettings&gt;) =&gt; {
+      setPageSettingsState((prev) =&gt; ({ ...prev, ...newSettings }));
+    },
+    []
+  );
 &nbsp;
   const setRulerPlacementMode = useCallback((mode: RulerPlacementMode) =&gt; {
     setRulerPlacementModeState(mode);
@@ -229,7 +277,7 @@ export const useBoardSettingsState = (): BoardSettingsState =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-27T22:18:50.318Z
+                at 2025-06-29T01:31:20.913Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

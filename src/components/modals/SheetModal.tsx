@@ -1,5 +1,5 @@
 import { useTokens } from "../../contexts/TokensContext";
-import { TokenType, type PlayerToken } from "../../types";
+import { TokenType, type PlayerToken } from "../../shared/types";
 import { InteractiveModal } from "../ui/InteractiveModal";
 import { useTokenSheetForm } from "../../hooks/useTokenSheetForm";
 import { CreatureSheet } from "../sheets/creature/CreatureSheet";
@@ -59,13 +59,31 @@ export function SheetModal({
 
   // Posição inicial centralizada com um pequeno offset
   const initialPosition = {
-    x: Math.max(0, (window.innerWidth - (initialTokenData?.type === TokenType.PLAYER ? 750 : 450)) / 2 + 30),
-    y: Math.max(0, (window.innerHeight - (initialTokenData?.type === TokenType.PLAYER ? ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT : 620)) / 2 + 30),
+    x: Math.max(
+      0,
+      (window.innerWidth -
+        (initialTokenData?.type === TokenType.PLAYER ? 750 : 450)) /
+        2 +
+        30
+    ),
+    y: Math.max(
+      0,
+      (window.innerHeight -
+        (initialTokenData?.type === TokenType.PLAYER
+          ? ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT
+          : 620)) /
+        2 +
+        30
+    ),
   };
 
   // Largura e altura iniciais baseadas no tipo de token
-  const initialModalWidth = initialTokenData?.type === TokenType.PLAYER ? 750 : 450;
-  const initialModalHeight = initialTokenData?.type === TokenType.PLAYER ? ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT : 620;
+  const initialModalWidth =
+    initialTokenData?.type === TokenType.PLAYER ? 750 : 450;
+  const initialModalHeight =
+    initialTokenData?.type === TokenType.PLAYER
+      ? ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT
+      : 620;
 
   if (!tokenId || editingTokenType === null || !isOpen) {
     return null;
@@ -95,7 +113,8 @@ export function SheetModal({
       zIndex={zIndex}
     >
       <form onSubmit={handleSave} className="space-y-0.5 bg-surface-0 ">
-        {editingTokenType === TokenType.PLAYER && initialTokenData?.type === TokenType.PLAYER ? (
+        {editingTokenType === TokenType.PLAYER &&
+        initialTokenData?.type === TokenType.PLAYER ? (
           <PlayerSheetProvider
             initialToken={initialTokenData as PlayerToken}
             setToken={(updatedPlayerToken) => {

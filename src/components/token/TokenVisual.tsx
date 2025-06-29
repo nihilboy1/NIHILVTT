@@ -2,9 +2,6 @@ export interface TokenMetrics {
   tokenRenderWidth: number;
   tokenRenderHeight: number;
   imageUrl: string; // Nova propriedade para a URL da imagem
-  strokeColor: string;
-  strokeWidth: number;
-  cornerRadius: number;
   name: string; // Adicionado para o nome completo
   fontSize: number; // Mantido para o novo nome, pode ser ajustado
 }
