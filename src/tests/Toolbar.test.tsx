@@ -1,9 +1,9 @@
-import { Toolbar } from "@/widgets/Toolbar";
+import { Toolbar } from "@/widgets/toolBar/ui/Toolbar";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { BoardSettingsContext } from "../contexts/BoardSettingsContext";
 import { ChatContext } from "../contexts/ChatContext";
-import { type BoardSettingsState } from "../hooks/useBoardSettingsState";
+import { BoardSettingsContext } from "../features/boardSettings/contexts/BoardSettingsContext";
+import { type BoardSettingsState } from "../features/boardSettings/hooks/useBoardSettingsState";
 import { type ChatState } from "../hooks/useChatState";
 import { RulerPlacementMode, SidebarTab, Tool } from "../shared/api/types";
 import {

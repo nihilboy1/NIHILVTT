@@ -1,7 +1,10 @@
-import { DEFAULT_TOKEN_HP, DEFAULT_TOKEN_SIZE } from "@/shared/config/constants";
-import { DEFAULT_TOKEN_IMAGE } from "@/constants/sheetDefaults";
-import { useCharacterSheetForm } from "@/hooks/useCharacterSheetForm";
+import { useCharacterSheetForm } from "@/entities/character/model/hooks/useCharacterSheetForm";
 import { CharacterType } from "@/shared/api/types";
+import {
+  DEFAULT_TOKEN_HP,
+  DEFAULT_TOKEN_SIZE,
+} from "@/shared/config/constants";
+import { DEFAULT_TOKEN_IMAGE } from "@/shared/config/sheetDefaults";
 import { act, renderHook } from "@testing-library/react";
 
 // Mock para a classe Image, para evitar erros de ambiente de teste
@@ -57,7 +60,10 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
 
     expect(result.current.editingCharacterName).toBe("Test Character");
@@ -85,11 +91,17 @@ describe("useCharacterSheetForm", () => {
       inspiration: true,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: playerCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: playerCharacter,
+        onSave: mockOnSave,
+      })
     );
     expect(result.current.editingInspiration).toBe(true);
 
-    const playerCharacterNoInspiration = { ...playerCharacter, inspiration: false };
+    const playerCharacterNoInspiration = {
+      ...playerCharacter,
+      inspiration: false,
+    };
     const { result: result2 } = renderHook(() =>
       useCharacterSheetForm({
         initialCharacterData: playerCharacterNoInspiration,
@@ -112,7 +124,10 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
 
     expect(result.current.hasCharacterSheetChanged).toBe(false);
@@ -146,7 +161,10 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
 
     act(() => {
@@ -214,7 +232,10 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
 
     act(() => {
@@ -275,7 +296,10 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
     const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
 
@@ -308,11 +332,16 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
 
     act(() => {
-      result.current.setEditingCharacterImage("http://example.com/valid-image.png");
+      result.current.setEditingCharacterImage(
+        "http://example.com/valid-image.png"
+      );
     });
 
     // Simula o carregamento bem-sucedido da imagem com dimensões válidas
@@ -350,11 +379,16 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
 
     act(() => {
-      result.current.setEditingCharacterImage("http://example.com/large-image.png");
+      result.current.setEditingCharacterImage(
+        "http://example.com/large-image.png"
+      );
     });
 
     mockImage.width = 600; // Maior que MAX_IMAGE_DIMENSION (500)
@@ -392,7 +426,10 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
 
     act(() => {
@@ -433,7 +470,10 @@ describe("useCharacterSheetForm", () => {
       challengeRating: 5,
     };
     const { result } = renderHook(() =>
-      useCharacterSheetForm({ initialCharacterData: initialCharacter, onSave: mockOnSave })
+      useCharacterSheetForm({
+        initialCharacterData: initialCharacter,
+        onSave: mockOnSave,
+      })
     );
 
     act(() => {

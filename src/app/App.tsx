@@ -1,14 +1,17 @@
 // src/app/App.tsx (versão idealizada)
-import { Toolbar } from "../widgets/Toolbar";
-import { RightSidebar } from "../widgets/RightSidebar";
 import { GameBoardPage } from "../pages/GameBoardPage"; // A página conteria a lógica do tabuleiro
+import { RightSidebar } from "../widgets/RightSidebar";
+import { Toolbar } from "../widgets/toolBar/ui/Toolbar";
+import { useUI } from "./providers/UIProvider"; // Importar o hook useUI
+
 export default function App() {
-  // Quase nenhum estado ou lógica aqui!
+  const { isToolbarVisible, isRightSidebarVisible } = useUI(); // Obter estados de visibilidade
+
   return (
-    <div className="flex h-screen ...">
-      <Toolbar />
-      <GameBoardPage /> {/* A página agora é autossuficiente */}
-      <RightSidebar />
+    <div className="flex h-screen">
+      {isToolbarVisible && <Toolbar />}
+      <GameBoardPage />
+      {isRightSidebarVisible && <RightSidebar />}
     </div>
   );
 }

@@ -78,7 +78,7 @@ export function InteractiveModal({
     top: 0,
     right:
       window.innerWidth - (typeof width === "number" ? width : initialWidth),
-    bottom: window.innerHeight - HEADER_HEIGHT_REM * 16,
+    bottom: window.innerHeight - HEADER_HEIGHT_REM * 16, // O arraste para quando o header encontra a barra inferior
   });
 
   useEffect(() => {
@@ -87,23 +87,25 @@ export function InteractiveModal({
         const containerRect = containerRef.current.getBoundingClientRect();
         const modalRect = modalRef.current.getBoundingClientRect();
 
-        setDraggableBounds({
+        const newBounds = {
           left: containerRect.left,
           top: containerRect.top,
           right: containerRect.right - modalRect.width,
-          bottom: containerRect.bottom - HEADER_HEIGHT_REM * 16, // Garante que o header esteja sempre visível
-        });
+          bottom: Math.max(0, containerRect.bottom - modalRect.height), // Garante que o modal inteiro esteja visível e o limite não seja negativo
+        };
+        setDraggableBounds(newBounds);
       } else {
         // Fallback para o viewport se containerRef não estiver disponível
-        setDraggableBounds({
+        const newBounds = {
           left: 0,
           top: 0,
           right:
             window.innerWidth -
             (modalRef.current?.offsetWidth ||
               (typeof width === "number" ? width : initialWidth)),
-          bottom: window.innerHeight - HEADER_HEIGHT_REM * 16,
-        });
+          bottom: Math.max(0, window.innerHeight - (modalRef.current?.offsetHeight || (typeof height === "number" ? height : initialHeight as number))), // Garante que o modal inteiro esteja visível e o limite não seja negativo
+        };
+        setDraggableBounds(newBounds);
       }
     };
 
@@ -174,13 +176,11 @@ export function InteractiveModal({
           resizeData;
         let newWidth = startWidth;
         let newHeight = startHeight;
-        let newX = position.x;
-        let newY = position.y;
 
         const deltaX = event.clientX - startX;
         const deltaY = event.clientY - startY;
 
-        // Calcular novas dimensões e posição
+        // Calcular novas dimensões
         if (direction.includes("e")) {
           newWidth = startWidth + deltaX;
         }
@@ -189,46 +189,23 @@ export function InteractiveModal({
         }
         if (direction.includes("w")) {
           newWidth = startWidth - deltaX;
-          newX = position.x + deltaX; // Mover a posição X
         }
         if (direction.includes("n")) {
           newHeight = startHeight - deltaY;
-          newY = position.y + deltaY; // Mover a posição Y
         }
 
         // Aplicar limites de min/max para largura e altura
         newWidth = Math.min(maxWidth, Math.max(minWidth, newWidth));
         newHeight = Math.min(maxHeight, Math.max(minHeight, newHeight));
 
-        // Ajustar a posição X e Y para garantir que o modal não saia da tela
-        // e que o redimensionamento a partir do topo/esquerda funcione corretamente
-        if (direction.includes("w")) {
-          // Se a nova largura for menor que a mínima, ajustar newX para manter a largura mínima
-          if (newWidth === minWidth && startWidth - deltaX > minWidth) {
-            newX = position.x + (startWidth - minWidth);
-          }
-          // Clamp newX to prevent going off-screen left
-          newX = Math.max(0, newX);
-        }
-        if (direction.includes("n")) {
-          // Se a nova altura for menor que a mínima, ajustar newY para manter a altura mínima
-          if (newHeight === minHeight && startHeight - deltaY > minHeight) {
-            newY = position.y + (startHeight - minHeight);
-          }
-          // Clamp newY to prevent going off-screen top
-          newY = Math.max(0, newY);
-        }
-
         // Atualizar estados
         setWidth(newWidth);
         setHeight(newHeight);
-        setPosition({ x: newX, y: newY });
       }
     },
     [
       isResizing,
       resizeData,
-      position,
       minWidth,
       minHeight,
       maxWidth,
@@ -296,7 +273,7 @@ export function InteractiveModal({
     // Define a posição do modal minimizado para o canto inferior esquerdo, com um pequeno offset
     // O offset de 16px (1rem) para X e 40px (2.5rem) para Y é um palpite baseado na imagem
     // para posicionar acima da barra de tarefas e com um pequeno padding.
-    const offsetBottom = 25; // Ajuste conforme a altura da barra de tarefas ou preferência
+    const offsetBottom = 28; // Ajuste conforme a altura da barra de tarefas ou preferência
     const offsetLeft = 75; // Ajuste para o padding esquerdo
 
     const newMinimizedX = offsetLeft;

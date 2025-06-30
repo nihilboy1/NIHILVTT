@@ -10,7 +10,7 @@ export function RightSidebar() {
 
   return (
     <div
-      className="w-80 md:w-96 flex flex-col shadow-xl border-l"
+      className="bg-surface-0 w-80 md:w-96 flex flex-col shadow-xl border-l fixed right-0 top-0 bottom-0 z-50 h-full"
       role="tablist"
       aria-orientation="horizontal"
     >

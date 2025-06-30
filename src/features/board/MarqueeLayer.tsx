@@ -1,5 +1,5 @@
+import { useGameBoard } from "../../widgets/gameBoard/model/contexts/GameBoardContext";
 import React from "react";
-import { useGameBoard } from "../../contexts/GameBoardContext";
 
 export const MarqueeLayer: React.FC = () => {
   const { marqueeSelection, zoomLevel } = useGameBoard();

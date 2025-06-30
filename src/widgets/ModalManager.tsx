@@ -1,16 +1,13 @@
-import { HPControlModal } from "../components/modals/HPControlModal";
-import { SimpleNameModal } from "../components/modals/SimpleNameModal";
+import { HPControlModal } from "../features/characterUpdateHp/ui/HPControlModal";
 
-import { SheetModal } from "../components/sheets/player/SheetModal";
-import { DEFAULT_TOKEN_IMAGE } from "../constants/sheetDefaults";
-import { useGameBoardInteractionContext } from "../contexts/GameBoardInteractionContext";
-import { SheetProvider } from "../contexts/SheetContext";
-import { useCharacters } from "../contexts/CharactersContext"; // Renomeado
+import { useModal } from "../app/providers/ModalProvider";
+import { ModalEntry } from "../app/providers/useModalStateManagement"; // Importar ModalEntry
+import { useCharacters } from "../entities/character/model/contexts/CharactersContext"; // Renomeado
 import {
   CharacterType,
-  type Token,
-  type PlayerCharacter,
   type Character,
+  type PlayerCharacter,
+  type Token,
 } from "../shared/api/types";
 import {
   DEFAULT_PLAYER_INSPIRATION,
@@ -18,9 +15,12 @@ import {
   DEFAULT_TOKEN_HP,
   DEFAULT_TOKEN_SIZE,
 } from "../shared/config/constants";
+import { DEFAULT_TOKEN_IMAGE } from "../shared/config/sheetDefaults";
 import { ConfirmationModal } from "../shared/ui/ConfirmationModal";
-import { useModal } from "../app/providers/ModalProvider";
-import { ModalEntry } from "../app/providers/useModalStateManagement"; // Importar ModalEntry
+import { useGameBoardInteractionContext } from "./gameBoard/model/contexts/GameBoardInteractionContext";
+import { SheetModal } from "./sheetModal/ui/SheetModal";
+import { SimpleNameModal } from "../features/characterCreation/ui/SimpleNameModal";
+import { SheetProvider } from "./sheetModal/model/contexts/SheetContext";
 
 export function ModalManager() {
   const {
@@ -29,7 +29,8 @@ export function ModalManager() {
     handleMakeInstanceIndependent,
   } = useGameBoardInteractionContext();
   const { modalStack, openModal, closeModal } = useModal();
-  const { characters, tokensOnBoard, addCharacter, updateCharacter } = useCharacters(); // Renomeado
+  const { characters, tokensOnBoard, addCharacter, updateCharacter } =
+    useCharacters(); // Renomeado
 
   const handleSaveNewTokenName = (
     name: string,
@@ -90,11 +91,6 @@ export function ModalManager() {
         const { name, props } = modalEntry;
         const isTopModal = index === modalStack.length - 1;
 
-        // Renderiza apenas o modal no topo da pilha
-        if (!isTopModal) {
-          return null;
-        }
-
         switch (name) {
           case "simpleName":
             return (
@@ -109,7 +105,8 @@ export function ModalManager() {
               />
             );
           case "sheet":
-            const foundCharacter = characters.find( // Renomeado
+            const foundCharacter = characters.find(
+              // Renomeado
               (c: Character) => c.id === props.characterId
             );
             const initialCharacterData =
@@ -139,11 +136,13 @@ export function ModalManager() {
           case "actionEdit":
             return null;
           case "hpControl":
-            const selectedTokenForHP = tokensOnBoard.find( // Renomeado
+            const selectedTokenForHP = tokensOnBoard.find(
+              // Renomeado
               (t: Token) => t.id === props.tokenId
             );
             const characterForHPModal = selectedTokenForHP
-              ? characters.find( // Renomeado
+              ? characters.find(
+                  // Renomeado
                   (c: Character) => c.id === selectedTokenForHP.characterId
                 )
               : null;
@@ -159,7 +158,8 @@ export function ModalManager() {
                   anchorPoint={props.anchorPoint as { x: number; y: number }}
                   isOpen={isTopModal}
                   onClose={closeModal}
-                  onHPChange={(tokenId, newHP) => { // Renomeado
+                  onHPChange={(tokenId, newHP) => {
+                    // Renomeado
                     if (tokenId) {
                       handleHPChangeFromModal(tokenId as string, newHP); // Renomeado
                     }

@@ -1,4 +1,4 @@
-import { HPControlModal } from "@/components/modals/HPControlModal";
+import { HPControlModal } from "@/features/characterUpdateHp/ui/HPControlModal";
 import { CharacterType } from "@/shared/api/types"; // Importar TokenType
 import useDismissable from "@/shared/lib/hooks/useDismissable";
 import { calculateNewHP } from "@/shared/lib/utils/hpUtils";
@@ -111,7 +111,9 @@ describe("HPControlModal", () => {
         const value = parseInt(valueStr, 10);
 
         if (!isNaN(value) && value >= 0) {
-          newCalculatedHP = isPositive ? _currentHP + value : _currentHP - value;
+          newCalculatedHP = isPositive
+            ? _currentHP + value
+            : _currentHP - value;
         } else {
           return null;
         }
@@ -134,8 +136,12 @@ describe("HPControlModal", () => {
       screen.getByRole("dialog", { name: "Controle de Vida" })
     ).toBeInTheDocument();
     // O input de HP é inicializado com o maxHp do character, não currentHp
-    expect(screen.getByLabelText("Vida Atual")).toHaveValue(String(defaultProps.character.maxHp));
-    expect(screen.getByTestId("max-hp-display")).toHaveTextContent(String(defaultProps.character.maxHp)); // Usar data-testid
+    expect(screen.getByLabelText("Vida Atual")).toHaveValue(
+      String(defaultProps.character.maxHp)
+    );
+    expect(screen.getByTestId("max-hp-display")).toHaveTextContent(
+      String(defaultProps.character.maxHp)
+    ); // Usar data-testid
     expect(screen.getByTitle("Tornar Token Independente")).toBeInTheDocument();
     expect(screen.getByTitle("Remover do Tabuleiro")).toBeInTheDocument();
   });

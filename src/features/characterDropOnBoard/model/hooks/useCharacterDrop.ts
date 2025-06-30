@@ -1,0 +1,79 @@
+import { Character, GridSettings, PageSettings, Point } from "@/shared/api/types";
+import { parseTokenSize } from "../../../../shared/lib/utils/board/boardUtils";
+import { useCallback } from "react";
+
+interface UseCharacterDropProps {
+  getSVGPoint: (clientX: number, clientY: number) => Point;
+  characters: Character[]; // Renomeado tokens para characters
+  gridSettings: GridSettings;
+  pageSettings: PageSettings;
+  addToken: (characterId: string, position: Point, currentHp?: number) => void; // Renomeado addGridInstance para addToken
+}
+
+export const useCharacterDrop = ({
+  getSVGPoint,
+  characters, // Renomeado
+  gridSettings,
+  pageSettings,
+  addToken, // Renomeado
+}: UseCharacterDropProps) => {
+  const handleDragOver = useCallback(
+    (event: React.DragEvent<SVGSVGElement>) => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+    },
+    []
+  );
+
+  const handleCharacterDrop = useCallback( // Renomeado
+    (event: React.DragEvent<SVGSVGElement>) => {
+      event.preventDefault();
+      const characterId = event.dataTransfer.getData( // Renomeado tokenInfoId para characterId
+        "application/vtt-character-id" // Renomeado
+      );
+      if (characterId) {
+        const character = characters.find((c) => c.id === characterId); // Renomeado sheet para character
+        if (!character) return;
+
+        const dropPoint = getSVGPoint(event.clientX, event.clientY);
+        const cellSize = gridSettings.visualCellSize;
+        const pageActualWidth = pageSettings.widthInUnits * cellSize;
+        const pageActualHeight = pageSettings.heightInUnits * cellSize;
+        if (
+          dropPoint.x < 0 ||
+          dropPoint.x > pageActualWidth ||
+          dropPoint.y < 0 ||
+          dropPoint.y > pageActualHeight
+        )
+          return;
+
+        const [sizeMultiplierX, sizeMultiplierY] = parseTokenSize(character.size); // Renomeado sheet.size para character.size
+        let gridX = Math.floor(dropPoint.x / cellSize);
+        let gridY = Math.floor(dropPoint.y / cellSize);
+
+        gridX = Math.max(
+          0,
+          Math.min(
+            gridX,
+            pageSettings.widthInUnits - Math.ceil(sizeMultiplierX)
+          )
+        );
+        gridY = Math.max(
+          0,
+          Math.min(
+            gridY,
+            pageSettings.heightInUnits - Math.ceil(sizeMultiplierY)
+          )
+        );
+
+        addToken(characterId, { x: gridX, y: gridY }, character.maxHp); // Renomeado addGridInstance para addToken, e adicionado position e currentHp
+      }
+    },
+    [getSVGPoint, characters, gridSettings, pageSettings, addToken] // Renomeado tokens para characters, addGridInstance para addToken
+  );
+
+  return {
+    handleDragOver,
+    handleCharacterDrop, // Renomeado
+  };
+};

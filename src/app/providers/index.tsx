@@ -1,9 +1,9 @@
-import { BoardSettingsProvider } from "../../contexts/BoardSettingsContext";
-import { ChatProvider } from "../../contexts/ChatContext";
-import { SelectedTokenProvider } from "../../contexts/SelectedTokenContext";
-import { CharactersProvider } from "../../contexts/CharactersContext";
-import { UIProvider } from "./UIProvider";
+import { ChatProvider } from "../../widgets/chatPanel/model/contexts/ChatContext";
+import { CharactersProvider } from "../../entities/character/model/contexts/CharactersContext";
+import { SelectedTokenProvider } from "../../entities/token/model/contexts/SelectedTokenContext";
+import { BoardSettingsProvider } from "../../features/boardSettings/contexts/BoardSettingsContext";
 import { ModalProvider } from "./ModalProvider";
+import { UIProvider } from "./UIProvider";
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
   return (

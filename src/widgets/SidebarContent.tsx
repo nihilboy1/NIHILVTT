@@ -1,7 +1,7 @@
 import React from "react";
-import { ChatPanel } from "../components/chat/ChatPanel";
-import { CharactersPanel } from "../components/tokens/CharactersPanel";
 import { SidebarTab } from "../shared/api/types";
+import { ChatPanel } from "./chatPanel/ui/ChatPanel";
+import { CharactersPanel } from "./charactersPanel/ui/CharactersPanel";
 
 interface SidebarContentProps {
   activeSidebarTab: SidebarTab;

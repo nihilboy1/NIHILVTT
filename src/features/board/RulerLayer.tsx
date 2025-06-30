@@ -1,7 +1,7 @@
 import React from "react";
-import { useGameBoard } from "../../contexts/GameBoardContext";
 import { RulerPointData } from "../../shared/api/types";
 import { calculateDistanceInMeters } from "../../shared/lib/utils/board/boardUtils";
+import { useGameBoard } from "../../widgets/gameBoard/model/contexts/GameBoardContext";
 
 export const RulerLayer: React.FC = () => {
   const { rulerPath, zoomLevel, gridSettings } = useGameBoard();
