@@ -61,17 +61,14 @@ export function BoardToken({
   // onMakeIndependent,
   onSetMultiSelectedTokenIds,
 }: BoardTokenProps) {
-  console.log(`[BoardToken] Renderizando token: ${token.id}`); // Removido activeHPModalTokenId do log inicial
   const tokenGroupRef = useRef<SVGGElement>(null);
   const { selectedTokenId, setSelectedTokenId } = useSelectedToken();
 
   const handleSelectThisToken = useCallback(
     (tokenId: string) => {
       if (activeTool !== Tool.SELECT) {
-        console.log(`[BoardToken] Ferramenta ativa não é SELECT: ${activeTool}`);
         return;
       }
-      console.log(`[BoardToken] Token clicado: ${tokenId}`);
       setSelectedTokenId(tokenId);
       onSetMultiSelectedTokenIds([tokenId]);
     },

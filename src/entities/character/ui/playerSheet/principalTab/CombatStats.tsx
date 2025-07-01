@@ -1,11 +1,11 @@
 import React from "react";
 import { cn } from "../../../../../shared/lib/utils/cn";
+import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext"; // Importar usePlayerSheet
 
 interface CombatStatsProps {
   editingArmorClass: string;
   setEditingArmorClass: (value: string) => void;
-  editingInitiative: string;
-  setEditingInitiative: (value: string) => void;
+  // editingInitiative e setEditingInitiative removidos, pois agora é calculado
   editingSpeed: string;
   setEditingSpeed: (value: string) => void;
   editingShieldEquipped: boolean;
@@ -15,13 +15,13 @@ interface CombatStatsProps {
 export const CombatStats: React.FC<CombatStatsProps> = ({
   editingArmorClass,
   setEditingArmorClass,
-  editingInitiative,
-  setEditingInitiative,
   editingSpeed,
   setEditingSpeed,
   editingShieldEquipped,
   setEditingShieldEquipped,
 }) => {
+  const { calculatedInitiative, calculatedPassivePerception } = usePlayerSheet(); // Obter valores calculados do contexto
+
   return (
     <fieldset className="p-2 rounded-md bg-surface-1">
       <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
@@ -49,21 +49,20 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
         </div>
         <div className="w-16">
           <label
-            htmlFor="editingInitiative"
+            htmlFor="initiative"
             className="block text-[0.8rem] font-medium mb-px"
           >
             INICIATIVA
           </label>
-          <input
-            id="editingInitiative"
-            type="number"
-            value={editingInitiative}
-            onChange={(e) => setEditingInitiative(e.target.value)}
+          <div
+            id="initiative"
             className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-              "text-center hide-number-spinners"
+              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary",
+              "text-center text-lg font-semibold"
             )}
-          />
+          >
+            {calculatedInitiative >= 0 ? `+${calculatedInitiative}` : calculatedInitiative}
+          </div>
         </div>
         <div className="w-16">
           <label
@@ -85,7 +84,7 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
           />
         </div>
       </div>
-      <div className="pt-2">
+      <div className="pt-2 flex justify-between items-center">
         <label
           htmlFor="editingShieldEquipped"
           className="flex items-center space-x-1.5 cursor-pointer"
@@ -101,6 +100,23 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
             ESCUDO
           </span>
         </label>
+        <div className="w-24">
+          <label
+            htmlFor="passivePerception"
+            className="block text-[0.8rem] font-medium mb-px text-center"
+          >
+            PERCEPÇÃO PASSIVA
+          </label>
+          <div
+            id="passivePerception"
+            className={cn(
+              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary",
+              "text-center text-lg font-semibold"
+            )}
+          >
+            {calculatedPassivePerception}
+          </div>
+        </div>
       </div>
     </fieldset>
   );

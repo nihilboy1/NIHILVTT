@@ -3,6 +3,7 @@ import {
   CharacterType,
   type Character,
   type PlayerCharacter,
+  type BaseDndCharacter,
 } from "../../../../shared/api/types";
 import {
   DEFAULT_TOKEN_HP,
@@ -23,6 +24,10 @@ export interface UseCharacterSheetFormReturn {
   >;
   editingMaxHp: string;
   setEditingMaxHp: React.Dispatch<React.SetStateAction<string>>;
+  editingArmorClass: string;
+  setEditingArmorClass: React.Dispatch<React.SetStateAction<string>>;
+  editingSpeed: string;
+  setEditingSpeed: React.Dispatch<React.SetStateAction<string>>;
   editingCharacterNotes: string;
   setEditingCharacterNotes: React.Dispatch<React.SetStateAction<string>>;
   editingInspiration: boolean;
@@ -48,6 +53,8 @@ export function useCharacterSheetForm({
   const [editingCharacterType, setEditingCharacterType] =
     useState<CharacterType | null>(null);
   const [editingMaxHp, setEditingMaxHp] = useState(String(DEFAULT_TOKEN_HP));
+  const [editingArmorClass, setEditingArmorClass] = useState("10"); // Valor padrão para CA
+  const [editingSpeed, setEditingSpeed] = useState("30"); // Valor padrão para velocidade
   const [editingCharacterNotes, setEditingCharacterNotes] = useState("");
   const [editingInspiration, setEditingInspiration] = useState(false);
 
@@ -61,8 +68,23 @@ export function useCharacterSheetForm({
       setEditingCharacterImage(initialCharacterData.image);
       setEditingCharacterSize(initialCharacterData.size);
       setEditingCharacterType(initialCharacterData.type);
-      setEditingMaxHp(String(initialCharacterData.maxHp ?? DEFAULT_TOKEN_HP));
       setEditingCharacterNotes(initialCharacterData.notes || "");
+
+      // Inicializa campos de BaseDndCharacter
+      if (
+        initialCharacterData.type === CharacterType.PLAYER ||
+        initialCharacterData.type === CharacterType.MONSTER_NPC
+      ) {
+        const dndCharacter = initialCharacterData as BaseDndCharacter;
+        setEditingMaxHp(String(dndCharacter.combatStats?.maxHp ?? DEFAULT_TOKEN_HP));
+        setEditingArmorClass(String(dndCharacter.combatStats?.armorClass ?? 10));
+        setEditingSpeed(String(dndCharacter.combatStats?.speed ?? 30));
+      } else {
+        setEditingMaxHp(String(DEFAULT_TOKEN_HP));
+        setEditingArmorClass("10");
+        setEditingSpeed("30");
+      }
+
       // Apenas inicializa inspiration se for PlayerCharacter
       if (initialCharacterData.type === CharacterType.PLAYER) {
         setEditingInspiration(
@@ -96,10 +118,27 @@ export function useCharacterSheetForm({
     changed =
       changed || editingCharacterType !== (initialCharacterData.type || null);
     changed =
-      changed ||
-      editingMaxHp !== String(initialCharacterData.maxHp ?? DEFAULT_TOKEN_HP);
-    changed =
       changed || editingCharacterNotes !== (initialCharacterData.notes || "");
+
+    // Verifica mudanças em BaseDndCharacter
+    if (
+      initialCharacterData.type === CharacterType.PLAYER ||
+      initialCharacterData.type === CharacterType.MONSTER_NPC
+    ) {
+      const dndCharacter = initialCharacterData as BaseDndCharacter;
+      changed =
+        changed || editingMaxHp !== String(dndCharacter.combatStats?.maxHp ?? DEFAULT_TOKEN_HP);
+      changed =
+        changed ||
+        editingArmorClass !== String(dndCharacter.combatStats?.armorClass ?? 10);
+      changed =
+        changed || editingSpeed !== String(dndCharacter.combatStats?.speed ?? 30);
+    } else {
+      // Se mudou para um tipo não-D&D, e os valores padrão não correspondem
+      changed = changed || editingMaxHp !== String(DEFAULT_TOKEN_HP);
+      changed = changed || editingArmorClass !== "10";
+      changed = changed || editingSpeed !== "30";
+    }
 
     if (initialCharacterData.type === CharacterType.PLAYER) {
       changed =
@@ -115,6 +154,8 @@ export function useCharacterSheetForm({
     editingCharacterSize,
     editingCharacterType,
     editingMaxHp,
+    editingArmorClass,
+    editingSpeed,
     editingCharacterNotes,
     editingInspiration,
     initialCharacterData,
@@ -123,25 +164,15 @@ export function useCharacterSheetForm({
   const handleSave = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      // Se initialCharacterData é nulo, estamos criando um novo personagem.
-      // A validação aqui é para garantir que o tipo do personagem foi selecionado.
       if (editingCharacterType === null) {
         alert("Erro: O tipo do personagem deve ser selecionado.");
         return;
-      }
-      // Se estamos editando um personagem existente e initialCharacterData é nulo por algum motivo,
-      // isso indica um erro de estado, mas o caso de criação já foi tratado acima.
-      if (!initialCharacterData && editingCharacterType !== null) {
-        // Isso pode acontecer se o hook for usado para criar um personagem,
-        // mas o initialCharacterData é nulo. Não precisamos de um alerta aqui,
-        // pois o tipo já foi validado.
       }
       if (!editingCharacterName.trim()) {
         alert("O nome do personagem não pode estar vazio.");
         return;
       }
 
-      // Validação de imagem
       const MAX_IMAGE_DIMENSION = 500;
       if (
         editingCharacterImage.trim() !== "" &&
@@ -185,9 +216,19 @@ export function useCharacterSheetForm({
       }
 
       const maxHpNum = parseInt(editingMaxHp, 10);
+      const armorClassNum = parseInt(editingArmorClass, 10);
+      const speedNum = parseInt(editingSpeed, 10);
 
       if (isNaN(maxHpNum) || maxHpNum <= 0) {
         alert("Valores de HP inválidos. Vida Máxima deve ser > 0.");
+        return;
+      }
+      if (isNaN(armorClassNum) || armorClassNum <= 0) {
+        alert("Valores de CA inválidos. CA deve ser > 0.");
+        return;
+      }
+      if (isNaN(speedNum) || speedNum <= 0) {
+        alert("Valores de Velocidade inválidos. Velocidade deve ser > 0.");
         return;
       }
 
@@ -198,25 +239,39 @@ export function useCharacterSheetForm({
             ? DEFAULT_TOKEN_IMAGE
             : editingCharacterImage,
         size: editingCharacterSize,
-        maxHp: maxHpNum,
         notes: editingCharacterNotes,
         type: editingCharacterType,
       };
 
+      if (
+        editingCharacterType === CharacterType.PLAYER ||
+        editingCharacterType === CharacterType.MONSTER_NPC
+      ) {
+        (updatedCharacterPartialData as Partial<BaseDndCharacter>).combatStats = {
+          maxHp: maxHpNum,
+          currentHp: maxHpNum,
+          armorClass: armorClassNum,
+          speed: speedNum,
+        };
+        // TODO: Adicionar atributos, proficiências, actions, attacks, featuresAndTraits
+      }
+
       if (editingCharacterType === CharacterType.PLAYER) {
         (updatedCharacterPartialData as Partial<PlayerCharacter>).inspiration =
           editingInspiration;
+        // TODO: Adicionar level, xp, hitDice, deathSaves
       }
 
       onSave(updatedCharacterPartialData);
     },
     [
-      initialCharacterData,
       editingCharacterName,
       editingCharacterImage,
       editingCharacterSize,
       editingCharacterType,
       editingMaxHp,
+      editingArmorClass,
+      editingSpeed,
       editingCharacterNotes,
       editingInspiration,
       onSave,
@@ -234,6 +289,10 @@ export function useCharacterSheetForm({
     setEditingCharacterType,
     editingMaxHp,
     setEditingMaxHp,
+    editingArmorClass,
+    setEditingArmorClass,
+    editingSpeed,
+    setEditingSpeed,
     editingCharacterNotes,
     setEditingCharacterNotes,
     editingInspiration,

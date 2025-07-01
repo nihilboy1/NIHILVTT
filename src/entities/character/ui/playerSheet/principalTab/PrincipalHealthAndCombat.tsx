@@ -8,22 +8,12 @@ import { HealthSection } from "./HealthSection";
 
 export function PrincipalHealthAndCombat() {
   const {
-    editingArmorClass,
-    setEditingArmorClass,
-    editingInitiative,
-    setEditingInitiative,
-    editingSpeed,
-    setEditingSpeed,
-    editingShieldEquipped,
-    setEditingShieldEquipped,
-    editingMaxHp,
-    setEditingMaxHp,
-    editingTempHp,
-    setEditingTempHp,
+    combatStats,
     editingHitDiceEntries,
     setEditingHitDiceEntries,
     actions,
     handleAddAction,
+    playerCharacter, // Adicionado para o sender da rolagem
   } = usePlayerSheet();
 
   const { openModal } = useModal();
@@ -37,20 +27,20 @@ export function PrincipalHealthAndCombat() {
       <h2 className="sr-only">Dados de Saúde e Combate do Personagem</h2>
       <div>
         <CombatStats
-          editingArmorClass={editingArmorClass}
-          setEditingArmorClass={setEditingArmorClass}
-          editingInitiative={editingInitiative}
-          setEditingInitiative={setEditingInitiative}
-          editingSpeed={editingSpeed}
-          setEditingSpeed={setEditingSpeed}
-          editingShieldEquipped={editingShieldEquipped}
-          setEditingShieldEquipped={setEditingShieldEquipped}
+          editingArmorClass={combatStats.editingArmorClass}
+          setEditingArmorClass={combatStats.setEditingArmorClass}
+          editingInitiative={combatStats.editingInitiative}
+          setEditingInitiative={combatStats.setEditingInitiative}
+          editingSpeed={combatStats.editingSpeed}
+          setEditingSpeed={combatStats.setEditingSpeed}
+          editingShieldEquipped={combatStats.editingShieldEquipped}
+          setEditingShieldEquipped={combatStats.setEditingShieldEquipped}
         />
         <HealthSection
-          editingMaxHp={editingMaxHp}
-          setEditingMaxHp={setEditingMaxHp}
-          editingTempHp={editingTempHp}
-          setEditingTempHp={setEditingTempHp}
+          editingMaxHp={combatStats.editingMaxHp}
+          setEditingMaxHp={combatStats.setEditingMaxHp}
+          editingTempHp={combatStats.editingTempHp}
+          setEditingTempHp={combatStats.setEditingTempHp}
           editingHitDiceEntries={editingHitDiceEntries}
           setEditingHitDiceEntries={setEditingHitDiceEntries}
         />

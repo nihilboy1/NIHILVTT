@@ -12,8 +12,6 @@ export function PrincipalAttributesAndSkills() {
     skillProficiencies,
     setSkillProficiencies,
     SKILLS_CONFIG,
-    proficiencyBonus,
-    playerCharacter, // Adicionar playerCharacter
   } = usePlayerSheet();
 
   const handleAttributeChange = (
@@ -56,10 +54,14 @@ export function PrincipalAttributesAndSkills() {
         (attrName: keyof NonNullable<PlayerCharacter["attributes"]>) => {
           // Adicionado tipagem para attrName
           const attrValue = attributes[attrName];
-          const modifier = Math.floor((attrValue - 10) / 2);
 
-          const savingThrowSkill = {
-            key: String(`${attrName}SavingThrow`), // Adicionado String()
+          const savingThrowSkill: {
+            key: keyof NonNullable<PlayerCharacter["proficiencies"]>["savingThrows"];
+            label: string;
+            parentAttribute: keyof NonNullable<PlayerCharacter["attributes"]>;
+            isSavingThrow: true;
+          } = {
+            key: attrName, // A chave para salvaguardas é o próprio nome do atributo
             label: "Salvaguarda",
             parentAttribute: attrName,
             isSavingThrow: true,
@@ -67,21 +69,15 @@ export function PrincipalAttributesAndSkills() {
 
           const parentAttributeSkills = [
             savingThrowSkill,
-            ...SKILLS_CONFIG.filter(
-              (skill: {
-                parentAttribute: keyof NonNullable<
-                  PlayerCharacter["attributes"]
-                >;
-              }) => skill.parentAttribute === attrName // Adicionado tipagem para skill
-            ).map(
-              (skill: {
-                key: string;
-                label: string;
-                parentAttribute: keyof NonNullable<
-                  PlayerCharacter["attributes"]
-                >;
-              }) => ({ ...skill, isSavingThrow: false })
-            ), // Adicionado tipagem para skill
+            ...(SKILLS_CONFIG.filter(
+              (skill) => skill.parentAttribute === attrName
+            ) as Array<{
+              key: keyof NonNullable<PlayerCharacter["proficiencies"]>["skills"];
+              label: string;
+              parentAttribute: keyof NonNullable<PlayerCharacter["attributes"]>;
+            }>).map(
+              (skill) => ({ ...skill, isSavingThrow: false })
+            ),
           ];
 
           return (
@@ -90,12 +86,10 @@ export function PrincipalAttributesAndSkills() {
               className="flex flex-col space-y-2 p-3 rounded bg-surface-1"
             >
               <AttributeBlock
-                attrName={
-                  attrName as keyof NonNullable<PlayerCharacter["attributes"]>
-                } // Adicionado tipagem
+                attrName={attrName}
                 attrValue={attrValue}
                 onAttributeChange={handleAttributeChange}
-                characterName={playerCharacter.name} // Passar o nome do personagem
+                // characterName removido, pois AttributeBlock o obtém do contexto
               />
               {parentAttributeSkills.length > 0 && (
                 <div className="mt-1.5 space-y-0.5">
@@ -104,7 +98,7 @@ export function PrincipalAttributesAndSkills() {
                     const skillKey = isSavingThrow
                       ? (attrName as keyof NonNullable<
                           PlayerCharacter["proficiencies"]
-                        >["savingThrows"])
+                        >["savingThrows"]) // Usar attrName diretamente para salvaguardas
                       : (skillInfo.key as keyof NonNullable<
                           PlayerCharacter["proficiencies"]
                         >["skills"]);
@@ -117,24 +111,16 @@ export function PrincipalAttributesAndSkills() {
                           skillKey as keyof typeof skillProficiencies
                         ];
 
-                    const proficiencyBonusValue = isProficient
-                      ? proficiencyBonus
-                      : 0;
-                    const totalBonus = modifier + proficiencyBonusValue;
+                    // totalBonus, proficiencyBonusValue e modifier não são mais passados,
+                    // pois SkillProficiencyItem os calcula internamente.
 
                     return (
                       <SkillProficiencyItem
                         key={skillInfo.key}
                         skillInfo={skillInfo}
                         isProficient={isProficient}
-                        totalBonus={totalBonus}
                         onProficiencyChange={handleProficiencyChange}
-                        attrName={
-                          attrName as keyof NonNullable<
-                            PlayerCharacter["attributes"]
-                          >
-                        } // Adicionado tipagem
-                        characterName={playerCharacter.name} // Passar o nome do personagem
+                        // totalBonus, attrName, characterName removidos
                       />
                     );
                   })}

@@ -191,21 +191,14 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
   // Modificando onSetMultiSelectedTokenIds para gerenciar o HPModal
   const handleSetMultiSelectedTokenIds = useCallback(
     (ids: string[]) => {
-      console.log(
-        `[GameBoardContext] handleSetMultiSelectedTokenIds recebido:`,
-        ids
-      );
+     
       onSetMultiSelectedTokenIds(ids); // Chama a função original
 
       if (ids.length === 1) {
         setActiveHPModalTokenId(ids[0]);
-        console.log(`[GameBoardContext] HPModal ativado para: ${ids[0]}`);
       } else {
         setActiveHPModalTokenId(null); // Limpa o HPModal se mais de um ou nenhum token for selecionado
-        console.log(
-          `[GameBoardContext] HPModal desativado. IDs selecionados:`,
-          ids
-        );
+        
       }
     },
     [onSetMultiSelectedTokenIds]

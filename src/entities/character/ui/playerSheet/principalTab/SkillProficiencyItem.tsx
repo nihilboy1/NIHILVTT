@@ -2,34 +2,41 @@ import React from "react";
 import { useDiceRoller } from "../../../../../features/diceRolling/model/hooks/useDiceRoller";
 import { DiceFormula, PlayerCharacter, RollCategory } from "../../../../../shared/api/types";
 import { ATTRIBUTE_LABELS } from "../../../../../shared/config/sheetDefaults";
+import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext"; // Importar usePlayerSheet
 
 interface SkillProficiencyItemProps {
   skillInfo: {
-    key: string;
+    key: keyof NonNullable<PlayerCharacter["proficiencies"]>["skills"] | keyof NonNullable<PlayerCharacter["proficiencies"]>["savingThrows"]; // Pode ser perícia ou saving throw
     label: string;
     parentAttribute: keyof NonNullable<PlayerCharacter["attributes"]>;
     isSavingThrow?: boolean;
   };
   isProficient: boolean;
-  totalBonus: number;
+  // totalBonus não é mais uma prop, será calculado
   onProficiencyChange: (
     skillKey: string,
     isSavingThrow: boolean,
     checked: boolean
   ) => void;
-  attrName: keyof NonNullable<PlayerCharacter["attributes"]>;
-  characterName: string;
+  // attrName e characterName não são mais necessários como props
 }
 
 export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
   skillInfo,
   isProficient,
-  totalBonus,
   onProficiencyChange,
-  attrName,
-  characterName,
 }) => {
+  const { calculatedSkillBonuses, calculatedAttributeModifiers, calculatedProficiencyBonus, playerCharacter, savingThrowProficiencies } = usePlayerSheet(); // Obter do contexto
   const { rollDice } = useDiceRoller();
+  const characterName = playerCharacter.name; // Obter o nome do personagem do contexto
+
+  let totalBonus: number;
+  if (skillInfo.isSavingThrow) {
+    const attributeModifier = calculatedAttributeModifiers[skillInfo.parentAttribute];
+    totalBonus = isProficient ? attributeModifier + calculatedProficiencyBonus : attributeModifier;
+  } else {
+    totalBonus = calculatedSkillBonuses[skillInfo.key as keyof typeof calculatedSkillBonuses];
+  }
 
   const handleRoll = () => {
     const rollName = skillInfo.isSavingThrow
@@ -48,7 +55,7 @@ export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
     rollDice(formula, rollName, category, characterName);
   };
 
-  const checkboxId = `skill-prof-${String(skillInfo.key)}-${String(attrName)}`;
+  const checkboxId = `skill-prof-${String(skillInfo.key)}`; // attrName removido
 
   return (
     <div key={skillInfo.key} className="flex items-center gap-x-1">

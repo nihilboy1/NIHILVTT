@@ -3,6 +3,7 @@ import { useDiceRoller } from "../../../../../features/diceRolling/model/hooks/u
 import { DiceFormula, PlayerCharacter } from "../../../../../shared/api/types";
 import { ATTRIBUTE_LABELS } from "../../../../../shared/config/sheetDefaults";
 import { cn } from "../../../../../shared/lib/utils/cn";
+import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext"; // Importar usePlayerSheet
 
 interface AttributeBlockProps {
   attrName: keyof NonNullable<PlayerCharacter["attributes"]>;
@@ -11,18 +12,19 @@ interface AttributeBlockProps {
     attrName: keyof NonNullable<PlayerCharacter["attributes"]>,
     value: number | ""
   ) => void;
-  characterName: string;
+  // characterName não é mais necessário como prop, será obtido do contexto
 }
 
 export const AttributeBlock: React.FC<AttributeBlockProps> = ({
   attrName,
   attrValue,
   onAttributeChange,
-  characterName,
 }) => {
+  const { calculatedAttributeModifiers, playerCharacter } = usePlayerSheet(); // Obter do contexto
   const attrLabel = ATTRIBUTE_LABELS[attrName as keyof typeof ATTRIBUTE_LABELS];
-  const modifier = Math.floor((attrValue - 10) / 2);
+  const modifier = calculatedAttributeModifiers[attrName]; // Usar o modificador calculado
   const { rollDice } = useDiceRoller();
+  const characterName = playerCharacter.name; // Obter o nome do personagem do contexto
 
   const handleRoll = () => {
     let formula: DiceFormula;

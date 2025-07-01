@@ -6,6 +6,7 @@ import {
   CharacterType,
   type Character,
   type PlayerCharacter,
+  type MonsterNPCCharacter, // Adicionado
   type Token,
 } from "../../../shared/api/types";
 import {
@@ -14,7 +15,7 @@ import {
   DEFAULT_TOKEN_HP,
   DEFAULT_TOKEN_SIZE,
 } from "../../../shared/config/constants";
-import { DEFAULT_TOKEN_IMAGE } from "../../../shared/config/sheetDefaults";
+import { DEFAULT_TOKEN_IMAGE, DEFAULT_CHARACTER_DATA, DEFAULT_MONSTER_NPC_DATA } from "../../../shared/config/sheetDefaults"; // Adicionado DEFAULT_MONSTER_NPC_DATA
 import { ConfirmationModal } from "../../../shared/ui/ConfirmationModal";
 import { useGameBoardInteractionContext } from "../../gameBoard/model/contexts/GameBoardInteractionContext";
 import { SheetProvider } from "../../sheetModal/model/contexts/SheetContext";
@@ -52,34 +53,26 @@ export function ModalManager() {
 
     if (typeToUse === CharacterType.PLAYER) {
       newSheetData = {
+        ...DEFAULT_CHARACTER_DATA,
         name: name,
         type: CharacterType.PLAYER,
-        image: DEFAULT_TOKEN_IMAGE,
-        size: DEFAULT_TOKEN_SIZE,
-        maxHp: DEFAULT_TOKEN_HP,
-        notes: "",
-        species: "",
-        charClass: "",
-        subclass: "",
-        level: DEFAULT_PLAYER_LEVEL,
-        background: "",
-        inspiration: DEFAULT_PLAYER_INSPIRATION,
-        armorClass: 10,
-        shieldEquipped: false,
-        tempHp: 0,
-        hitDiceUsed: 0,
-        hitDiceMax: DEFAULT_PLAYER_LEVEL,
-        deathSavesSuccesses: 0,
-        deathSavesFailures: 0,
       } as Omit<PlayerCharacter, "id">;
+    } else if (typeToUse === CharacterType.MONSTER_NPC) {
+      newSheetData = {
+        ...DEFAULT_MONSTER_NPC_DATA,
+        name: name,
+        type: CharacterType.MONSTER_NPC,
+      } as Omit<MonsterNPCCharacter, "id">;
     } else {
+      // Para CharacterType.OBJECT ou outros tipos futuros
       newSheetData = {
         name: name,
         type: typeToUse,
         image: DEFAULT_TOKEN_IMAGE,
         size: DEFAULT_TOKEN_SIZE,
-        maxHp: DEFAULT_TOKEN_HP,
         notes: "",
+        // Objetos podem ter uma estrutura mais simples
+        // Se houver um DEFAULT_OBJECT_DATA, ele seria usado aqui
       } as Omit<Character, "id">;
     }
     const newCharacter = addCharacter(newSheetData);
@@ -87,7 +80,6 @@ export function ModalManager() {
     openModal("sheet", { characterId: newCharacter.id }, false); // Abrir ficha como não dismissible
   };
 
-  console.log("ModalManager: modalStack atual:", modalStack);
 
   const topModal = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
   const shouldRenderOverlay = topModal && topModal.name !== "hpControl"; // Renderiza overlay apenas se não for HPControlModal
@@ -109,7 +101,6 @@ export function ModalManager() {
         const { name, props, dismissible } = modalEntry;
         const isTopModal = index === modalStack.length - 1;
 
-        console.log(`ModalManager: Renderizando ${name} (isTopModal: ${isTopModal}, dismissible: ${dismissible})`);
 
         switch (name) {
           case "simpleName":
@@ -125,7 +116,6 @@ export function ModalManager() {
               />
             );
           case "sheet":
-            console.log(`ModalManager: SheetModal - isOpen: ${true}, zIndex: ${100 + index}`);
             const foundCharacter = characters.find(
               // Renomeado
               (c: Character) => c.id === props.characterId
@@ -155,7 +145,6 @@ export function ModalManager() {
               </SheetProvider>
             );
           case "actionEdit": {
-            console.log(`ModalManager: ActionEditModal - isOpen: ${true}, zIndex: ${100 + index}`);
             const characterForActionEdit = characters.find(
               (c: Character) => c.id === props.characterId
             );
@@ -189,7 +178,6 @@ export function ModalManager() {
             return null;
           }
           case "hpControl":
-            console.log(`ModalManager: HPControlModal - isOpen: ${isTopModal}, zIndex: ${100 + index}`);
             const selectedTokenForHP = tokensOnBoard.find(
               // Renomeado
               (t: Token) => t.id === props.tokenId
@@ -225,7 +213,6 @@ export function ModalManager() {
               )
             );
           case "confirmationModal":
-            console.log(`ModalManager: ConfirmationModal - isOpen: ${true}, zIndex: ${200 + index}`);
             return (
               <ConfirmationModal
                 key={modalEntry.id}

@@ -1,4 +1,4 @@
-import { CharacterType, PlayerCharacter } from "../api/types";
+import { CharacterType, PlayerCharacter, MonsterNPCCharacter } from "../api/types";
 import defaultTokenImage from "../assets/defaultToken.png"; // Importar a imagem diretamente
 
 export const SKILLS_CONFIG: {
@@ -94,22 +94,67 @@ export const defaultSkills: NonNullable<
   survival: false,
 };
 
-export const DEFAULT_CHARACTER_DATA = {
+export const DEFAULT_CHARACTER_DATA: Omit<PlayerCharacter, "id"> = {
   name: "Novo Personagem",
   type: CharacterType.PLAYER,
   image: DEFAULT_TOKEN_IMAGE,
   size: "medium",
-  maxHp: 10, // currentHp removido
   notes: "",
   attributes: defaultAttributes,
   proficiencyBonus: 2,
-  initiative: 0,
-  speed: 30,
-  passivePerception: 10,
   proficiencies: {
     savingThrows: defaultSavingThrows,
     skills: defaultSkills,
   },
+  combatStats: {
+    maxHp: 10,
+    currentHp: 10,
+    armorClass: 10,
+    speed: 30,
+    initiative: 0,
+    passivePerception: 10,
+    shieldEquipped: false,
+  },
+  // Campos específicos de PlayerCharacter que são obrigatórios ou têm valores padrão
+  level: 1, // Nível padrão
+  xp: 0,
+  inspiration: false,
+  hitDiceUsed: 0,
+  hitDiceMax: 1, // Exemplo de dado de vida inicial
+  deathSavesSuccesses: 0,
+  deathSavesFailures: 0,
+  hitDiceEntries: [{ id: crypto.randomUUID(), type: "d6", quantity: 1 }], // Exemplo de entrada de dado de vida
+  
+  // Arrays vazios para evitar undefined
+  actions: [],
+  attacks: [],
+  equipment: [],
+  featuresAndTraits: [],
+};
+
+export const DEFAULT_MONSTER_NPC_DATA: Omit<MonsterNPCCharacter, "id"> = {
+  name: "Novo Monstro/NPC",
+  type: CharacterType.MONSTER_NPC,
+  image: DEFAULT_TOKEN_IMAGE,
+  size: "medium",
+  notes: "",
+  attributes: defaultAttributes, // Monstros também têm atributos
+  proficiencyBonus: 2, // Bônus de proficiência padrão para CR 0-4
+  proficiencies: {
+    savingThrows: defaultSavingThrows,
+    skills: defaultSkills,
+  },
+  combatStats: {
+    maxHp: 10,
+    currentHp: 10,
+    armorClass: 10,
+    speed: 30,
+    initiative: 0,
+    passivePerception: 10,
+    shieldEquipped: false,
+  },
+  challengeRating: 0, // CR padrão
+  actions: [],
   attacks: [],
   equipment: [],
   featuresAndTraits: [],

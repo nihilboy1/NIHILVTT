@@ -31,12 +31,16 @@ export function SheetModal({
     : null;
 
   const {
+    editingCharacterName, // Adicionado
+    setEditingCharacterName, // Adicionado
     editingCharacterImage,
     setEditingCharacterImage,
     editingCharacterSize,
     setEditingCharacterSize,
     editingCharacterType,
     setEditingCharacterType,
+    editingMaxHp, // Adicionado
+    setEditingMaxHp, // Adicionado
     editingCharacterNotes,
     setEditingCharacterNotes,
     editingInspiration,
@@ -47,10 +51,8 @@ export function SheetModal({
     initialCharacterData: initialCharacterData,
     onSave: (updatedData) => {
       if (characterId) {
-        if (initialCharacterData?.type !== CharacterType.PLAYER) {
-          updateCharacter(characterId, updatedData);
-          onClose();
-        }
+        updateCharacter(characterId, updatedData);
+        onClose();
       }
     },
   });
@@ -141,28 +143,14 @@ export function SheetModal({
               hasCharacterSheetChanged={hasCharacterSheetChanged}
             />
           </PlayerSheetProvider>
-        ) : (
+        ) : ( // Se não for PlayerCharacter, renderiza CreatureSheet
           <CreatureSheet
-            editingCharacterName={initialCharacterData?.name || ""}
-            setEditingCharacterName={(name) => {
-              if (initialCharacterData) {
-                updateCharacter(initialCharacterData.id, {
-                  ...initialCharacterData,
-                  name,
-                });
-              }
-            }}
+            editingCharacterName={editingCharacterName}
+            setEditingCharacterName={setEditingCharacterName}
             editingCharacterType={editingCharacterType}
             setEditingCharacterType={setEditingCharacterType}
-            editingMaxHp={initialCharacterData?.maxHp?.toString() || ""}
-            setEditingMaxHp={(hp) => {
-              if (initialCharacterData) {
-                updateCharacter(initialCharacterData.id, {
-                  ...initialCharacterData,
-                  maxHp: parseInt(hp),
-                });
-              }
-            }}
+            editingMaxHp={editingMaxHp}
+            setEditingMaxHp={setEditingMaxHp}
             editingCharacterNotes={editingCharacterNotes}
             setEditingCharacterNotes={setEditingCharacterNotes}
             editingCharacterImage={editingCharacterImage}

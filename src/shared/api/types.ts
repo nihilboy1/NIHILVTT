@@ -60,31 +60,13 @@ export interface BaseCharacter {
   type: CharacterType; // O discriminador
   image: string;
   size: string;
-  maxHp?: number;
   notes?: string;
 }
 
-// Interface para Personagens de Jogador
-export interface PlayerCharacter extends BaseCharacter {
-  type: typeof CharacterType.PLAYER; // Garante que este é um personagem de jogador
-  species?: string;
-  charClass?: string;
-  subclass?: string;
-  level?: number;
-  background?: string;
-  xp?: number;
-  inspiration?: boolean;
-  armorClass?: number;
-  shieldEquipped?: boolean;
-  tempHp?: number;
-  hitDiceUsed?: number;
-  hitDiceMax?: number;
-  deathSavesSuccesses?: number;
-  deathSavesFailures?: number;
-  hitDiceEntries?: HitDiceEntry[];
-
+// Interface base para qualquer criatura de D&D 5.5 (Jogador ou Monstro/NPC)
+export interface BaseDndCharacter extends BaseCharacter {
   // Campos D&D 5.5
-  attributes?: {
+  attributes: {
     strength: number;
     dexterity: number;
     constitution: number;
@@ -92,12 +74,9 @@ export interface PlayerCharacter extends BaseCharacter {
     wisdom: number;
     charisma: number;
   };
-  proficiencyBonus?: number;
-  initiative?: number;
-  speed?: number; // Este campo é para a velocidade de deslocamento principal
-  passivePerception?: number;
+  proficiencyBonus: number; // Calculado a partir do nível (Player) ou CR (Monster/NPC)
 
-  proficiencies?: {
+  proficiencies: {
     savingThrows: {
       strength: boolean;
       dexterity: boolean;
@@ -128,16 +107,44 @@ export interface PlayerCharacter extends BaseCharacter {
     };
   };
 
+  combatStats: {
+    maxHp: number;
+    currentHp: number;
+    tempHp?: number;
+    armorClass: number;
+    speed: number; // Este campo é para a velocidade de deslocamento principal
+    initiative?: number; // Sugerido para ser derivado
+    passivePerception?: number; // Sugerido para ser derivado
+    shieldEquipped?: boolean;
+  };
+
   actions?: Action[];
-  attacks?: Attack[]; // Adicionado
+  attacks?: Attack[];
   equipment?: EquipmentItem[];
   featuresAndTraits?: FeatureOrTrait[];
 }
 
+// Interface para Personagens de Jogador
+export interface PlayerCharacter extends BaseDndCharacter {
+  type: typeof CharacterType.PLAYER; // Garante que este é um personagem de jogador
+  species?: string;
+  charClass?: string;
+  subclass?: string;
+  level: number;
+  background?: string;
+  xp?: number;
+  inspiration?: boolean;
+  hitDiceUsed?: number;
+  hitDiceMax?: number;
+  deathSavesSuccesses?: number;
+  deathSavesFailures?: number;
+  hitDiceEntries?: HitDiceEntry[];
+}
+
 // Interface para Personagens de Monstro/NPC
-export interface MonsterNPCCharacter extends BaseCharacter {
+export interface MonsterNPCCharacter extends BaseDndCharacter {
   type: typeof CharacterType.MONSTER_NPC; // Garante que este é um personagem de monstro/NPC
-  challengeRating?: number;
+  challengeRating: number;
 }
 
 // Interface para Personagens de Objeto

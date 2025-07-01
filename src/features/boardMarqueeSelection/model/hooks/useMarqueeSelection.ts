@@ -90,7 +90,6 @@ export const useMarqueeSelection = ({
           selectedIds.push(token.id); // Renomeado
         }
       });
-      console.log(`[useMarqueeSelection] IDs selecionados pela marquee:`, selectedIds); // Adicionado log
       onSetMultiSelectedTokenIds(selectedIds); // Renomeado
       setMarqueeSelection({
         isActive: false,

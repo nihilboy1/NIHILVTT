@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import {
@@ -10,11 +11,19 @@ import {
   type FeatureOrTrait,
   type HitDiceEntry,
   type PlayerCharacter,
+  type BaseDndCharacter,
 } from "../../../../shared/api/types";
 import { SKILLS_CONFIG } from "../../../../shared/config/sheetDefaults";
+import {
+  getModifier,
+  getProficiencyBonus,
+  getSkillBonus,
+  getInitiative,
+  getPassivePerception,
+} from "../../lib/utils/sheetUtils";
 
 interface PlayerSheetContextType {
-  playerCharacter: PlayerCharacter; // Adicionar playerCharacter
+  playerCharacter: PlayerCharacter;
   editingCharacterName: string;
   setEditingCharacterName: (name: string) => void;
   editingCharClass: string;
@@ -27,19 +36,52 @@ interface PlayerSheetContextType {
   setEditingSpecies: (species: string) => void;
   editingSubclass: string;
   setEditingSubclass: (subclass: string) => void;
-  proficiencyBonus: number;
-  editingArmorClass: string;
-  setEditingArmorClass: (value: string) => void;
-  editingInitiative: string;
-  setEditingInitiative: (value: string) => void;
-  editingSpeed: string;
-  setEditingSpeed: (value: string) => void;
-  editingShieldEquipped: boolean;
-  setEditingShieldEquipped: (value: boolean) => void;
-  editingTempHp: string;
-  setEditingTempHp: (value: string) => void;
-  editingMaxHp: string;
-  setEditingMaxHp: (value: string) => void;
+  // Valores calculados
+  calculatedProficiencyBonus: number;
+  calculatedAttributeModifiers: {
+    strength: number;
+    dexterity: number;
+    constitution: number;
+    intelligence: number;
+    wisdom: number;
+    charisma: number;
+  };
+  calculatedSkillBonuses: {
+    acrobatics: number;
+    animalHandling: number;
+    arcana: number;
+    athletics: number;
+    deception: number;
+    history: number;
+    insight: number;
+    intimidation: number;
+    investigation: number;
+    medicine: number;
+    nature: number;
+    perception: number;
+    performance: number;
+    persuasion: number;
+    religion: number;
+    sleightOfHand: number;
+    stealth: number;
+    survival: number;
+  };
+  calculatedInitiative: number;
+  calculatedPassivePerception: number;
+
+  // Propriedades de combate agrupadas (algumas ainda editáveis)
+  combatStats: {
+    editingArmorClass: string;
+    setEditingArmorClass: (value: string) => void;
+    editingSpeed: string;
+    setEditingSpeed: (value: string) => void;
+    editingShieldEquipped: boolean;
+    setEditingShieldEquipped: (value: boolean) => void;
+    editingTempHp: string;
+    setEditingTempHp: (value: string) => void;
+    editingMaxHp: string;
+    setEditingMaxHp: (value: string) => void;
+  };
   editingHitDiceEntries: HitDiceEntry[];
   setEditingHitDiceEntries: (value: HitDiceEntry[]) => void;
   editingDeathSavesSuccesses: number;
@@ -68,16 +110,16 @@ interface PlayerSheetContextType {
   handleAddAction: () => void;
   handleRemoveAction: (id: string) => void;
   handleActionChange: (id: string, field: keyof Action, value: string) => void;
-  attacks: NonNullable<PlayerCharacter["attacks"]>; // Adicionado
-  handleAddAttack: () => void; // Adicionado
-  handleRemoveAttack: (id: string) => void; // Adicionado
+  attacks: NonNullable<PlayerCharacter["attacks"]>;
+  handleAddAttack: () => void;
+  handleRemoveAttack: (id: string) => void;
   handleAttackChange: (
     id: string,
     field: keyof NonNullable<PlayerCharacter["attacks"]>[number],
     value: string
-  ) => void; // Adicionado
-  featuresAndTraits: FeatureOrTrait[]; // Alterado para garantir que não seja undefined
-  setFeaturesAndTraits: React.Dispatch<React.SetStateAction<FeatureOrTrait[]>>; // Alterado para garantir que não seja undefined
+  ) => void;
+  featuresAndTraits: FeatureOrTrait[];
+  setFeaturesAndTraits: React.Dispatch<React.SetStateAction<FeatureOrTrait[]>>;
   SKILLS_CONFIG: {
     key: string;
     label: string;
@@ -118,25 +160,24 @@ export function PlayerSheetProvider({
   const [editingSubclass, setEditingSubclass] = useState(
     initialCharacter.subclass || ""
   );
-  const [proficiencyBonus] = useState(initialCharacter.proficiencyBonus || 2);
+
+  // Estados para combatStats
   const [editingArmorClass, setEditingArmorClass] = useState(
-    initialCharacter.armorClass?.toString() || ""
-  );
-  const [editingInitiative, setEditingInitiative] = useState(
-    initialCharacter.initiative?.toString() || ""
+    initialCharacter.combatStats?.armorClass?.toString() || ""
   );
   const [editingSpeed, setEditingSpeed] = useState(
-    initialCharacter.speed?.toString() || ""
+    initialCharacter.combatStats?.speed?.toString() || ""
   );
   const [editingShieldEquipped, setEditingShieldEquipped] = useState(
-    initialCharacter.shieldEquipped || false
+    initialCharacter.combatStats?.shieldEquipped || false
   );
   const [editingTempHp, setEditingTempHp] = useState(
-    initialCharacter.tempHp?.toString() || ""
+    initialCharacter.combatStats?.tempHp?.toString() || ""
   );
   const [editingMaxHp, setEditingMaxHp] = useState(
-    initialCharacter.maxHp?.toString() || ""
+    initialCharacter.combatStats?.maxHp?.toString() || ""
   );
+
   const [editingHitDiceEntries, setEditingHitDiceEntries] = useState<
     HitDiceEntry[]
   >(
@@ -204,7 +245,7 @@ export function PlayerSheetProvider({
   >(initialCharacter.actions || []);
   const [attacks, setAttacks] = useState<
     NonNullable<PlayerCharacter["attacks"]>
-  >(initialCharacter.attacks || []); // Adicionado
+  >(initialCharacter.attacks || []);
   const [featuresAndTraits, setFeaturesAndTraits] = useState<
     NonNullable<PlayerCharacter["featuresAndTraits"]>
   >(initialCharacter.featuresAndTraits || []);
@@ -217,12 +258,14 @@ export function PlayerSheetProvider({
     setEditingBackground(initialCharacter.background || "");
     setEditingSpecies(initialCharacter.species || "");
     setEditingSubclass(initialCharacter.subclass || "");
-    setEditingArmorClass(initialCharacter.armorClass?.toString() || "");
-    setEditingInitiative(initialCharacter.initiative?.toString() || "");
-    setEditingSpeed(initialCharacter.speed?.toString() || "");
-    setEditingShieldEquipped(initialCharacter.shieldEquipped || false);
-    setEditingTempHp(initialCharacter.tempHp?.toString() || "");
-    setEditingMaxHp(initialCharacter.maxHp?.toString() || "");
+    
+    // Sincroniza combatStats
+    setEditingArmorClass(initialCharacter.combatStats?.armorClass?.toString() || "");
+    setEditingSpeed(initialCharacter.combatStats?.speed?.toString() || "");
+    setEditingShieldEquipped(initialCharacter.combatStats?.shieldEquipped || false);
+    setEditingTempHp(initialCharacter.combatStats?.tempHp?.toString() || "");
+    setEditingMaxHp(initialCharacter.combatStats?.maxHp?.toString() || "");
+
     setEditingHitDiceEntries(
       initialCharacter.hitDiceEntries &&
         initialCharacter.hitDiceEntries.length > 0
@@ -274,9 +317,59 @@ export function PlayerSheetProvider({
       }
     );
     setActions(initialCharacter.actions || []);
-    setAttacks(initialCharacter.attacks || []); // Adicionado
+    setAttacks(initialCharacter.attacks || []);
     setFeaturesAndTraits(initialCharacter.featuresAndTraits || []);
   }, [initialCharacter]);
+
+  // Cálculos de valores derivados usando useMemo
+  const calculatedProficiencyBonus = useMemo(
+    () => getProficiencyBonus(Number(editingLevel)),
+    [editingLevel]
+  );
+
+  const calculatedAttributeModifiers = useMemo(() => {
+    return {
+      strength: getModifier(attributes.strength),
+      dexterity: getModifier(attributes.dexterity),
+      constitution: getModifier(attributes.constitution),
+      intelligence: getModifier(attributes.intelligence),
+      wisdom: getModifier(attributes.wisdom),
+      charisma: getModifier(attributes.charisma),
+    };
+  }, [attributes]);
+
+  const calculatedSkillBonuses = useMemo(() => {
+    const skillBonuses: PlayerSheetContextType["calculatedSkillBonuses"] = {} as PlayerSheetContextType["calculatedSkillBonuses"];
+    for (const skillKey of Object.keys(skillProficiencies) as Array<keyof NonNullable<PlayerCharacter["proficiencies"]>["skills"]>) {
+      const config = SKILLS_CONFIG.find(s => s.key === skillKey);
+      if (config) {
+        const isProficient = skillProficiencies[skillKey];
+        const attributeModifier = calculatedAttributeModifiers[config.parentAttribute];
+        skillBonuses[skillKey] = getSkillBonus(isProficient, attributeModifier, calculatedProficiencyBonus);
+      }
+    }
+    return skillBonuses;
+  }, [SKILLS_CONFIG, skillProficiencies, calculatedAttributeModifiers, calculatedProficiencyBonus]);
+
+
+  const calculatedInitiative = useMemo(
+    () => getInitiative(calculatedAttributeModifiers.dexterity),
+    [calculatedAttributeModifiers.dexterity]
+  );
+
+  const calculatedPassivePerception = useMemo(
+    () =>
+      getPassivePerception(
+        calculatedAttributeModifiers.wisdom,
+        skillProficiencies.perception,
+        calculatedProficiencyBonus
+      ),
+    [
+      calculatedAttributeModifiers.wisdom,
+      skillProficiencies.perception,
+      calculatedProficiencyBonus,
+    ]
+  );
 
   // Handlers for actions
   const handleAddAction = useCallback(() => {
@@ -331,19 +424,24 @@ export function PlayerSheetProvider({
   // Nova função para obter o personagem atualizado com base nos estados internos
   const getUpdatedPlayerCharacter = useCallback((): PlayerCharacter => {
     return {
-      ...initialCharacter, // Começa com o personagem inicial para manter propriedades não gerenciadas pelo contexto
+      ...(initialCharacter as PlayerCharacter), // Começa com o personagem inicial para manter propriedades não gerenciadas pelo contexto
       name: editingCharacterName,
       charClass: editingCharClass,
       level: Number(editingLevel),
       background: editingBackground,
       species: editingSpecies,
       subclass: editingSubclass,
-      armorClass: Number(editingArmorClass),
-      initiative: Number(editingInitiative),
-      speed: Number(editingSpeed),
-      shieldEquipped: editingShieldEquipped,
-      tempHp: Number(editingTempHp),
-      maxHp: Number(editingMaxHp),
+      proficiencyBonus: calculatedProficiencyBonus, // Usar o valor calculado
+      combatStats: {
+        armorClass: Number(editingArmorClass),
+        initiative: calculatedInitiative, // Usar o valor calculado
+        speed: Number(editingSpeed),
+        shieldEquipped: editingShieldEquipped,
+        tempHp: Number(editingTempHp),
+        maxHp: Number(editingMaxHp),
+        currentHp: initialCharacter.combatStats.currentHp, // Manter o HP atual do personagem
+        passivePerception: calculatedPassivePerception, // Usar o valor calculado
+      },
       hitDiceEntries: editingHitDiceEntries,
       deathSavesSuccesses: editingDeathSavesSuccesses,
       deathSavesFailures: editingDeathSavesFailures,
@@ -353,9 +451,8 @@ export function PlayerSheetProvider({
         skills: skillProficiencies,
       },
       actions: actions,
-      attacks: attacks, // Adicionado
+      attacks: attacks,
       featuresAndTraits: featuresAndTraits,
-      // Outras propriedades do personagem que podem ser gerenciadas pelo PlayerSheetContext
     };
   }, [
     initialCharacter,
@@ -365,12 +462,15 @@ export function PlayerSheetProvider({
     editingBackground,
     editingSpecies,
     editingSubclass,
+    calculatedProficiencyBonus,
     editingArmorClass,
-    editingInitiative,
+    calculatedInitiative,
     editingSpeed,
     editingShieldEquipped,
     editingTempHp,
     editingMaxHp,
+    initialCharacter.combatStats.currentHp,
+    calculatedPassivePerception,
     editingHitDiceEntries,
     editingDeathSavesSuccesses,
     editingDeathSavesFailures,
@@ -378,12 +478,12 @@ export function PlayerSheetProvider({
     savingThrowProficiencies,
     skillProficiencies,
     actions,
-    attacks, // Adicionado
+    attacks,
     featuresAndTraits,
   ]);
 
   const value = {
-    playerCharacter: initialCharacter, // Expor o personagem inicial
+    playerCharacter: initialCharacter,
     editingCharacterName,
     setEditingCharacterName,
     editingCharClass,
@@ -396,19 +496,23 @@ export function PlayerSheetProvider({
     setEditingSpecies,
     editingSubclass,
     setEditingSubclass,
-    proficiencyBonus,
-    editingArmorClass,
-    setEditingArmorClass,
-    editingInitiative,
-    setEditingInitiative,
-    editingSpeed,
-    setEditingSpeed,
-    editingShieldEquipped,
-    setEditingShieldEquipped,
-    editingTempHp,
-    setEditingTempHp,
-    editingMaxHp,
-    setEditingMaxHp,
+    calculatedProficiencyBonus, // Expor o valor calculado
+    calculatedAttributeModifiers, // Expor os modificadores calculados
+    calculatedSkillBonuses, // Expor os bônus de perícia calculados
+    calculatedInitiative, // Expor a iniciativa calculada
+    calculatedPassivePerception, // Expor a percepção passiva calculada
+    combatStats: {
+      editingArmorClass,
+      setEditingArmorClass,
+      editingSpeed,
+      setEditingSpeed,
+      editingShieldEquipped,
+      setEditingShieldEquipped,
+      editingTempHp,
+      setEditingTempHp,
+      editingMaxHp,
+      setEditingMaxHp,
+    },
     editingHitDiceEntries,
     setEditingHitDiceEntries,
     editingDeathSavesSuccesses,
@@ -425,10 +529,10 @@ export function PlayerSheetProvider({
     handleAddAction,
     handleRemoveAction,
     handleActionChange,
-    attacks, // Adicionado
-    handleAddAttack, // Adicionado
-    handleRemoveAttack, // Adicionado
-    handleAttackChange, // Adicionado
+    attacks,
+    handleAddAttack,
+    handleRemoveAttack,
+    handleAttackChange,
     featuresAndTraits,
     setFeaturesAndTraits,
     SKILLS_CONFIG,
