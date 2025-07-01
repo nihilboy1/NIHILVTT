@@ -46,49 +46,43 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 bg-overlay flex items-center justify-center p-4" // Overlay de fundo
-      onClick={onClose} // Fecha o modal ao clicar fora da área de conteúdo
+      className={`bg-surface-0 p-6 rounded-lg shadow-xl max-w-md w-full ${modalClassName}`} // Container do conteúdo do modal com classes adicionais
       role="dialog" // Semântica para acessibilidade
       aria-modal="true" // Indica que o conteúdo fora do modal está inerte
       aria-labelledby="modal-title" // Associa o título ao modal para acessibilidade
-      style={{ zIndex: zIndex }} // Aplicar zIndex no overlay
+      style={{ zIndex: zIndex, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} // Aplicar zIndex e centralizar
     >
-      <div
-        className={`bg-surface-0 p-6 rounded-lg shadow-xl max-w-md w-full ${modalClassName}`} // Container do conteúdo do modal com classes adicionais
-        onClick={(e) => e.stopPropagation()} // Impede que o clique dentro do modal feche-o
-      >
-        <div className="flex justify-between items-center mb-6">
-          <h2 id="modal-title" className="text-2xl font-semibold">
-            {title}
-          </h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 id="modal-title" className="text-2xl font-semibold">
+          {title}
+        </h2>
+        <button
+          onClick={onClose}
+          className="bg-surface-2 p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-feedback-negative cursor-pointer hover:bg-feedback-negative"
+          aria-label="Fechar modal"
+        >
+          <XMarkIcon className="w-6 h-6" />
+        </button>
+      </div>
+      {children} {/* Conteúdo do modal injetado aqui */}
+      {!hideFooter && (
+        <div className="flex justify-end space-x-3 pt-4">
           <button
             onClick={onClose}
-            className="bg-surface-2 p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-feedback-negative cursor-pointer hover:bg-feedback-negative"
-            aria-label="Fechar modal"
+            className="text-surface-0 cursor-pointer bg-surface-2 border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-feedback-negative-hover hover:text-text-primary hover:bg-feedback-negative-hover"
           >
-            <XMarkIcon className="w-6 h-6" />
+            {cancelText}
           </button>
-        </div>
-        {children} {/* Conteúdo do modal injetado aqui */}
-        {!hideFooter && (
-          <div className="flex justify-end space-x-3 pt-4">
+          {onConfirm && ( // Renderiza o botão de confirmação apenas se onConfirm for fornecido
             <button
-              onClick={onClose}
-              className="text-surface-0 cursor-pointer bg-surface-2 border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-feedback-negative-hover hover:text-text-primary hover:bg-feedback-negative-hover"
+              onClick={onConfirm}
+              className="text-surface-0 cursor-pointer bg-accent-secondary border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-accent-primary-hover hover:text-text-primary hover:bg-accent-primary-hover"
             >
-              {cancelText}
+              {confirmText}
             </button>
-            {onConfirm && ( // Renderiza o botão de confirmação apenas se onConfirm for fornecido
-              <button
-                onClick={onConfirm}
-                className="text-surface-0 cursor-pointer bg-accent-secondary border border-surface-0 px-4 py-2 rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-accent-primary-hover hover:text-text-primary hover:bg-accent-primary-hover"
-              >
-                {confirmText}
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

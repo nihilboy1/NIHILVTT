@@ -1,8 +1,9 @@
-import { useChat } from "../../../widgets/chatPanel/model/contexts/ChatContext";
-import { useUI } from "../../../app/providers/UIProvider";
+import { RulerPopover } from "../../../features/boardRuler/ui/RulerPopover";
 import { useBoardSettings } from "../../../features/boardSettings/contexts/BoardSettingsContext";
+import { DiceRollPopover } from "../../../features/diceRolling/ui/DiceRollPopover";
+import { useDiceRoller } from "../../../features/diceRolling/model/hooks/useDiceRoller"; // Importar useDiceRoller
 import { Tool } from "../../../shared/api/types";
-import { DiceRollPopover } from "../../../shared/ui/DiceRollPopover";
+import { DEFAULT_PLAYER_NAME } from "../../../shared/config/constants"; // Importar DEFAULT_PLAYER_NAME
 import {
   ChevronLeftIcon,
   DiceIcon,
@@ -10,14 +11,14 @@ import {
   RulerIcon,
   SelectIcon,
 } from "../../../shared/ui/Icons";
-import { RulerPopover } from "../../../shared/ui/RulerPopover";
 import { ToolbarButton } from "../../../shared/ui/ToolbarButton";
 import { ToolbarPopoverButton } from "../../../shared/ui/ToolbarPopoverButton";
+import { useUI } from "../../layoutControls/model/contexts/UIProvider";
 import { useToolbarState } from "../model/hooks/useToolbarState";
 
 // barra lateral esquerda com os botões de ferramentas
 export function Toolbar() {
-  const { rollAndSendMessage } = useChat();
+  const { rollDice } = useDiceRoller(); // Usar o novo hook
   const {
     rulerPlacementMode,
     setRulerPlacementMode,
@@ -27,6 +28,10 @@ export function Toolbar() {
   const { activeTool, setActiveTool, setIsToolbarVisible } = useUI();
 
   const { activePopover, setActivePopover } = useToolbarState({ activeTool });
+
+  const handleToolbarRoll = (notation: string) => {
+    rollDice(notation, notation, "Generic", DEFAULT_PLAYER_NAME);
+  };
 
   return (
     <div className="bg-surface-0 w-16 flex flex-col border-r shadow-xl py-5 space-y-3 fixed left-0 top-0 bottom-0 z-50 h-full">
@@ -74,7 +79,7 @@ export function Toolbar() {
         isActive={false}
         popoverComponent={DiceRollPopover}
         popoverProps={{
-          onRoll: rollAndSendMessage,
+          onRoll: handleToolbarRoll, // Passar a nova função
         }}
         activeTool={activeTool}
         setActiveTool={setActiveTool}

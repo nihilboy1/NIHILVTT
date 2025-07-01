@@ -3,10 +3,10 @@ import { useGameBoard } from "../model/contexts/GameBoardContext"; // Apenas use
 import { BoardTokenLayer } from "./BoardTokenLayer";
 import { GridLayer } from "./GridLayer";
 
-import { useUI } from "../../../app/providers/UIProvider"; // Importar useUI
-import { MarqueeLayer } from "../../../features/board/MarqueeLayer";
-import { RulerLayer } from "../../../features/board/RulerLayer";
+import { MarqueeLayer } from "../../../features/boardMarqueeSelection/ui/MarqueeLayer";
+import { RulerLayer } from "../../../features/boardRuler/ui/RulerLayer";
 import { PageSettingsModal } from "../../../features/boardSettings/ui/PageSettingsModal";
+import { useUI } from "../../layoutControls/model/contexts/UIProvider";
 import { GameBoardSideOption } from "./GameBoardSideOption";
 
 // GameBoardContent não precisa de props, pois tudo vem do contexto

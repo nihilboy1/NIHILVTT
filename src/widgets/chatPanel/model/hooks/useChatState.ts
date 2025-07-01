@@ -1,6 +1,5 @@
 import { DiceRollDetails, DiceRollMessage, Message, TextMessage } from "@/shared/api/types";
 import { DEFAULT_PLAYER_NAME } from "../../../../shared/config/constants";
-import { rollDiceInternal } from "../../../../shared/lib/utils/dice/diceUtils";
 import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
 import { useCallback, useState } from "react";
 
@@ -8,8 +7,7 @@ import { useCallback, useState } from "react";
 export interface ChatState {
   messages: Message[];
   sendMessage: (content: string | DiceRollDetails, sender?: string) => void;
-  rollAndSendMessage: (notation: string) => void;
-  clearMessages: () => void; // Adicionar esta linha
+  clearMessages: () => void;
 }
 
 export const useChatState = (): ChatState => {
@@ -21,7 +19,7 @@ export const useChatState = (): ChatState => {
     isDiceRoll: false,
   };
 
-  const [messages, setMessages] = useState<Message[]>([initialWelcomeMessage]); // Usar a mensagem inicial
+  const [messages, setMessages] = useState<Message[]>([initialWelcomeMessage]);
 
   const sendMessage = useCallback(
     (
@@ -42,18 +40,13 @@ export const useChatState = (): ChatState => {
         };
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       } else {
-        const summary =
-          `Rolou ${content.notation}: [${content.rolls.join(", ")}]` +
-          (content.modifierOperator && content.modifierValue !== undefined
-            ? ` ${content.modifierOperator} ${content.modifierValue}`
-            : "") +
-          ` = ${content.finalResult}`;
-
+        // A propriedade 'text' para DiceRollMessage pode ser uma string vazia ou uma mensagem genérica,
+        // pois o conteúdo detalhado da rolagem será renderizado pelo componente de exibição.
         const newMessage: DiceRollMessage = {
           ...baseMessage,
           isDiceRoll: true,
-          diceRollDetails: { ...content },
-          text: summary,
+          diceRollDetails: content, // 'content' já é DiceRollDetails completa
+          text: "", // Ou uma string como "Rolagem de dados"
         };
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       }
@@ -61,21 +54,9 @@ export const useChatState = (): ChatState => {
     []
   );
 
-  const rollAndSendMessage = useCallback(
-    (notation: string) => {
-      const rollDetailsOrError = rollDiceInternal(notation);
-      if ("error" in rollDetailsOrError) {
-        sendMessage(rollDetailsOrError.error, "Sistema");
-      } else {
-        sendMessage(rollDetailsOrError, DEFAULT_PLAYER_NAME);
-      }
-    },
-    [sendMessage]
-  ); // Removido rollDiceInternal das dependências, pois não é mais um useCallback local
-
   const clearMessages = useCallback(() => {
-    setMessages([initialWelcomeMessage]); // Limpa as mensagens e adiciona a mensagem inicial novamente
-  }, [initialWelcomeMessage]); // Dependência para useCallback
+    setMessages([initialWelcomeMessage]);
+  }, []); // initialWelcomeMessage é uma constante, não precisa ser dependência
 
-  return { messages, sendMessage, rollAndSendMessage, clearMessages }; // Retornar clearMessages
+  return { messages, sendMessage, clearMessages };
 };

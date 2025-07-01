@@ -16,13 +16,13 @@ interface UseRulerProps {
   getSVGPoint: (clientX: number, clientY: number) => Point;
 }
 
-export const useRuler = ({
+export function useRuler({
   activeTool,
   rulerPlacementMode,
   rulerPersists,
   gridSettings,
   getSVGPoint,
-}: UseRulerProps) => {
+}: UseRulerProps) {
   const [rulerPath, setRulerPath] = useState<RulerPathState>({
     isActive: false,
     points: [],
@@ -175,4 +175,4 @@ export const useRuler = ({
     handleRulerRightClick,
     clearRuler,
   };
-};
+}

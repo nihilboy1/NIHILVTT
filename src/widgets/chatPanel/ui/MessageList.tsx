@@ -1,6 +1,6 @@
-import { DiceRollMessage, Message } from "@/shared/api/types";
-import { DEFAULT_PLAYER_NAME } from "../../../shared/config/constants";
+import { DiceRollMessage, Message, DiceRollDetails } from "@/shared/api/types";
 import React from "react";
+import { DEFAULT_PLAYER_NAME } from "../../../shared/config/constants";
 
 interface MessageListProps {
   messages: Message[];
@@ -43,62 +43,76 @@ export function MessageList({ messages, messagesEndRef }: MessageListProps) {
             {msg.isDiceRoll ? (
               <div className="text-sm">
                 {(() => {
-                  const diceRollDetails = (msg as DiceRollMessage)
-                    .diceRollDetails;
+                  const diceRollDetails = (msg as DiceRollMessage).diceRollDetails;
 
-                  const modifierElement =
-                    diceRollDetails.modifierOperator &&
-                    diceRollDetails.modifierValue !== undefined ? (
-                      <span className="italic">
-                        {" "}
-                        {diceRollDetails.modifierOperator}{" "}
-                        {diceRollDetails.modifierValue}
-                      </span>
-                    ) : null;
+                  const getCategoryPrefix = (category: DiceRollDetails['category']) => {
+                    switch (category) {
+                      case "Attribute":
+                        return "Teste de Atributo: ";
+                      case "Skill":
+                        return "Teste de Perícia: ";
+                      case "Saving Throw":
+                        return "Salvaguarda: ";
+                      case "Attack":
+                        return "Ataque: ";
+                      case "Damage":
+                        return "Dano: ";
+                      case "Generic":
+                      default:
+                        return "Rolagem: ";
+                    }
+                  };
 
                   return (
                     <>
-                      {/* TypeScript agora sabe que msg é do tipo DiceRollMessage aqui */}
-                      <span className="italic">
-                        Rolou {diceRollDetails.notation}:
+                      <span className="font-semibold">
+                        {getCategoryPrefix(diceRollDetails.category)}
+                        {diceRollDetails.rollName}
                       </span>
-                      <span className="mx-1 font-medium">{"["}</span>
-                      {diceRollDetails.rolls.map((roll, index) => (
-                        <span
-                          key={index}
-                          className={`font-bold ${
-                            roll === 20
-                              ? "text-feedback-positive"
-                              : roll === 1
-                              ? "text-feedback-negative"
-                              : ""
+                      <div className="mt-1 text-sm">
+                        <span className="italic">Resultados: </span>
+                        <span className="mx-1 font-medium">{"["}</span>
+                        {diceRollDetails.parts.map((part, index) => (
+                          <React.Fragment key={index}>
+                            {typeof part === 'number' ? (
+                              <span className="font-bold text-text-secondary">
+                                {part >= 0 ? `+${part}` : part}
+                              </span>
+                            ) : (
+                              <span
+                                className={`font-bold ${
+                                  part.result === 20
+                                    ? "text-feedback-positive"
+                                    : part.result === 1
+                                    ? "text-feedback-negative"
+                                    : ""
+                                }`}
+                              >
+                                {part.result}
+                              </span>
+                            )}
+                            {index < diceRollDetails.parts.length - 1 ? (
+                              <span className="font-medium">, </span>
+                            ) : (
+                              ""
+                            )}
+                          </React.Fragment>
+                        ))}
+                        <span className="mx-1 font-medium">{"]"}</span>
+                        <span className="mx-1">=</span>
+                        <div
+                          className={`inline-block mt-1 p-1 px-2.5 rounded shadow-inner ${
+                            diceRollDetails.finalResult === 20
+                              ? ` bg-feedback-positive text-surface-0 `
+                              : diceRollDetails.finalResult === 1
+                              ? `bg-feedback-negative text-surface-0`
+                              : "bg-surface-0"
                           }`}
                         >
-                          {roll}
-                          {index < diceRollDetails.rolls.length - 1 ? (
-                            <span className="font-medium">, </span>
-                          ) : (
-                            ""
-                          )}
-                        </span>
-                      ))}
-                      <span className="mx-1 font-medium">{"]"}</span>
-
-                      {modifierElement}
-
-                      <span className="mx-1">=</span>
-                      <div
-                        className={`inline-block mt-1 p-1 px-2.5 rounded shadow-inner ${
-                          diceRollDetails.finalResult === 20
-                            ? ` bg-feedback-positive text-surface-0 `
-                            : diceRollDetails.finalResult === 1
-                            ? `bg-feedback-negative text-surface-0`
-                            : "bg-surface-0"
-                        }`}
-                      >
-                        <span className="font-bold text-lg">
-                          {diceRollDetails.finalResult}
-                        </span>
+                          <span className="font-bold text-lg">
+                            {diceRollDetails.finalResult}
+                          </span>
+                        </div>
                       </div>
                     </>
                   );
@@ -116,4 +130,3 @@ export function MessageList({ messages, messagesEndRef }: MessageListProps) {
     </div>
   );
 }
-// ESTILO AJUSTADO

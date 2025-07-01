@@ -1,7 +1,8 @@
-import { useModal } from "../../../../../app/providers/ModalProvider";
 import { type Action } from "../../../../../shared/api/types";
 import { EditIcon, PlusCircleIcon } from "../../../../../shared/ui/Icons";
-import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext"; // Renomeado
+import { useDiceRoller } from "../../../../../features/diceRolling/model/hooks/useDiceRoller";
+import { useModal } from "../../../../../widgets/modalManager/model/contexts/ModalProvider";
+import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext";
 import { CombatStats } from "./CombatStats";
 import { HealthSection } from "./HealthSection";
 
@@ -28,7 +29,7 @@ export function PrincipalHealthAndCombat() {
   const { openModal } = useModal();
 
   const handleOpenEditModal = (action: Action) => {
-    openModal("actionEdit", { actionId: action.id });
+    openModal("actionEdit", { actionId: action.id }, false); // Abrir ActionEditModal como não dismissible
   };
 
   return (
@@ -61,37 +62,50 @@ export function PrincipalHealthAndCombat() {
             AÇÕES
           </legend>
           {actions.map(
-            (
-              action: Action // Adicionado tipagem para action
-            ) => (
-              <div key={action.id} className="relative group">
-                <button
-                  type="button"
-                  title="Realizar ação"
-                  className="w-full grid grid-cols-6 gap-2 text-[0.70rem] rounded bg-accent-primary hover:bg-surface-4 text-start hover:bg-accent-primary-hover hover:shadow-md"
-                >
-                  <span className="border col-span-3 border-surface-2 rounded-md p-1 my-1 ml-1">
-                    {action.name || "-"}
-                  </span>
-                  <span className="border border-surface-2 rounded-md p-1 my-1">
-                    {action.bonus || "-"}
-                  </span>
-                  <span className="border col-span-2 border-surface-2 rounded-md p-1 my-1 mr-1">
-                    {action.damage || "-"}
-                  </span>
-                </button>
-                <div className="absolute -top-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            (action: Action) => {
+              const { rollDice } = useDiceRoller();
+              const { playerCharacter } = usePlayerSheet(); // Obter o personagem para o sender
+
+              const handleRollAction = () => {
+                if (action.bonus) {
+                  rollDice(action.bonus, action.name, "Attack", playerCharacter.name);
+                }
+                if (action.damage) {
+                  rollDice(action.damage, `${action.name} - Dano`, "Damage", playerCharacter.name);
+                }
+              };
+
+              return (
+                <div key={action.id} className="relative group">
                   <button
                     type="button"
-                    onClick={() => handleOpenEditModal(action)}
-                    className="flex items-center justify-center w-5 h-5 text-xl font-bold bg-accent-primary hover:bg-accent-primary-hover"
-                    title="Editar ação"
+                    title="Realizar ação"
+                    className="w-full grid grid-cols-6 gap-2 text-[0.70rem] rounded bg-accent-primary hover:bg-surface-4 text-start hover:bg-accent-primary-hover hover:shadow-md"
+                    onClick={handleRollAction} // Adicionar onClick para rolagem
                   >
-                    <EditIcon height={4} width={4} />
+                    <span className="border col-span-3 border-surface-2 rounded-md p-1 my-1 ml-1">
+                      {action.name || "-"}
+                    </span>
+                    <span className="border border-surface-2 rounded-md p-1 my-1">
+                      {typeof action.bonus === 'number' ? (action.bonus >= 0 ? `+${action.bonus}` : action.bonus) : action.bonus || "-"}
+                    </span>
+                    <span className="border col-span-2 border-surface-2 rounded-md p-1 my-1 mr-1">
+                      {typeof action.damage === 'number' ? (action.damage >= 0 ? `+${action.damage}` : action.damage) : action.damage || "-"}
+                    </span>
                   </button>
+                  <div className="absolute -top-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(action)}
+                      className="flex items-center justify-center w-5 h-5 text-xl font-bold bg-accent-primary hover:bg-accent-primary-hover"
+                      title="Editar ação"
+                    >
+                      <EditIcon height={4} width={4} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )
+              );
+            }
           )}
           <button
             type="button"

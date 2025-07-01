@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { useModal } from "../../../../app/providers/ModalProvider";
 import { ActionEditModal } from "../../../../features/characterEditAction/ui/ActionEditModal";
 import { PlayerCharacter } from "../../../../shared/api/types";
+import { useModal } from "../../../../widgets/modalManager/model/contexts/ModalProvider";
 import { usePlayerSheet } from "../../model/contexts/CharacterSheetContext"; // Renomeado
 import { PlayerSheetConfigTab } from "./configTab/PlayerSheetConfigTab";
 import { PlayerSheetDetailsTab } from "./detailsTab/PlayerSheetDetailsTab";
@@ -106,7 +106,9 @@ export function PlayerSheetContent({
         <ActionEditModal
           isOpen={true}
           actionId={activeModalProps.actionId}
-          onClose={closeModal}
+          onClose={() => {
+            closeModal();
+          }}
           zIndex={200}
         />
       )}

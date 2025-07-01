@@ -1,9 +1,8 @@
-import { useChat } from "@/contexts/ChatContext";
+import { useChat } from "../model/contexts/ChatContext";
+import { performDiceRoll } from "@/utils/dice/diceUtils";
 
-
-type RollAndSendMessageFn = ReturnType<typeof useChat>['rollAndSendMessage'];
 type SendMessageFn = ReturnType<typeof useChat>['sendMessage'];
-type ClearMessagesFn = ReturnType<typeof useChat>['clearMessages']; // Adicionar esta linha
+type ClearMessagesFn = ReturnType<typeof useChat>['clearMessages'];
 
 /**
  * @interface CommandContext
@@ -11,9 +10,8 @@ type ClearMessagesFn = ReturnType<typeof useChat>['clearMessages']; // Adicionar
  * Contém funções para enviar mensagens e rolar dados, além de acessar todos os comandos.
  */
 export interface CommandContext {
-  rollAndSendMessage: RollAndSendMessageFn;
   sendMessage: SendMessageFn;
-  clearMessages: ClearMessagesFn; // Adicionar esta linha
+  clearMessages: ClearMessagesFn;
   getAllCommands: () => Command[];
 }
 
@@ -59,18 +57,23 @@ const commandsRegistry: Command[] = [
       return null; // Valid
     },
     execute: (_args: string[], context: CommandContext) => {
-      const notation = _args.join(' '); // Alterado args para _args
-      context.rollAndSendMessage(notation);
+      const notation = _args.join(' ');
+      try {
+        const diceRollDetails = performDiceRoll(notation, notation, "Generic");
+        context.sendMessage(diceRollDetails);
+      } catch (error) {
+        context.sendMessage(`Erro ao rolar dados: ${(error as Error).message}`, "Sistema");
+      }
     },
   },
   {
     name: "/help",
     description: "Mostra informações sobre os comandos disponíveis.",
     usage: "/help [nome-do-comando]",
-    execute: (_args: string[], context: CommandContext) => { // Alterado args para _args
+    execute: (_args: string[], context: CommandContext) => {
       const allCommands = context.getAllCommands();
-      if (_args.length > 0) { // Alterado args para _args
-        const commandName = _args[0].startsWith('/') ? _args[0] : `/${_args[0]}`; // Alterado args para _args
+      if (_args.length > 0) {
+        const commandName = _args[0].startsWith('/') ? _args[0] : `/${_args[0]}`;
         const foundCommand = allCommands.find(cmd => cmd.name === commandName || cmd.aliases?.includes(commandName));
         if (foundCommand) {
           let helpText = `Ajuda para ${foundCommand.name}:\n`;
@@ -95,8 +98,8 @@ const commandsRegistry: Command[] = [
   {
     name: "/clear",
     description: "Limpa o histórico do chat.",
-    aliases: ["/cls"], // Opcional: adicionar um alias
-    execute: (_args: string[], context: CommandContext) => { // Alterado args para _args
+    aliases: ["/cls"],
+    execute: (_args: string[], context: CommandContext) => {
       context.clearMessages();
       context.sendMessage("Histórico do chat limpo.", "Sistema");
     },
@@ -123,5 +126,5 @@ export const findCommand = (commandName: string): Command | undefined => {
  * @returns {Command[]} Um array de objetos Command.
  */
 export const getAllCommands = (): Command[] => {
-  return [...commandsRegistry]; // Retorna uma cópia
+  return [...commandsRegistry];
 };

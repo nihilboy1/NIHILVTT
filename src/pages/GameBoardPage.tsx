@@ -1,12 +1,12 @@
 import { useRef } from "react";
-import { useModal } from "../app/providers/ModalProvider";
-import { useUI } from "../app/providers/UIProvider"; // Importar useUI
 import { useSelectedToken } from "../entities/token/model/contexts/SelectedTokenContext";
 import { ChevronLeftIcon, ChevronRightIcon } from "../shared/ui/Icons"; // Importar ícones
 import { GameBoardInteractionProvider } from "../widgets/gameBoard/model/contexts/GameBoardInteractionContext";
 import { useGameBoardInteraction } from "../widgets/gameBoard/model/hooks/useGameBoardInteraction";
 import { GameBoard } from "../widgets/gameBoard/ui/GameBoard";
-import { ModalManager } from "../widgets/ModalManager";
+import { useUI } from "../widgets/layoutControls/model/contexts/UIProvider"; // Importar useUI
+import { useModal } from "../widgets/modalManager/model/contexts/ModalProvider";
+import { ModalManager } from "../widgets/modalManager/ui/ModalManager";
 
 export function GameBoardPage() {
   const { closeModal } = useModal();

@@ -14,6 +14,7 @@ import {
 import { SKILLS_CONFIG } from "../../../../shared/config/sheetDefaults";
 
 interface PlayerSheetContextType {
+  playerCharacter: PlayerCharacter; // Adicionar playerCharacter
   editingCharacterName: string;
   setEditingCharacterName: (name: string) => void;
   editingCharClass: string;
@@ -382,6 +383,7 @@ export function PlayerSheetProvider({
   ]);
 
   const value = {
+    playerCharacter: initialCharacter, // Expor o personagem inicial
     editingCharacterName,
     setEditingCharacterName,
     editingCharClass,

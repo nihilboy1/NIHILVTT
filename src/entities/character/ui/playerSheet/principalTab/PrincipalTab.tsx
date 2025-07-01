@@ -1,6 +1,5 @@
 import { PrincipalHeader } from "./PrincipalHeader";
 import { PrincipalAttributesAndSkills } from "./PrincipalAttributesAndSkills";
-import { PrincipalAttacksAndFeatures } from "./PrincipalAttacksAndFeatures"; // Alterado para importação nomeada
 import { PrincipalHealthAndCombat } from "./PrincipalHealthAndCombat";
 // Não é mais necessário importar usePlayerSheet aqui, pois os componentes filhos o utilizam diretamente.
 
@@ -14,7 +13,6 @@ export function PrincipalTab() {
 
         <PrincipalHealthAndCombat />
 
-        <PrincipalAttacksAndFeatures />
       </div>
     </div>
   );

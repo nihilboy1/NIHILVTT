@@ -1,10 +1,18 @@
+export type RollCategory = "Attack" | "Damage" | "Attribute" | "Skill" | "Saving Throw" | "Generic";
+
+export interface Roll {
+  dice: `d${number}`;
+  result: number;
+}
+
 export interface DiceRollDetails {
-  notation: string;
-  rolls: number[];
-  modifierOperator?: "+" | "-";
-  modifierValue?: number;
+  rollName: string; // Ex: "Força", "Acrobacia", "Espada Longa"
+  category: RollCategory; // A categoria da rolagem
+  parts: (Roll | number)[];
   finalResult: number;
 }
+
+export type DiceFormula = string | number;
 
 interface BaseMessage {
   id: string;
@@ -145,16 +153,16 @@ export type Character = PlayerCharacter | MonsterNPCCharacter | ObjectCharacter;
 export interface Action {
   id: string;
   name: string;
-  bonus?: string;
-  damage?: string;
+  bonus?: DiceFormula;
+  damage?: DiceFormula;
   notes?: string;
 }
 
 export interface Attack {
   id: string;
   name: string;
-  attackBonus?: string;
-  damage?: string;
+  attackBonus?: DiceFormula;
+  damage?: DiceFormula;
 }
 
 export interface EquipmentItem {

@@ -1,7 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useModal } from "../../../../app/providers/ModalProvider";
-import { useUI } from "../../../../app/providers/UIProvider";
-import { ModalEntry } from "../../../../app/providers/useModalStateManagement";
 import { useCharacters } from "../../../../entities/character/model/contexts/CharactersContext"; // Renomeado
 import { useSelectedToken } from "../../../../entities/token/model/contexts/SelectedTokenContext";
 import { HP_MODAL_ESTIMATED_HEIGHT_REM } from "../../../../features/characterUpdateHp/ui/HPControlModal";
@@ -12,6 +9,9 @@ import {
   type DraggingVisuals,
   type Token, // Renomeado de GridInstance
 } from "../../../../shared/api/types";
+import { useUI } from "../../../layoutControls/model/contexts/UIProvider";
+import { useModal } from "../../../modalManager/model/contexts/ModalProvider";
+import { ModalEntry } from "../../../modalManager/model/hooks/useModalStateManagement";
 
 interface UseGameBoardInteractionProps {
   gameBoardRef: React.RefObject<HTMLDivElement>;

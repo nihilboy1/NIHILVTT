@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useModal } from "../../../app/providers/ModalProvider";
 import { usePlayerSheet } from "../../../entities/character/model/contexts/CharacterSheetContext"; // Renomeado
 import { type Action } from "../../../shared/api/types";
 import { Modal } from "../../../shared/ui/Modal";
+import { useModal } from "../../../widgets/modalManager/model/contexts/ModalProvider";
 interface ActionEditModalProps {
   isOpen: boolean;
   actionId: string;
@@ -19,24 +19,16 @@ export function ActionEditModal({
   const { actions, handleActionChange, handleRemoveAction } = usePlayerSheet();
   const { openModal, closeModal } = useModal();
 
-  console.log("ActionEditModal: Renderizando com actionId:", actionId);
-
   // Encontrar a ação mais recente do contexto com base no actionId
   const currentAction = actions.find((a: Action) => a.id === actionId); // Adicionado tipagem para 'a'
-  console.log("ActionEditModal: currentAction do contexto:", currentAction);
 
   // Estado local para a ação editada, inicializado com a ação encontrada ou um fallback
   const [editedAction, setEditedAction] = useState<Action>(
     currentAction || { id: actionId, name: "", bonus: "", damage: "" }
   );
-  console.log("ActionEditModal: Estado inicial editedAction:", editedAction);
 
   // Sincronizar o estado local com a ação do contexto sempre que ela mudar
   useEffect(() => {
-    console.log(
-      "ActionEditModal: useEffect - currentAction mudou:",
-      currentAction
-    );
     if (currentAction) {
       setEditedAction(currentAction);
     }
@@ -48,22 +40,8 @@ export function ActionEditModal({
   };
 
   const handleSave = () => {
-    console.log(
-      "ActionEditModal: handleSave chamado. editedAction:",
-      editedAction
-    );
     // Certifique-se de que editedAction.id não é undefined antes de salvar
     if (editedAction.id) {
-      console.log(
-        "ActionEditModal: Salvando ação com ID:",
-        editedAction.id,
-        "Nome:",
-        editedAction.name,
-        "Bônus:",
-        editedAction.bonus,
-        "Dano:",
-        editedAction.damage
-      );
       handleActionChange(editedAction.id, "name", editedAction.name);
       handleActionChange(editedAction.id, "bonus", editedAction.bonus || "");
       handleActionChange(editedAction.id, "damage", editedAction.damage || "");
@@ -81,18 +59,14 @@ export function ActionEditModal({
       title: "Confirmar Exclusão",
       content: "Você tem certeza que deseja remover esta ação?",
       onConfirm: () => {
-        console.log(
-          "ActionEditModal: Confirmando exclusão da ação com ID:",
-          actionId
-        );
         handleRemoveAction(actionId);
-        closeModal();
-        closeModal();
+        closeModal(); // Fecha o confirmationModal
+        closeModal(); // Fecha o ActionEditModal
       },
       onCancel: () => {
-        closeModal();
+        closeModal(); // Fecha apenas o confirmationModal
       },
-    });
+    }, true); // ConfirmationModal é dismissible
   };
 
   if (!isOpen) return null;

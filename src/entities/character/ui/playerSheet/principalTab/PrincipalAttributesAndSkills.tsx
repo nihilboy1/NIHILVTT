@@ -13,6 +13,7 @@ export function PrincipalAttributesAndSkills() {
     setSkillProficiencies,
     SKILLS_CONFIG,
     proficiencyBonus,
+    playerCharacter, // Adicionar playerCharacter
   } = usePlayerSheet();
 
   const handleAttributeChange = (
@@ -94,6 +95,7 @@ export function PrincipalAttributesAndSkills() {
                 } // Adicionado tipagem
                 attrValue={attrValue}
                 onAttributeChange={handleAttributeChange}
+                characterName={playerCharacter.name} // Passar o nome do personagem
               />
               {parentAttributeSkills.length > 0 && (
                 <div className="mt-1.5 space-y-0.5">
@@ -132,6 +134,7 @@ export function PrincipalAttributesAndSkills() {
                             PlayerCharacter["attributes"]
                           >
                         } // Adicionado tipagem
+                        characterName={playerCharacter.name} // Passar o nome do personagem
                       />
                     );
                   })}

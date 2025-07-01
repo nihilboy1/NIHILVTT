@@ -1,9 +1,9 @@
 import React from "react";
-import { useModal } from "../../../../../app/providers/ModalProvider";
 import { HitDiceEntry } from "../../../../../shared/api/types";
 import { cn } from "../../../../../shared/lib/utils/cn";
 import { generateUniqueId } from "../../../../../shared/lib/utils/id/idUtils";
 import { DeleteIcon, PlusCircleIcon } from "../../../../../shared/ui/Icons";
+import { useModal } from "../../../../../widgets/modalManager/model/contexts/ModalProvider";
 
 interface HealthSectionProps {
   editingTempHp: string;

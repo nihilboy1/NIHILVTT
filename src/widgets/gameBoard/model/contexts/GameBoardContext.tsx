@@ -8,12 +8,12 @@ import React, {
   type ReactNode,
 } from "react";
 
-import { useModal } from "../../../../app/providers/ModalProvider";
-import { useUI } from "../../../../app/providers/UIProvider";
 import { useCharacters } from "../../../../entities/character/model/contexts/CharactersContext";
+import { useMarqueeSelection } from "../../../../features/boardMarqueeSelection/model/hooks/useMarqueeSelection";
 import { useZoomAndPan } from "../../../../features/boardPanningAndZoom/model/hooks/useZoomAndPan";
 import { useRuler } from "../../../../features/boardRuler/model/hooks/useRuler";
 import { useBoardSettings } from "../../../../features/boardSettings/contexts/BoardSettingsContext";
+import { useCharacterDrop } from "../../../../features/characterDropOnBoard/model/hooks/useCharacterDrop";
 import {
   type Character,
   type DraggingVisuals,
@@ -26,9 +26,9 @@ import {
   type Tool,
 } from "../../../../shared/api/types";
 import { parseCharacterSize } from "../../../../shared/lib/utils/characterUtils";
+import { useUI } from "../../../layoutControls/model/contexts/UIProvider";
+import { useModal } from "../../../modalManager/model/contexts/ModalProvider";
 import { useGameBoardEvents } from "../hooks/useGameBoardEvents";
-import { useMarqueeSelection } from "../../../../features/boardMarqueeSelection/model/hooks/useMarqueeSelection";
-import { useCharacterDrop } from "../../../../features/characterDropOnBoard/model/hooks/useCharacterDrop";
 
 interface GameBoardProviderProps {
   children: ReactNode;
