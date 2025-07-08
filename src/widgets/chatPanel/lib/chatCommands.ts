@@ -3,6 +3,7 @@ import { performDiceRoll } from "@/utils/dice/diceUtils";
 
 type SendMessageFn = ReturnType<typeof useChat>['sendMessage'];
 type ClearMessagesFn = ReturnType<typeof useChat>['clearMessages'];
+type RollAndSendMessageFn = ReturnType<typeof useChat>['rollAndSendMessage'];
 
 /**
  * @interface CommandContext
@@ -12,6 +13,7 @@ type ClearMessagesFn = ReturnType<typeof useChat>['clearMessages'];
 export interface CommandContext {
   sendMessage: SendMessageFn;
   clearMessages: ClearMessagesFn;
+  rollAndSendMessage: RollAndSendMessageFn; // Adicionado
   getAllCommands: () => Command[];
 }
 

@@ -11,7 +11,6 @@ import {
   type FeatureOrTrait,
   type HitDiceEntry,
   type PlayerCharacter,
-  type BaseDndCharacter,
 } from "../../../../shared/api/types";
 import { SKILLS_CONFIG } from "../../../../shared/config/sheetDefaults";
 import {

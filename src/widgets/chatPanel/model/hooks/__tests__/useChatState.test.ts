@@ -1,27 +1,28 @@
 import { act, renderHook } from "@testing-library/react";
-import { useChatState } from "../hooks/useChatState";
+import { useChatState } from "@/widgets/chatPanel/model/hooks/useChatState";
 import {
   DiceRollDetails,
   DiceRollMessage,
   TextMessage,
-} from "../shared/api/types";
-import { DEFAULT_PLAYER_NAME } from "../shared/config/constants";
+  RollCategory,
+} from "@/shared/api/types";
+import { DEFAULT_PLAYER_NAME } from "@/shared/config/constants";
 
 // Mock para generateUniqueId para garantir IDs consistentes nos testes
-jest.mock("../shared/lib/utils/id/idUtils", () => ({
+jest.mock("../../../../shared/lib/utils/id/idUtils", () => ({
   generateUniqueId: jest.fn(() => "mock-id"),
 }));
 
-// Mock para rollDiceInternal para controlar o resultado das rolagens
-jest.mock("../shared/lib/utils/dice/diceUtils", () => ({
-  rollDiceInternal: jest.fn((notation: string) => {
-    if (notation === "1d6") {
-      return { notation: "1d6", rolls: [3], finalResult: 3 };
+// Mock para performDiceRoll para controlar o resultado das rolagens
+jest.mock("@/utils/dice/diceUtils", () => ({
+  performDiceRoll: jest.fn((formula: string, rollName: string, category: RollCategory) => {
+    if (formula === "1d6") {
+      return { rollName, category, parts: [{ dice: "d6", result: 3 }], finalResult: 3 };
     }
-    if (notation === "invalid") {
-      return { error: "Comando inválido" };
+    if (formula === "invalid") {
+      throw new Error("Comando inválido");
     }
-    return { notation: "1d1", rolls: [1], finalResult: 1 };
+    return { rollName, category, parts: [{ dice: "d1", result: 1 }], finalResult: 1 };
   }),
 }));
 
@@ -59,10 +60,9 @@ describe("useChatState", () => {
     const { result } = renderHook(() => useChatState());
 
     const diceRollDetails: DiceRollDetails = {
-      notation: "2d6+5",
-      rolls: [1, 6],
-      modifierOperator: "+",
-      modifierValue: 5,
+      rollName: "2d6+5",
+      category: "Generic",
+      parts: [{ dice: "d6", result: 1 }, { dice: "d6", result: 6 }, 5],
       finalResult: 12,
     };
 
@@ -72,7 +72,7 @@ describe("useChatState", () => {
 
     expect(result.current.messages.length).toBe(2);
     const sentMessage = result.current.messages[1] as DiceRollMessage;
-    expect(sentMessage.text).toBe("Rolou 2d6+5: [1, 6] + 5 = 12");
+    expect(sentMessage.text).toBe(""); // Agora o texto é vazio, o componente de exibição renderiza os detalhes
     expect(sentMessage.sender).toBe("Mestre");
     expect(sentMessage.isDiceRoll).toBe(true);
     expect(sentMessage.diceRollDetails).toEqual(diceRollDetails);
@@ -87,10 +87,11 @@ describe("useChatState", () => {
 
     expect(result.current.messages.length).toBe(2);
     const sentMessage = result.current.messages[1] as DiceRollMessage;
-    expect(sentMessage.text).toBe("Rolou 1d6: [3] = 3"); // Baseado no mock
+    expect(sentMessage.text).toBe(""); // Agora o texto é vazio
     expect(sentMessage.sender).toBe(DEFAULT_PLAYER_NAME);
     expect(sentMessage.isDiceRoll).toBe(true);
-    expect(sentMessage.diceRollDetails.notation).toBe("1d6");
+    expect(sentMessage.diceRollDetails.rollName).toBe("1d6");
+    expect(sentMessage.diceRollDetails.finalResult).toBe(3);
   });
 
   it("deve enviar mensagem de erro para rolagem de dados inválida", () => {
@@ -102,7 +103,7 @@ describe("useChatState", () => {
 
     expect(result.current.messages.length).toBe(2);
     const errorMessage = result.current.messages[1] as TextMessage;
-    expect(errorMessage.text).toBe("Comando inválido"); // Baseado no mock
+    expect(errorMessage.text).toBe("Erro ao rolar dados: Comando inválido"); // Baseado no mock
     expect(errorMessage.sender).toBe("Sistema");
     expect(errorMessage.isDiceRoll).toBe(false);
   });

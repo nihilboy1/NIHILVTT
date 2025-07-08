@@ -1,4 +1,4 @@
-import { CharacterType, PlayerCharacter, MonsterNPCCharacter } from "../api/types";
+import { PlayerCharacter, MonsterNPCCharacter } from "../api/types";
 import defaultTokenImage from "../assets/defaultToken.png"; // Importar a imagem diretamente
 
 export const SKILLS_CONFIG: {
@@ -94,9 +94,8 @@ export const defaultSkills: NonNullable<
   survival: false,
 };
 
-export const DEFAULT_CHARACTER_DATA: Omit<PlayerCharacter, "id"> = {
+export const DEFAULT_CHARACTER_DATA: Omit<PlayerCharacter, "id" | "type"> = { // Removido 'type'
   name: "Novo Personagem",
-  type: CharacterType.PLAYER,
   image: DEFAULT_TOKEN_IMAGE,
   size: "medium",
   notes: "",
@@ -132,9 +131,8 @@ export const DEFAULT_CHARACTER_DATA: Omit<PlayerCharacter, "id"> = {
   featuresAndTraits: [],
 };
 
-export const DEFAULT_MONSTER_NPC_DATA: Omit<MonsterNPCCharacter, "id"> = {
+export const DEFAULT_MONSTER_NPC_DATA: Omit<MonsterNPCCharacter, "id" | "type"> = { // Removido 'type'
   name: "Novo Monstro/NPC",
-  type: CharacterType.MONSTER_NPC,
   image: DEFAULT_TOKEN_IMAGE,
   size: "medium",
   notes: "",

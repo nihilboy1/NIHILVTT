@@ -1,5 +1,5 @@
 import { useCharacterSheetForm } from "@/entities/character/model/hooks/useCharacterSheetForm";
-import { CharacterType } from "@/shared/api/types";
+import { CharacterType, MonsterNPCCharacter, PlayerCharacter } from "@/shared/api/types";
 import {
   DEFAULT_TOKEN_HP,
   DEFAULT_TOKEN_SIZE,
@@ -48,16 +48,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("deve inicializar com os dados do personagem fornecidos", () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Test Character",
       image: "http://example.com/image.png",
       size: "2x2",
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Some notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -79,16 +89,27 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("deve inicializar inspiration corretamente para PlayerCharacter", () => {
-    const playerCharacter = {
+    const playerCharacter: PlayerCharacter = {
       id: "player1",
       name: "Player One",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.PLAYER,
-      currentHp: 20,
-      maxHp: 20,
       notes: "",
       inspiration: true,
+      level: 1,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 20,
+        currentHp: 20,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -112,16 +133,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("deve atualizar hasCharacterSheetChanged quando os campos são alterados", () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Test Character",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Some notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -149,16 +180,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("deve chamar onSave com os dados atualizados para um personagem existente", async () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Old Name",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -220,16 +261,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("não deve chamar onSave se o nome do personagem estiver vazio", async () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Old Name",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -284,16 +335,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("não deve chamar onSave com valores de HP inválidos", async () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Test Character",
       image: DEFAULT_TOKEN_IMAGE,
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -320,16 +381,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("deve validar o tamanho da imagem e chamar onSave se for válido", async () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Test Character",
       image: "http://example.com/valid-image.png",
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -367,16 +438,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("não deve chamar onSave se a imagem for muito grande", async () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Test Character",
       image: "http://example.com/large-image.png",
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -414,16 +495,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("não deve chamar onSave se a imagem não puder ser carregada", async () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Test Character",
       image: "http://example.com/invalid-image.png",
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({
@@ -458,16 +549,26 @@ describe("useCharacterSheetForm", () => {
   });
 
   it("deve usar DEFAULT_TOKEN_IMAGE se a imagem for uma string vazia", async () => {
-    const initialCharacter = {
+    const initialCharacter: MonsterNPCCharacter = {
       id: "123",
       name: "Test Character",
       image: "http://example.com/image.png",
       size: DEFAULT_TOKEN_SIZE,
       type: CharacterType.MONSTER_NPC,
-      currentHp: 50,
-      maxHp: 100,
       notes: "Old notes",
       challengeRating: 5,
+      attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+      proficiencyBonus: 2,
+      proficiencies: {
+        savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: false, wisdom: false, charisma: false },
+        skills: { acrobatics: false, animalHandling: false, arcana: false, athletics: false, deception: false, history: false, insight: false, intimidation: false, investigation: false, medicine: false, nature: false, perception: false, performance: false, persuasion: false, religion: false, sleightOfHand: false, stealth: false, survival: false },
+      },
+      combatStats: {
+        maxHp: 100,
+        currentHp: 50,
+        armorClass: 10,
+        speed: 30,
+      },
     };
     const { result } = renderHook(() =>
       useCharacterSheetForm({

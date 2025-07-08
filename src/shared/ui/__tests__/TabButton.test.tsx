@@ -1,13 +1,13 @@
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { SidebarTab } from "../shared/api/types";
-import { DiceIcon } from "../shared/ui/Icons"; // Importe um ícone de exemplo
-import { TabButton } from "../shared/ui/TabButton";
+import { SidebarTab } from "@/shared/api/types";
+import { DiceIcon } from "@/shared/ui/Icons"; // Importe um ícone de exemplo
+import { TabButton } from "@/shared/ui/TabButton";
 
 describe("TabButton", () => {
   const mockOnClick = jest.fn();
   const defaultProps = {
-    tab: SidebarTab.CHAT,
+    tab: SidebarTab.CHAT, // Usar o valor do enum diretamente
     label: "Chat",
     icon: <DiceIcon />,
     isActive: false,

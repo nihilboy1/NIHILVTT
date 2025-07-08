@@ -2,11 +2,12 @@ import { DiceRollDetails, DiceRollMessage, Message, TextMessage } from "@/shared
 import { DEFAULT_PLAYER_NAME } from "../../../../shared/config/constants";
 import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
 import { useCallback, useState } from "react";
-
+import { performDiceRoll } from "@/utils/dice/diceUtils"; // Importar performDiceRoll
 
 export interface ChatState {
   messages: Message[];
   sendMessage: (content: string | DiceRollDetails, sender?: string) => void;
+  rollAndSendMessage: (formula: string, sender?: string) => void; // Adicionado
   clearMessages: () => void;
 }
 
@@ -54,9 +55,21 @@ export const useChatState = (): ChatState => {
     []
   );
 
+  const rollAndSendMessage = useCallback(
+    (formula: string, sender: string = DEFAULT_PLAYER_NAME) => {
+      try {
+        const diceRollDetails = performDiceRoll(formula, formula, "Generic"); // Usar "Generic" como categoria padrão
+        sendMessage(diceRollDetails, sender);
+      } catch (error) {
+        sendMessage(`Erro ao rolar dados: ${(error as Error).message}`, "Sistema");
+      }
+    },
+    [sendMessage]
+  );
+
   const clearMessages = useCallback(() => {
     setMessages([initialWelcomeMessage]);
   }, []); // initialWelcomeMessage é uma constante, não precisa ser dependência
 
-  return { messages, sendMessage, clearMessages };
+  return { messages, sendMessage, rollAndSendMessage, clearMessages };
 };

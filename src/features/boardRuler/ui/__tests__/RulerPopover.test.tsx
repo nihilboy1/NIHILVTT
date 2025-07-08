@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { RulerPopover } from "../features/boardRuler/ui/RulerPopover";
-import { RulerPlacementMode } from "../shared/api/types";
+import { RulerPopover } from "@/features/boardRuler/ui/RulerPopover";
+import { RulerPlacementMode } from "@/shared/api/types";
 
 describe("RulerPopover", () => {
   const mockOnClose = jest.fn();

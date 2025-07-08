@@ -1,4 +1,4 @@
-import { Character, GridSettings, PageSettings, Point } from "@/shared/api/types";
+import { Character, GridSettings, PageSettings, Point, CharacterType } from "@/shared/api/types"; // Adicionado CharacterType
 import { parseTokenSize } from "../../../../shared/lib/utils/board/boardUtils";
 import { useCallback } from "react";
 
@@ -66,10 +66,17 @@ export const useCharacterDrop = ({
           )
         );
 
-        addToken(characterId, { x: gridX, y: gridY }, character.maxHp); // Renomeado addGridInstance para addToken, e adicionado position e currentHp
+        // Determina o HP inicial com base no tipo de personagem
+        const initialHp =
+          character.type === CharacterType.PLAYER ||
+          character.type === CharacterType.MONSTER_NPC
+            ? character.combatStats.maxHp
+            : undefined;
+
+        addToken(characterId, { x: gridX, y: gridY }, initialHp); // Passa o HP inicial
       }
     },
-    [getSVGPoint, characters, gridSettings, pageSettings, addToken] // Renomeado tokens para characters, addGridInstance para addToken
+    [getSVGPoint, characters, gridSettings, pageSettings, addToken]
   );
 
   return {

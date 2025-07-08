@@ -3,8 +3,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import {
   BoardSettingsProvider,
   useBoardSettings,
-} from "../features/boardSettings/contexts/BoardSettingsContext";
-import { useBoardSettingsState } from "../features/boardSettings/hooks/useBoardSettingsState";
+} from "@/features/boardSettings/contexts/BoardSettingsContext";
+import { useBoardSettingsState } from "@/features/boardSettings/hooks/useBoardSettingsState";
 
 // Mock the useBoardSettingsState hook
 jest.mock("../hooks/useBoardSettingsState", () => ({

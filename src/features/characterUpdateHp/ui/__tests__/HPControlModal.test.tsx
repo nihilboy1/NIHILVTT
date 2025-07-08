@@ -1,5 +1,4 @@
 import { HPControlModal } from "@/features/characterUpdateHp/ui/HPControlModal";
-import { CharacterType } from "@/shared/api/types"; // Importar TokenType
 import useDismissable from "@/shared/lib/hooks/useDismissable";
 import { calculateNewHP } from "@/shared/lib/utils/hpUtils";
 import "@testing-library/jest-dom";
@@ -11,6 +10,8 @@ import {
   waitFor,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event"; // Import userEvent
+import { PlayerCharacter } from "@/shared/api/types";
+import { defaultAttributes, defaultSavingThrows, defaultSkills } from "@/shared/config/sheetDefaults";
 
 // Mock do hook useDismissable
 jest.mock("../shared/lib/hooks/useDismissable");
@@ -30,50 +31,40 @@ describe("HPControlModal", () => {
   const mockOnRemoveFromBoard = jest.fn();
   const mockOnMakeIndependent = jest.fn();
 
-  const defaultCharacter = {
+  const defaultCharacter: PlayerCharacter = {
     id: "char-1",
     name: "Hero",
-    type: CharacterType.PLAYER, // Usar o enum
-    color: "#000",
+    type: "Player",
     size: "medium",
-    maxHp: 100, // HP máximo do personagem
-    ac: 15,
-    initiative: 10,
-    speed: 30,
-    image: "test-image.png", // Alterado de tokenImageUrl para image
-    sheet: {
-      basicInfo: {
-        name: "Hero",
-        description: "",
-        tokenType: "player",
-        size: "medium",
-        alignment: "neutral",
-        creatureType: "humanoid",
-        challengeRating: "1",
-        armorClass: 15,
-        hitPoints: 100,
-        speed: 30,
-        senses: "",
-        languages: "",
-        proficiencies: "",
-        resistances: "",
-        vulnerabilities: "",
-        immunities: "",
-      },
-      attributesAndSkills: {
-        strength: 10,
-        dexterity: 10,
-        constitution: 10,
-        intelligence: 10,
-        wisdom: 10,
-        charisma: 10,
-        skills: [],
-      },
-      attacksAndFeatures: {
-        attacks: [],
-        features: [],
-      },
+    image: "test-image.png",
+    notes: "",
+    level: 1,
+    xp: 0,
+    inspiration: false,
+    hitDiceUsed: 0,
+    hitDiceMax: 1,
+    deathSavesSuccesses: 0,
+    deathSavesFailures: 0,
+    hitDiceEntries: [],
+    attributes: defaultAttributes,
+    proficiencyBonus: 2,
+    proficiencies: {
+      savingThrows: defaultSavingThrows,
+      skills: defaultSkills,
     },
+    combatStats: {
+      maxHp: 100,
+      currentHp: 100,
+      armorClass: 15,
+      speed: 30,
+      initiative: 10,
+      passivePerception: 10,
+      shieldEquipped: false,
+    },
+    actions: [],
+    attacks: [],
+    equipment: [],
+    featuresAndTraits: [],
   };
 
   const defaultProps = {
@@ -137,10 +128,10 @@ describe("HPControlModal", () => {
     ).toBeInTheDocument();
     // O input de HP é inicializado com o maxHp do character, não currentHp
     expect(screen.getByLabelText("Vida Atual")).toHaveValue(
-      String(defaultProps.character.maxHp)
+      String(defaultProps.character.combatStats.maxHp)
     );
     expect(screen.getByTestId("max-hp-display")).toHaveTextContent(
-      String(defaultProps.character.maxHp)
+      String(defaultProps.character.combatStats.maxHp)
     ); // Usar data-testid
     expect(screen.getByTitle("Tornar Token Independente")).toBeInTheDocument();
     expect(screen.getByTitle("Remover do Tabuleiro")).toBeInTheDocument();
@@ -187,14 +178,14 @@ describe("HPControlModal", () => {
     // O currentHP passado para calculateNewHP será o valor atual do input (que é o maxHp do character inicialmente)
     // ou o valor digitado se o input já tiver sido alterado.
     // Para este teste, o input é 100 (maxHp inicial), então 60 é o valor digitado.
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("60", 60, 100);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("60", defaultProps.character.combatStats.currentHp, defaultProps.character.combatStats.maxHp);
     expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 60); // Passar tokenId
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(hpInput).toHaveValue("60");
   });
 
   test("deve atualizar o HP ao digitar um valor com operador de soma e pressionar Enter", async () => {
-    mockCalculateNewHP.mockReturnValue(105); // currentHP (100) + 5
+    mockCalculateNewHP.mockReturnValue(defaultProps.character.combatStats.currentHp + 5); // currentHP (100) + 5
     render(<HPControlModal {...defaultProps} />);
     const hpInput = screen.getByLabelText("Vida Atual");
     fireEvent.change(hpInput, { target: { value: "+5" } });
@@ -202,14 +193,14 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("+5", 5, 100);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("+5", defaultProps.character.combatStats.currentHp, defaultProps.character.combatStats.maxHp);
     expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 105);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(hpInput).toHaveValue("105");
   });
 
   test("deve atualizar o HP ao digitar um valor com operador de subtração e pressionar Enter", async () => {
-    mockCalculateNewHP.mockReturnValue(95); // currentHP (100) - 5
+    mockCalculateNewHP.mockReturnValue(defaultProps.character.combatStats.currentHp - 5); // currentHP (100) - 5
     render(<HPControlModal {...defaultProps} />);
     const hpInput = screen.getByLabelText("Vida Atual");
     fireEvent.change(hpInput, { target: { value: "-5" } });
@@ -217,14 +208,14 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("-5", -5, 100);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("-5", defaultProps.character.combatStats.currentHp, defaultProps.character.combatStats.maxHp);
     expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 95);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(hpInput).toHaveValue("95");
   });
 
   test("deve limitar o HP ao maxHP ao digitar um valor muito alto", async () => {
-    mockCalculateNewHP.mockReturnValue(100); // Limita a 100
+    mockCalculateNewHP.mockReturnValue(defaultProps.character.combatStats.maxHp); // Limita a 100
     render(<HPControlModal {...defaultProps} />);
     const hpInput = screen.getByLabelText("Vida Atual");
     fireEvent.change(hpInput, { target: { value: "200" } });
@@ -232,7 +223,7 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("200", 200, 100);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("200", defaultProps.character.combatStats.currentHp, defaultProps.character.combatStats.maxHp);
     expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 100);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(hpInput).toHaveValue("100");
@@ -247,7 +238,7 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("-100", -100, 100);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("-100", defaultProps.character.combatStats.currentHp, defaultProps.character.combatStats.maxHp);
     expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 0);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
     expect(hpInput).toHaveValue("0");
@@ -262,10 +253,10 @@ describe("HPControlModal", () => {
       fireEvent.keyDown(hpInput, { key: "Enter" });
     });
 
-    expect(mockCalculateNewHP).toHaveBeenCalledWith("abc", NaN, 100);
+    expect(mockCalculateNewHP).toHaveBeenCalledWith("abc", defaultProps.character.combatStats.currentHp, defaultProps.character.combatStats.maxHp);
     expect(mockOnHPChange).not.toHaveBeenCalled();
     expect(mockOnClose).toHaveBeenCalledTimes(1);
-    expect(hpInput).toHaveValue("100"); // Reverte para o HP atual (maxHp inicial)
+    expect(hpInput).toHaveValue(String(defaultProps.character.combatStats.maxHp)); // Reverte para o HP atual (maxHp inicial)
   });
 
   test("deve chamar onClose ao pressionar Escape no input", async () => {
@@ -292,7 +283,7 @@ describe("HPControlModal", () => {
 
     // Wrap assertions in waitFor
     await waitFor(() => {
-      expect(mockCalculateNewHP).toHaveBeenCalledWith("55", 55, 100); // Ensure calculateNewHP is called correctly
+      expect(mockCalculateNewHP).toHaveBeenCalledWith("55", defaultProps.character.combatStats.currentHp, defaultProps.character.combatStats.maxHp); // Ensure calculateNewHP is called correctly
       expect(mockOnHPChange).toHaveBeenCalledWith("instance-1", 55);
     });
     // Assert that onClose was not called, outside waitFor as it's an immediate check post-blur
@@ -334,9 +325,9 @@ describe("HPControlModal", () => {
   test("deve sincronizar o input com character.maxHp quando character muda e modal está aberto", () => {
     const { rerender } = render(<HPControlModal {...defaultProps} />);
     const hpInput = screen.getByLabelText("Vida Atual");
-    expect(hpInput).toHaveValue(String(defaultProps.character.maxHp));
+    expect(hpInput).toHaveValue(String(defaultProps.character.combatStats.maxHp));
 
-    const updatedCharacter = { ...defaultCharacter, maxHp: 75 };
+    const updatedCharacter = { ...defaultCharacter, combatStats: { ...defaultCharacter.combatStats, maxHp: 75 } };
     rerender(<HPControlModal {...defaultProps} character={updatedCharacter} />);
 
     expect(hpInput).toHaveValue("75");

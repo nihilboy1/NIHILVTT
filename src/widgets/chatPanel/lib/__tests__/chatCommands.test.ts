@@ -2,7 +2,7 @@ import {
   CommandContext,
   findCommand,
   getAllCommands,
-} from "@/widgets/chatPanel/lib/chatCommands";
+} from "@/widgets/chatPanel/lib/chatCommands"; // O caminho já está correto, mas a tipagem está errada.
 
 describe("chatCommands", () => {
   let mockRollAndSendMessage: jest.Mock;

@@ -1,11 +1,11 @@
-import { ChatCommandPopover } from "@/components/chat/ChatCommandPopover";
+import { ChatCommandPopover } from "@/widgets/chatPanel/ui/ChatCommandPopover"; // Corrigido o caminho
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
-import * as chatCommands from "../widgets/chatPanel/lib/chatCommands";
+import * as chatCommands from "@/widgets/chatPanel/lib/chatCommands"; // Corrigido o caminho
 
-jest.mock("../components/chat/lib/chatCommands");
+jest.mock("@/widgets/chatPanel/lib/chatCommands"); // Corrigido o caminho do mock
 
 const mockGetAllCommands = chatCommands.getAllCommands as jest.Mock;
 

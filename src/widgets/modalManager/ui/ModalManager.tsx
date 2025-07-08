@@ -10,9 +10,6 @@ import {
   type Token,
 } from "../../../shared/api/types";
 import {
-  DEFAULT_PLAYER_INSPIRATION,
-  DEFAULT_PLAYER_LEVEL,
-  DEFAULT_TOKEN_HP,
   DEFAULT_TOKEN_SIZE,
 } from "../../../shared/config/constants";
 import { DEFAULT_TOKEN_IMAGE, DEFAULT_CHARACTER_DATA, DEFAULT_MONSTER_NPC_DATA } from "../../../shared/config/sheetDefaults"; // Adicionado DEFAULT_MONSTER_NPC_DATA
@@ -98,7 +95,7 @@ export function ModalManager() {
         />
       )}
       {modalStack.map((modalEntry: ModalEntry, index: number) => {
-        const { name, props, dismissible } = modalEntry;
+        const { name, props } = modalEntry;
         const isTopModal = index === modalStack.length - 1;
 
 

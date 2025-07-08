@@ -26,7 +26,7 @@ export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
   isProficient,
   onProficiencyChange,
 }) => {
-  const { calculatedSkillBonuses, calculatedAttributeModifiers, calculatedProficiencyBonus, playerCharacter, savingThrowProficiencies } = usePlayerSheet(); // Obter do contexto
+  const { calculatedSkillBonuses, calculatedAttributeModifiers, calculatedProficiencyBonus, playerCharacter } = usePlayerSheet(); // Obter do contexto
   const { rollDice } = useDiceRoller();
   const characterName = playerCharacter.name; // Obter o nome do personagem do contexto
 

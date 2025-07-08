@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { OptionsPopover } from "../shared/ui/OptionsPopover";
+import { OptionsPopover } from "@/shared/ui/OptionsPopover";
 
 // Mock para getBoundingClientRect e contains
 const mockGetBoundingClientRect = jest.fn(() => ({

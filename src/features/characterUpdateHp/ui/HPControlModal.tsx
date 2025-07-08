@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { type Character, type Point } from "../../../shared/api/types"; // Importar Character
+import { type Character, type Point, CharacterType } from "../../../shared/api/types"; // Importar Character
 import useDismissable from "../../../shared/lib/hooks/useDismissable";
 import { calculateNewHP } from "../../../shared/lib/utils/hpUtils";
 import { DetatchIcon, XMarkIcon } from "../../../shared/ui/Icons";
@@ -37,9 +37,12 @@ export function HPControlModal({
     // Este useEffect sincroniza o HP do token com o estado local do input
     // Ele deve ser executado apenas quando o modal abre ou o token muda,
     // não durante a digitação do usuário para evitar "flickering".
-    if (isOpen && character && character.maxHp !== undefined) {
-      // Usar character.maxHp para inicializar
-      setEditableHP(String(character.maxHp)); // Inicializar com maxHp do Character
+    if (isOpen && character) {
+      if (character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) {
+        setEditableHP(String(character.combatStats.maxHp)); // Inicializar com maxHp do Character
+      } else {
+        setEditableHP("0"); // Para ObjectCharacter ou outros tipos sem maxHp
+      }
     } else if (!character && isOpen) {
       // Se o character for nulo e o modal estiver aberto, feche-o.
       onClose();
@@ -55,34 +58,34 @@ export function HPControlModal({
   }, [isOpen]);
 
   const handleSubmit = useCallback(() => {
-    if (
-      !character ||
-      character.maxHp === undefined // Apenas maxHp no Character
-    ) {
-      setEditableHP(String(character?.maxHp ?? 0));
+    if (!character) {
+      setEditableHP("0");
       return;
     }
 
-    // Para o HP atual, precisaremos do Token real, não apenas do Character.
-    // Por enquanto, vamos assumir que o HP atual é o que está no input,
-    // e que a validação será feita com base no maxHp do Character.
-    // A lógica de `currentHp` no `Token` será tratada no `useCharactersState`.
-    const currentActualHp = parseInt(editableHP, 10); // Usar o valor do input como HP atual
-    const maxHp = character.maxHp;
+    let maxHp: number;
+    let currentActualHp: number;
+
+    if (character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) {
+      maxHp = character.combatStats.maxHp;
+      currentActualHp = parseInt(editableHP, 10);
+    } else {
+      // Para ObjectCharacter ou outros tipos sem combatStats
+      setEditableHP("0");
+      return;
+    }
 
     const newHP = calculateNewHP(editableHP, currentActualHp, maxHp);
 
     if (newHP !== null) {
       if (tokenId) {
-        // Passar tokenId para onHPChange
         onHPChange(tokenId, newHP);
       }
       setEditableHP(String(newHP));
     } else {
-      // Se a entrada for inválida, redefina para o HP atual (do input)
-      setEditableHP(String(character.maxHp)); // Corrected line
+      setEditableHP(String(maxHp));
     }
-  }, [editableHP, character, onHPChange, tokenId]); // Adicionado tokenId
+  }, [editableHP, character, onHPChange, tokenId]);
 
   const handleCloseAndSave = useCallback(() => {
     handleSubmit();
@@ -162,7 +165,7 @@ export function HPControlModal({
         data-testid="max-hp-display"
         className="text-sm font-medium min-w-[1.25rem] text-center select-none"
       >
-        {character.maxHp ?? "N/A"}
+        {(character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) ? character.combatStats.maxHp : "N/A"}
       </span>
 
       {showMakeIndependentButton && (

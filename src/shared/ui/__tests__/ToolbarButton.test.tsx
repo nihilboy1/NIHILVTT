@@ -1,7 +1,7 @@
 /// <reference types="@testing-library/jest-dom" />
 import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react"; // Re-adicionado para React.createRef
-import { ToolbarButton } from "../shared/ui/ToolbarButton";
+import { ToolbarButton } from "@/shared/ui/ToolbarButton";
 
 describe("ToolbarButton", () => {
   const defaultProps = {

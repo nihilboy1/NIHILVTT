@@ -1,38 +1,38 @@
 import { Toolbar } from "@/widgets/toolBar/ui/Toolbar";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { ChatContext } from "../contexts/ChatContext";
-import { BoardSettingsContext } from "../features/boardSettings/contexts/BoardSettingsContext";
-import { type BoardSettingsState } from "../features/boardSettings/hooks/useBoardSettingsState";
-import { type ChatState } from "../hooks/useChatState";
-import { RulerPlacementMode, SidebarTab, Tool } from "../shared/api/types";
+import { ChatContext } from "@/widgets/chatPanel/model/contexts/ChatContext"; // Corrigido
+import { BoardSettingsContext } from "@/features/boardSettings/contexts/BoardSettingsContext"; // Corrigido
+import { type BoardSettingsState } from "@/features/boardSettings/hooks/useBoardSettingsState"; // Corrigido
+import { type ChatState } from "@/widgets/chatPanel/model/hooks/useChatState"; // Corrigido
+import { RulerPlacementMode, SidebarTab, Tool } from "@/shared/api/types"; // Corrigido
 import {
   DEFAULT_METERS_PER_SQUARE,
   DEFAULT_PAGE_SETTINGS,
   GRID_CELL_SIZE,
-} from "../shared/config/constants";
+} from "@/shared/config/constants"; // Corrigido
 
-import { UIContext } from "../app/providers/UIProvider";
-import { UIState } from "../app/providers/useUIState";
+import { UIContext } from "@/widgets/layoutControls/model/contexts/UIProvider"; // Corrigido
+import { UIState } from "@/widgets/layoutControls/model/hooks/useUIState"; // Corrigido
 
 // Mock the actual hook modules and their return values
 const mockUseUIState = jest.fn();
 const mockUseBoardSettingsState = jest.fn();
 const mockUseChatState = jest.fn();
 
-jest.mock("../app/providers/useUIState", () => ({
+jest.mock("@/app/providers/useUIState", () => ({ // Corrigido
   useUIState: () => mockUseUIState(),
 }));
-jest.mock("../hooks/useBoardSettingsState", () => ({
+jest.mock("@/features/boardSettings/hooks/useBoardSettingsState", () => ({ // Corrigido
   useBoardSettingsState: () => mockUseBoardSettingsState(),
 }));
-jest.mock("../hooks/useChatState", () => ({
+jest.mock("@/widgets/chatPanel/model/hooks/useChatState", () => ({ // Corrigido
   useChatState: () => mockUseChatState(),
 }));
-jest.mock("../shared/ui/RulerPopover", () => ({
+jest.mock("@/features/boardRuler/ui/RulerPopover", () => ({ // Corrigido
   RulerPopover: jest.fn(() => null), // Mock RulerPopover to return null
 }));
-jest.mock("../shared/ui/DiceRollPopover", () => ({
+jest.mock("@/features/diceRolling/ui/DiceRollPopover", () => ({ // Corrigido
   DiceRollPopover: jest.fn(() => null), // Mock DiceRollPopover to return null
 }));
 

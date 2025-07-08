@@ -151,10 +151,10 @@ export const useGameBoardInteraction = ({
           // Renomeado
           (c: Character) => c.id === token.characterId // Renomeado
         );
-        if (character) {
-          const maxHp = character.maxHp ?? newHP; // Usar character.maxHp
+        if (character && "combatStats" in character) { // Adicionar type guard
+          const maxHp = character.combatStats.maxHp ?? newHP; // Usar character.combatStats.maxHp
           const validatedHP = Math.max(0, Math.min(newHP, maxHp));
-          updateTokenHp(tokenId, validatedHP); // Renomeado
+          updateTokenHp(tokenId, validatedHP);
         }
       }
     },

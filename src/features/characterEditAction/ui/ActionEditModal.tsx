@@ -43,8 +43,8 @@ export function ActionEditModal({
     // Certifique-se de que editedAction.id não é undefined antes de salvar
     if (editedAction.id) {
       handleActionChange(editedAction.id, "name", editedAction.name);
-      handleActionChange(editedAction.id, "bonus", editedAction.bonus || "");
-      handleActionChange(editedAction.id, "damage", editedAction.damage || "");
+      handleActionChange(editedAction.id, "bonus", String(editedAction.bonus || ""));
+      handleActionChange(editedAction.id, "damage", String(editedAction.damage || ""));
       onClose();
     } else {
       console.error(

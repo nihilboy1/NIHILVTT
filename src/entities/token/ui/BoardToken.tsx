@@ -5,6 +5,7 @@ import {
   type PageSettings,
   type Point,
   type Token,
+  CharacterType, // Adicionado CharacterType
 } from "../../../shared/api/types";
 import { parseCharacterSize } from "../../../shared/lib/utils/characterUtils";
 import { getFirstName } from "../../../shared/lib/utils/nameUtils";
@@ -186,12 +187,16 @@ export function BoardToken({
       filter={isDragging ? "url(#tokenDragShadow)" : "none"}
       data-token-id={token.id}
     >
-      <HealthBar
-        currentHp={token.currentHp}
-        maxHp={character.maxHp}
-        tokenRenderWidth={tokenRenderWidth}
-        zoomLevel={zoomLevel}
-      />
+      {/* Renderiza HealthBar apenas para PlayerCharacter ou MonsterNPCCharacter */}
+      {(character.type === CharacterType.PLAYER ||
+        character.type === CharacterType.MONSTER_NPC) && (
+        <HealthBar
+          currentHp={token.currentHp}
+          maxHp={character.combatStats.maxHp}
+          tokenRenderWidth={tokenRenderWidth}
+          zoomLevel={zoomLevel}
+        />
+      )}
       <TokenVisual metrics={tokenMetrics} />
       <text
         x={tokenRenderWidth / 2}

@@ -13,7 +13,6 @@ export function PrincipalHealthAndCombat() {
     setEditingHitDiceEntries,
     actions,
     handleAddAction,
-    playerCharacter, // Adicionado para o sender da rolagem
   } = usePlayerSheet();
 
   const { openModal } = useModal();
@@ -29,8 +28,6 @@ export function PrincipalHealthAndCombat() {
         <CombatStats
           editingArmorClass={combatStats.editingArmorClass}
           setEditingArmorClass={combatStats.setEditingArmorClass}
-          editingInitiative={combatStats.editingInitiative}
-          setEditingInitiative={combatStats.setEditingInitiative}
           editingSpeed={combatStats.editingSpeed}
           setEditingSpeed={combatStats.setEditingSpeed}
           editingShieldEquipped={combatStats.editingShieldEquipped}

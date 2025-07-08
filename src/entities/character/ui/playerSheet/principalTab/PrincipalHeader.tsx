@@ -14,7 +14,7 @@ export function PrincipalHeader() {
     setEditingSpecies,
     editingSubclass,
     setEditingSubclass,
-    proficiencyBonus,
+    calculatedProficiencyBonus,
   } = usePlayerSheet();
 
   return (
@@ -127,16 +127,16 @@ export function PrincipalHeader() {
 
         <div>
           <label
-            htmlFor="proficiencyBonus"
+            htmlFor="calculatedProficiencyBonus"
             className="block text-[0.6rem] font-medium w-full"
           >
             PROF. BÔNUS
           </label>
           <span
-            id="proficiencyBonus"
+            id="calculatedProficiencyBonus"
             className="block hide-arrows  pl-1.5 bg-surface-1 border border-surface-2 rounded-md text-[0.8rem] "
           >
-            +{proficiencyBonus}
+            +{calculatedProficiencyBonus}
           </span>
         </div>
       </div>
