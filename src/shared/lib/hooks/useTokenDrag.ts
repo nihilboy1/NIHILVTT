@@ -1,22 +1,22 @@
-import { PageSettings, Point, Tool } from "../../../../../shared/api/types";
-import { parseTokenSize } from "../../../../../shared/lib/utils/board/boardUtils";
+import { PageSettings, Point, Tool } from "../../../shared/api/types";
+import { parseTokenSize } from "../../../shared/lib/utils/board/boardUtils";
 import { useCallback, useEffect, useState } from "react";
 
 const CLICK_THRESHOLD_MS = 200;
 
-interface UseTokenDragProps { // Renomeado
-  tokenId: string; // Renomeado
-  initialPosition: Point; // Renomeado
-  characterSize: string; // Renomeado
+interface UseTokenDragProps {
+  tokenId: string;
+  initialPosition: Point;
+  characterSize: string;
   cellSize: number;
   activeTool: Tool;
   pageSettings: PageSettings;
   getSVGPoint: (clientX: number, clientY: number) => Point;
-  onMove: (tokenId: string, newPosition: Point) => void; // Renomeado
-  onDragStart: (tokenId: string) => void; // Renomeado
-  onDragMove: (tokenId: string, visualSVGPoint: Point) => void; // Renomeado
-  onDragEnd: (tokenId: string) => void; // Renomeado
-  onSelectToken: (tokenId: string) => void; // Renomeado
+  onMove: (tokenId: string, newPosition: Point) => void;
+  onDragStart: (tokenId: string) => void;
+  onDragMove: (tokenId: string, visualSVGPoint: Point) => void;
+  onDragEnd: (tokenId: string) => void;
+  onSelectToken: (tokenId: string) => void;
 }
 
 export const useTokenDrag = ({
@@ -54,17 +54,16 @@ export const useTokenDrag = ({
       setClickStartTimestamp(Date.now());
 
       const initialSVGPoint = getSVGPoint(event.clientX, event.clientY);
-      const tokenCurrentSvgX = initialPosition.x * cellSize; // Usar initialPosition
-      const tokenCurrentSvgY = initialPosition.y * cellSize; // Usar initialPosition
+      const tokenCurrentSvgX = initialPosition.x * cellSize;
+      const tokenCurrentSvgY = initialPosition.y * cellSize;
 
       setDragStartMouseOffset({
         x: initialSVGPoint.x - tokenCurrentSvgX,
         y: initialSVGPoint.y - tokenCurrentSvgY,
       });
-      // Set initial visual position to where the token actually is, not where the mouse is.
       setCurrentVisualPosition({ x: tokenCurrentSvgX, y: tokenCurrentSvgY });
     },
-    [activeTool, initialPosition, cellSize, getSVGPoint] // Renomeado
+    [activeTool, initialPosition, cellSize, getSVGPoint]
   );
 
   useEffect(() => {
@@ -72,9 +71,8 @@ export const useTokenDrag = ({
       if (!dragStartMouseOffset || !currentVisualPosition) return;
 
       if (!isDragging) {
-        // First move after mousedown
         setIsDragging(true);
-        onDragStart(tokenId); // Renomeado
+        onDragStart(tokenId);
         document.body.style.cursor = "grabbing";
       }
 
@@ -85,7 +83,7 @@ export const useTokenDrag = ({
       };
 
       setCurrentVisualPosition(newVisualPos);
-      onDragMove(tokenId, newVisualPos); // Renomeado
+      onDragMove(tokenId, newVisualPos);
     };
 
     const handleMouseUp = (event: MouseEvent) => {
@@ -101,7 +99,7 @@ export const useTokenDrag = ({
       if (isDragging) {
         if (currentVisualPosition) {
           const [sizeMultiplierX, sizeMultiplierY] =
-            parseTokenSize(characterSize); // Renomeado
+            parseTokenSize(characterSize);
           let finalGridX = Math.round(currentVisualPosition.x / cellSize);
           let finalGridY = Math.round(currentVisualPosition.y / cellSize);
 
@@ -119,16 +117,15 @@ export const useTokenDrag = ({
               pageSettings.heightInUnits - Math.ceil(sizeMultiplierY)
             )
           );
-          onMove(tokenId, { x: finalGridX, y: finalGridY }); // Renomeado
+          onMove(tokenId, { x: finalGridX, y: finalGridY });
         }
-        onDragEnd(tokenId); // Renomeado
+        onDragEnd(tokenId);
       } else if (
         activeTool === Tool.SELECT &&
         timeSinceClickStart < CLICK_THRESHOLD_MS &&
         event.button === 0
       ) {
-        // Chamar onSelectToken apenas se a ferramenta for SELECT
-        onSelectToken(tokenId); // Renomeado
+        onSelectToken(tokenId);
       }
 
       setIsDragging(false);
@@ -153,8 +150,8 @@ export const useTokenDrag = ({
     dragStartMouseOffset,
     currentVisualPosition,
     clickStartTimestamp,
-    tokenId, // Renomeado
-    characterSize, // Renomeado
+    tokenId,
+    characterSize,
     cellSize,
     pageSettings,
     activeTool,
@@ -163,13 +160,13 @@ export const useTokenDrag = ({
     onDragStart,
     onDragMove,
     onDragEnd,
-    onSelectToken, // Renomeado
+    onSelectToken,
   ]);
 
   const displayPosition =
     isDragging && currentVisualPosition
       ? currentVisualPosition
-      : { x: initialPosition.x * cellSize, y: initialPosition.y * cellSize }; // Usar initialPosition
+      : { x: initialPosition.x * cellSize, y: initialPosition.y * cellSize };
 
   return {
     isDragging,

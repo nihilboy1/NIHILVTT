@@ -1,6 +1,6 @@
 import { type Action } from "../../../../../shared/api/types";
 import { EditIcon, PlusCircleIcon } from "../../../../../shared/ui/Icons";
-import { useDiceRoller } from "../../../../../features/diceRolling/model/hooks/useDiceRoller";
+import { useDiceRoller } from "../../../../../shared/lib/hooks/useDiceRoller";
 import { useModal } from "../../../../../widgets/modalManager/model/contexts/ModalProvider";
 import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext";
 import { CombatStats } from "./CombatStats";

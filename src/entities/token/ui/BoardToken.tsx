@@ -12,7 +12,7 @@ import { getFirstName } from "../../../shared/lib/utils/nameUtils";
 import { useSelectedToken } from "../model/contexts/SelectedTokenContext";
 import { HealthBar } from "./HealthBar";
 import { TokenVisual, TokenVisualMetrics } from "./TokenVisual";
-import { useTokenDrag } from "../../../features/characterDropOnBoard/tokenDrag/model/hooks/useTokenDrag";
+import { useTokenDrag } from "../../../shared/lib/hooks/useTokenDrag";
 
 interface BoardTokenProps {
   token: Token;

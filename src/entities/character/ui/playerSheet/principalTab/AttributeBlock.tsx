@@ -1,5 +1,5 @@
 import React from "react";
-import { useDiceRoller } from "../../../../../features/diceRolling/model/hooks/useDiceRoller";
+import { useDiceRoller } from "../../../../../shared/lib/hooks/useDiceRoller";
 import { DiceFormula, PlayerCharacter } from "../../../../../shared/api/types";
 import { ATTRIBUTE_LABELS } from "../../../../../shared/config/sheetDefaults";
 import { cn } from "../../../../../shared/lib/utils/cn";

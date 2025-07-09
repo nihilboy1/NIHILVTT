@@ -1,7 +1,7 @@
 import { RulerPopover } from "../../../features/boardRuler/ui/RulerPopover";
 import { useBoardSettings } from "../../../features/boardSettings/contexts/BoardSettingsContext";
 import { DiceRollPopover } from "../../../features/diceRolling/ui/DiceRollPopover";
-import { useDiceRoller } from "../../../features/diceRolling/model/hooks/useDiceRoller"; // Importar useDiceRoller
+import { useDiceRoller } from "../../../shared/lib/hooks/useDiceRoller";
 import { Tool } from "../../../shared/api/types";
 import { DEFAULT_PLAYER_NAME } from "../../../shared/config/constants"; // Importar DEFAULT_PLAYER_NAME
 import {

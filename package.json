@@ -8,7 +8,10 @@
     "test": "jest",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dep-cruise:graph": "npx depcruise src -T json -f dependency-graph.json",
+    "dep-cruise:errors": "npx depcruise src -T err-long",
+    "dep-cruise:circular": "npx depcruise src --max-depth 0"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.10",
@@ -26,12 +29,13 @@
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/user-event": "^14.6.1",
     "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.9.0",
+    "dependency-cruiser": "^16.10.4",
     "eslint": "^9.25.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-react-hooks": "^5.2.0",
