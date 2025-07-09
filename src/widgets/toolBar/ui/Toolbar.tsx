@@ -13,8 +13,8 @@ import {
 } from "../../../shared/ui/Icons";
 import { ToolbarButton } from "../../../shared/ui/ToolbarButton";
 import { ToolbarPopoverButton } from "../../../shared/ui/ToolbarPopoverButton";
-import { useUI } from "../../layoutControls/model/contexts/UIProvider";
 import { useToolbarState } from "../model/hooks/useToolbarState";
+import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 
 // barra lateral esquerda com os botões de ferramentas
 export function Toolbar() {

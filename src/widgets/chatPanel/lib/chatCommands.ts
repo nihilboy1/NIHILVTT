@@ -1,4 +1,4 @@
-import { useChat } from "../model/contexts/ChatContext";
+import { useChat } from "@/features/chat/model/contexts/ChatContext";
 import { performDiceRoll } from "@/utils/dice/diceUtils";
 
 type SendMessageFn = ReturnType<typeof useChat>['sendMessage'];

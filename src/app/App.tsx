@@ -1,6 +1,6 @@
 // src/app/App.tsx (versão idealizada)
 import { GameBoardPage } from "../pages/GameBoardPage"; // A página conteria a lógica do tabuleiro
-import { useUI } from "../widgets/layoutControls/model/contexts/UIProvider";
+import { useUI } from "../features/layoutControls/model/contexts/UIProvider";
 import { RightSidebar } from "../widgets/rightSidebar/ui/RightSidebar";
 import { Toolbar } from "../widgets/toolBar/ui/Toolbar";
 

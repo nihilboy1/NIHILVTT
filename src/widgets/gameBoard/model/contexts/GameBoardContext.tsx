@@ -26,9 +26,9 @@ import {
   type Tool,
 } from "../../../../shared/api/types";
 import { parseCharacterSize } from "../../../../shared/lib/utils/characterUtils";
-import { useUI } from "../../../layoutControls/model/contexts/UIProvider";
-import { useModal } from "../../../modalManager/model/contexts/ModalProvider";
 import { useGameBoardEvents } from "../hooks/useGameBoardEvents";
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 
 interface GameBoardProviderProps {
   children: ReactNode;

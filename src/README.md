@@ -9,7 +9,7 @@ O projeto é dividido nas seguintes camadas, organizadas em fatias verticais (sl
 *   **`app/`**: Contém a lógica de inicialização da aplicação, provedores globais e estilos globais. É a camada mais alta e orquestra a aplicação.
     *   `App.tsx`: Componente raiz da aplicação.
     *   `index.tsx`: Ponto de entrada da aplicação.
-    *   `providers/`: Provedores de contexto globais (ex: `ModalProvider`, `UIProvider`).
+    *   `providers/`: Provedores de contexto globais (ex: `ModalProvider`, `UIProvider`, `ChatProvider`).
     *   `styles/`: Estilos CSS globais.
 
 *   **`pages/`**: Representa as páginas da aplicação. Cada página é uma composição de widgets e features.

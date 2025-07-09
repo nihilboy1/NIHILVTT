@@ -1,5 +1,4 @@
 import { act, renderHook } from "@testing-library/react";
-import { useChatState } from "@/widgets/chatPanel/model/hooks/useChatState";
 import {
   DiceRollDetails,
   DiceRollMessage,
@@ -7,6 +6,7 @@ import {
   RollCategory,
 } from "@/shared/api/types";
 import { DEFAULT_PLAYER_NAME } from "@/shared/config/constants";
+import { useChatState } from "../useChatState";
 
 // Mock para generateUniqueId para garantir IDs consistentes nos testes
 jest.mock("../../../../shared/lib/utils/id/idUtils", () => ({

@@ -9,9 +9,10 @@ import {
   type DraggingVisuals,
   type Token, // Renomeado de GridInstance
 } from "../../../../shared/api/types";
-import { useUI } from "../../../layoutControls/model/contexts/UIProvider";
-import { useModal } from "../../../modalManager/model/contexts/ModalProvider";
-import { ModalEntry } from "../../../modalManager/model/hooks/useModalStateManagement";
+import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import { ModalEntry } from "@/features/modalManager/model/hooks/useModalStateManagement";
+
 
 interface UseGameBoardInteractionProps {
   gameBoardRef: React.RefObject<HTMLDivElement>;

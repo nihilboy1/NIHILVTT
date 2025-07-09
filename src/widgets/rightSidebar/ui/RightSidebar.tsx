@@ -1,5 +1,5 @@
+import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 import { ChevronRightIcon } from "../../../shared/ui/Icons";
-import { useUI } from "../../layoutControls/model/contexts/UIProvider";
 import { SidebarContent } from "./SidebarContent";
 import { SidebarTabs } from "./SidebarTabs";
 

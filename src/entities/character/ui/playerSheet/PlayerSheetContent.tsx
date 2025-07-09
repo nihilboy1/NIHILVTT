@@ -2,12 +2,12 @@ import { useState } from "react";
 
 import { ActionEditModal } from "../../../../features/characterEditAction/ui/ActionEditModal";
 import { PlayerCharacter } from "../../../../shared/api/types";
-import { useModal } from "../../../../widgets/modalManager/model/contexts/ModalProvider";
 import { usePlayerSheet } from "../../model/contexts/CharacterSheetContext"; // Renomeado
 import { PlayerSheetConfigTab } from "./configTab/PlayerSheetConfigTab";
 import { PlayerSheetDetailsTab } from "./detailsTab/PlayerSheetDetailsTab";
 import { PlayerSheetTabs } from "./PlayerSheetTabs";
 import { PrincipalTab } from "./principalTab/PrincipalTab";
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 
 type PlayerSheetTab = "principal" | "detalhes" | "configuracoes";
 

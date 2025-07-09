@@ -2,7 +2,7 @@ import { GiAncientSword, GiNinjaHeroicStance } from "react-icons/gi";
 import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
 import { CharacterTemplateListItem } from "../../../entities/character/ui/CharacterTemplateListItem";
 import { Character, CharacterType } from "../../../shared/api/types";
-import { useModal } from "../../modalManager/model/contexts/ModalProvider";
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 
 // painel de personagens geral
 export function CharactersPanel() {

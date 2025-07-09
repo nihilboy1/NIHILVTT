@@ -1,11 +1,12 @@
 import { useRef } from "react";
 import { useSelectedToken } from "../entities/token/model/contexts/SelectedTokenContext";
-import { ChevronLeftIcon, ChevronRightIcon } from "../shared/ui/Icons"; // Importar ícones
+import { ChevronLeftIcon, ChevronRightIcon } from "../shared/ui/Icons";
+import { ToggleSidebarButton } from "../features/toggleSidebar/ui/ToggleSidebarButton";
 import { GameBoardInteractionProvider } from "../widgets/gameBoard/model/contexts/GameBoardInteractionContext";
 import { useGameBoardInteraction } from "../widgets/gameBoard/model/hooks/useGameBoardInteraction";
 import { GameBoard } from "../widgets/gameBoard/ui/GameBoard";
-import { useUI } from "../widgets/layoutControls/model/contexts/UIProvider"; // Importar useUI
-import { useModal } from "../widgets/modalManager/model/contexts/ModalProvider";
+import { useUI } from "../features/layoutControls/model/contexts/UIProvider"; // Importar useUI
+import { useModal } from "../features/modalManager/model/contexts/ModalProvider";
 import { ModalManager } from "../widgets/modalManager/ui/ModalManager";
 
 export function GameBoardPage() {
@@ -62,28 +63,24 @@ export function GameBoardPage() {
       <ModalManager />
 
       {/* Botão para mostrar a Toolbar */}
-      {!isToolbarVisible && (
-        <button
-          onClick={() => setIsToolbarVisible(true)}
-          className="border border-l-0 border-surface-2 hover:bg-accent-primary-hover  absolute top-1/2 left-0 -translate-y-1/2 bg-surface-1 p-2 rounded-r-md shadow-lg z-10"
-          aria-label="Mostrar Barra de Ferramentas"
-          title="Mostrar Barra de Ferramentas"
-        >
-          <ChevronRightIcon className="w-6 h-6 text-text-1" />
-        </button>
-      )}
+      <ToggleSidebarButton
+        isVisible={isToolbarVisible}
+        onClick={() => setIsToolbarVisible(true)}
+        ariaLabel="Mostrar Barra de Ferramentas"
+        title="Mostrar Barra de Ferramentas"
+        icon={<ChevronRightIcon className="w-6 h-6 text-text-1" />}
+        position="left"
+      />
 
       {/* Botão para mostrar a RightSidebar */}
-      {!isRightSidebarVisible && (
-        <button
-          onClick={() => setIsRightSidebarVisible(true)}
-          className="border border-r-0 border-surface-2 hover:bg-accent-primary-hover  absolute top-1/2 right-0 -translate-y-1/2 bg-surface-0 p-2 rounded-l-md shadow-lg z-10"
-          aria-label="Mostrar Barra Lateral Direita"
-          title="Mostrar Barra Lateral Direita"
-        >
-          <ChevronLeftIcon className="w-6 h-6 text-text-1" />
-        </button>
-      )}
+      <ToggleSidebarButton
+        isVisible={isRightSidebarVisible}
+        onClick={() => setIsRightSidebarVisible(true)}
+        ariaLabel="Mostrar Barra Lateral Direita"
+        title="Mostrar Barra Lateral Direita"
+        icon={<ChevronLeftIcon className="w-6 h-6 text-text-1" />}
+        position="right"
+      />
     </GameBoardInteractionProvider>
   );
 }

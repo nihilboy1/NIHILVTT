@@ -1,28 +1,35 @@
 import { CharacterType } from "@/shared/api/types";
 import { Modal } from "../../../shared/ui/Modal";
 import { useEffect, useRef, useState } from "react";
+import { useCharacterCreation } from "../model/hooks/useCharacterCreation";
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 
+// Apenas UMA definição da interface, a correta.
 interface SimpleNameModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (name: string, characterType?: CharacterType) => void; // Adicionado characterType
   title: string;
   currentName?: string;
-  characterType?: CharacterType; // Adicionado characterType como prop
-  zIndex?: number; // Adicionado zIndex
+  zIndex?: number;
 }
 
 export function SimpleNameModal({
   isOpen,
   onClose,
-  onSave,
   title,
   currentName = "",
-  characterType, // Receber characterType
-  zIndex, // Receber zIndex
+  zIndex,
 }: SimpleNameModalProps) {
   const [name, setName] = useState(currentName);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { modalStack } = useModal();
+  const { handleCreateCharacter } = useCharacterCreation();
+
+  // Extrai a prop do topo da pilha de modais.
+  // Esta é agora a única fonte para characterType.
+  const topModal = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
+  const characterType = topModal?.props?.characterType as CharacterType | undefined;
 
   useEffect(() => {
     if (isOpen) {
@@ -33,7 +40,13 @@ export function SimpleNameModal({
 
   const handleSaveClick = () => {
     if (name.trim()) {
-      onSave(name.trim(), characterType); // Passa o characterType recebido como prop
+      if (characterType) {
+        handleCreateCharacter(name.trim(), characterType);
+      } else {
+        console.error(
+          "CharacterType is undefined when trying to create character."
+        );
+      }
     } else {
       inputRef.current?.focus();
     }
@@ -44,13 +57,11 @@ export function SimpleNameModal({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      onConfirm={handleSaveClick} // Passa a função de salvar para o modal base
-      confirmText="Salvar" // Define o texto do botão de confirmação
-      zIndex={zIndex} // Passar zIndex para o Modal base
+      onConfirm={handleSaveClick}
+      confirmText="Salvar"
+      zIndex={zIndex}
     >
       <div>
-        {" "}
-        {/* Envolver o conteúdo com a ref */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -74,7 +85,7 @@ export function SimpleNameModal({
               required
               minLength={1}
               placeholder="Digite o nome"
-              maxLength={35} /* Adicionado maxLength */
+              maxLength={35}
             />
           </div>
         </form>
@@ -82,5 +93,3 @@ export function SimpleNameModal({
     </Modal>
   );
 }
-
-//visto

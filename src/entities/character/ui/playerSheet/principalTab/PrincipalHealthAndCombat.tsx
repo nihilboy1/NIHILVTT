@@ -1,10 +1,10 @@
 import { type Action } from "../../../../../shared/api/types";
 import { EditIcon, PlusCircleIcon } from "../../../../../shared/ui/Icons";
 import { useDiceRoller } from "../../../../../shared/lib/hooks/useDiceRoller";
-import { useModal } from "../../../../../widgets/modalManager/model/contexts/ModalProvider";
 import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext";
 import { CombatStats } from "./CombatStats";
 import { HealthSection } from "./HealthSection";
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 
 export function PrincipalHealthAndCombat() {
   const {

@@ -7,8 +7,8 @@ import {
 } from "../lib/chatCommands";
 import { ChatInput } from "./ChatInput"; // Importar o novo componente
 import { MessageList } from "./MessageList";
-import { useChat } from "../model/contexts/ChatContext";
 import { DEFAULT_PLAYER_NAME } from "../../../shared/config/constants";
+import { useChat } from "@/features/chat/model/contexts/ChatContext";
 
 // inclui a caixa do chat, o popover de comandos e o formulário de envio
 export function ChatPanel() {

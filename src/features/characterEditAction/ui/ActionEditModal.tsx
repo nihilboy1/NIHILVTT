@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { usePlayerSheet } from "../../../entities/character/model/contexts/CharacterSheetContext"; // Renomeado
 import { type Action } from "../../../shared/api/types";
 import { Modal } from "../../../shared/ui/Modal";
-import { useModal } from "../../../widgets/modalManager/model/contexts/ModalProvider";
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 interface ActionEditModalProps {
   isOpen: boolean;
   actionId: string;

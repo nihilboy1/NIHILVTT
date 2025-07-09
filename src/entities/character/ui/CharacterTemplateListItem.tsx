@@ -3,8 +3,8 @@ import { type Character } from "../../../shared/api/types";
 import { characterTypeTranslations } from "../../../shared/config/constants";
 import { DotsThreeVerticalIcon } from "../../../shared/ui/Icons";
 import { OptionsPopover } from "../../../shared/ui/OptionsPopover";
-import { useModal } from "../../../widgets/modalManager/model/contexts/ModalProvider";
 import { useCharacters } from "../model/contexts/CharactersContext"; // Caminho corrigido
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 
 interface CharacterTemplateListItemProps {
   character: Character;

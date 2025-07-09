@@ -1,7 +1,7 @@
 import { DiceFormula, RollCategory, SidebarTab } from "@/shared/api/types";
 import rollNotificationSound from "@/shared/assets/sounds/rollNotification.wav";
-import { useChat } from "@/widgets/chatPanel/model/contexts/ChatContext";
-import { useUI } from "@/widgets/layoutControls/model/contexts/UIProvider";
+import { useChat } from "@/features/chat/model/contexts/ChatContext";
+import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 import { useCallback } from "react";
 import { performDiceRoll } from "@/utils/dice/diceUtils"; // Importar a nova função
 
