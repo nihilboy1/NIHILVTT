@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { type Character, type Point, CharacterType } from "../../../shared/api/types"; // Importar Character
+import { type Character, type Point, CharacterType, type Token } from "../../../shared/api/types"; // Importar Character e Token
 import useDismissable from "../../../shared/lib/hooks/useDismissable";
 import { calculateNewHP } from "../../../shared/lib/utils/hpUtils";
 import { DetatchIcon, XMarkIcon } from "../../../shared/ui/Icons";
@@ -7,6 +7,7 @@ import { DetatchIcon, XMarkIcon } from "../../../shared/ui/Icons";
 interface HPControlModalProps {
   tokenId: string | null; // ID do Token no tabuleiro
   character: Character | null; // A ficha de personagem vinculada a este token
+  token: Token | null; // O token real no tabuleiro
   anchorPoint: Point | null;
   isOpen: boolean;
   onClose: () => void;
@@ -21,6 +22,7 @@ export const HP_MODAL_ESTIMATED_HEIGHT_REM = 2.5;
 export function HPControlModal({
   tokenId,
   character,
+  token, // Adicionado o prop token
   anchorPoint,
   isOpen,
   onClose,
@@ -37,17 +39,16 @@ export function HPControlModal({
     // Este useEffect sincroniza o HP do token com o estado local do input
     // Ele deve ser executado apenas quando o modal abre ou o token muda,
     // não durante a digitação do usuário para evitar "flickering".
-    if (isOpen && character) {
+    if (isOpen && token && character) { // Usar token para currentHp
       if (character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) {
-        setEditableHP(String(character.combatStats.maxHp)); // Inicializar com maxHp do Character
+        setEditableHP(String(token.currentHp ?? character.combatStats.maxHp)); // Inicializar com currentHp do Token, ou maxHp do Character como fallback
       } else {
         setEditableHP("0"); // Para ObjectCharacter ou outros tipos sem maxHp
       }
-    } else if (!character && isOpen) {
-      // Se o character for nulo e o modal estiver aberto, feche-o.
+    } else if (!token && isOpen) { // Se o token for nulo e o modal estiver aberto, feche-o.
       onClose();
     }
-  }, [isOpen, character, onClose]);
+  }, [isOpen, token, character, onClose]); // Adicionado token às dependências
 
   useEffect(() => {
     if (isOpen) {
@@ -58,7 +59,7 @@ export function HPControlModal({
   }, [isOpen]);
 
   const handleSubmit = useCallback(() => {
-    if (!character) {
+    if (!character || !token) { // Verificar também o token
       setEditableHP("0");
       return;
     }
@@ -68,7 +69,7 @@ export function HPControlModal({
 
     if (character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) {
       maxHp = character.combatStats.maxHp;
-      currentActualHp = parseInt(editableHP, 10);
+      currentActualHp = parseInt(editableHP, 10); // currentActualHp é o valor digitado no input
     } else {
       // Para ObjectCharacter ou outros tipos sem combatStats
       setEditableHP("0");
@@ -81,11 +82,12 @@ export function HPControlModal({
       if (tokenId) {
         onHPChange(tokenId, newHP);
       }
-      setEditableHP(String(newHP));
+      // Não atualize editableHP aqui, pois ele deve ser sincronizado pelo useEffect com o estado do token
+      // setEditableHP(String(newHP)); // Removido para evitar dessincronização
     } else {
-      setEditableHP(String(maxHp));
+      setEditableHP(String(token.currentHp ?? maxHp)); // Reverter para o HP atual do token ou maxHp
     }
-  }, [editableHP, character, onHPChange, tokenId]);
+  }, [editableHP, character, token, onHPChange, tokenId]); // Adicionado token às dependências
 
   const handleCloseAndSave = useCallback(() => {
     handleSubmit();

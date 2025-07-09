@@ -69,6 +69,9 @@ export const HPModalRenderer: React.FC = () => {
                   ?.characterId
             ) || null
           }
+          token={
+            tokensOnBoard.find((t: Token) => t.id === activeHPModalTokenId) || null
+          }
           anchorPoint={hpModalAnchorPoint}
           isOpen={true}
           onClose={() => onHPModalAnchorShouldUpdate(null, null)} // Usar onHPModalAnchorShouldUpdate para fechar o modal

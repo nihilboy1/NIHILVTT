@@ -1,6 +1,7 @@
 import { HPControlModal } from "../../../features/characterUpdateHp/ui/HPControlModal";
 
-import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext"; // Renomeado
+import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
+import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { SimpleNameModal } from "../../../features/characterCreation/ui/SimpleNameModal";
 import {
   CharacterType,
@@ -25,7 +26,8 @@ export function ModalManager() {
     handleMakeInstanceIndependent,
   } = useGameBoardInteractionContext();
   const { modalStack, closeModal } = useModal();
-  const { characters, tokensOnBoard, updateCharacter } = useCharacters(); // Renomeado
+  const { characters, updateCharacter } = useCharacters();
+  const { tokensOnBoard } = useTokens();
 
   const topModal =
     modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
@@ -124,12 +126,10 @@ export function ModalManager() {
           }
           case "hpControl":
             const selectedTokenForHP = tokensOnBoard.find(
-              // Renomeado
               (t: Token) => t.id === props.tokenId
             );
             const characterForHPModal = selectedTokenForHP
               ? characters.find(
-                  // Renomeado
                   (c: Character) => c.id === selectedTokenForHP.characterId
                 )
               : null;

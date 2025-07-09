@@ -9,6 +9,7 @@ import React, {
 } from "react";
 
 import { useCharacters } from "../../../../entities/character/model/contexts/CharactersContext";
+import { useTokens } from "../../../../entities/token/model/contexts/TokenContext";
 import { useMarqueeSelection } from "../../../../features/boardMarqueeSelection/model/hooks/useMarqueeSelection";
 import { useZoomAndPan } from "../../../../features/boardPanningAndZoom/model/hooks/useZoomAndPan";
 import { useRuler } from "../../../../features/boardRuler/model/hooks/useRuler";
@@ -135,7 +136,8 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
   onRemoveFromBoard,
   onMakeIndependent,
 }) => {
-  const { characters, tokensOnBoard, addToken } = useCharacters();
+  const { characters } = useCharacters();
+  const { tokensOnBoard, addToken } = useTokens();
   const { gridSettings, pageSettings, rulerPlacementMode, rulerPersists } =
     useBoardSettings();
   const { activeTool } = useUI();
@@ -253,7 +255,7 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
   const handleBoardTokenDoubleClick = useCallback(
     (tokenId: string, altKey: boolean) => {
       if (altKey) {
-        const token = tokensOnBoard.find((t) => t.id === tokenId);
+        const token = tokensOnBoard.find((t: Token) => t.id === tokenId);
         if (token) {
           openModal("sheet", { characterId: token.characterId });
         } else {
@@ -354,9 +356,9 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
     let hasValidToken = false;
 
     multiSelectedTokenIds.forEach((tokenId) => {
-      const token = tokensOnBoard.find((t) => t.id === tokenId);
+      const token = tokensOnBoard.find((t: Token) => t.id === tokenId);
       if (token) {
-        const character = characters.find((c) => c.id === token.characterId);
+        const character = characters.find((c: Character) => c.id === token.characterId);
         if (character) {
           hasValidToken = true;
           const [sizeMultiplierX, sizeMultiplierY] = parseCharacterSize(

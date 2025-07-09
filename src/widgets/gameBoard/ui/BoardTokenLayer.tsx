@@ -1,11 +1,11 @@
 import React from "react";
-import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
+import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { BoardToken } from "../../../entities/token/ui/BoardToken";
 import { Point } from "../../../shared/api/types"; // Importar Point
 import { useGameBoard } from "../model/contexts/GameBoardContext";
 
 export const BoardTokenLayer: React.FC = () => {
-  const { updateTokenPosition } = useCharacters();
+  const { updateTokenPosition } = useTokens();
   const {
     tokensOnBoard,
     characters,
@@ -44,7 +44,7 @@ export const BoardTokenLayer: React.FC = () => {
         if (!character) return null;
         return (
           <BoardToken
-            key={token.id}
+            key={`${token.id}-${token.characterId}`}
             token={token}
             character={character}
             cellSize={gridSettings.visualCellSize}

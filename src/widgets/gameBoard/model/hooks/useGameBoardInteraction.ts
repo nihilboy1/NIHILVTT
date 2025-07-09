@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import { useCharacters } from "../../../../entities/character/model/contexts/CharactersContext"; // Renomeado
+import { useCharacters } from "../../../../entities/character/model/contexts/CharactersContext";
+import { useTokens } from "../../../../entities/token/model/contexts/TokenContext";
 import { useSelectedToken } from "../../../../entities/token/model/contexts/SelectedTokenContext";
 import { HP_MODAL_ESTIMATED_HEIGHT_REM } from "../../../../features/characterUpdateHp/ui/HPControlModal";
 import {
   Tool,
-  type Point as AppPoint, // Renomeado de GridInstance
+  type Point as AppPoint,
   type Character,
   type DraggingVisuals,
-  type Token, // Renomeado de GridInstance
+  type Token,
 } from "../../../../shared/api/types";
 import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
@@ -20,43 +21,41 @@ interface UseGameBoardInteractionProps {
 
 interface UseGameBoardInteractionReturn {
   draggingVisuals: DraggingVisuals;
-  multiSelectedTokenIds: string[]; // Renomeado
+  multiSelectedTokenIds: string[];
   handleTokenSelectForHPModal: (
-    // Renomeado
-    tokenId: string, // Renomeado
+    tokenId: string,
     tokenScreenRect: DOMRect | null
   ) => void;
-  handleHPChangeFromModal: (tokenId: string, newHP: number) => void; // Renomeado
-  handleRemoveInstanceFromBoard: (tokenId: string) => void; // Renomeado
-  handleMakeInstanceIndependent: (tokenId: string) => void; // Renomeado
+  handleHPChangeFromModal: (tokenId: string, newHP: number) => void;
+  handleRemoveInstanceFromBoard: (tokenId: string) => void;
+  handleMakeInstanceIndependent: (tokenId: string) => void;
   handleHPModalAnchorShouldUpdate: (
-    _tokenId: string, // Renomeado
+    _tokenId: string,
     newScreenRect: DOMRect | null
   ) => void;
-  handleTokenDragStart: (tokenId: string) => void; // Renomeado
+  handleTokenDragStart: (tokenId: string) => void;
   handleTokenDragMove: (
-    // Renomeado
-    tokenId: string, // Renomeado
+    tokenId: string,
     visualSVGPoint: AppPoint
   ) => void;
-  handleTokenDragEnd: (tokenId: string) => void; // Renomeado
-  handleSetMultiSelectedTokenIds: (ids: string[]) => void; // Renomeado
+  handleTokenDragEnd: (tokenId: string) => void;
+  handleSetMultiSelectedTokenIds: (ids: string[]) => void;
   handleClearMultiSelection: () => void;
 }
 
 export const useGameBoardInteraction = ({
   gameBoardRef,
 }: UseGameBoardInteractionProps): UseGameBoardInteractionReturn => {
+  const { characters } = useCharacters();
   const {
-    characters, // Renomeado
-    tokensOnBoard, // Renomeado
-    removeToken, // Renomeado
-    updateTokenHp, // Adicionado
-    makeTokenIndependent, // Renomeado
-  } = useCharacters(); // Renomeado
+    tokensOnBoard,
+    removeToken,
+    updateTokenHp,
+    makeTokenIndependent,
+  } = useTokens();
   const { activeTool } = useUI();
   const { modalStack, openModal, closeModal, updateModalProps } = useModal();
-  const { selectedTokenId, setSelectedTokenId } = useSelectedToken(); // Renomeado
+  const { selectedTokenId, setSelectedTokenId } = useSelectedToken();
 
   const [draggingVisuals, setDraggingVisuals] = useState<DraggingVisuals>({
     tokenId: null, // Renomeado
@@ -144,8 +143,7 @@ export const useGameBoardInteraction = ({
     (tokenId: string, newHP: number) => {
       // Renomeado
       const token = tokensOnBoard.find(
-        // Renomeado
-        (t: Token) => t.id === tokenId // Renomeado
+        (t: Token) => t.id === tokenId
       );
       if (token) {
         const character = characters.find(
@@ -153,7 +151,7 @@ export const useGameBoardInteraction = ({
           (c: Character) => c.id === token.characterId // Renomeado
         );
         if (character && "combatStats" in character) { // Adicionar type guard
-          const maxHp = character.combatStats.maxHp ?? newHP; // Usar character.combatStats.maxHp
+          const maxHp = character.combatStats.maxHp;
           const validatedHP = Math.max(0, Math.min(newHP, maxHp));
           updateTokenHp(tokenId, validatedHP);
         }
@@ -316,7 +314,7 @@ export const useGameBoardInteraction = ({
 
       if (ids.length === 1) {
         setSelectedTokenId(ids[0]); // Renomeado
-        const token = tokensOnBoard.find((t) => t.id === ids[0]); // Renomeado
+      const token = tokensOnBoard.find((t: Token) => t.id === ids[0]);
         if (token) {
           const domElement = gameBoardRef.current?.querySelector(
             `[data-token-id="${ids[0]}"]` // Renomeado
@@ -351,8 +349,7 @@ export const useGameBoardInteraction = ({
       activeModalName === "hpControl" &&
       currentHPModalTokenId && // Renomeado
       !tokensOnBoard.find(
-        // Renomeado
-        (t: Token) => t.id === currentHPModalTokenId // Renomeado
+        (t: Token) => t.id === currentHPModalTokenId
       )
     ) {
       closeModal();
@@ -360,56 +357,53 @@ export const useGameBoardInteraction = ({
     if (
       activeModalName === "sheet" &&
       currentSheetId &&
-      !characters.find((c: Character) => c.id === currentSheetId) // Renomeado
+      !characters.find((c: Character) => c.id === currentSheetId)
     ) {
       closeModal();
     }
     if (
-      draggingVisuals.tokenId && // Renomeado
+      draggingVisuals.tokenId &&
       !tokensOnBoard.find(
-        // Renomeado
-        (t: Token) => t.id === draggingVisuals.tokenId // Renomeado
+        (t: Token) => t.id === draggingVisuals.tokenId
       )
     ) {
-      setDraggingVisuals({ tokenId: null, visualSVGPoint: null }); // Renomeado
+      setDraggingVisuals({ tokenId: null, visualSVGPoint: null });
     }
     if (
-      preDragHPModalTokenId && // Renomeado
+      preDragHPModalTokenId &&
       !tokensOnBoard.find(
-        // Renomeado
-        (t: Token) => t.id === preDragHPModalTokenId // Renomeado
+        (t: Token) => t.id === preDragHPModalTokenId
       )
     ) {
-      setPreDragHPModalTokenId(null); // Renomeado
+      setPreDragHPModalTokenId(null);
     }
     setMultiSelectedTokenIds(
       (
-        prev: string[] // Renomeado
+        prev: string[]
       ) =>
         prev.filter(
-          (id: string) => tokensOnBoard.some((t: Token) => t.id === id) // Renomeado
+          (id: string) => tokensOnBoard.some((t: Token) => t.id === id)
         )
     );
     if (
-      selectedTokenId && // Renomeado
+      selectedTokenId &&
       !tokensOnBoard.some(
-        // Renomeado
-        (t: Token) => t.id === selectedTokenId // Renomeado
+        (t: Token) => t.id === selectedTokenId
       )
     ) {
-      setSelectedTokenId(null); // Renomeado
+      setSelectedTokenId(null);
     }
   }, [
-    characters, // Renomeado
-    tokensOnBoard, // Renomeado
+    characters,
+    tokensOnBoard,
     activeModalName,
     closeModal,
-    draggingVisuals.tokenId, // Renomeado
-    preDragHPModalTokenId, // Renomeado
-    activeModalProps?.tokenId, // Renomeado
-    activeModalProps?.characterId, // Renomeado
-    selectedTokenId, // Renomeado
-    setSelectedTokenId, // Renomeado
+    draggingVisuals.tokenId,
+    preDragHPModalTokenId,
+    activeModalProps?.tokenId,
+    activeModalProps?.characterId,
+    selectedTokenId,
+    setSelectedTokenId,
   ]);
 
   // Limpar seleção e fechar modal de HP ao trocar de ferramenta
@@ -424,22 +418,21 @@ export const useGameBoardInteraction = ({
     if (activeModalName === "hpControl" && activeModalProps?.tokenId) {
       // Renomeado
       const selectedToken = tokensOnBoard.find(
-        // Renomeado
-        (t: Token) => t.id === activeModalProps.tokenId // Renomeado
+        (t: Token) => t.id === activeModalProps.tokenId
       );
-      const isTokenBeingDragged = // Renomeado
-        draggingVisuals.tokenId === activeModalProps.tokenId && // Renomeado
+      const isTokenBeingDragged =
+        draggingVisuals.tokenId === activeModalProps.tokenId &&
         draggingVisuals.visualSVGPoint !== null;
 
       if (
-        !isTokenBeingDragged && // Renomeado
-        (!selectedToken || activeTool !== Tool.SELECT) // Renomeado
+        !isTokenBeingDragged &&
+        (!selectedToken || activeTool !== Tool.SELECT)
       ) {
         closeModal();
       }
     }
   }, [
-    tokensOnBoard, // Renomeado
+    tokensOnBoard,
     activeTool,
     activeModalName,
     activeModalProps,
@@ -471,15 +464,15 @@ export const useGameBoardInteraction = ({
           // Renomeado
           multiSelectedTokenIds.forEach(
             (
-              id: string // Renomeado
-            ) => removeToken(id) // Renomeado
+              id: string
+            ) => removeToken(id)
           );
           handleClearMultiSelection();
         } else if (
           activeModalName === "hpControl" &&
-          activeModalProps?.tokenId // Renomeado
+          activeModalProps?.tokenId
         ) {
-          removeToken(activeModalProps.tokenId); // Renomeado
+          removeToken(activeModalProps.tokenId);
           closeModal();
         }
       }
@@ -492,12 +485,12 @@ export const useGameBoardInteraction = ({
   }, [
     activeModalName,
     activeModalProps,
-    multiSelectedTokenIds, // Renomeado
-    removeToken, // Renomeado
+    multiSelectedTokenIds,
+    removeToken,
     handleClearMultiSelection,
     closeModal,
-    selectedTokenId, // Renomeado
-    setSelectedTokenId, // Renomeado
+    selectedTokenId,
+    setSelectedTokenId,
   ]);
 
   // Prevent default behavior for Alt key to avoid browser menu focus
