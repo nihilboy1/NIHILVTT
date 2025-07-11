@@ -1,52 +1,65 @@
+// src/entities/character/ui/playerSheet/principalTab/CombatStats.tsx
+
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import { cn } from "../../../../../shared/lib/utils/cn";
-import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext"; // Importar usePlayerSheet
+import { type PlayerCharacterSchema } from "../../../model/schemas/character.schema";
 
-interface CombatStatsProps {
-  editingArmorClass: string;
-  setEditingArmorClass: (value: string) => void;
-  // editingInitiative e setEditingInitiative removidos, pois agora é calculado
-  editingSpeed: string;
-  setEditingSpeed: (value: string) => void;
-  editingShieldEquipped: boolean;
-  setEditingShieldEquipped: (value: boolean) => void;
-}
+// Helper para calcular o modificador de um atributo
+const getModifier = (attributeValue: number | undefined) => {
+  if (typeof attributeValue !== "number") return 0;
+  return Math.floor((attributeValue - 10) / 2);
+};
 
-export const CombatStats: React.FC<CombatStatsProps> = ({
-  editingArmorClass,
-  setEditingArmorClass,
-  editingSpeed,
-  setEditingSpeed,
-  editingShieldEquipped,
-  setEditingShieldEquipped,
-}) => {
-  const { calculatedInitiative, calculatedPassivePerception } = usePlayerSheet(); // Obter valores calculados do contexto
+// Helper para calcular o bônus de proficiência (regra padrão 5e)
+const getProficiencyBonus = (level: number | undefined) => {
+  if (typeof level !== "number" || level < 1) return 2; // Retorna 2 como padrão se o nível for inválido
+  return Math.floor((level - 1) / 4) + 2;
+};
+
+
+export const CombatStats: React.FC = () => {
+  // 1. "Observamos" todos os valores base que precisamos do formulário
+  const { register, watch } = useFormContext<PlayerCharacterSchema>();
+  const level = Number(watch("level") || 0);
+  const dexterity = Number(watch("attributes.dexterity") || 0);
+  const wisdom = Number(watch("attributes.wisdom") || 0);
+  const isPerceptionProficient = watch("proficiencies.skills.perception");
+
+  // 2. Calculamos os valores derivados usando os valores base
+  const dexModifier = getModifier(dexterity);
+  const wisModifier = getModifier(wisdom);
+  const proficiencyBonus = getProficiencyBonus(level);
+  
+  const calculatedInitiative = dexModifier;
+  // Percepção passiva só adiciona o bônus de proficiência se o personagem for proficiente
+  const calculatedPassivePerception = 10 + wisModifier + (isPerceptionProficient ? proficiencyBonus : 0);
 
   return (
     <fieldset className="p-2 rounded-md bg-surface-1">
       <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
         Armadura e Combate
       </legend>
-      <div className="flex justify-between items-end ">
+      <div className="flex justify-between items-end">
+        {/* CA */}
         <div className="w-16">
           <label
-            htmlFor="editingArmorClass"
+            htmlFor="armorClass"
             className="text-center block text-[0.8rem] font-medium mb-px"
           >
             CA
           </label>
           <input
-            id="editingArmorClass"
+            id="armorClass"
             type="number"
-            value={editingArmorClass}
-            onChange={(e) => setEditingArmorClass(e.target.value)}
+            {...register("combatStats.armorClass", { valueAsNumber: true })}
             className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-              "text-center hide-number-spinners"
+              "w-full p-2 text-center hide-number-spinners" /* ... */
             )}
             min="0"
           />
         </div>
+        {/* Iniciativa */}
         <div className="w-16">
           <label
             htmlFor="initiative"
@@ -57,49 +70,50 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
           <div
             id="initiative"
             className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary",
-              "text-center text-lg font-semibold"
+              "w-full p-2 text-center text-lg font-semibold" /* ... */
             )}
           >
-            {calculatedInitiative >= 0 ? `+${calculatedInitiative}` : calculatedInitiative}
+            {calculatedInitiative >= 0
+              ? `+${calculatedInitiative}`
+              : calculatedInitiative}
           </div>
         </div>
+        {/* Deslocamento */}
         <div className="w-16">
           <label
-            htmlFor="editingSpeed"
+            htmlFor="speed"
             className="block text-[0.8rem] font-medium mb-px"
           >
             DESLOC.
           </label>
           <input
-            id="editingSpeed"
+            id="speed"
             type="number"
-            value={editingSpeed}
-            onChange={(e) => setEditingSpeed(e.target.value)}
+            {...register("combatStats.speed", { valueAsNumber: true })}
             className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-              "text-center hide-number-spinners"
+              "w-full p-2 text-center hide-number-spinners" /* ... */
             )}
             min="0"
           />
         </div>
       </div>
       <div className="pt-2 flex justify-between items-center">
+        {/* Escudo */}
         <label
-          htmlFor="editingShieldEquipped"
+          htmlFor="shieldEquipped"
           className="flex items-center space-x-1.5 cursor-pointer"
         >
           <input
-            id="editingShieldEquipped"
+            id="shieldEquipped"
             type="checkbox"
-            checked={editingShieldEquipped}
-            onChange={(e) => setEditingShieldEquipped(e.target.checked)}
+            {...register("combatStats.shieldEquipped")}
             className="h-3.5 w-3.5 rounded-sm focus:ring-accent-primary bg-surface-1"
           />
           <span className={cn("block text-[0.8rem] font-medium mb-px", "mb-0")}>
             ESCUDO
           </span>
         </label>
+        {/* Percepção Passiva */}
         <div className="w-24">
           <label
             htmlFor="passivePerception"
@@ -110,8 +124,7 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
           <div
             id="passivePerception"
             className={cn(
-              "w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary",
-              "text-center text-lg font-semibold"
+              "w-full p-2 text-center text-lg font-semibold" /* ... */
             )}
           >
             {calculatedPassivePerception}

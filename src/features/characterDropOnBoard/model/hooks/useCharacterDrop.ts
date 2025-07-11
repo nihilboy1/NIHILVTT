@@ -1,10 +1,11 @@
-import { Character, GridSettings, PageSettings, Point, CharacterType } from "@/shared/api/types"; // Adicionado CharacterType
+import { GridSettings, PageSettings, Point, CharacterType } from "@/shared/api/types"; // Adicionado CharacterType
 import { parseTokenSize } from "../../../../shared/lib/utils/board/boardUtils";
 import { useCallback } from "react";
+import { CharacterSchema } from "@/entities/character/model/schemas/character.schema";
 
 interface UseCharacterDropProps {
   getSVGPoint: (clientX: number, clientY: number) => Point;
-  characters: Character[]; // Renomeado tokens para characters
+  characters: CharacterSchema[]; // Renomeado tokens para characters
   gridSettings: GridSettings;
   pageSettings: PageSettings;
   addToken: (characterId: string, position: Point, currentHp?: number) => void; // Renomeado addGridInstance para addToken

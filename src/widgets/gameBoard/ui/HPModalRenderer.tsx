@@ -1,6 +1,9 @@
+// src/widgets/gameBoard/ui/HPModalRenderer.tsx
+
 import React, { useEffect, useState } from "react";
 import { HPControlModal } from "../../../features/characterUpdateHp/ui/HPControlModal";
-import { Character, Point, Token } from "../../../shared/api/types";
+// 1. A importação do 'Character' antigo foi removida.
+import { type Point } from "../../../shared/api/types";
 import { useGameBoard } from "../model/contexts/GameBoardContext";
 
 export const HPModalRenderer: React.FC = () => {
@@ -18,19 +21,14 @@ export const HPModalRenderer: React.FC = () => {
     gridSettings,
   } = useGameBoard();
 
-  const [hpModalAnchorPoint, setHpModalAnchorPoint] = useState<Point | null>(
-    null
-  );
+  const [hpModalAnchorPoint, setHpModalAnchorPoint] = useState<Point | null>(null);
 
   useEffect(() => {
     if (activeHPModalTokenId) {
-      const tokenToUpdate = tokensOnBoard.find(
-        (t) => t.id === activeHPModalTokenId
-      );
+      const tokenToUpdate = tokensOnBoard.find((t) => t.id === activeHPModalTokenId);
       if (tokenToUpdate) {
-        const character = characters.find(
-          (c) => c.id === tokenToUpdate.characterId
-        );
+        // Deixamos o 'c' ser inferido como CharacterSchema
+        const character = characters.find((c) => c.id === tokenToUpdate.characterId);
         const newScreenRect = getTokenScreenRect(tokenToUpdate, character);
         if (newScreenRect) {
           setHpModalAnchorPoint({
@@ -56,25 +54,20 @@ export const HPModalRenderer: React.FC = () => {
     gridSettings,
   ]);
 
+  const selectedToken = tokensOnBoard.find((t) => t.id === activeHPModalTokenId) || null;
+  const characterForModal = selectedToken ? characters.find((c) => c.id === selectedToken.characterId) || null : null;
+
   return (
     <>
-      {activeHPModalTokenId && hpModalAnchorPoint && (
+      {activeHPModalTokenId && hpModalAnchorPoint && selectedToken && characterForModal && (
         <HPControlModal
           tokenId={activeHPModalTokenId}
-          character={
-            characters.find(
-              (c: Character) =>
-                c.id ===
-                tokensOnBoard.find((t: Token) => t.id === activeHPModalTokenId)
-                  ?.characterId
-            ) || null
-          }
-          token={
-            tokensOnBoard.find((t: Token) => t.id === activeHPModalTokenId) || null
-          }
+          // 2. Agora o `character` é inferido como `CharacterSchema`, o tipo correto.
+          character={characterForModal}
+          token={selectedToken}
           anchorPoint={hpModalAnchorPoint}
           isOpen={true}
-          onClose={() => onHPModalAnchorShouldUpdate(null, null)} // Usar onHPModalAnchorShouldUpdate para fechar o modal
+          onClose={() => onHPModalAnchorShouldUpdate(null, null)}
           onHPChange={onHPChange}
           onRemoveFromBoard={onRemoveFromBoard}
           onMakeIndependent={onMakeIndependent}

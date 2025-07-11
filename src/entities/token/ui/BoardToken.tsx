@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useRef } from "react";
 import {
   Tool,
-  type Character,
   type PageSettings,
   type Point,
   type Token,
@@ -13,10 +12,11 @@ import { useSelectedToken } from "../model/contexts/SelectedTokenContext";
 import { HealthBar } from "./HealthBar";
 import { TokenVisual, TokenVisualMetrics } from "./TokenVisual";
 import { useTokenDrag } from "../../../shared/lib/hooks/useTokenDrag";
+import { CharacterSchema } from "@/entities/character/model/schemas/character.schema";
 
 interface BoardTokenProps {
   token: Token;
-  character: Character;
+  character: CharacterSchema;
   cellSize: number;
   zoomLevel: number;
   onMove: (tokenId: string, newPosition: Point) => void;
@@ -222,8 +222,6 @@ export function BoardToken({
           strokeWidth={strokeWidth}
         />
       )}
-
-   
     </g>
   );
 }

@@ -26,9 +26,9 @@ describe("useUIState", () => {
     const { result } = renderHook(() => useUIState());
 
     act(() => {
-      result.current.setActiveSidebarTab(SidebarTab.TOKENS);
+      result.current.setActiveSidebarTab(SidebarTab.CHARACTERS);
     });
-    expect(result.current.activeSidebarTab).toBe(SidebarTab.TOKENS);
+    expect(result.current.activeSidebarTab).toBe(SidebarTab.CHARACTERS);
   });
 
   it("deve definir a visibilidade da barra de ferramentas", () => {

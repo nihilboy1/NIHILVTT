@@ -1,13 +1,13 @@
 import React, { useRef, useState } from "react";
-import { type Character } from "../../../shared/api/types";
 import { characterTypeTranslations } from "../../../shared/config/constants";
 import { DotsThreeVerticalIcon } from "../../../shared/ui/Icons";
 import { OptionsPopover } from "../../../shared/ui/OptionsPopover";
 import { useCharacters } from "../model/contexts/CharactersContext"; // Caminho corrigido
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import { CharacterSchema } from "../model/schemas/character.schema";
 
 interface CharacterTemplateListItemProps {
-  character: Character;
+  character: CharacterSchema;
   instanceCount: number;
   openSheetModal: (characterId: string) => void;
 }

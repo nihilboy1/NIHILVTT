@@ -1,17 +1,28 @@
-import { useCharacterSheetForm, UseCharacterSheetFormProps, UseCharacterSheetFormReturn } from "../../../../entities/character/model/hooks/useCharacterSheetForm";
+// src/widgets/sheetModal/model/contexts/SheetContext.tsx
+
 import React, { createContext, useContext, type ReactNode } from "react";
+// 1. Importações necessárias do RHF e do seu schema
+import { type UseFormReturn } from "react-hook-form";
+import { type PlayerCharacterSchema } from "../../../../entities/character/model/schemas/character.schema";
+import { useCharacterSheetForm, type UseCharacterSheetFormProps } from "../../../../entities/character/model/hooks/useCharacterSheetForm";
 
+// 2. Definimos um novo tipo para o valor do nosso contexto.
+// Ele representa o que o `useCharacterSheetForm` AGORA retorna.
+type CharacterSheetFormContextType = {
+  form: UseFormReturn<PlayerCharacterSchema>;
+  handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+};
 
-// Criar o contexto
-const SheetContext = createContext<UseCharacterSheetFormReturn | undefined>(
+// 3. Criamos o contexto com o novo tipo.
+const SheetContext = createContext<CharacterSheetFormContextType | undefined>(
   undefined
 );
 
 // Componente Provedor do Contexto
 interface SheetProviderProps {
   children: ReactNode;
-  initialCharacterData: UseCharacterSheetFormProps["initialCharacterData"]; // Usar o tipo de props do hook
-  onSave: UseCharacterSheetFormProps["onSave"]; // Usar o tipo de props do hook
+  initialCharacterData: UseCharacterSheetFormProps["initialCharacterData"];
+  onSave: UseCharacterSheetFormProps["onSave"];
 }
 
 export const SheetProvider: React.FC<SheetProviderProps> = ({
@@ -19,20 +30,21 @@ export const SheetProvider: React.FC<SheetProviderProps> = ({
   initialCharacterData,
   onSave,
 }) => {
-  const sheetFormState = useCharacterSheetForm({
+  // O nome 'formMethods' é mais descritivo do que 'sheetFormState' agora.
+  const formMethods = useCharacterSheetForm({
     initialCharacterData,
     onSave,
   });
 
   return (
-    <SheetContext.Provider value={sheetFormState}>
+    <SheetContext.Provider value={formMethods}>
       {children}
     </SheetContext.Provider>
   );
 };
 
-// Hook personalizado para consumir o contexto
-export const useSheet = (): UseCharacterSheetFormReturn => {
+// 4. O hook para consumir o contexto agora retorna o novo tipo.
+export const useSheet = (): CharacterSheetFormContextType => {
   const context = useContext(SheetContext);
   if (context === undefined) {
     throw new Error("useSheet must be used within a SheetProvider");

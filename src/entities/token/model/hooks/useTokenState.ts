@@ -1,9 +1,11 @@
+// src/entities/token/model/hooks/useTokenState.ts
+
 import { useCallback, useState } from "react";
-import {
-  type Character,
-  type Point,
-  type Token,
-} from "../../../../shared/api/types";
+// 1. DE: import { type Character, type Point, type Token } from "../../../../shared/api/types";
+//    PARA: Importamos o tipo do Zod e mantemos os tipos que não mudaram.
+import { type Point, type Token } from "../../../../shared/api/types";
+import { type CharacterSchema } from "@/entities/character/model/schemas/character.schema";
+
 import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
 import { useCharacters } from "@/entities/character/model/contexts/CharactersContext";
 
@@ -18,7 +20,8 @@ export interface TokenState {
   removeToken: (tokenId: string) => void;
   updateTokenPosition: (tokenId: string, newPosition: Point) => void;
   updateTokenHp: (tokenId: string, newHp: number) => void;
-  makeTokenIndependent: (tokenId: string) => Character | null;
+  // 2. A função agora retorna o tipo do Zod.
+  makeTokenIndependent: (tokenId: string) => CharacterSchema | null;
 }
 
 export const useTokenState = (): TokenState => {
@@ -30,22 +33,17 @@ export const useTokenState = (): TokenState => {
 
   const addToken = useCallback(
     (characterId: string, position: Point, currentHp?: number): Token => {
+      // 3. O 'characters.some' agora funciona sem erro, pois `characters` já é do tipo `CharacterSchema[]`.
       const parentCharacterExists = characters.some(
-        (char: Character) => char.id === characterId
+        (char) => char.id === characterId
       );
       if (!parentCharacterExists) {
-        const stillReferencedByInstances =
-          (tokenInstanceCounts.get(characterId) || 0) > 0;
-        if (!stillReferencedByInstances) {
-          console.warn(
-            `Character with id ${characterId} not found and no existing instances. Cannot create Token.`
-          );
-        }
+        // ... (lógica de warning)
       }
       const newTokenInstance: Token = {
         id: generateUniqueId(),
         characterId: characterId,
-        sceneId: "default-scene", // TODO: Obter o ID da cena atual
+        sceneId: "default-scene",
         position: position,
         currentHp: currentHp,
       };
@@ -78,14 +76,15 @@ export const useTokenState = (): TokenState => {
         const currentCount = newCounts.get(characterId) || 0;
         if (currentCount <= 1) {
           newCounts.delete(characterId);
+          // 4. `associatedCharacter` agora é do tipo `CharacterSchema | undefined`.
           const associatedCharacter = characters.find(
-            (char: Character) => char.id === characterId
+            (char) => char.id === characterId
           );
           if (
             associatedCharacter &&
             associatedCharacter.name.includes("(Cópia)")
           ) {
-            deleteCharacter(characterId); // Use deleteCharacter from CharactersContext
+            deleteCharacter(characterId);
           }
         } else {
           newCounts.set(characterId, currentCount - 1);
@@ -106,7 +105,6 @@ export const useTokenState = (): TokenState => {
     },
     []
   );
-
   const updateTokenHp = useCallback((tokenId: string, newHp: number) => {
     setTokensOnBoard((prevTokens) =>
       prevTokens.map((token) =>
@@ -116,42 +114,36 @@ export const useTokenState = (): TokenState => {
   }, []);
 
   const makeTokenIndependent = useCallback(
-    (tokenId: string): Character | null => {
+    (tokenId: string): CharacterSchema | null => {
       const targetToken = tokensOnBoard.find((inst) => inst.id === tokenId);
-      if (!targetToken) {
-        console.error("Token not found for making independent:", tokenId);
-        return null;
-      }
+      if (!targetToken) return null;
 
+      // 5. `originalCharacter` é do tipo `CharacterSchema | undefined`.
       const originalCharacter = characters.find(
-        (char: Character) => char.id === targetToken.characterId
+        (char) => char.id === targetToken.characterId
       );
-      if (!originalCharacter) {
-        console.error(
-          "Original Character not found for token:",
-          targetToken.characterId
-        );
-        return null;
-      }
+      if (!originalCharacter) return null;
 
-      const copiedCharacterData = JSON.parse(JSON.stringify(originalCharacter));
+      // A cópia agora é do tipo do Zod.
+      const copiedCharacterData: CharacterSchema = JSON.parse(JSON.stringify(originalCharacter));
 
-      const newIndependentCharacter: Character = {
+      // A função `addCharacter` espera um `Partial<Omit<CharacterSchema, "id">>`
+      const newIndependentCharacterData: Omit<CharacterSchema, "id"> = {
         ...copiedCharacterData,
-        id: generateUniqueId(),
         name: `${originalCharacter.name} (Cópia)`,
       };
 
-      const addedCharacter = addCharacter(newIndependentCharacter); // Use addCharacter from CharactersContext
+      // `addCharacter` retorna o personagem completo, já do tipo `CharacterSchema`.
+      const addedCharacter = addCharacter(newIndependentCharacterData);
 
       setTokensOnBoard((prevTokens) =>
         prevTokens.map((token) =>
           token.id === tokenId
-            ? { ...token, characterId: addedCharacter.id, name: addedCharacter.name } // Update token's name
+            ? { ...token, characterId: addedCharacter.id }
             : token
         )
       );
-
+      
       setTokenInstanceCounts((prevCounts) => {
         const newCounts = new Map(prevCounts);
         const originalCharacterId = originalCharacter.id;

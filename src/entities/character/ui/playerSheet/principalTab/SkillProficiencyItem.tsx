@@ -1,80 +1,55 @@
+// src/entities/character/ui/playerSheet/principalTab/SkillProficiencyItem.tsx
+
 import React from "react";
+import { useFormContext } from 'react-hook-form';
 import { useDiceRoller } from "../../../../../shared/lib/hooks/useDiceRoller";
-import { DiceFormula, PlayerCharacter, RollCategory } from "../../../../../shared/api/types";
-import { ATTRIBUTE_LABELS } from "../../../../../shared/config/sheetDefaults";
-import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext"; // Importar usePlayerSheet
+import { type DiceFormula, type RollCategory } from "../../../../../shared/api/types";
+import { type PlayerCharacterSchema, type ProficiencyPath } from "../../../model/schemas/character.schema";
 
 interface SkillProficiencyItemProps {
-  skillInfo: {
-    key: keyof NonNullable<PlayerCharacter["proficiencies"]>["skills"] | keyof NonNullable<PlayerCharacter["proficiencies"]>["savingThrows"]; // Pode ser perícia ou saving throw
-    label: string;
-    parentAttribute: keyof NonNullable<PlayerCharacter["attributes"]>;
-    isSavingThrow?: boolean;
-  };
-  isProficient: boolean;
-  // totalBonus não é mais uma prop, será calculado
-  onProficiencyChange: (
-    skillKey: string,
-    isSavingThrow: boolean,
-    checked: boolean
-  ) => void;
-  // attrName e characterName não são mais necessários como props
+  skillLabel: string;
+  name: ProficiencyPath;
+  parentAttributeName: `attributes.${keyof PlayerCharacterSchema['attributes']}`;
 }
 
 export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
-  skillInfo,
-  isProficient,
-  onProficiencyChange,
+  skillLabel,
+  name,
+  parentAttributeName,
 }) => {
-  const { calculatedSkillBonuses, calculatedAttributeModifiers, calculatedProficiencyBonus, playerCharacter } = usePlayerSheet(); // Obter do contexto
-  const { rollDice } = useDiceRoller();
-  const characterName = playerCharacter.name; // Obter o nome do personagem do contexto
+  const { register, watch } = useFormContext<PlayerCharacterSchema>();
 
-  let totalBonus: number;
-  if (skillInfo.isSavingThrow) {
-    const attributeModifier = calculatedAttributeModifiers[skillInfo.parentAttribute];
-    totalBonus = isProficient ? attributeModifier + calculatedProficiencyBonus : attributeModifier;
-  } else {
-    totalBonus = calculatedSkillBonuses[skillInfo.key as keyof typeof calculatedSkillBonuses];
-  }
+  const isProficient = watch(name);
+  const attributeValue = watch(parentAttributeName);
+  const level = watch('level');
+  const characterName = watch('name');
+
+  const proficiencyBonus = level ? Math.floor((level - 1) / 4) + 2 : 2;
+  const attributeModifier = attributeValue ? Math.floor((attributeValue - 10) / 2) : 0;
+  const totalBonus = isProficient
+    ? attributeModifier + proficiencyBonus
+    : attributeModifier;
+
+  const { rollDice } = useDiceRoller();
 
   const handleRoll = () => {
-    const rollName = skillInfo.isSavingThrow
-      ? ATTRIBUTE_LABELS[skillInfo.parentAttribute]
-      : skillInfo.label;
-
-    const category: RollCategory = skillInfo.isSavingThrow ? "Saving Throw" : "Skill";
-
-    let formula: DiceFormula;
-    if (totalBonus === 0) {
-      formula = "1d20";
-    } else {
-      formula = `1d20${totalBonus >= 0 ? "+" : ""}${totalBonus}`;
-    }
-
+    const isSavingThrow = name.includes('savingThrows');
+    // CORREÇÃO: Usamos diretamente a prop 'skillLabel', que já vem formatada do pai.
+    const rollName = skillLabel;
+    const category: RollCategory = isSavingThrow ? "Saving Throw" : "Skill";
+    const formula: DiceFormula = `1d20${totalBonus >= 0 ? "+" : ""}${totalBonus}`;
     rollDice(formula, rollName, category, characterName);
   };
 
-  const checkboxId = `skill-prof-${String(skillInfo.key)}`; // attrName removido
+  const checkboxId = `skill-prof-${name}`;
 
   return (
-    <div key={skillInfo.key} className="flex items-center gap-x-1">
-      <label
-        htmlFor={checkboxId}
-        className="flex items-center gap-x-1 cursor-pointer"
-      >
+    <div key={name} className="flex items-center gap-x-1">
+      <label htmlFor={checkboxId} className="flex items-center gap-x-1 cursor-pointer">
         <input
           type="checkbox"
           id={checkboxId}
-          checked={isProficient}
-          onChange={(e) => {
-            // Não precisa de stopPropagation aqui, pois o label já está associado
-            onProficiencyChange(
-              skillInfo.key,
-              !!skillInfo.isSavingThrow,
-              e.target.checked
-            );
-          }}
+          {...register(name)}
           className="h-3.5 w-3.5 rounded-sm border-surface-2 text-accent-primary focus:ring-accent-primary bg-surface-1 flex-shrink-0"
         />
         <span className="text-xs font-bold text-accent-primary w-max-[0.375rem] text-right flex-shrink-0">
@@ -85,7 +60,7 @@ export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
         className="text-xs font-medium text-accent-primary cursor-pointer hover:bg-surface-2 transition-colors duration-200 rounded-md p-1 flex-grow"
         onClick={handleRoll}
       >
-        {skillInfo.label}
+        {skillLabel}
       </span>
     </div>
   );

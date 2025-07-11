@@ -1,77 +1,66 @@
-import React from "react";
-import { useDiceRoller } from "../../../../../shared/lib/hooks/useDiceRoller";
-import { DiceFormula, PlayerCharacter } from "../../../../../shared/api/types";
-import { ATTRIBUTE_LABELS } from "../../../../../shared/config/sheetDefaults";
-import { cn } from "../../../../../shared/lib/utils/cn";
-import { usePlayerSheet } from "../../../model/contexts/CharacterSheetContext"; // Importar usePlayerSheet
+// src/entities/character/ui/playerSheet/principalTab/AttributeBlock.tsx
 
+import { useFormContext } from 'react-hook-form';
+import { useDiceRoller } from "../../../../../shared/lib/hooks/useDiceRoller";
+import { type DiceFormula } from "../../../../../shared/api/types";
+import { cn } from "../../../../../shared/lib/utils/cn";
+import { type PlayerCharacterSchema } from '../../../model/schemas/character.schema';
+
+// 1. A interface de props agora também recebe o `label`
 interface AttributeBlockProps {
-  attrName: keyof NonNullable<PlayerCharacter["attributes"]>;
-  attrValue: number;
-  onAttributeChange: (
-    attrName: keyof NonNullable<PlayerCharacter["attributes"]>,
-    value: number | ""
-  ) => void;
-  // characterName não é mais necessário como prop, será obtido do contexto
+  name: `attributes.${keyof PlayerCharacterSchema['attributes']}`;
+  label: string;
 }
 
-export const AttributeBlock: React.FC<AttributeBlockProps> = ({
-  attrName,
-  attrValue,
-  onAttributeChange,
-}) => {
-  const { calculatedAttributeModifiers, playerCharacter } = usePlayerSheet(); // Obter do contexto
-  const attrLabel = ATTRIBUTE_LABELS[attrName as keyof typeof ATTRIBUTE_LABELS];
-  const modifier = calculatedAttributeModifiers[attrName]; // Usar o modificador calculado
+export const AttributeBlock: React.FC<AttributeBlockProps> = ({ name, label }) => {
+  const { register, watch } = useFormContext<PlayerCharacterSchema>();
+
+  const attrValue = watch(name);
+  const characterName = watch("name");
+
+  const modifier = attrValue ? Math.floor((attrValue - 10) / 2) : 0;
+  
+  // 2. A constante 'attrLabel' foi removida. Usamos a prop 'label' diretamente.
+  // const attrLabel = ATTRIBUTE_LABELS[name.split('.')[1] as keyof typeof ATTRIBUTE_LABELS]; // LINHA REMOVIDA
+
   const { rollDice } = useDiceRoller();
-  const characterName = playerCharacter.name; // Obter o nome do personagem do contexto
 
   const handleRoll = () => {
-    let formula: DiceFormula;
-    if (modifier === 0) {
-      formula = "1d20";
-    } else {
-      formula = `1d20${modifier >= 0 ? "+" : ""}${modifier}`;
-    }
-    rollDice(formula, attrLabel, "Attribute", characterName);
+    const formula: DiceFormula = `1d20${modifier >= 0 ? "+" : ""}${modifier}`;
+    // Usamos a prop 'label' aqui
+    rollDice(formula, label, "Attribute", characterName);
   };
 
   return (
     <div
-      className="flex justify-between w-[10rem] cursor-pointer hover:bg-surface-2 transition-colors duration-200 rounded-md p-1" // Adicionar estilos de cursor e hover
-      onClick={handleRoll} // Adicionar onClick
+      className="flex justify-between w-[10rem] cursor-pointer hover:bg-surface-2 transition-colors duration-200 rounded-md p-1"
+      onClick={handleRoll}
     >
-      <div className="flex flex-col ">
+      <div className="flex flex-col">
         <label
-          htmlFor={`attr-${String(attrName)}`}
-          className={cn(
-            "cursor-pointer block text-xs font-bold mb-0.5",
-            "text-xs uppercase"
-          )}
+          htmlFor={name}
+          className={cn("cursor-pointer block text-xs font-bold mb-0.5", "text-xs uppercase")}
         >
-          {attrLabel}
+          {/* 3. E usamos a prop 'label' aqui */}
+          {label}
         </label>
         <input
-          id={`attr-${String(attrName)}`}
+          id={name}
           type="number"
-          value={attrValue}
-          onChange={(e) => {
-            const value = parseInt(e.target.value, 10);
-            if (!isNaN(value)) {
-              onAttributeChange(attrName, Math.max(1, Math.min(30, value)));
-            } else if (e.target.value === "") {
-              onAttributeChange(attrName, "");
-            }
-          }}
+          {...register(name, {
+            valueAsNumber: true,
+            min: 1,
+            max: 30,
+          })}
           className={cn(
-            "hide-arrows w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-            "text-center hide-number-spinners w-12 text-lg font-semibold p-0"
+            "text-center hide-number-spinners w-12 text-lg font-semibold p-0",
+            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
           )}
-          onClick={(e) => e.stopPropagation()} // Impedir que o clique no input propague para o div pai
+          onClick={(e) => e.stopPropagation()}
         />
       </div>
       <div id="modificador" className="flex items-center justify-center w-14">
-        <span className="block text-2xl font-bold p-1 border rounded w-full text-center ">
+        <span className="block text-2xl font-bold p-1 border rounded w-full text-center">
           {modifier >= 0 ? `+${modifier}` : modifier}
         </span>
       </div>

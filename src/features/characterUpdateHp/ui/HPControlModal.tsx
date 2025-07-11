@@ -1,19 +1,24 @@
+// src/features/characterUpdateHp/ui/HPControlModal.tsx
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { type Character, type Point, CharacterType, type Token } from "../../../shared/api/types"; // Importar Character e Token
+// 1. MUDANÇA NA IMPORTAÇÃO: Removemos o 'Character' antigo e importamos o 'CharacterSchema' do Zod.
+import { type Point, CharacterType, type Token } from "../../../shared/api/types";
+import { type CharacterSchema } from "@/entities/character/model/schemas/character.schema";
 import useDismissable from "../../../shared/lib/hooks/useDismissable";
 import { calculateNewHP } from "../../../shared/lib/utils/hpUtils";
 import { DetatchIcon, XMarkIcon } from "../../../shared/ui/Icons";
 
 interface HPControlModalProps {
-  tokenId: string | null; // ID do Token no tabuleiro
-  character: Character | null; // A ficha de personagem vinculada a este token
-  token: Token | null; // O token real no tabuleiro
+  tokenId: string | null;
+  // 2. MUDANÇA NA PROP: A prop 'character' agora espera o tipo do Zod.
+  character: CharacterSchema | null;
+  token: Token | null;
   anchorPoint: Point | null;
   isOpen: boolean;
   onClose: () => void;
-  onHPChange: (tokenId: string, newHP: number) => void; // Atualizar HP no Token
-  onRemoveFromBoard: (tokenId: string) => void; // Remove o Token do tabuleiro
-  onMakeIndependent: (tokenId: string) => void; // Torna o Token independente
+  onHPChange: (tokenId: string, newHP: number) => void;
+  onRemoveFromBoard: (tokenId: string) => void;
+  onMakeIndependent: (tokenId: string) => void;
   zIndex?: number;
 }
 
@@ -22,7 +27,7 @@ export const HP_MODAL_ESTIMATED_HEIGHT_REM = 2.5;
 export function HPControlModal({
   tokenId,
   character,
-  token, // Adicionado o prop token
+  token,
   anchorPoint,
   isOpen,
   onClose,
@@ -36,20 +41,18 @@ export function HPControlModal({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Este useEffect sincroniza o HP do token com o estado local do input
-    // Ele deve ser executado apenas quando o modal abre ou o token muda,
-    // não durante a digitação do usuário para evitar "flickering".
-    if (isOpen && token && character) { // Usar token para currentHp
+    if (isOpen && token && character) {
       if (character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) {
-        setEditableHP(String(token.currentHp ?? character.combatStats.maxHp)); // Inicializar com currentHp do Token, ou maxHp do Character como fallback
+        // A lógica continua funcionando, pois a estrutura de 'combatStats' é a mesma.
+        setEditableHP(String(token.currentHp ?? character.combatStats.maxHp));
       } else {
-        setEditableHP("0"); // Para ObjectCharacter ou outros tipos sem maxHp
+        setEditableHP("0");
       }
-    } else if (!token && isOpen) { // Se o token for nulo e o modal estiver aberto, feche-o.
+    } else if (!token && isOpen) {
       onClose();
     }
-  }, [isOpen, token, character, onClose]); // Adicionado token às dependências
-
+  }, [isOpen, token, character, onClose]);
+  
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -190,7 +193,6 @@ export function HPControlModal({
         <XMarkIcon className="w-4 h-4" />
       </button>
     </div>
-  );
-}
-
-//visto
+  );}
+  
+ 

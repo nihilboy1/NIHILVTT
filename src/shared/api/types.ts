@@ -42,7 +42,7 @@ export type Tool = (typeof Tool)[keyof typeof Tool];
 
 export const SidebarTab = {
   CHAT: "CHAT",
-  TOKENS: "TOKENS",
+  CHARACTERS: "CHARACTERS",
 } as const;
 export type SidebarTab = (typeof SidebarTab)[keyof typeof SidebarTab];
 
@@ -80,8 +80,8 @@ export interface BaseDndCharacter extends BaseCharacter {
     savingThrows: {
       strength: boolean;
       dexterity: boolean;
-      constitution: boolean;
       intelligence: boolean;
+      constitution: boolean;
       wisdom: boolean;
       charisma: boolean;
     };

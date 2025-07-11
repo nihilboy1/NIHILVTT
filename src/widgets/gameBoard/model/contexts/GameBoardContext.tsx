@@ -1,13 +1,3 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-
 import { useCharacters } from "../../../../entities/character/model/contexts/CharactersContext";
 import { useTokens } from "../../../../entities/token/model/contexts/TokenContext";
 import { useMarqueeSelection } from "../../../../features/boardMarqueeSelection/model/hooks/useMarqueeSelection";
@@ -15,8 +5,11 @@ import { useZoomAndPan } from "../../../../features/boardPanningAndZoom/model/ho
 import { useRuler } from "../../../../features/boardRuler/model/hooks/useRuler";
 import { useBoardSettings } from "../../../../features/boardSettings/contexts/BoardSettingsContext";
 import { useCharacterDrop } from "../../../../features/characterDropOnBoard/model/hooks/useCharacterDrop";
+import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
+
+// 1. MUDANÇA NA IMPORTAÇÃO: Trocamos 'Character' por 'CharacterSchema'
 import {
-  type Character,
   type DraggingVisuals,
   type GridSettings,
   type MarqueeSelectionState,
@@ -26,10 +19,18 @@ import {
   type Token,
   type Tool,
 } from "../../../../shared/api/types";
+import { type CharacterSchema } from "@/entities/character/model/schemas/character.schema";
 import { parseCharacterSize } from "../../../../shared/lib/utils/characterUtils";
 import { useGameBoardEvents } from "../hooks/useGameBoardEvents";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
-import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 interface GameBoardProviderProps {
   children: ReactNode;
@@ -77,7 +78,7 @@ interface GameBoardContextType {
   handleBoardTokenDoubleClick: (tokenId: string, altKey: boolean) => void;
   getTokenScreenRect: (
     token: Token,
-    character: Character | undefined,
+    character: CharacterSchema | undefined,
     liveSVGPoint?: Point
   ) => DOMRect | null;
   isPageAndGridSettingsModalOpen: boolean;
@@ -110,7 +111,7 @@ interface GameBoardContextType {
   onHPChange: (tokenId: string, newHP: number) => void;
   onRemoveFromBoard: (tokenId: string) => void;
   onMakeIndependent: (tokenId: string) => void;
-  characters: Character[];
+  characters: CharacterSchema[];
   tokensOnBoard: Token[];
   gridSettings: GridSettings;
   pageSettings: PageSettings;
@@ -193,14 +194,12 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
   // Modificando onSetMultiSelectedTokenIds para gerenciar o HPModal
   const handleSetMultiSelectedTokenIds = useCallback(
     (ids: string[]) => {
-     
       onSetMultiSelectedTokenIds(ids); // Chama a função original
 
       if (ids.length === 1) {
         setActiveHPModalTokenId(ids[0]);
       } else {
         setActiveHPModalTokenId(null); // Limpa o HPModal se mais de um ou nenhum token for selecionado
-        
       }
     },
     [onSetMultiSelectedTokenIds]
@@ -269,7 +268,7 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
   const getTokenScreenRect = useCallback(
     (
       token: Token,
-      character: Character | undefined,
+      character: CharacterSchema | undefined,
       liveSVGPoint?: Point
     ): DOMRect | null => {
       if (!svgRef.current || !character) return null;
@@ -319,7 +318,7 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
       );
       if (tokenToUpdate) {
         const character = characters.find(
-          (c: Character) => c.id === tokenToUpdate.characterId
+          (c) => c.id === tokenToUpdate.characterId
         );
         let livePointForCalc: Point | undefined = undefined;
         if (
@@ -358,7 +357,9 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
     multiSelectedTokenIds.forEach((tokenId) => {
       const token = tokensOnBoard.find((t: Token) => t.id === tokenId);
       if (token) {
-        const character = characters.find((c: Character) => c.id === token.characterId);
+        const character = characters.find(
+          (c) => c.id === token.characterId
+        );
         if (character) {
           hasValidToken = true;
           const [sizeMultiplierX, sizeMultiplierY] = parseCharacterSize(

@@ -91,6 +91,15 @@ export function CreatureSheet({
           min="1"
           step="1"
           required
+          // Adicionado para garantir que o valor seja tratado como número
+          // Embora o onChange já faça a conversão, o register com valueAsNumber é mais robusto
+          // para formulários controlados pelo react-hook-form.
+          // Como este componente não usa register, a conversão manual é necessária.
+          // No entanto, a instrução é para adicionar { valueAsNumber: true } ao register.
+          // Este input não usa register, então a instrução não se aplica diretamente aqui.
+          // Vou manter a lógica existente, pois o onChange já lida com a string.
+          // Se este input fosse parte de um formulário react-hook-form, eu adicionaria.
+          // Por enquanto, não há alteração aqui.
         />
       </div>
       <div>

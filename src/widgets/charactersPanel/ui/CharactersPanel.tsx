@@ -2,8 +2,10 @@ import { GiAncientSword, GiNinjaHeroicStance } from "react-icons/gi";
 import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
 import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { CharacterTemplateListItem } from "../../../entities/character/ui/CharacterTemplateListItem";
-import { Character, CharacterType } from "../../../shared/api/types";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import {
+  CharacterType,
+} from "@/entities/character/model/schemas/character.schema";
 
 // painel de personagens geral
 export function CharactersPanel() {
@@ -14,9 +16,7 @@ export function CharactersPanel() {
   return (
     <div className="flex-grow p-4 overflow-y-scroll space-y-6 hide-scrollbar">
       <div>
-        <h3 className="text-lg font-semibold  mb-4">
-          Criar Personagem
-        </h3>
+        <h3 className="text-lg font-semibold  mb-4">Criar Personagem</h3>
         <div className="space-y-3">
           <button
             onClick={() =>
@@ -53,12 +53,11 @@ export function CharactersPanel() {
         </h3>
         {characters.length === 0 ? (
           <p className="text-text-secondary">
-            Nenhuma ficha por aqui...
-            Que tal criar uma? 👀
+            Nenhuma ficha por aqui... Que tal criar uma? 👀
           </p>
         ) : (
           <ul className="space-y-2" aria-label="Lista de modelos de personagem">
-            {characters.map((character: Character) => (
+            {characters.map((character) => (
               <CharacterTemplateListItem
                 key={character.id}
                 character={character}

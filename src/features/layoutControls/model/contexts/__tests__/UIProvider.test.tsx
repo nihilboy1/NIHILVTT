@@ -87,7 +87,7 @@ describe("UIContext", () => {
       return (
         <div>
           <button onClick={() => setActiveTool(Tool.PAN)}>Set Tool</button>
-          <button onClick={() => setActiveSidebarTab(SidebarTab.TOKENS)}>
+          <button onClick={() => setActiveSidebarTab(SidebarTab.CHARACTERS)}>
             Set Tab
           </button>
           <button onClick={() => setIsToolbarVisible(false)}>
@@ -112,7 +112,7 @@ describe("UIContext", () => {
 
     fireEvent.click(screen.getByText("Set Tab"));
     expect(mockUIState.setActiveSidebarTab).toHaveBeenCalledWith(
-      SidebarTab.TOKENS
+      SidebarTab.CHARACTERS
     );
 
     fireEvent.click(screen.getByText("Hide Toolbar"));

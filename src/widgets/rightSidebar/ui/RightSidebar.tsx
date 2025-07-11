@@ -1,7 +1,7 @@
 import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 import { ChevronRightIcon } from "../../../shared/ui/Icons";
-import { SidebarContent } from "./SidebarContent";
 import { SidebarTabs } from "./SidebarTabs";
+import { RightSidebarContent } from "./RightSidebarContent";
 
 // a barra lateral direita como um todo. botões de abas e as condicionais para exibir os painéis de chat e tokens
 export function RightSidebar() {
@@ -29,7 +29,7 @@ export function RightSidebar() {
         />
       </header>
 
-      <SidebarContent activeSidebarTab={activeSidebarTab} />
+      <RightSidebarContent activeSidebarTab={activeSidebarTab} />
     </div>
   );
 }

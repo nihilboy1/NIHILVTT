@@ -1,37 +1,28 @@
-import { HPControlModal } from "../../../features/characterUpdateHp/ui/HPControlModal";
+// src/widgets/modalManager/ui/ModalManager.tsx
 
+import { HPControlModal } from "../../../features/characterUpdateHp/ui/HPControlModal";
 import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
 import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { SimpleNameModal } from "../../../features/characterCreation/ui/SimpleNameModal";
-import {
-  CharacterType,
-  type Character,
-  type PlayerCharacter,
-  type Token,
-} from "../../../shared/api/types";
-
 import { ConfirmationModal } from "../../../shared/ui/ConfirmationModal";
 import { useGameBoardInteractionContext } from "../../gameBoard/model/contexts/GameBoardInteractionContext";
-import { SheetProvider } from "../../sheetModal/model/contexts/SheetContext";
 import { SheetModal } from "../../sheetModal/ui/SheetModal";
-import { ActionEditModal } from "../../../features/characterEditAction/ui/ActionEditModal";
-import { PlayerSheetProvider } from "../../../entities/character/model/contexts/CharacterSheetContext";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 import { ModalEntry } from "@/features/modalManager/model/hooks/useModalStateManagement";
 
+// 1. Novas Importações: Trocamos os tipos manuais pelo CharacterSchema do Zod.
+import { type Token } from "@/shared/api/types";
+
+
 export function ModalManager() {
-  const {
-    handleHPChangeFromModal,
-    handleRemoveInstanceFromBoard,
-    handleMakeInstanceIndependent,
-  } = useGameBoardInteractionContext();
+  const { handleHPChangeFromModal, handleRemoveInstanceFromBoard, handleMakeInstanceIndependent } = useGameBoardInteractionContext();
   const { modalStack, closeModal } = useModal();
-  const { characters, updateCharacter } = useCharacters();
+  // `characters` agora é do tipo `CharacterSchema[]`
+  const { characters } = useCharacters();
   const { tokensOnBoard } = useTokens();
 
-  const topModal =
-    modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
-  const shouldRenderOverlay = topModal && topModal.name !== "hpControl"; // Renderiza overlay apenas se não for HPControlModal
+  const topModal = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
+  const shouldRenderOverlay = topModal && topModal.name !== "hpControl";
 
   return (
     <>
@@ -40,11 +31,10 @@ export function ModalManager() {
           className="fixed inset-0 bg-overlay flex items-center justify-center p-4"
           onClick={() => {
             if (topModal && topModal.dismissible !== false) {
-              // Só fecha se o modal superior for dismissible
               closeModal();
             }
           }}
-          style={{ zIndex: 99 }} // Z-index para o overlay, abaixo dos modais
+          style={{ zIndex: 99 }} // Overlay zIndex
         />
       )}
       {modalStack.map((modalEntry: ModalEntry, index: number) => {
@@ -56,82 +46,34 @@ export function ModalManager() {
             return (
               <SimpleNameModal
                 key={modalEntry.id}
-                isOpen={true} // Alterado para sempre estar aberto quando na pilha
+                isOpen={true}
                 onClose={closeModal}
                 title={props.title as string}
-                zIndex={100 + index}
+                zIndex={100 + index} // Default modal zIndex
               />
             );
+
           case "sheet":
-            const foundCharacter = characters.find(
-              // Renomeado
-              (c: Character) => c.id === props.characterId
-            );
-            const initialCharacterData =
-              foundCharacter && foundCharacter.type === CharacterType.PLAYER
-                ? (foundCharacter as PlayerCharacter)
-                : null;
-
             return (
-              <SheetProvider
+              <SheetModal
                 key={props.characterId as string}
-                initialCharacterData={initialCharacterData}
-                onSave={(updatedData: Partial<Character>) => {
-                  if (props.characterId) {
-                    updateCharacter(props.characterId as string, updatedData); // Renomeado
-                    closeModal();
-                  }
-                }}
-              >
-                <SheetModal
-                  characterId={props.characterId as string}
-                  isOpen={true}
-                  onClose={closeModal}
-                  zIndex={100 + index}
-                />
-              </SheetProvider>
+                characterId={props.characterId as string}
+                isOpen={true}
+                onClose={closeModal}
+                zIndex={1000 + index} // Character sheet zIndex (higher than overlay)
+              />
             );
+          
           case "actionEdit": {
-            const characterForActionEdit = characters.find(
-              (c: Character) => c.id === props.characterId
-            );
-
-            if (
-              characterForActionEdit &&
-              characterForActionEdit.type === CharacterType.PLAYER
-            ) {
-              return (
-                <PlayerSheetProvider
-                  key={modalEntry.id}
-                  initialCharacter={characterForActionEdit as PlayerCharacter}
-                  setCharacter={(updatedPlayerCharacter) => {
-                    if (props.characterId) {
-                      updateCharacter(
-                        props.characterId as string,
-                        updatedPlayerCharacter
-                      );
-                    }
-                  }}
-                >
-                  <ActionEditModal
-                    isOpen={true}
-                    actionId={props.actionId as string}
-                    onClose={closeModal}
-                    zIndex={100 + index}
-                  />
-                </PlayerSheetProvider>
-              );
-            }
             return null;
           }
+
           case "hpControl":
             const selectedTokenForHP = tokensOnBoard.find(
               (t: Token) => t.id === props.tokenId
             );
             const characterForHPModal = selectedTokenForHP
-              ? characters.find(
-                  (c: Character) => c.id === selectedTokenForHP.characterId
-                )
+              ? characters.find((c) => c.id === selectedTokenForHP.characterId)
               : null;
 
             return (
@@ -141,22 +83,19 @@ export function ModalManager() {
                 <HPControlModal
                   key={modalEntry.id}
                   tokenId={props.tokenId as string}
-                  character={characterForHPModal}
+                  token={selectedTokenForHP || null} 
+                  character={characterForHPModal} 
                   anchorPoint={props.anchorPoint as { x: number; y: number }}
                   isOpen={isTopModal}
                   onClose={closeModal}
-                  onHPChange={(tokenId, newHP) => {
-                    // Renomeado
-                    if (tokenId) {
-                      handleHPChangeFromModal(tokenId as string, newHP); // Renomeado
-                    }
-                  }}
+                  onHPChange={handleHPChangeFromModal}
                   onRemoveFromBoard={handleRemoveInstanceFromBoard}
                   onMakeIndependent={handleMakeInstanceIndependent}
-                  zIndex={100 + index}
+                  zIndex={100 + index} // Default modal zIndex
                 />
               )
             );
+
           case "confirmationModal":
             return (
               <ConfirmationModal
@@ -168,9 +107,10 @@ export function ModalManager() {
                 cancelText={props.cancelText as string}
                 onConfirm={props.onConfirm as () => void}
                 onCancel={props.onCancel as () => void}
-                zIndex={200 + index}
+                zIndex={2000 + index} // Confirmation modal zIndex (highest)
               />
             );
+            
           default:
             return null;
         }

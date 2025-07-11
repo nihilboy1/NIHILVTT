@@ -3,11 +3,11 @@ import { SidebarTab } from "../../../shared/api/types";
 import { ChatPanel } from "../../chatPanel/ui/ChatPanel";
 import { CharactersPanel } from "../../charactersPanel/ui/CharactersPanel";
 
-interface SidebarContentProps {
+interface RightSidebarContentProps {
   activeSidebarTab: SidebarTab;
 }
 
-export const SidebarContent: React.FC<SidebarContentProps> = ({
+export const RightSidebarContent: React.FC<RightSidebarContentProps> = ({
   activeSidebarTab,
 }) => {
   return (
@@ -27,11 +27,11 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
       </div>
 
       <div
-        id="tabpanel-tokens"
+        id="tabpanel-characters"
         role="tabpanel"
-        aria-labelledby="tab-tokens"
+        aria-labelledby="tab-CHARACTERS"
         className={`absolute inset-0 flex flex-col ${
-          activeSidebarTab === SidebarTab.TOKENS ? "" : "hidden"
+          activeSidebarTab === SidebarTab.CHARACTERS ? "" : "hidden"
         }`}
       >
         <CharactersPanel />

@@ -136,13 +136,9 @@
         "src/widgets/gameBoard/ui/GridLayer.tsx",
         "src/widgets/gameBoard/ui/HPModalRenderer.tsx",
         "src/widgets/modalManager/ui/ModalManager.tsx",
-        "src/entities/character/model/contexts/CharacterSheetContext.tsx",
         "src/features/characterCreation/ui/SimpleNameModal.tsx",
-        "src/features/characterEditAction/ui/ActionEditModal.tsx",
         "src/shared/ui/ConfirmationModal.tsx",
-        "src/widgets/sheetModal/model/contexts/SheetContext.tsx",
         "src/widgets/sheetModal/ui/SheetModal.tsx",
-        "src/entities/character/ui/CreatureSheet.tsx",
         "src/entities/character/ui/playerSheet/PlayerSheetContent.tsx",
         "src/entities/character/ui/playerSheet/configTab/PlayerSheetConfigTab.tsx",
         "src/entities/character/ui/playerSheet/detailsTab/PlayerSheetDetailsTab.tsx",
@@ -175,10 +171,11 @@
         "src/shared/ui/ToolbarPopoverButton.tsx",
         "src/app/index.tsx",
         "src/app/providers/index.tsx",
+        "src/entities/character/ui/CreatureSheet.tsx",
         "src/entities/character/ui/playerSheet/principalTab/FeaturesAndTraits.tsx",
         "src/features/boardRuler/ui/__tests__/RulerPopover.test.tsx",
         "src/features/boardSettings/contexts/__tests__/BoardSettingsContext.test.tsx",
-        "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx",
+        "src/features/characterEditAction/ui/ActionEditModal.tsx",
         "src/features/chat/model/contexts/__tests__/ChatContext.test.tsx",
         "src/features/diceRolling/ui/__tests__/DiceRollPopover.test.tsx",
         "src/features/layoutControls/model/contexts/__tests__/UIProvider.test.tsx",
@@ -190,6 +187,7 @@
         "src/shared/ui/__tests__/ToolbarPopoverButton.test.tsx",
         "src/shared/ui/__tests__/icons.test.tsx",
         "src/widgets/chatPanel/ui/__tests__/ChatCommandPopover.test.tsx",
+        "src/widgets/sheetModal/model/contexts/SheetContext.tsx",
         "src/widgets/toolBar/ui/__tests__/Toolbar.test.tsx"
       ],
       "orphan": false,
@@ -313,14 +311,11 @@
         "src/shared/lib/hooks/useTokenDrag.ts",
         "src/widgets/gameBoard/ui/GridLayer.tsx",
         "src/widgets/gameBoard/ui/HPModalRenderer.tsx",
-        "src/entities/character/model/contexts/CharacterSheetContext.tsx",
         "src/features/characterCreation/ui/SimpleNameModal.tsx",
-        "src/features/characterEditAction/ui/ActionEditModal.tsx",
-        "src/widgets/sheetModal/model/contexts/SheetContext.tsx",
+        "src/features/characterCreation/model/hooks/useCharacterCreation.ts",
         "src/entities/character/model/hooks/useCharacterSheetForm.ts",
         "src/entities/character/ui/playerSheet/PlayerSheetContent.tsx",
         "src/entities/character/ui/playerSheet/PlayerSheetTabs.tsx",
-        "src/entities/character/ui/playerSheet/principalTab/AttributeBlock.tsx",
         "src/shared/lib/hooks/useDiceRoller.ts",
         "src/features/chat/model/contexts/ChatContext.tsx",
         "src/features/chat/model/hooks/useChatState.ts",
@@ -348,7 +343,8 @@
         "src/shared/lib/hooks/__tests__/useDismissable.test.tsx",
         "src/shared/ui/__tests__/ToolbarButton.test.tsx",
         "src/shared/ui/__tests__/ToolbarPopoverButton.test.tsx",
-        "src/widgets/chatPanel/ui/__tests__/ChatCommandPopover.test.tsx"
+        "src/widgets/chatPanel/ui/__tests__/ChatCommandPopover.test.tsx",
+        "src/widgets/sheetModal/model/contexts/SheetContext.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -414,19 +410,15 @@
         "src/widgets/gameBoard/model/hooks/useGameBoardEvents.ts",
         "src/entities/token/ui/BoardToken.tsx",
         "src/shared/lib/hooks/useTokenDrag.ts",
-        "src/widgets/modalManager/ui/ModalManager.tsx",
+        "src/features/characterCreation/ui/SimpleNameModal.tsx",
         "src/features/characterCreation/model/hooks/useCharacterCreation.ts",
-        "src/entities/character/model/hooks/useCharacterSheetForm.ts",
-        "src/widgets/sheetModal/ui/SheetModal.tsx",
         "src/entities/character/ui/playerSheet/configTab/PlayerSheetConfigTab.tsx",
         "src/shared/lib/hooks/useDiceRoller.ts",
         "src/widgets/rightSidebar/ui/SidebarContent.tsx",
-        "src/widgets/charactersPanel/ui/CharactersPanel.tsx",
         "src/widgets/rightSidebar/ui/SidebarTabs.tsx",
         "src/widgets/toolBar/ui/Toolbar.tsx",
         "src/features/boardRuler/ui/RulerPopover.tsx",
         "src/widgets/toolBar/model/hooks/useToolbarState.ts",
-        "src/entities/character/model/hooks/__tests__/useCharacterSheetForm.test.ts",
         "src/features/boardRuler/ui/__tests__/RulerPopover.test.tsx",
         "src/features/layoutControls/model/contexts/__tests__/UIProvider.test.tsx",
         "src/features/layoutControls/model/hooks/__tests__/useUIState.test.ts",
@@ -742,14 +734,12 @@
         "src/widgets/gameBoard/model/contexts/GameBoardContext.tsx",
         "src/widgets/modalManager/ui/ModalManager.tsx",
         "src/features/characterCreation/ui/SimpleNameModal.tsx",
-        "src/features/characterCreation/model/hooks/useCharacterCreation.ts",
-        "src/features/characterEditAction/ui/ActionEditModal.tsx",
-        "src/entities/character/ui/playerSheet/PlayerSheetContent.tsx",
         "src/entities/character/ui/playerSheet/principalTab/PrincipalHealthAndCombat.tsx",
         "src/entities/character/ui/playerSheet/principalTab/HealthSection.tsx",
         "src/widgets/charactersPanel/ui/CharactersPanel.tsx",
         "src/entities/character/ui/CharacterTemplateListItem.tsx",
-        "src/app/providers/index.tsx"
+        "src/app/providers/index.tsx",
+        "src/features/characterEditAction/ui/ActionEditModal.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -1730,11 +1720,31 @@
       "source": "src/entities/character/model/hooks/useCharactersState.ts",
       "dependencies": [
         {
-          "module": "../../../../shared/api/types",
+          "module": "../schemas/character.schema",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/entities/character/model/schemas/character.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/shared/api/types",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
             "local",
             "import"
           ],
@@ -1747,11 +1757,14 @@
           "valid": true
         },
         {
-          "module": "../../../../shared/config/sheetDefaults",
+          "module": "@/shared/config/sheetDefaults",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
             "local",
             "import"
           ],
@@ -1764,11 +1777,14 @@
           "valid": true
         },
         {
-          "module": "../../../../shared/lib/utils/id/idUtils",
+          "module": "@/shared/lib/utils/id/idUtils",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
             "local",
             "import"
           ],
@@ -1805,6 +1821,53 @@
       "valid": true
     },
     {
+      "source": "src/entities/character/model/schemas/character.schema.ts",
+      "dependencies": [
+        {
+          "module": "zod",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/zod/index.cjs",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/entities/character/model/hooks/useCharactersState.ts",
+        "src/widgets/sheetModal/ui/SheetModal.tsx",
+        "src/entities/character/model/hooks/useCharacterSheetForm.ts",
+        "src/widgets/charactersPanel/ui/CharactersPanel.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/zod/index.cjs",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/entities/character/model/schemas/character.schema.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "src/shared/config/sheetDefaults.ts",
       "dependencies": [
         {
@@ -1827,13 +1890,7 @@
       ],
       "dependents": [
         "src/entities/character/model/hooks/useCharactersState.ts",
-        "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-        "src/features/characterCreation/model/hooks/useCharacterCreation.ts",
-        "src/entities/character/model/hooks/useCharacterSheetForm.ts",
-        "src/entities/character/ui/playerSheet/principalTab/AttributeBlock.tsx",
-        "src/entities/character/ui/playerSheet/principalTab/SkillProficiencyItem.tsx",
-        "src/entities/character/model/hooks/__tests__/useCharacterSheetForm.test.ts",
-        "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx"
+        "src/features/characterCreation/model/hooks/useCharacterCreation.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2144,8 +2201,7 @@
       "dependents": [
         "src/widgets/gameBoard/model/hooks/useGameBoardInteraction.ts",
         "src/widgets/gameBoard/ui/HPModalRenderer.tsx",
-        "src/widgets/modalManager/ui/ModalManager.tsx",
-        "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx"
+        "src/widgets/modalManager/ui/ModalManager.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -2173,7 +2229,6 @@
       ],
       "dependents": [
         "src/features/characterUpdateHp/ui/HPControlModal.tsx",
-        "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx",
         "src/shared/lib/hooks/__tests__/useDismissable.test.tsx"
       ],
       "orphan": false,
@@ -2184,7 +2239,6 @@
       "dependencies": [],
       "dependents": [
         "src/features/characterUpdateHp/ui/HPControlModal.tsx",
-        "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx",
         "src/shared/lib/utils/__tests__/hpUtils.test.ts"
       ],
       "orphan": false,
@@ -2674,16 +2728,13 @@
         "src/features/boardSettings/hooks/useBoardSettingsState.ts",
         "src/features/boardSettings/ui/PageSettingsModal.tsx",
         "src/features/boardPanningAndZoom/ui/ZoomControls.tsx",
-        "src/features/characterCreation/model/hooks/useCharacterCreation.ts",
-        "src/entities/character/model/hooks/useCharacterSheetForm.ts",
-        "src/entities/character/ui/CreatureSheet.tsx",
         "src/entities/character/ui/playerSheet/configTab/PlayerSheetConfigTab.tsx",
         "src/features/chat/model/hooks/useChatState.ts",
         "src/entities/character/ui/CharacterTemplateListItem.tsx",
         "src/widgets/chatPanel/ui/ChatPanel.tsx",
         "src/widgets/chatPanel/ui/MessageList.tsx",
         "src/widgets/toolBar/ui/Toolbar.tsx",
-        "src/entities/character/model/hooks/__tests__/useCharacterSheetForm.test.ts",
+        "src/entities/character/ui/CreatureSheet.tsx",
         "src/features/chat/model/hooks/__tests__/useChatState.test.ts",
         "src/widgets/toolBar/ui/__tests__/Toolbar.test.tsx"
       ],
@@ -3475,7 +3526,6 @@
       "dependents": [
         "src/features/boardSettings/ui/PageSettingsModal.tsx",
         "src/widgets/gameBoard/ui/GameBoardSideOption.tsx",
-        "src/entities/character/ui/CreatureSheet.tsx",
         "src/entities/character/ui/playerSheet/configTab/PlayerSheetConfigTab.tsx",
         "src/entities/character/ui/playerSheet/detailsTab/PlayerSheetDetailsTab.tsx",
         "src/entities/character/ui/playerSheet/PlayerSheetTabs.tsx",
@@ -3483,6 +3533,7 @@
         "src/entities/character/ui/playerSheet/principalTab/CombatStats.tsx",
         "src/entities/character/ui/playerSheet/principalTab/HealthSection.tsx",
         "src/shared/ui/TabButton.tsx",
+        "src/entities/character/ui/CreatureSheet.tsx",
         "src/entities/character/ui/playerSheet/principalTab/FeaturesAndTraits.tsx",
         "src/shared/lib/utils/__tests__/cn.test.ts"
       ],
@@ -3583,8 +3634,8 @@
       "dependents": [
         "src/features/boardSettings/ui/PageSettingsModal.tsx",
         "src/features/characterCreation/ui/SimpleNameModal.tsx",
-        "src/features/characterEditAction/ui/ActionEditModal.tsx",
-        "src/shared/ui/ConfirmationModal.tsx"
+        "src/shared/ui/ConfirmationModal.tsx",
+        "src/features/characterEditAction/ui/ActionEditModal.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -4315,23 +4366,6 @@
           "valid": true
         },
         {
-          "module": "../../../entities/character/model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "../../../entities/token/model/contexts/TokenContext",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -4366,23 +4400,6 @@
           "valid": true
         },
         {
-          "module": "../../../features/characterEditAction/ui/ActionEditModal",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/features/characterEditAction/ui/ActionEditModal.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "../../../features/characterUpdateHp/ui/HPControlModal",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -4392,23 +4409,6 @@
             "import"
           ],
           "resolved": "src/features/characterUpdateHp/ui/HPControlModal.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../../shared/api/types",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/api/types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -4443,23 +4443,6 @@
             "import"
           ],
           "resolved": "src/widgets/gameBoard/model/contexts/GameBoardInteractionContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../sheetModal/model/contexts/SheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/widgets/sheetModal/model/contexts/SheetContext.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -4529,102 +4512,6 @@
       "valid": true
     },
     {
-      "source": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-      "dependencies": [
-        {
-          "module": "../../../../shared/config/sheetDefaults",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/config/sheetDefaults.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../lib/utils/sheetUtils",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/lib/utils/sheetUtils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "react",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/react/index.js",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": true,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "react/jsx-runtime",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/react/jsx-runtime.js",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": true,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/widgets/modalManager/ui/ModalManager.tsx",
-        "src/features/characterEditAction/ui/ActionEditModal.tsx",
-        "src/widgets/sheetModal/ui/SheetModal.tsx",
-        "src/entities/character/ui/playerSheet/PlayerSheetContent.tsx",
-        "src/entities/character/ui/playerSheet/principalTab/PrincipalAttributesAndSkills.tsx",
-        "src/entities/character/ui/playerSheet/principalTab/AttributeBlock.tsx",
-        "src/entities/character/ui/playerSheet/principalTab/SkillProficiencyItem.tsx",
-        "src/entities/character/ui/playerSheet/principalTab/PrincipalHeader.tsx",
-        "src/entities/character/ui/playerSheet/principalTab/PrincipalHealthAndCombat.tsx",
-        "src/entities/character/ui/playerSheet/principalTab/CombatStats.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/entities/character/lib/utils/sheetUtils.ts",
-      "dependencies": [],
-      "dependents": [
-        "src/entities/character/model/contexts/CharacterSheetContext.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
       "source": "src/features/characterCreation/ui/SimpleNameModal.tsx",
       "dependencies": [
         {
@@ -4682,6 +4569,26 @@
           "valid": true
         },
         {
+          "module": "@/shared/api/types",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/shared/api/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
           "module": "react",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -4726,11 +4633,14 @@
       "source": "src/features/characterCreation/model/hooks/useCharacterCreation.ts",
       "dependencies": [
         {
-          "module": "../../../../entities/character/model/contexts/CharactersContext",
+          "module": "@/entities/character/model/contexts/CharactersContext",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
             "local",
             "import"
           ],
@@ -4743,11 +4653,14 @@
           "valid": true
         },
         {
-          "module": "../../../../shared/api/types",
+          "module": "@/shared/api/types",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
             "local",
             "import"
           ],
@@ -4760,102 +4673,7 @@
           "valid": true
         },
         {
-          "module": "../../../../shared/config/constants",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/config/constants.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../../../shared/config/sheetDefaults",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/config/sheetDefaults.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../../modalManager/model/contexts/ModalProvider",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/features/modalManager/model/contexts/ModalProvider.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/features/characterCreation/ui/SimpleNameModal.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/characterEditAction/ui/ActionEditModal.tsx",
-      "dependencies": [
-        {
-          "module": "../../../entities/character/model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../../shared/ui/Modal",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/ui/Modal.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@/features/modalManager/model/contexts/ModalProvider",
+          "module": "@/shared/config/sheetDefaults",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -4866,7 +4684,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/features/modalManager/model/contexts/ModalProvider.tsx",
+          "resolved": "src/shared/config/sheetDefaults.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -4890,28 +4708,10 @@
           "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
-        },
-        {
-          "module": "react/jsx-runtime",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/react/jsx-runtime.js",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": true,
-          "circular": false,
-          "valid": true
         }
       ],
       "dependents": [
-        "src/widgets/modalManager/ui/ModalManager.tsx",
-        "src/entities/character/ui/playerSheet/PlayerSheetContent.tsx"
+        "src/features/characterCreation/ui/SimpleNameModal.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -4962,147 +4762,6 @@
       "valid": true
     },
     {
-      "source": "src/widgets/sheetModal/model/contexts/SheetContext.tsx",
-      "dependencies": [
-        {
-          "module": "../../../../entities/character/model/hooks/useCharacterSheetForm",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/hooks/useCharacterSheetForm.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "react",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/react/index.js",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": true,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "react/jsx-runtime",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/react/jsx-runtime.js",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": true,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/widgets/modalManager/ui/ModalManager.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/entities/character/model/hooks/useCharacterSheetForm.ts",
-      "dependencies": [
-        {
-          "module": "../../../../shared/api/types",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/api/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../../../shared/config/constants",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/config/constants.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../../../shared/config/sheetDefaults",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/config/sheetDefaults.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "react",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/react/index.js",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": true,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/widgets/sheetModal/model/contexts/SheetContext.tsx",
-        "src/widgets/sheetModal/ui/SheetModal.tsx",
-        "src/entities/character/model/hooks/__tests__/useCharacterSheetForm.test.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
       "source": "src/widgets/sheetModal/ui/SheetModal.tsx",
       "dependencies": [
         {
@@ -5115,23 +4774,6 @@
             "import"
           ],
           "resolved": "src/entities/character/model/contexts/CharactersContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../../entities/character/model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -5157,23 +4799,6 @@
           "valid": true
         },
         {
-          "module": "../../../entities/character/ui/CreatureSheet",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/ui/CreatureSheet.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "../../../entities/character/ui/playerSheet/PlayerSheetContent",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -5183,23 +4808,6 @@
             "import"
           ],
           "resolved": "src/entities/character/ui/playerSheet/PlayerSheetContent.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../../shared/api/types",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/api/types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -5221,6 +4829,43 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/entities/character/model/schemas/character.schema",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/entities/character/model/schemas/character.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         },
@@ -5249,10 +4894,38 @@
       "valid": true
     },
     {
-      "source": "src/entities/character/ui/CreatureSheet.tsx",
+      "source": "node_modules/react-hook-form/dist/index.cjs.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/widgets/sheetModal/ui/SheetModal.tsx",
+        "src/entities/character/model/hooks/useCharacterSheetForm.ts",
+        "src/entities/character/ui/playerSheet/PlayerSheetContent.tsx",
+        "src/entities/character/ui/playerSheet/configTab/PlayerSheetConfigTab.tsx",
+        "src/entities/character/ui/playerSheet/detailsTab/PlayerSheetDetailsTab.tsx",
+        "src/entities/character/ui/playerSheet/principalTab/AttributeBlock.tsx",
+        "src/entities/character/ui/playerSheet/principalTab/SkillProficiencyItem.tsx",
+        "src/entities/character/ui/playerSheet/principalTab/PrincipalHeader.tsx",
+        "src/entities/character/ui/playerSheet/principalTab/PrincipalHealthAndCombat.tsx",
+        "src/entities/character/ui/playerSheet/principalTab/CombatStats.tsx",
+        "src/entities/character/ui/playerSheet/principalTab/HealthSection.tsx",
+        "src/features/characterEditAction/ui/ActionEditModal.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/entities/character/model/hooks/useCharacterSheetForm.ts",
       "dependencies": [
         {
-          "module": "../../../shared/config/constants",
+          "module": "../schemas/character.schema",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -5260,7 +4933,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/shared/config/constants.ts",
+          "resolved": "src/entities/character/model/schemas/character.schema.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -5269,24 +4942,7 @@
           "valid": true
         },
         {
-          "module": "../../../shared/lib/utils/cn",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/lib/utils/cn.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "react/jsx-runtime",
+          "module": "@hookform/resolvers/zod",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -5294,7 +4950,58 @@
             "npm",
             "import"
           ],
-          "resolved": "node_modules/react/jsx-runtime.js",
+          "resolved": "node_modules/@hookform/resolvers/zod/dist/zod.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "use-debounce",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/use-debounce/dist/index.js",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -5304,7 +5011,42 @@
         }
       ],
       "dependents": [
-        "src/widgets/sheetModal/ui/SheetModal.tsx"
+        "src/widgets/sheetModal/ui/SheetModal.tsx",
+        "src/widgets/sheetModal/model/contexts/SheetContext.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/@hookform/resolvers/zod/dist/zod.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/entities/character/model/hooks/useCharacterSheetForm.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/use-debounce/dist/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/entities/character/model/hooks/useCharacterSheetForm.ts"
       ],
       "orphan": false,
       "valid": true
@@ -5312,40 +5054,6 @@
     {
       "source": "src/entities/character/ui/playerSheet/PlayerSheetContent.tsx",
       "dependencies": [
-        {
-          "module": "../../../../features/characterEditAction/ui/ActionEditModal",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/features/characterEditAction/ui/ActionEditModal.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "../../model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
         {
           "module": "./configTab/PlayerSheetConfigTab",
           "moduleSystem": "es6",
@@ -5415,26 +5123,6 @@
           "valid": true
         },
         {
-          "module": "@/features/modalManager/model/contexts/ModalProvider",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "resolved": "src/features/modalManager/model/contexts/ModalProvider.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "react",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -5444,6 +5132,23 @@
             "import"
           ],
           "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -5530,6 +5235,23 @@
           "valid": true
         },
         {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
           "module": "react/jsx-runtime",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -5570,6 +5292,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         },
@@ -5740,23 +5479,6 @@
       "source": "src/entities/character/ui/playerSheet/principalTab/PrincipalAttributesAndSkills.tsx",
       "dependencies": [
         {
-          "module": "../../../model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "./AttributeBlock",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -5818,23 +5540,6 @@
       "source": "src/entities/character/ui/playerSheet/principalTab/AttributeBlock.tsx",
       "dependencies": [
         {
-          "module": "../../../../../shared/config/sheetDefaults",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/config/sheetDefaults.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "../../../../../shared/lib/hooks/useDiceRoller",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -5869,24 +5574,7 @@
           "valid": true
         },
         {
-          "module": "../../../model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "react",
+          "module": "react-hook-form",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -5894,7 +5582,7 @@
             "npm",
             "import"
           ],
-          "resolved": "node_modules/react/index.js",
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -6240,23 +5928,6 @@
       "source": "src/entities/character/ui/playerSheet/principalTab/SkillProficiencyItem.tsx",
       "dependencies": [
         {
-          "module": "../../../../../shared/config/sheetDefaults",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/config/sheetDefaults.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "../../../../../shared/lib/hooks/useDiceRoller",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -6274,23 +5945,6 @@
           "valid": true
         },
         {
-          "module": "../../../model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "react",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -6300,6 +5954,23 @@
             "import"
           ],
           "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -6335,19 +6006,19 @@
       "source": "src/entities/character/ui/playerSheet/principalTab/PrincipalHeader.tsx",
       "dependencies": [
         {
-          "module": "../../../model/contexts/CharacterSheetContext",
+          "module": "react-hook-form",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
-            "local",
+            "npm",
             "import"
           ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
           "coreModule": false,
-          "followable": true,
+          "followable": false,
           "couldNotResolve": false,
-          "matchesDoNotFollow": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         },
@@ -6413,23 +6084,6 @@
           "valid": true
         },
         {
-          "module": "../../../model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "./CombatStats",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -6484,6 +6138,23 @@
           "valid": true
         },
         {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
           "module": "react/jsx-runtime",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -6528,23 +6199,6 @@
           "valid": true
         },
         {
-          "module": "../../../model/contexts/CharacterSheetContext",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/contexts/CharacterSheetContext.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
           "module": "react",
           "moduleSystem": "es6",
           "dynamic": false,
@@ -6554,6 +6208,23 @@
             "import"
           ],
           "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -6669,6 +6340,23 @@
             "import"
           ],
           "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react-hook-form",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -7043,15 +6731,18 @@
           "valid": true
         },
         {
-          "module": "../../../shared/api/types",
+          "module": "@/entities/character/model/schemas/character.schema",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
             "local",
             "import"
           ],
-          "resolved": "src/shared/api/types.ts",
+          "resolved": "src/entities/character/model/schemas/character.schema.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8683,57 +8374,21 @@
       "valid": true
     },
     {
-      "source": "src/entities/character/model/hooks/__tests__/useCharacterSheetForm.test.ts",
+      "source": "src/entities/character/lib/utils/sheetUtils.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "src/entities/character/ui/CreatureSheet.tsx",
       "dependencies": [
         {
-          "module": "@/entities/character/model/hooks/useCharacterSheetForm",
+          "module": "../../../shared/config/constants",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "resolved": "src/entities/character/model/hooks/useCharacterSheetForm.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@/shared/api/types",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/api/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@/shared/config/constants",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
             "local",
             "import"
           ],
@@ -8746,18 +8401,15 @@
           "valid": true
         },
         {
-          "module": "@/shared/config/sheetDefaults",
+          "module": "../../../shared/lib/utils/cn",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
             "local",
             "import"
           ],
-          "resolved": "src/shared/config/sheetDefaults.ts",
+          "resolved": "src/shared/lib/utils/cn.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8766,15 +8418,15 @@
           "valid": true
         },
         {
-          "module": "@testing-library/react",
+          "module": "react/jsx-runtime",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
-            "npm-dev",
+            "npm",
             "import"
           ],
-          "resolved": "node_modules/@testing-library/react/dist/index.js",
+          "resolved": "node_modules/react/jsx-runtime.js",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -8784,43 +8436,6 @@
         }
       ],
       "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "node_modules/@testing-library/react/dist/index.js",
-      "followable": false,
-      "coreModule": false,
-      "couldNotResolve": false,
-      "matchesDoNotFollow": true,
-      "dependencyTypes": [
-        "npm-dev",
-        "import"
-      ],
-      "dependencies": [],
-      "dependents": [
-        "src/entities/character/model/hooks/__tests__/useCharacterSheetForm.test.ts",
-        "src/features/boardRuler/ui/__tests__/RulerPopover.test.tsx",
-        "src/features/boardSettings/contexts/__tests__/BoardSettingsContext.test.tsx",
-        "src/features/boardSettings/hooks/__tests__/useBoardSettingsState.test.ts",
-        "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx",
-        "src/features/chat/model/contexts/__tests__/ChatContext.test.tsx",
-        "src/features/chat/model/hooks/__tests__/useChatState.test.ts",
-        "src/features/diceRolling/ui/__tests__/DiceRollPopover.test.tsx",
-        "src/features/layoutControls/model/contexts/__tests__/UIProvider.test.tsx",
-        "src/features/layoutControls/model/hooks/__tests__/useUIState.test.ts",
-        "src/features/modalManager/model/hooks/__tests__/useModalStateManagement.test.ts",
-        "src/shared/lib/hooks/__tests__/useCommandHistory.test.ts",
-        "src/shared/lib/hooks/__tests__/useDismissable.test.tsx",
-        "src/shared/ui/__tests__/ConfirmationModal.test.tsx",
-        "src/shared/ui/__tests__/OptionsPopover.test.tsx",
-        "src/shared/ui/__tests__/TabButton.test.tsx",
-        "src/shared/ui/__tests__/ToolbarButton.test.tsx",
-        "src/shared/ui/__tests__/ToolbarPopoverButton.test.tsx",
-        "src/shared/ui/__tests__/icons.test.tsx",
-        "src/widgets/chatPanel/ui/__tests__/ChatCommandPopover.test.tsx",
-        "src/widgets/toolBar/ui/__tests__/Toolbar.test.tsx"
-      ],
       "orphan": false,
       "valid": true
     },
@@ -9055,13 +8670,47 @@
       "dependents": [
         "src/features/boardRuler/ui/__tests__/RulerPopover.test.tsx",
         "src/features/boardSettings/contexts/__tests__/BoardSettingsContext.test.tsx",
-        "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx",
         "src/features/chat/model/contexts/__tests__/ChatContext.test.tsx",
         "src/features/diceRolling/ui/__tests__/DiceRollPopover.test.tsx",
         "src/features/layoutControls/model/contexts/__tests__/UIProvider.test.tsx",
         "src/shared/ui/__tests__/ConfirmationModal.test.tsx",
         "src/shared/ui/__tests__/OptionsPopover.test.tsx",
         "src/shared/ui/__tests__/TabButton.test.tsx",
+        "src/shared/ui/__tests__/ToolbarPopoverButton.test.tsx",
+        "src/shared/ui/__tests__/icons.test.tsx",
+        "src/widgets/chatPanel/ui/__tests__/ChatCommandPopover.test.tsx",
+        "src/widgets/toolBar/ui/__tests__/Toolbar.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/@testing-library/react/dist/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm-dev",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/features/boardRuler/ui/__tests__/RulerPopover.test.tsx",
+        "src/features/boardSettings/contexts/__tests__/BoardSettingsContext.test.tsx",
+        "src/features/boardSettings/hooks/__tests__/useBoardSettingsState.test.ts",
+        "src/features/chat/model/contexts/__tests__/ChatContext.test.tsx",
+        "src/features/chat/model/hooks/__tests__/useChatState.test.ts",
+        "src/features/diceRolling/ui/__tests__/DiceRollPopover.test.tsx",
+        "src/features/layoutControls/model/contexts/__tests__/UIProvider.test.tsx",
+        "src/features/layoutControls/model/hooks/__tests__/useUIState.test.ts",
+        "src/features/modalManager/model/hooks/__tests__/useModalStateManagement.test.ts",
+        "src/shared/lib/hooks/__tests__/useCommandHistory.test.ts",
+        "src/shared/lib/hooks/__tests__/useDismissable.test.tsx",
+        "src/shared/ui/__tests__/ConfirmationModal.test.tsx",
+        "src/shared/ui/__tests__/OptionsPopover.test.tsx",
+        "src/shared/ui/__tests__/TabButton.test.tsx",
+        "src/shared/ui/__tests__/ToolbarButton.test.tsx",
         "src/shared/ui/__tests__/ToolbarPopoverButton.test.tsx",
         "src/shared/ui/__tests__/icons.test.tsx",
         "src/widgets/chatPanel/ui/__tests__/ChatCommandPopover.test.tsx",
@@ -9212,10 +8861,27 @@
       "valid": true
     },
     {
-      "source": "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx",
+      "source": "src/features/characterEditAction/ui/ActionEditModal.tsx",
       "dependencies": [
         {
-          "module": "@/features/characterUpdateHp/ui/HPControlModal",
+          "module": "../../../shared/ui/Modal",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/shared/ui/Modal.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/features/modalManager/model/contexts/ModalProvider",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -9226,7 +8892,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/features/characterUpdateHp/ui/HPControlModal.tsx",
+          "resolved": "src/features/modalManager/model/contexts/ModalProvider.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -9235,109 +8901,15 @@
           "valid": true
         },
         {
-          "module": "@/shared/config/sheetDefaults",
+          "module": "react-hook-form",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
+            "npm",
             "import"
           ],
-          "resolved": "src/shared/config/sheetDefaults.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@/shared/lib/hooks/useDismissable",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/lib/hooks/useDismissable.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@/shared/lib/utils/hpUtils",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "resolved": "src/shared/lib/utils/hpUtils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@testing-library/jest-dom",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-dev",
-            "import"
-          ],
-          "resolved": "node_modules/@testing-library/jest-dom/dist/index.js",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": true,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@testing-library/react",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-dev",
-            "import"
-          ],
-          "resolved": "node_modules/@testing-library/react/dist/index.js",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": true,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@testing-library/user-event",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-dev",
-            "import"
-          ],
-          "resolved": "node_modules/@testing-library/user-event/dist/cjs/index.js",
+          "resolved": "node_modules/react-hook-form/dist/index.cjs.js",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -9364,25 +8936,6 @@
         }
       ],
       "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "node_modules/@testing-library/user-event/dist/cjs/index.js",
-      "followable": false,
-      "coreModule": false,
-      "couldNotResolve": false,
-      "matchesDoNotFollow": true,
-      "dependencyTypes": [
-        "npm-dev",
-        "import"
-      ],
-      "dependencies": [],
-      "dependents": [
-        "src/features/characterUpdateHp/ui/__tests__/HPControlModal.test.tsx",
-        "src/shared/lib/hooks/__tests__/useDismissable.test.tsx",
-        "src/widgets/chatPanel/ui/__tests__/ChatCommandPopover.test.tsx"
-      ],
       "orphan": false,
       "valid": true
     },
@@ -9988,6 +9541,24 @@
         }
       ],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/@testing-library/user-event/dist/cjs/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm-dev",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/shared/lib/hooks/__tests__/useDismissable.test.tsx",
+        "src/widgets/chatPanel/ui/__tests__/ChatCommandPopover.test.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -10878,6 +10449,65 @@
       "valid": true
     },
     {
+      "source": "src/widgets/sheetModal/model/contexts/SheetContext.tsx",
+      "dependencies": [
+        {
+          "module": "../../../../entities/character/model/hooks/useCharacterSheetForm",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/entities/character/model/hooks/useCharacterSheetForm.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "react/jsx-runtime",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react/jsx-runtime.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "src/widgets/toolBar/ui/__tests__/Toolbar.test.tsx",
       "dependencies": [
         {
@@ -11063,8 +10693,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 164,
-    "totalDependenciesCruised": 513,
+    "totalCruised": 166,
+    "totalDependenciesCruised": 490,
     "optionsUsed": {
       "baseDir": "D:\\CODE\\NIHILVTT",
       "combinedDependencies": false,

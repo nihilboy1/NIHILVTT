@@ -6,7 +6,6 @@ import { HP_MODAL_ESTIMATED_HEIGHT_REM } from "../../../../features/characterUpd
 import {
   Tool,
   type Point as AppPoint,
-  type Character,
   type DraggingVisuals,
   type Token,
 } from "../../../../shared/api/types";
@@ -148,7 +147,7 @@ export const useGameBoardInteraction = ({
       if (token) {
         const character = characters.find(
           // Renomeado
-          (c: Character) => c.id === token.characterId // Renomeado
+          (c) => c.id === token.characterId // Renomeado
         );
         if (character && "combatStats" in character) { // Adicionar type guard
           const maxHp = character.combatStats.maxHp;
@@ -357,7 +356,7 @@ export const useGameBoardInteraction = ({
     if (
       activeModalName === "sheet" &&
       currentSheetId &&
-      !characters.find((c: Character) => c.id === currentSheetId)
+      !characters.find((c) => c.id === currentSheetId)
     ) {
       closeModal();
     }

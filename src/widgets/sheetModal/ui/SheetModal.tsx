@@ -1,16 +1,11 @@
-import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
-import { PlayerSheetProvider } from "../../../entities/character/model/contexts/CharacterSheetContext"; // Renomeado
-import { useCharacterSheetForm } from "../../../entities/character/model/hooks/useCharacterSheetForm";
-import { CreatureSheet } from "../../../entities/character/ui/CreatureSheet";
-import { PlayerSheetContent } from "../../../entities/character/ui/playerSheet/PlayerSheetContent";
-import {
-  Character,
-  CharacterType,
-  PlayerCharacter,
-} from "../../../shared/api/types";
-import { InteractiveModal } from "../../../shared/ui/InteractiveModal";
+// src/widgets/sheetModal/ui/SheetModal.tsx
 
-const ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT = 700;
+import { FormProvider } from "react-hook-form";
+import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
+import { useCharacterSheetForm, type SaveStatus } from "../../../entities/character/model/hooks/useCharacterSheetForm";
+import { PlayerSheetContent } from "../../../entities/character/ui/playerSheet/PlayerSheetContent";
+import { InteractiveModal } from "../../../shared/ui/InteractiveModal";
+import { CharacterType } from "@/entities/character/model/schemas/character.schema";
 
 interface CharacterSheetModalProps {
   characterId: string | null;
@@ -19,147 +14,76 @@ interface CharacterSheetModalProps {
   zIndex?: number;
 }
 
+// Componente auxiliar para o indicador de salvamento
+const SaveIndicator = ({ status, isDirty }: { status: SaveStatus, isDirty: boolean }) => {
+  if (status === 'saving') {
+    return <span className="text-xs text-text-secondary animate-pulse">Salvando...</span>;
+  }
+  if (status === 'success') {
+    return <span className="text-xs text-green-400">Salvo!</span>;
+  }
+  if (isDirty) {
+    return <span className="text-xs text-yellow-400" title="Alterações não salvas">•</span>;
+  }
+  return null;
+};
+
 export function SheetModal({
   characterId,
   isOpen,
   onClose,
   zIndex,
 }: CharacterSheetModalProps) {
-  const { characters, updateCharacter } = useCharacters(); // Renomeado para characters e updateCharacter
+  const { characters, updateCharacter } = useCharacters();
+
   const initialCharacterData = characterId
-    ? characters.find((c: Character) => c.id === characterId) || null
+    ? characters.find((c) => c.id === characterId) || null
     : null;
 
-  const {
-    editingCharacterName, // Adicionado
-    setEditingCharacterName, // Adicionado
-    editingCharacterImage,
-    setEditingCharacterImage,
-    editingCharacterSize,
-    setEditingCharacterSize,
-    editingCharacterType,
-    setEditingCharacterType,
-    editingMaxHp, // Adicionado
-    setEditingMaxHp, // Adicionado
-    editingCharacterNotes,
-    setEditingCharacterNotes,
-    editingInspiration,
-    setEditingInspiration,
-    hasCharacterSheetChanged,
-    handleSave,
-  } = useCharacterSheetForm({
+  const { form, handleSubmit, saveStatus } = useCharacterSheetForm({
     initialCharacterData: initialCharacterData,
     onSave: (updatedData) => {
       if (characterId) {
         updateCharacter(characterId, updatedData);
-        onClose();
       }
     },
   });
 
-  // Estados para controlar as dimensões do modal
-  const MIN_SHEET_WIDTH = 400;
-  const MIN_SHEET_HEIGHT = 300;
-  const MAX_SHEET_WIDTH = 900;
-  const MAX_SHEET_HEIGHT = 800;
+  const { isDirty } = form.formState;
+  const modalTitle = form.watch('name') || "";
 
-  // Posição inicial centralizada
-  const initialPosition = {
-    x: Math.max(
-      0,
-      (window.innerWidth -
-        (initialCharacterData?.type === CharacterType.PLAYER ? 750 : 450)) /
-        2
-    ),
-    y: Math.max(
-      0,
-      (window.innerHeight -
-        (initialCharacterData?.type === CharacterType.PLAYER
-          ? ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT
-          : 620)) /
-        2
-    ),
-  };
-
-  // Largura e altura iniciais baseadas no tipo de personagem
-  const initialModalWidth =
-    initialCharacterData?.type === CharacterType.PLAYER ? 750 : 450;
-  const initialModalHeight =
-    initialCharacterData?.type === CharacterType.PLAYER
-      ? Math.min(ESTIMATED_PLAYER_SHEET_AUTO_HEIGHT, window.innerHeight - 40) // Ajusta a altura para caber na tela
-      : Math.min(620, window.innerHeight - 40); // Ajusta a altura para caber na tela
-
-  if (!characterId || editingCharacterType === null || !isOpen) {
+  if (!characterId || !initialCharacterData || !isOpen) {
     return null;
   }
-
-  const modalTitle =
-    editingCharacterType === CharacterType.PLAYER
-      ? `${initialCharacterData?.name || ""}`
-      : `Ficha de ${initialCharacterData?.name || ""}`;
-
-  const minimizedModalTitle = initialCharacterData?.name || "";
+  
+  // 1. A declaração duplicada de 'modalTitle' foi removida daqui.
 
   return (
     <InteractiveModal
       id={`sheet-${characterId}`}
-      title={modalTitle}
-      minimizedTitle={minimizedModalTitle}
+      // 2. A prop 'title' agora recebe o JSX com o título e o indicador.
+      title={
+        <div className="flex items-center gap-3">
+          <span>{modalTitle}</span>
+          <SaveIndicator status={saveStatus} isDirty={isDirty} />
+        </div>
+      }
       isOpen={isOpen}
       onClose={onClose}
-      initialPosition={initialPosition}
-      initialWidth={initialModalWidth}
-      initialHeight={initialModalHeight}
-      minWidth={MIN_SHEET_WIDTH}
-      minHeight={MIN_SHEET_HEIGHT}
-      maxWidth={MAX_SHEET_WIDTH}
-      maxHeight={MAX_SHEET_HEIGHT}
       zIndex={zIndex}
     >
-      <form onSubmit={handleSave} className="space-y-0.5 bg-surface-0 ">
-        {editingCharacterType === CharacterType.PLAYER &&
-        initialCharacterData?.type === CharacterType.PLAYER ? (
-          <PlayerSheetProvider
-            initialCharacter={initialCharacterData as PlayerCharacter}
-            setCharacter={(updatedPlayerCharacter: PlayerCharacter) => {
-              // Adicionado tipagem
-              if (characterId) {
-                updateCharacter(characterId, updatedPlayerCharacter);
-              }
-            }}
-          >
-            <PlayerSheetContent
-              characterId={characterId}
-              updateCharacter={updateCharacter}
-              onClose={onClose}
-              editingCharacterImage={editingCharacterImage}
-              setEditingCharacterImage={setEditingCharacterImage}
-              editingCharacterSize={editingCharacterSize}
-              setEditingCharacterSize={setEditingCharacterSize}
-              editingCharacterNotes={editingCharacterNotes}
-              setEditingCharacterNotes={setEditingCharacterNotes}
-              editingInspiration={editingInspiration}
-              setEditingInspiration={setEditingInspiration}
-              hasCharacterSheetChanged={hasCharacterSheetChanged}
-            />
-          </PlayerSheetProvider>
-        ) : ( // Se não for PlayerCharacter, renderiza CreatureSheet
-          <CreatureSheet
-            editingCharacterName={editingCharacterName}
-            setEditingCharacterName={setEditingCharacterName}
-            editingCharacterType={editingCharacterType}
-            setEditingCharacterType={setEditingCharacterType}
-            editingMaxHp={editingMaxHp}
-            setEditingMaxHp={setEditingMaxHp}
-            editingCharacterNotes={editingCharacterNotes}
-            setEditingCharacterNotes={setEditingCharacterNotes}
-            editingCharacterImage={editingCharacterImage}
-            setEditingCharacterImage={setEditingCharacterImage}
-            editingCharacterSize={editingCharacterSize}
-            setEditingCharacterSize={setEditingCharacterSize}
-          />
-        )}
-      </form>
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit} className="space-y-0.5 bg-surface-0">
+          {initialCharacterData.type === CharacterType.PLAYER ? (
+            // 3. A prop 'onClose' foi removida de PlayerSheetContent.
+            <PlayerSheetContent />
+          ) : (
+            <div>
+              <p className="p-4">A ficha de Criatura/NPC precisa ser refatorada.</p>
+            </div>
+          )}
+        </form>
+      </FormProvider>
     </InteractiveModal>
   );
 }

@@ -1,10 +1,11 @@
+// src/features/characterCreation/ui/SimpleNameModal.tsx
+
 import { CharacterType } from "@/shared/api/types";
 import { Modal } from "../../../shared/ui/Modal";
 import { useEffect, useRef, useState } from "react";
 import { useCharacterCreation } from "../model/hooks/useCharacterCreation";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 
-// Apenas UMA definição da interface, a correta.
 interface SimpleNameModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -24,10 +25,9 @@ export function SimpleNameModal({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { modalStack } = useModal();
-  const { handleCreateCharacter } = useCharacterCreation();
+  // 1. Desestruturamos as novas funções do hook
+  const { createPlayerCharacter, createMonsterNpc } = useCharacterCreation();
 
-  // Extrai a prop do topo da pilha de modais.
-  // Esta é agora a única fonte para characterType.
   const topModal = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
   const characterType = topModal?.props?.characterType as CharacterType | undefined;
 
@@ -40,12 +40,15 @@ export function SimpleNameModal({
 
   const handleSaveClick = () => {
     if (name.trim()) {
-      if (characterType) {
-        handleCreateCharacter(name.trim(), characterType);
+      // 2. Adicionamos lógica para chamar a função correta baseada no tipo
+      if (characterType === CharacterType.PLAYER) {
+        createPlayerCharacter(name.trim());
+        onClose(); // Fechar o modal após salvar
+      } else if (characterType === CharacterType.MONSTER_NPC) {
+        createMonsterNpc(name.trim());
+        onClose(); // Fechar o modal após salvar
       } else {
-        console.error(
-          "CharacterType is undefined when trying to create character."
-        );
+        console.error("CharacterType indefinido ao tentar criar personagem.");
       }
     } else {
       inputRef.current?.focus();
@@ -68,11 +71,9 @@ export function SimpleNameModal({
             handleSaveClick();
           }}
         >
+          {/* ... O resto do seu JSX permanece igual ... */}
           <div className="mb-4">
-            <label
-              htmlFor="simpleModalNameInput"
-              className="block text-sm font-medium text-accent-primary mb-1"
-            >
+            <label htmlFor="simpleModalNameInput" className="block text-sm font-medium text-accent-primary mb-1">
               Nome do Personagem
             </label>
             <input

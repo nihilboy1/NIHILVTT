@@ -22,11 +22,11 @@ export const SidebarTabs: React.FC<SidebarTabsProps> = ({
         onClick={() => setActiveSidebarTab(SidebarTab.CHAT)}
       />
       <TabButton
-        tab={SidebarTab.TOKENS}
-        label="Tokens"
+        tab={SidebarTab.CHARACTERS}
+        label="Personagens"
         icon={<IdentificationCardIcon />}
-        isActive={activeSidebarTab === SidebarTab.TOKENS}
-        onClick={() => setActiveSidebarTab(SidebarTab.TOKENS)}
+        isActive={activeSidebarTab === SidebarTab.CHARACTERS}
+        onClick={() => setActiveSidebarTab(SidebarTab.CHARACTERS)}
       />
     </>
   );
