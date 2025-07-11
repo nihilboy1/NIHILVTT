@@ -3,13 +3,14 @@
 import React, { createContext, useContext, type ReactNode } from "react";
 // 1. Importações necessárias do RHF e do seu schema
 import { type UseFormReturn } from "react-hook-form";
-import { type PlayerCharacterSchema } from "../../../../entities/character/model/schemas/character.schema";
+import { type CharacterSchema } from '@/entities/character/model/schemas/character.schema';
+
 import { useCharacterSheetForm, type UseCharacterSheetFormProps } from "../../../../entities/character/model/hooks/useCharacterSheetForm";
 
 // 2. Definimos um novo tipo para o valor do nosso contexto.
 // Ele representa o que o `useCharacterSheetForm` AGORA retorna.
 type CharacterSheetFormContextType = {
-  form: UseFormReturn<PlayerCharacterSchema>;
+  form: UseFormReturn<CharacterSchema>;
   handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
 };
 
