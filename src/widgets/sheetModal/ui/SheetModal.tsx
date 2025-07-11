@@ -20,10 +20,14 @@ const SaveIndicator = ({ status, isDirty }: { status: SaveStatus, isDirty: boole
     return <span className="text-xs text-text-secondary animate-pulse">Salvando...</span>;
   }
   if (status === 'success') {
-    return <span className="text-xs text-green-400">Salvo!</span>;
+    return <span className="text-xs text-feedback-positive">Salvo!</span>;
+  }
+  // ---> ADICIONE ESTE BLOCO <---
+  if (status === 'error') {
+    return <span className="text-xs text-feedback-negative">Erro ao salvar</span>;
   }
   if (isDirty) {
-    return <span className="text-xs text-yellow-400" title="Alterações não salvas">•</span>;
+    return <span className="text-xs text-accent-secondary" title="Alterações não salvas">•</span>;
   }
   return null;
 };

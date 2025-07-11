@@ -1,6 +1,6 @@
 // src/entities/character/model/hooks/useCharacterSheetForm.ts
 
-import { useEffect, useState } from 'react'; // Adicione useState
+import { useEffect, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useDebouncedCallback } from 'use-debounce';
@@ -11,8 +11,8 @@ export interface UseCharacterSheetFormProps {
   onSave: (updatedData: Partial<CharacterSchema>) => void;
 }
 
-// 1. Definimos os possíveis status de salvamento
-export type SaveStatus = 'idle' | 'saving' | 'success';
+// 1. Adicionamos o novo estado 'error'
+export type SaveStatus = 'idle' | 'saving' | 'success' | 'error';
 
 export function useCharacterSheetForm({
   initialCharacterData,
@@ -24,46 +24,47 @@ export function useCharacterSheetForm({
     defaultValues: initialCharacterData || undefined,
   });
 
-  // 2. Criamos o novo estado para controlar o status
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
   useEffect(() => {
     if (initialCharacterData) {
       form.reset(initialCharacterData);
-      // Quando resetamos, consideramos o estado como 'salvo'
       setSaveStatus('idle');
     }
   }, [initialCharacterData, form.reset]);
   
-  // 3. Modificamos a função de auto-save
-  const debouncedSave = useDebouncedCallback((data: Partial<CharacterSchema>) => {
-    setSaveStatus('saving'); // <-- Muda o status para "salvando"
-    onSave(data);
-    
-    // Como o onSave é "dispare e esqueça", vamos simular que o salvamento
-    // foi um sucesso logo em seguida. É um padrão de UI comum e eficaz.
-    setTimeout(() => setSaveStatus('success'), 500);
+  // 2. A lógica de auto-save agora valida os dados ANTES de salvar
+  const debouncedSave = useDebouncedCallback((data: CharacterSchema) => {
+    // Usamos 'safeParse' que não lança erro, mas retorna um objeto com o resultado
+    const result = characterSchema.safeParse(data);
 
-  }, 1000); 
+    if (result.success) {
+      // SUCESSO: Os dados são válidos!
+      setSaveStatus('saving');
+      onSave(result.data); // Enviamos os dados validados
+      setTimeout(() => setSaveStatus('success'), 500);
+    } else {
+      // FALHA: Os dados são inválidos!
+      console.error("Validação falhou antes de salvar:", result.error.flatten());
+      setSaveStatus('error'); // Acionamos o estado de erro
+    }
+  }, 1500);
 
   const watchedFields = form.watch();
 
   useEffect(() => {
-    // Quando o usuário digita e o formulário fica "sujo", nós chamamos o save.
-    // O status visual de "não salvo" virá do próprio `isDirty`.
     if (form.formState.isDirty) {
       debouncedSave(watchedFields);
     }
   }, [watchedFields, form.formState.isDirty, debouncedSave]);
 
-  // 4. Adicionamos um efeito para o status de "sucesso" ser temporário
+  // 3. O status de "sucesso" ou "erro" agora são temporários
   useEffect(() => {
-    if (saveStatus === 'success') {
+    if (saveStatus === 'success' || saveStatus === 'error') {
       const timer = setTimeout(() => {
-        // Após 2 segundos, o status volta para 'idle' (parado/salvo)
         setSaveStatus('idle');
-      }, 2000);
-      return () => clearTimeout(timer); // Limpa o timer se o componente desmontar
+      }, 2500); // Mostra a mensagem por 2.5 segundos
+      return () => clearTimeout(timer);
     }
   }, [saveStatus]);
 
@@ -71,10 +72,9 @@ export function useCharacterSheetForm({
     onSave(validatedData);
   };
 
-  // 5. Retornamos o novo status junto com o resto
   return {
     form,
     handleSubmit: form.handleSubmit(processSubmit),
-    saveStatus, // <-- Exportamos o status para a UI
+    saveStatus,
   };
 }
