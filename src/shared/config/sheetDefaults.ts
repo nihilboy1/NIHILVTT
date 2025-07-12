@@ -6,6 +6,7 @@ import {
   type MonsterNpcCharacterSchema,
 } from "@/entities/character/model/schemas/character.schema";
 import defaultTokenImage from "../assets/defaultToken.png";
+import { generateUniqueId } from "@/shared/lib/utils/id/idUtils";
 
 // A maioria dos seus padrões de atributos e perícias pode continuar como está,
 // pois a estrutura interna não mudou.
@@ -75,7 +76,13 @@ export const DEFAULT_PLAYER_DATA: Omit<PlayerCharacterSchema, "id" | "type"> = {
   background: "",
   species: "Humano",
   actions: [],
-  hitDiceEntries: [],
+  hitDiceEntries: [
+    {
+      id: generateUniqueId(),
+      type: "d6", // Common default hit dice type
+      quantity: 1,
+    },
+  ],
 };
 
 // 3. Criamos o novo objeto de dados padrão para MONSTRO, usando o tipo do Zod.

@@ -50,7 +50,7 @@ export const HealthSection: React.FC = () => {
             id="currentHp"
             type="number"
             {...register("combatStats.currentHp", { valueAsNumber: true })}
-            className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
+            className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary placeholder-text-secondary", "text-center hide-arrows")}
           />
         </div>
         <div className="flex space-x-1.5 mt-1.5">
@@ -60,7 +60,7 @@ export const HealthSection: React.FC = () => {
               id="tempHp"
               type="number"
               {...register("combatStats.tempHp", { valueAsNumber: true })}
-              className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
+              className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-arrows")}
               min="0"
             />
           </div>
@@ -70,7 +70,7 @@ export const HealthSection: React.FC = () => {
               id="maxHp"
               type="number"
               {...register("combatStats.maxHp", { valueAsNumber: true })}
-              className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
+              className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-arrows")}
               min="1"
             />
           </div>
@@ -99,7 +99,7 @@ export const HealthSection: React.FC = () => {
               <input
                 type="number"
                 {...register(`hitDiceEntries.${index}.quantity`, { valueAsNumber: true })}
-                className={cn("w-full p-1 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-number-spinners")}
+                className={cn("w-full p-1 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-arrows")}
                 min="1"
               />
               <button

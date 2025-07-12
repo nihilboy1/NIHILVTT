@@ -86,7 +86,7 @@ export function CreatureSheet({
           onChange={(e) => setEditingMaxHp(e.target.value)}
           className={cn(
             "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-            "hide-number-spinners"
+            "hide-arrows"
           )}
           min="1"
           step="1"

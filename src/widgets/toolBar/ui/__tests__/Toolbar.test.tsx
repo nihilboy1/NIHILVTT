@@ -69,6 +69,7 @@ const defaultMockChatState: ChatState = {
   messages: [],
   sendMessage: jest.fn(),
   rollAndSendMessage: jest.fn(),
+  handleChatInput: jest.fn(),
   clearMessages: jest.fn(), // Adicionado para satisfazer a interface ChatState
 };
 

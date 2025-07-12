@@ -22,6 +22,7 @@ export function useDiceRoller() {
         setActiveSidebarTab(SidebarTab.CHAT);
 
         const audio = new Audio(rollNotificationSound);
+        audio.volume = 0.03; 
         audio.play();
       } catch (error) {
         console.error("Erro ao rolar dados:", error);

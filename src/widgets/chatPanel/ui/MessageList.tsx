@@ -102,9 +102,9 @@ export function MessageList({ messages, messagesEndRef }: MessageListProps) {
                         <span className="mx-1">=</span>
                         <div
                           className={`inline-block mt-1 p-1 px-2.5 rounded shadow-inner ${
-                            diceRollDetails.finalResult === 20
+                            diceRollDetails.naturalRollResult === 20
                               ? ` bg-feedback-positive text-surface-0 `
-                              : diceRollDetails.finalResult === 1
+                              : diceRollDetails.naturalRollResult === 1
                               ? `bg-feedback-negative text-surface-0`
                               : "bg-surface-0"
                           }`}

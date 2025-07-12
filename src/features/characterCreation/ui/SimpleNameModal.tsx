@@ -2,9 +2,12 @@
 
 import { CharacterType } from "@/shared/api/types";
 import { Modal } from "../../../shared/ui/Modal";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useCharacterCreation } from "../model/hooks/useCharacterCreation";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import { simpleNameSchema, type SimpleNameSchema } from "../model/schemas/simpleName.schema";
 
 interface SimpleNameModalProps {
   isOpen: boolean;
@@ -21,7 +24,15 @@ export function SimpleNameModal({
   currentName = "",
   zIndex,
 }: SimpleNameModalProps) {
-  const [name, setName] = useState(currentName);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SimpleNameSchema>({
+    resolver: zodResolver(simpleNameSchema),
+    defaultValues: { name: currentName },
+  });
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { modalStack } = useModal();
@@ -33,25 +44,20 @@ export function SimpleNameModal({
 
   useEffect(() => {
     if (isOpen) {
-      setName(currentName);
+      reset({ name: currentName });
       setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [isOpen, currentName]);
+  }, [isOpen, currentName, reset]);
 
-  const handleSaveClick = () => {
-    if (name.trim()) {
-      // 2. Adicionamos lógica para chamar a função correta baseada no tipo
-      if (characterType === CharacterType.PLAYER) {
-        createPlayerCharacter(name.trim());
-        onClose(); // Fechar o modal após salvar
-      } else if (characterType === CharacterType.MONSTER_NPC) {
-        createMonsterNpc(name.trim());
-        onClose(); // Fechar o modal após salvar
-      } else {
-        console.error("CharacterType indefinido ao tentar criar personagem.");
-      }
+  const onSubmit = (data: SimpleNameSchema) => {
+    if (characterType === CharacterType.PLAYER) {
+      createPlayerCharacter(data.name.trim());
+      onClose();
+    } else if (characterType === CharacterType.MONSTER_NPC) {
+      createMonsterNpc(data.name.trim());
+      onClose();
     } else {
-      inputRef.current?.focus();
+      console.error("CharacterType indefinido ao tentar criar personagem.");
     }
   };
 
@@ -60,34 +66,26 @@ export function SimpleNameModal({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      onConfirm={handleSaveClick}
+      onConfirm={handleSubmit(onSubmit)}
       confirmText="Salvar"
       zIndex={zIndex}
     >
       <div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSaveClick();
-          }}
-        >
-          {/* ... O resto do seu JSX permanece igual ... */}
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label htmlFor="simpleModalNameInput" className="block text-sm font-medium text-accent-primary mb-1">
               Nome do Personagem
             </label>
             <input
-              ref={inputRef}
               id="simpleModalNameInput"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register("name")}
               className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
-              required
-              minLength={1}
               placeholder="Digite o nome"
-              maxLength={35}
             />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+            )}
           </div>
         </form>
       </div>

@@ -2,13 +2,16 @@ import { DiceRollDetails, DiceRollMessage, Message, TextMessage } from "@/shared
 import { DEFAULT_PLAYER_NAME } from "../../../../shared/config/constants";
 import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
 import { useCallback, useState } from "react";
-import { performDiceRoll } from "@/utils/dice/diceUtils"; // Importar performDiceRoll
+import { performDiceRoll } from "@/utils/dice/diceUtils";
+import { parseAndValidateChatCommand } from "../lib/chatCommandParser";
+import { ChatCommand } from "../schemas/chatCommands.schema";
 
 export interface ChatState {
   messages: Message[];
   sendMessage: (content: string | DiceRollDetails, sender?: string) => void;
-  rollAndSendMessage: (formula: string, sender?: string) => void; // Adicionado
+  rollAndSendMessage: (formula: string, sender?: string) => void;
   clearMessages: () => void;
+  handleChatInput: (input: string, sender?: string) => void; // Novo método para lidar com o input do chat
 }
 
 export const useChatState = (): ChatState => {
@@ -52,7 +55,52 @@ export const useChatState = (): ChatState => {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       }
     },
-    []
+    [],
+  );
+
+  const handleChatInput = useCallback(
+    (input: string, sender: string = DEFAULT_PLAYER_NAME) => {
+      const command = parseAndValidateChatCommand(input);
+
+      if (command) {
+        // É um comando válido, processar
+        processChatCommand(command, sender);
+      } else {
+        // Não é um comando ou é um comando inválido, enviar como mensagem de texto
+        sendMessage(input, sender);
+      }
+    },
+    [sendMessage]
+  );
+
+  const clearMessages = useCallback(() => {
+    setMessages([initialWelcomeMessage]);
+  }, [initialWelcomeMessage]);
+
+  const processChatCommand = useCallback(
+    (command: ChatCommand, sender: string) => {
+      switch (command.type) {
+        case 'simpleCommand':
+          switch (command.command) {
+            case 'clear':
+              clearMessages();
+              sendMessage("Chat limpo.", "Sistema");
+              break;
+            case 'help':
+              sendMessage("Comandos disponíveis: /clear, /help, /whisper <alvo> <mensagem>", "Sistema");
+              break;
+          }
+          break;
+        case 'textArgumentCommand':
+          const whisperCommand = command; // 'command' is now correctly narrowed to TextArgumentCommand
+          sendMessage(`[Sussurro para ${whisperCommand.target}]: ${whisperCommand.message}`, sender);
+          break;
+        default:
+          sendMessage(`Comando desconhecido ou tipo de comando inválido.`, "Sistema");
+          break;
+      }
+    },
+    [clearMessages, sendMessage]
   );
 
   const rollAndSendMessage = useCallback(
@@ -67,9 +115,5 @@ export const useChatState = (): ChatState => {
     [sendMessage]
   );
 
-  const clearMessages = useCallback(() => {
-    setMessages([initialWelcomeMessage]);
-  }, []); // initialWelcomeMessage é uma constante, não precisa ser dependência
-
-  return { messages, sendMessage, rollAndSendMessage, clearMessages };
+  return { messages, sendMessage, rollAndSendMessage, clearMessages, handleChatInput };
 };

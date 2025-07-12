@@ -47,7 +47,8 @@ export function PrincipalAttributesAndSkills({ className }: PrincipalAttributesA
         return (
           <div
             key={attrName}
-            className="flex flex-col space-y-2 p-3 rounded bg-surface-1"
+            className="flex flex-col space-y-2 p-3 rounded bg-surface-1 w-[14rem]"
+            aria-label="bloco de atributo externo"
           >
             <AttributeBlock name={`attributes.${attrName}`} label={label} />
             

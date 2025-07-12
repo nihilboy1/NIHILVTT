@@ -66,12 +66,18 @@ export function performDiceRoll(
   const { diceParts, modifier } = parseDiceFormula(formula);
   const rolls: Roll[] = [];
   let totalDiceResult = 0;
+  let naturalRollResult: number | undefined;
 
   diceParts.forEach(({ count, sides }) => {
     for (let i = 0; i < count; i++) {
       const result = rollSingleDie(sides);
       rolls.push({ dice: `d${sides}`, result });
       totalDiceResult += result;
+
+      // Captura o resultado natural do primeiro d20 rolado
+      if (sides === 20 && naturalRollResult === undefined) {
+        naturalRollResult = result;
+      }
     }
   });
 
@@ -87,5 +93,6 @@ export function performDiceRoll(
     category,
     parts,
     finalResult,
+    naturalRollResult, // Inclui o resultado natural na saída
   };
 }

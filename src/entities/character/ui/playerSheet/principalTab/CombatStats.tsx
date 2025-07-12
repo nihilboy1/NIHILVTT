@@ -17,7 +17,6 @@ const getProficiencyBonus = (level: number | undefined) => {
   return Math.floor((level - 1) / 4) + 2;
 };
 
-
 export const CombatStats: React.FC = () => {
   // 1. "Observamos" todos os valores base que precisamos do formulário
   const { register, watch } = useFormContext<PlayerCharacterSchema>();
@@ -30,19 +29,20 @@ export const CombatStats: React.FC = () => {
   const dexModifier = getModifier(dexterity);
   const wisModifier = getModifier(wisdom);
   const proficiencyBonus = getProficiencyBonus(level);
-  
+
   const calculatedInitiative = dexModifier;
   // Percepção passiva só adiciona o bônus de proficiência se o personagem for proficiente
-  const calculatedPassivePerception = 10 + wisModifier + (isPerceptionProficient ? proficiencyBonus : 0);
+  const calculatedPassivePerception =
+    10 + wisModifier + (isPerceptionProficient ? proficiencyBonus : 0);
 
   return (
-    <fieldset className="p-2 rounded-md bg-surface-1">
+    <fieldset className="p-2 rounded-md bg-surface-1 border">
       <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
         Armadura e Combate
       </legend>
-      <div className="flex justify-between items-end">
+      <div className="flex justify-between ">
         {/* CA */}
-        <div className="w-16">
+        <div className="w-16 ">
           <label
             htmlFor="armorClass"
             className="text-center block text-[0.8rem] font-medium mb-px"
@@ -54,13 +54,33 @@ export const CombatStats: React.FC = () => {
             type="number"
             {...register("combatStats.armorClass", { valueAsNumber: true })}
             className={cn(
-              "w-full p-2 text-center hide-number-spinners" /* ... */
+              "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
             )}
             min="0"
           />
+          <div className="pt-2 flex justify-between items-center">
+            {/* Escudo */}
+            <label
+              htmlFor="shieldEquipped"
+              className="flex items-center space-x-1.5 cursor-pointer"
+            >
+              <input
+                id="shieldEquipped"
+                type="checkbox"
+                {...register("combatStats.shieldEquipped")}
+                className="h-3.5 w-3.5 rounded-sm focus:ring-accent-primary bg-surface-1"
+              />
+              <span
+                className={cn("block text-[0.8rem] font-medium mb-px", "mb-0")}
+              >
+                ESCUDO
+              </span>
+            </label>
+            {/* Percepção Passiva */}
+          </div>
         </div>
         {/* Iniciativa */}
-        <div className="w-16">
+        <div className="w-16 ">
           <label
             htmlFor="initiative"
             className="block text-[0.8rem] font-medium mb-px"
@@ -70,7 +90,7 @@ export const CombatStats: React.FC = () => {
           <div
             id="initiative"
             className={cn(
-              "w-full p-2 text-center text-lg font-semibold" /* ... */
+              "w-full p-2 text-center text-lg font-semibold border rounded border-text-secondary h-10 flex justify-center items-center"
             )}
           >
             {calculatedInitiative >= 0
@@ -79,7 +99,7 @@ export const CombatStats: React.FC = () => {
           </div>
         </div>
         {/* Deslocamento */}
-        <div className="w-16">
+        <div className="w-16 ">
           <label
             htmlFor="speed"
             className="block text-[0.8rem] font-medium mb-px"
@@ -91,40 +111,23 @@ export const CombatStats: React.FC = () => {
             type="number"
             {...register("combatStats.speed", { valueAsNumber: true })}
             className={cn(
-              "w-full p-2 text-center hide-number-spinners" /* ... */
+              "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
             )}
             min="0"
           />
         </div>
-      </div>
-      <div className="pt-2 flex justify-between items-center">
-        {/* Escudo */}
-        <label
-          htmlFor="shieldEquipped"
-          className="flex items-center space-x-1.5 cursor-pointer"
-        >
-          <input
-            id="shieldEquipped"
-            type="checkbox"
-            {...register("combatStats.shieldEquipped")}
-            className="h-3.5 w-3.5 rounded-sm focus:ring-accent-primary bg-surface-1"
-          />
-          <span className={cn("block text-[0.8rem] font-medium mb-px", "mb-0")}>
-            ESCUDO
-          </span>
-        </label>
-        {/* Percepção Passiva */}
         <div className="w-24">
           <label
             htmlFor="passivePerception"
+            title="Percepção Passiva"
             className="block text-[0.8rem] font-medium mb-px text-center"
           >
-            PERCEPÇÃO PASSIVA
+            PASS PERCEP
           </label>
           <div
             id="passivePerception"
             className={cn(
-              "w-full p-2 text-center text-lg font-semibold" /* ... */
+              "w-full p-2 text-center text-lg font-semibold border rounded border-text-secondary h-10 flex justify-center items-center"
             )}
           >
             {calculatedPassivePerception}

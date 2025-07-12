@@ -40,12 +40,12 @@ const proficienciesSchema = z.object({
 
 // Schema para os atributos (ex: Força, Destreza)
 const attributesSchema = z.object({
-  strength: z.number().min(0),
-  dexterity: z.number().min(0),
-  constitution: z.number().min(0),
-  intelligence: z.number().min(0),
-  wisdom: z.number().min(0),
-  charisma: z.number().min(0),
+  strength: z.number().min(1).max(30),
+  dexterity: z.number().min(1).max(30),
+  constitution: z.number().min(1).max(30),
+  intelligence: z.number().min(1).max(30),
+  wisdom: z.number().min(1).max(30),
+  charisma: z.number().min(1).max(30),
 });
 
 // NOVO: Schema para Ataques
@@ -161,6 +161,7 @@ export const playerCharacterSchema = z.object({
   // Campos específicos de PlayerCharacter
   inspiration: z.boolean(),
   level: z.number().min(1),
+  proficiencyBonus: z.number().optional(), // Tornar opcional no schema
 
   charClass: z.string(), 
   subclass: z.string(),
@@ -168,6 +169,15 @@ export const playerCharacterSchema = z.object({
   species: z.string(),
   // -------------------------
 });
+
+// Função para calcular o bônus de proficiência com base no nível
+export const calculateProficiencyBonus = (level: number): number => {
+  if (level >= 17) return 6;
+  if (level >= 13) return 5;
+  if (level >= 9) return 4;
+  if (level >= 5) return 3;
+  return 2;
+};
 
 type SkillName = keyof z.infer<typeof proficienciesSchema>['skills'];
 type SavingThrowName = keyof z.infer<typeof proficienciesSchema>['savingThrows'];

@@ -10,6 +10,7 @@ export interface DiceRollDetails {
   category: RollCategory; // A categoria da rolagem
   parts: (Roll | number)[];
   finalResult: number;
+  naturalRollResult?: number; // Adicionado para armazenar o resultado natural do dado principal (ex: d20)
 }
 
 export type DiceFormula = string | number;
