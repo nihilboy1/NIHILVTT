@@ -1,11 +1,34 @@
-import { z } from 'zod';
+import { z } from "zod";
 
+// =================================================================
+// --- 1. ENUMS E TIPOS CONSTANTES ---
+// Usados para garantir que apenas valores permitidos sejam usados.
+// =================================================================
 
-export const CharacterType = {
-  PLAYER: "Player",
-  MONSTER_NPC: "Monster/NPC",
-  OBJECT: "Object",
-} as const;
+export const CharacterTypeEnum = z.enum(["Player", "Monster/NPC", "Object"]);
+export const TokenSizeEnum = z.enum([
+  "Tiny",
+  "Small",
+  "Medium",
+  "Large",
+  "Huge",
+  "Gargantuan",
+]);
+export const HitDiceTypeEnum = z.enum(["d4", "d6", "d8", "d10", "d12", "d20"]);
+
+// =================================================================
+// --- 2. SCHEMAS MODULAREs E REUTILIZÁVEIS ---
+// Pequenas partes da ficha que são usadas em múltiplos lugares.
+// =================================================================
+
+const attributesSchema = z.object({
+  strength: z.number().int().min(1).max(30),
+  dexterity: z.number().int().min(1).max(30),
+  constitution: z.number().int().min(1).max(30),
+  intelligence: z.number().int().min(1).max(30),
+  wisdom: z.number().int().min(1).max(30),
+  charisma: z.number().int().min(1).max(30),
+});
 
 const proficienciesSchema = z.object({
   savingThrows: z.object({
@@ -38,165 +61,143 @@ const proficienciesSchema = z.object({
   }),
 });
 
-// Schema para os atributos (ex: Força, Destreza)
-const attributesSchema = z.object({
-  strength: z.number().min(1).max(30),
-  dexterity: z.number().min(1).max(30),
-  constitution: z.number().min(1).max(30),
-  intelligence: z.number().min(1).max(30),
-  wisdom: z.number().min(1).max(30),
-  charisma: z.number().min(1).max(30),
+const combatStatsSchema = z.object({
+  maxHp: z.number().int().positive("HP Máximo deve ser maior que 0"),
+  currentHp: z.number().int().min(0),
+  tempHp: z.number().int().min(0).optional(),
+  armorClass: z
+    .number()
+    .int()
+    .min(1)
+    .max(40, "Classe de Armadura deve ser entre 1 e 40"),
+  speed: z.number().int().min(0, "Velocidade não pode ser negativa"),
+  shieldEquipped: z.boolean().optional(),
 });
 
-// NOVO: Schema para Ataques
+export const actionSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  bonus: z.string().or(z.number()).optional(),
+  damage: z.string().or(z.number()).optional(),
+});
+
 const attackSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   name: z.string(),
   attackBonus: z.string().or(z.number()).optional(),
   damage: z.string().or(z.number()).optional(),
 });
 
-// NOVO: Schema para Itens de Equipamento
 const equipmentItemSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   name: z.string(),
-  quantity: z.number(),
+  quantity: z.number().int().min(0),
   description: z.string().optional(),
   weight: z.number().optional(),
   equipped: z.boolean().optional(),
 });
 
-// NOVO: Schema para Características e Talentos
 const featureOrTraitSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   name: z.string(),
   description: z.string(),
   source: z.string().optional(),
-  uses: z.object({
-    current: z.number(),
-    max: z.number(),
-    per: z.string().optional(),
-  }).optional(),
-});
-
-// NOVO: Schema para uma única Ação/Ataque
-const actionSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  bonus: z.string().or(z.number()).optional(), // Pode ser string como "1d4+2" ou um número
-  damage: z.string().or(z.number()).optional(),
+  uses: z
+    .object({
+      current: z.number().int(),
+      max: z.number().int(),
+      per: z.string().optional(),
+    })
+    .optional(),
 });
 
 const hitDiceEntrySchema = z.object({
-  id: z.string(),
-  type: z.string(), // Ex: "d6", "d8"
-  quantity: z.number().min(1),
+  id: z.uuid(),
+  type: HitDiceTypeEnum,
+  quantity: z.number().int().min(1),
 });
 
-// Schema para os status de combate
-const combatStatsSchema = z.object({
-  maxHp: z.number().positive("HP Máximo deve ser maior que 0"),
-  currentHp: z.number().min(0),
-  armorClass: z.number().min(0, "Classe de Armadura não pode ser negativa"),
-  speed: z.number().min(0, "Velocidade não pode ser negativa"),
-  shieldEquipped: z.boolean(), // <-- CAMPO ADICIONADO
-  tempHp: z.number().min(0).optional(), // <-- CAMPO ADICIONADO
+// =================================================================
+// --- 3. SCHEMAS BASE (PARA EVITAR REPETIÇÃO) ---
+// =================================================================
 
-
-});
-
-// 1. Schema para Monstros/NPCs
-export const monsterNpcCharacterSchema = z.object({
-  id: z.string(),
-  type: z.literal(CharacterType.MONSTER_NPC),
-  name: z.string().min(1),
+// Schema base para QUALQUER personagem no VTT
+const baseCharacterSchema = z.object({
+  id: z.uuid(),
+  name: z.string().min(1, "O nome é obrigatório."),
   image: z.string(),
-  size: z.string(),
+  size: TokenSizeEnum,
   notes: z.string().optional(),
+});
+
+// Schema base para personagens de D&D (Players e Monstros)
+const baseDndCharacterSchema = z.object({
+  ...baseCharacterSchema.shape,
   attributes: attributesSchema,
-  proficiencyBonus: z.number(),
   proficiencies: proficienciesSchema,
   combatStats: combatStatsSchema,
-  challengeRating: z.number(),
   actions: z.array(actionSchema).optional(),
   attacks: z.array(attackSchema).optional(),
   equipment: z.array(equipmentItemSchema).optional(),
   featuresAndTraits: z.array(featureOrTraitSchema).optional(),
 });
 
-// 2. Schema para Objetos
-export const objectCharacterSchema = z.object({
-  id: z.string(),
-  type: z.literal(CharacterType.OBJECT),
-  name: z.string().min(1),
-  image: z.string(),
-  size: z.string(),
-  notes: z.string().optional(),
-  isInteractive: z.boolean().optional(),
-});
+// =================================================================
+// --- 4. SCHEMAS FINAIS E ESPECÍFICOS POR TIPO ---
+// =================================================================
 
-
-
-
-
-// Schema principal para um PlayerCharacter
+// Schema para Personagens de Jogador
 export const playerCharacterSchema = z.object({
-  id: z.string(),
-  type: z.literal(CharacterType.PLAYER), // Garante que o tipo é sempre 'PLAYER'
-  name: z.string().min(1, "O nome do personagem é obrigatório."),
-  image: z.string(), // Deve ser uma URL válida ou uma string vazia
-  size: z.string(), // Poderia ser um z.enum(['small', 'medium', ...]) no futuro
-  notes: z.string(),
-  
-  // Objetos aninhados
-  attributes: attributesSchema,
-  combatStats: combatStatsSchema,
-  proficiencies: proficienciesSchema,
-
-  // Arrays
-
-  actions: z.array(actionSchema),
-  hitDiceEntries: z.array(hitDiceEntrySchema),
-
-  // Campos específicos de PlayerCharacter
+  ...baseDndCharacterSchema.shape,
+  type: z.literal(CharacterTypeEnum.enum.Player),
+  level: z.number().int().min(1).max(20),
   inspiration: z.boolean(),
-  level: z.number().min(1),
-  proficiencyBonus: z.number().optional(), // Tornar opcional no schema
-
-  charClass: z.string(), 
+  charClass: z.string(),
   subclass: z.string(),
   background: z.string(),
   species: z.string(),
-  // -------------------------
+  hitDiceEntries: z.array(hitDiceEntrySchema),
 });
 
-// Função para calcular o bônus de proficiência com base no nível
-export const calculateProficiencyBonus = (level: number): number => {
-  if (level >= 17) return 6;
-  if (level >= 13) return 5;
-  if (level >= 9) return 4;
-  if (level >= 5) return 3;
-  return 2;
-};
+// Schema para Monstros/NPCs
+export const monsterNpcCharacterSchema = z.object({
+  ...baseDndCharacterSchema.shape,
+  type: z.literal(CharacterTypeEnum.enum["Monster/NPC"]),
+  challengeRating: z.number(),
+});
 
-type SkillName = keyof z.infer<typeof proficienciesSchema>['skills'];
-type SavingThrowName = keyof z.infer<typeof proficienciesSchema>['savingThrows'];
+// Schema para Objetos
+export const objectCharacterSchema = z.object({
+  ...baseCharacterSchema.shape,
+  type: z.literal(CharacterTypeEnum.enum.Object),
+  isInteractive: z.boolean().optional(),
+});
 
-// Cria um tipo que representa todos os caminhos de proficiência válidos
-export type ProficiencyPath = 
-  | `proficiencies.skills.${SkillName}` 
-  | `proficiencies.savingThrows.${SavingThrowName}`;
+// =================================================================
+// --- 5. UNIÃO DISCRIMINADA E TIPOS INFERIDOS ---
+// Onde tudo se junta para formar o modelo final.
+// =================================================================
 
-// 4. Os tipos inferidos que usaremos em toda a aplicação
-export type PlayerCharacterSchema = z.infer<typeof playerCharacterSchema>;
-export type MonsterNpcCharacterSchema = z.infer<typeof monsterNpcCharacterSchema>;
-export type ObjectCharacterSchema = z.infer<typeof objectCharacterSchema>;
-
-// 3. A união de todos os schemas de personagem
 export const characterSchema = z.discriminatedUnion("type", [
   playerCharacterSchema,
   monsterNpcCharacterSchema,
   objectCharacterSchema,
 ]);
 
-export type CharacterSchema = z.infer<typeof characterSchema>; // <-- O NOVO TIPO 'Character'
+// --- Tipos TypeScript exportados para uso na aplicação ---
+export type PlayerCharacter = z.infer<typeof playerCharacterSchema>;
+export type MonsterNpcCharacter = z.infer<typeof monsterNpcCharacterSchema>;
+export type ObjectCharacter = z.infer<typeof objectCharacterSchema>;
+export type Character = z.infer<typeof characterSchema>;
+
+// --- Tipos Auxiliares para Proficiências (se necessário) ---
+type SkillName = keyof z.infer<typeof proficienciesSchema>["skills"];
+type SavingThrowName = keyof z.infer<
+  typeof proficienciesSchema
+>["savingThrows"];
+
+export type ProficiencyPath =
+  | `proficiencies.skills.${SkillName}`
+  | `proficiencies.savingThrows.${SavingThrowName}`;
+
+export type HitDiceEntry = z.infer<typeof hitDiceEntrySchema>;

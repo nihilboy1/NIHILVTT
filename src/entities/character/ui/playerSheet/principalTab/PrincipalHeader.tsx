@@ -1,10 +1,10 @@
 // src/entities/character/ui/playerSheet/principalTab/PrincipalHeader.tsx
 
 import { useFormContext } from 'react-hook-form';
-import { PlayerCharacterSchema } from '../../../model/schemas/character.schema';
+import { PlayerCharacter } from '../../../model/schemas/character.schema';
 
 export function PrincipalHeader() {
-  const { register, watch } = useFormContext<PlayerCharacterSchema>();
+  const { register, watch } = useFormContext<PlayerCharacter>();
 
   const level = watch('level');
   const calculatedProficiencyBonus = level ? Math.floor((level - 1) / 4) + 2 : 2;

@@ -6,7 +6,7 @@ import {
   DEFAULT_PLAYER_DATA,
   DEFAULT_MONSTER_DATA,
 } from "@/shared/config/sheetDefaults";
-import { CharacterType } from "@/shared/api/types";
+import { CharacterTypeEnum } from '@/entities/character/model/schemas/character.schema';
 
 export function useCharacterCreation() {
   const { addCharacter } = useCharacters();
@@ -15,7 +15,7 @@ export function useCharacterCreation() {
   const createPlayerCharacter = useCallback((name: string) => {
     addCharacter({
       ...DEFAULT_PLAYER_DATA,
-      type: CharacterType.PLAYER,
+      type: CharacterTypeEnum.enum.Player,
       name, // Usa o nome fornecido pelo modal
     });
   }, [addCharacter]);
@@ -23,7 +23,7 @@ export function useCharacterCreation() {
   const createMonsterNpc = useCallback((name: string) => {
     addCharacter({
       ...DEFAULT_MONSTER_DATA,
-      type: CharacterType.MONSTER_NPC,
+      type: CharacterTypeEnum.enum['Monster/NPC'],
       name, // Usa o nome fornecido pelo modal
     });
   }, [addCharacter]);

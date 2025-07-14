@@ -1,10 +1,20 @@
 import React from "react";
-import { RulerPointData } from "../../../shared/api/types";
+import { RulerPathState, RulerPointData } from "../../../shared/api/types";
 import { calculateDistanceInMeters } from "../../../shared/lib/utils/board/boardUtils";
-import { useGameBoard } from "../../../widgets/gameBoard/model/contexts/GameBoardContext";
+import { useGameBoard } from "../../../widgets/gameBoard/model/contexts/GameBoardContext"; // Importar useGameBoard
 
-export const RulerLayer: React.FC = () => {
-  const { rulerPath, zoomLevel, gridSettings } = useGameBoard();
+// 2. A interface de props agora define que o componente deve receber o 'rulerPath'.
+interface RulerLayerProps {
+  rulerPath: RulerPathState;
+}
+export function RulerLayer({rulerPath}:RulerLayerProps)  {
+   // 3. A chamada de hook agora busca apenas os dados GERAIS do tabuleiro no contexto da entidade 'board'.
+  const { zoomLevel, gridSettings } = useGameBoard(); // Usar useGameBoard
+  
+  // 4. A prop 'rulerPath' agora vem diretamente dos argumentos do componente.
+  // const { rulerPath } = useGameBoard(); // Linha antiga removida.
+
+  // O resto do código JSX permanece exatamente o mesmo, pois ele já tem os dados que precisa.
   const rulerLineStrokeWidth = 2.5 / zoomLevel;
   const rulerWaypointRadius = 6 / zoomLevel;
   const rulerTextFontSize = 12 / zoomLevel;

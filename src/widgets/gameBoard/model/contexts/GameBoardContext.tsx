@@ -1,9 +1,8 @@
 import { useCharacters } from "../../../../entities/character/model/contexts/CharactersContext";
 import { useTokens } from "../../../../entities/token/model/contexts/TokenContext";
 import { useMarqueeSelection } from "../../../../features/boardMarqueeSelection/model/hooks/useMarqueeSelection";
-import { useZoomAndPan } from "../../../../features/boardPanningAndZoom/model/hooks/useZoomAndPan";
 import { useRuler } from "../../../../features/boardRuler/model/hooks/useRuler";
-import { useBoardSettings } from "../../../../features/boardSettings/contexts/BoardSettingsContext";
+import { useBoardSettingsStore } from "../../../../features/boardSettings/model/store";
 import { useCharacterDrop } from "../../../../features/characterDropOnBoard/model/hooks/useCharacterDrop";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
@@ -19,8 +18,7 @@ import {
   type Token,
   type Tool,
 } from "../../../../shared/api/types";
-import { type CharacterSchema } from "@/entities/character/model/schemas/character.schema";
-import { parseCharacterSize } from "../../../../shared/lib/utils/characterUtils";
+import { type Character } from "@/entities/character/model/schemas/character.schema";
 import { useGameBoardEvents } from "../hooks/useGameBoardEvents";
 import React, {
   createContext,
@@ -31,6 +29,8 @@ import React, {
   useState,
   type ReactNode,
 } from "react";
+import { parseCharacterSize } from "@/entities/character/lib/utils/characterUtils";
+import { useZoomAndPan } from "@/entities/board/model/hooks/useZoomAndPan";
 
 interface GameBoardProviderProps {
   children: ReactNode;
@@ -78,7 +78,7 @@ interface GameBoardContextType {
   handleBoardTokenDoubleClick: (tokenId: string, altKey: boolean) => void;
   getTokenScreenRect: (
     token: Token,
-    character: CharacterSchema | undefined,
+    character: Character | undefined,
     liveSVGPoint?: Point
   ) => DOMRect | null;
   isPageAndGridSettingsModalOpen: boolean;
@@ -111,11 +111,12 @@ interface GameBoardContextType {
   onHPChange: (tokenId: string, newHP: number) => void;
   onRemoveFromBoard: (tokenId: string) => void;
   onMakeIndependent: (tokenId: string) => void;
-  characters: CharacterSchema[];
+  characters: Character[];
   tokensOnBoard: Token[];
   gridSettings: GridSettings;
   pageSettings: PageSettings;
   activeTool: Tool;
+  updateTokenPosition: (tokenId: string, newPosition: Point) => void; // Adicionado
 }
 
 const GameBoardContext = createContext<GameBoardContextType | undefined>(
@@ -138,9 +139,9 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
   onMakeIndependent,
 }) => {
   const { characters } = useCharacters();
-  const { tokensOnBoard, addToken } = useTokens();
+  const { tokensOnBoard, addToken, updateTokenPosition } = useTokens(); // Adicionado updateTokenPosition
   const { gridSettings, pageSettings, rulerPlacementMode, rulerPersists } =
-    useBoardSettings();
+    useBoardSettingsStore();
   const { activeTool } = useUI();
   const { openModal } = useModal();
 
@@ -268,7 +269,7 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
   const getTokenScreenRect = useCallback(
     (
       token: Token,
-      character: CharacterSchema | undefined,
+      character: Character | undefined,
       liveSVGPoint?: Point
     ): DOMRect | null => {
       if (!svgRef.current || !character) return null;
@@ -437,6 +438,7 @@ export const GameBoardProvider: React.FC<GameBoardProviderProps> = ({
     gridSettings,
     pageSettings,
     activeTool,
+    updateTokenPosition, // Adicionado
   };
 
   return (

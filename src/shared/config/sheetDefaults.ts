@@ -2,8 +2,8 @@
 
 // 1. Importamos os tipos INFERIDOS do Zod, nossa nova fonte da verdade.
 import {
-  type PlayerCharacterSchema,
-  type MonsterNpcCharacterSchema,
+  type PlayerCharacter,
+  type MonsterNpcCharacter,
 } from "@/entities/character/model/schemas/character.schema";
 import defaultTokenImage from "../assets/defaultToken.png";
 import { generateUniqueId } from "@/shared/lib/utils/id/idUtils";
@@ -54,10 +54,10 @@ export const DEFAULT_TOKEN_IMAGE = defaultTokenImage;
 
 // 2. Criamos o novo objeto de dados padrão para PLAYER, usando o tipo do Zod.
 // Note a ausência de proficiencyBonus, xp, deathSaves, etc.
-export const DEFAULT_PLAYER_DATA: Omit<PlayerCharacterSchema, "id" | "type"> = {
+export const DEFAULT_PLAYER_DATA: Omit<PlayerCharacter, "id" | "type"> = {
   name: "Novo Jogador",
   image: DEFAULT_TOKEN_IMAGE,
-  size: "medium",
+  size: "Medium",
   notes: "",
   attributes: defaultAttributes,
   proficiencies: defaultProficiencies,
@@ -87,14 +87,12 @@ export const DEFAULT_PLAYER_DATA: Omit<PlayerCharacterSchema, "id" | "type"> = {
 
 // 3. Criamos o novo objeto de dados padrão para MONSTRO, usando o tipo do Zod.
 export const DEFAULT_MONSTER_DATA: Omit<
-  MonsterNpcCharacterSchema,
+  MonsterNpcCharacter,
   "id" | "type"
 > = {
   name: "Novo Monstro",
   image: DEFAULT_TOKEN_IMAGE,
-  proficiencyBonus: 2, // <-- ADICIONE ESTA LINHA DE VOLTA
-
-  size: "medium",
+  size: "Medium",
   notes: "",
   attributes: defaultAttributes,
   proficiencies: defaultProficiencies,

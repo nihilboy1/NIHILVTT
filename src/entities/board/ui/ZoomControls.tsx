@@ -1,12 +1,11 @@
-import { useGameBoard } from "../../../widgets/gameBoard/model/contexts/GameBoardContext";
-import { MAX_ZOOM_LEVEL, MIN_ZOOM_LEVEL } from "../../../shared/config/constants";
+import {
+  MAX_ZOOM_LEVEL,
+  MIN_ZOOM_LEVEL,
+} from "../../../shared/config/constants";
+import { useGameBoard } from "../../../widgets/gameBoard/model/contexts/GameBoardContext"; // Importar useGameBoard
 
 export function ZoomControls() {
-  const {
-    zoomLevel,
-    handleZoomIn,
-    handleZoomOut,
-  } = useGameBoard();
+  const { zoomLevel, handleZoomIn, handleZoomOut } = useGameBoard(); // Usar useGameBoard
   return (
     <div className="bg-opacity-80 p-2 rounded-md shadow-md flex flex-col items-center space-y-2 w-10">
       <button

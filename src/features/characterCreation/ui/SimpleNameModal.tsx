@@ -1,6 +1,5 @@
 // src/features/characterCreation/ui/SimpleNameModal.tsx
 
-import { CharacterType } from "@/shared/api/types";
 import { Modal } from "../../../shared/ui/Modal";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -8,6 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCharacterCreation } from "../model/hooks/useCharacterCreation";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 import { simpleNameSchema, type SimpleNameSchema } from "../model/schemas/simpleName.schema";
+import z from "zod";
+import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
+
+type CharacterType = z.infer<typeof CharacterTypeEnum>
 
 interface SimpleNameModalProps {
   isOpen: boolean;
@@ -50,10 +53,10 @@ export function SimpleNameModal({
   }, [isOpen, currentName, reset]);
 
   const onSubmit = (data: SimpleNameSchema) => {
-    if (characterType === CharacterType.PLAYER) {
+    if (characterType === CharacterTypeEnum.enum.Player) {
       createPlayerCharacter(data.name.trim());
       onClose();
-    } else if (characterType === CharacterType.MONSTER_NPC) {
+    } else if (characterType === CharacterTypeEnum.enum["Monster/NPC"]) {
       createMonsterNpc(data.name.trim());
       onClose();
     } else {

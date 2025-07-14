@@ -15,9 +15,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
-    "@tailwindcss/vite": "^4.1.10",
-    "@types/tailwindcss": "^3.0.11",
-    "@types/uuid": "^10.0.0",
     "clsx": "^2.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -28,10 +25,12 @@
     "tailwindcss": "^4.1.10",
     "use-debounce": "^10.0.5",
     "uuid": "^11.1.0",
-    "zod": "^4.0.0"
+    "zod": "^4.0.5",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@tailwindcss/vite": "^4.1.10",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.3.1",
     "@testing-library/user-event": "^14.6.1",
@@ -39,6 +38,8 @@
     "@types/lodash": "^4.17.20",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/tailwindcss": "^3.0.11",
+    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "dependency-cruiser": "^16.10.4",
     "eslint": "^9.25.0",

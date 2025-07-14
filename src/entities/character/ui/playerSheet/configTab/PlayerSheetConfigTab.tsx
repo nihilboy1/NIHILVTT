@@ -1,17 +1,16 @@
 // src/entities/character/ui/playerSheet/configTab/PlayerSheetConfigTab.tsx
 
 import { useFormContext } from 'react-hook-form'; // 1. Importar
-import { CharacterType } from "../../../../../shared/api/types";
 import { characterTypeTranslations } from "../../../../../shared/config/constants";
 import { cn } from "../../../../../shared/lib/utils/cn";
-import { PlayerCharacterSchema } from '../../../model/schemas/character.schema';
+import { CharacterTypeEnum, PlayerCharacter } from '../../../model/schemas/character.schema';
 
 // 2. Interface de props agora está VAZIA
 interface PlayerSheetConfigTabProps {}
 
 export function PlayerSheetConfigTab({}: PlayerSheetConfigTabProps) {
   // 3. Pegamos o 'register' do contexto
-  const { register } = useFormContext<PlayerCharacterSchema>();
+  const { register } = useFormContext<PlayerCharacter>();
 
   return (
     <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]">
@@ -59,7 +58,7 @@ export function PlayerSheetConfigTab({}: PlayerSheetConfigTabProps) {
         {/* Este campo é apenas de exibição, não precisa ser registrado no formulário */}
         <input
           type="text"
-          value={characterTypeTranslations[CharacterType.PLAYER]}
+          value={characterTypeTranslations[CharacterTypeEnum.enum.Player]}
           className={cn(
             "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
             "bg-surface-1 opacity-70 cursor-not-allowed"

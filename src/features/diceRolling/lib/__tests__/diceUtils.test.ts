@@ -1,4 +1,4 @@
-import { performDiceRoll } from "@/utils/dice/diceUtils";
+import { performDiceRoll } from "../diceUtils";
 
 describe("performDiceRoll", () => {
   // Mock Math.random para resultados previsíveis

@@ -1,16 +1,20 @@
 import React from "react";
-import { useGameBoard } from "../model/contexts/GameBoardContext"; // Apenas useGameBoard
 import { BoardTokenLayer } from "./BoardTokenLayer";
 import { GridLayer } from "./GridLayer";
-
 import { MarqueeLayer } from "../../../features/boardMarqueeSelection/ui/MarqueeLayer";
 import { RulerLayer } from "../../../features/boardRuler/ui/RulerLayer";
 import { PageSettingsModal } from "../../../features/boardSettings/ui/PageSettingsModal";
 import { GameBoardSideOption } from "./GameBoardSideOption";
 import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
+import { useGameBoard } from "../model/contexts/GameBoardContext"; // Importar useGameBoard
+import { Point } from "@/shared/api/types"; // Importar Point, pois updateTokenPosition a usa
 
-// GameBoardContent não precisa de props, pois tudo vem do contexto
-export const GameBoardContent: React.FC = () => {
+interface GameBoardContentProps {
+  updateTokenPosition: (tokenId: string, newPosition: Point) => void;
+}
+
+export const GameBoardContent: React.FC<GameBoardContentProps> = ({ updateTokenPosition }) => {
+  const { isRightSidebarVisible } = useUI();
   const {
     svgRef,
     viewBox,
@@ -19,17 +23,12 @@ export const GameBoardContent: React.FC = () => {
     handleMouseDown,
     handleDragOver,
     handleCharacterDrop,
+    rulerPath,
+    marqueeSelection,
     multiSelectBoundingBox,
     isPageAndGridSettingsModalOpen,
     setIsPageAndGridSettingsModalOpen,
-    // activeHPModalTokenId, // Não é mais necessário aqui, pois o HPModal será renderizado em GameBoardPage
-    // onHPModalAnchorShouldUpdate, // Não é mais necessário aqui
-    // onHPChange, // Não é mais necessário aqui
-    // onRemoveFromBoard, // Não é mais necessário aqui
-    // onMakeIndependent, // Não é mais necessário aqui
-  } = useGameBoard();
-
-  const { isRightSidebarVisible } = useUI(); // Obter estado de visibilidade da RightSidebar
+  } = useGameBoard(); // Consumir o contexto GameBoard aqui
 
   return (
     <div className="flex-grow bg-surface-0 relative overflow-hidden">
@@ -45,7 +44,9 @@ export const GameBoardContent: React.FC = () => {
         onDrop={handleCharacterDrop}
       >
         <GridLayer />
-        <BoardTokenLayer />
+        
+        <BoardTokenLayer updateTokenPosition={updateTokenPosition} />
+        
         {multiSelectBoundingBox && (
           <rect
             x={multiSelectBoundingBox.x}
@@ -58,8 +59,9 @@ export const GameBoardContent: React.FC = () => {
             strokeOpacity="1.0"
           />
         )}
-        <MarqueeLayer />
-        <RulerLayer />
+
+        <MarqueeLayer marqueeSelection={marqueeSelection} />
+        <RulerLayer rulerPath={rulerPath} />
       </svg>
 
       <GameBoardSideOption

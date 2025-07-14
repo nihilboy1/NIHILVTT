@@ -7,7 +7,7 @@ interface UseGameBoardEventsProps {
   isPanning: boolean;
   handlePanStart: (point: Point) => void;
   handlePanMove: (event: MouseEvent) => void;
-  handlePanEnd: () => void;
+  handlePanEnd: (event: MouseEvent) => void; 
   handleRulerMouseDown: (event: React.MouseEvent<SVGSVGElement>) => void;
   handleRulerMouseMove: (event: MouseEvent) => void;
   handleRulerMouseUp: (event: MouseEvent) => void;
@@ -95,7 +95,7 @@ export const useGameBoardEvents = ({
 
     const handleGlobalMouseUp = (event: MouseEvent) => {
       if (isPanning) {
-        handlePanEnd();
+        handlePanEnd(event);
       } else if (activeTool === Tool.RULER) {
         handleRulerMouseUp(event);
       } else if (activeTool === Tool.SELECT) {

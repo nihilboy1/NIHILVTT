@@ -4,14 +4,33 @@ import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { CharacterTemplateListItem } from "../../../entities/character/ui/CharacterTemplateListItem";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 import {
-  CharacterType,
+  CharacterTypeEnum,
 } from "@/entities/character/model/schemas/character.schema";
 
 // painel de personagens geral
 export function CharactersPanel() {
-  const { characters } = useCharacters();
+  const { characters, deleteCharacter } = useCharacters();
   const { tokenInstanceCounts } = useTokens(); // Renomeado
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
+
+  const handleDeleteCharacter = (characterId: string) => {
+    const characterToDelete = characters.find((char) => char.id === characterId);
+    if (!characterToDelete) return;
+
+    openModal("confirmationModal", {
+      title: "Confirmar Exclusão",
+      content: `Tem certeza que deseja excluir permanentemente o modelo "${characterToDelete.name}" e todas as suas ${tokenInstanceCounts.get(characterId) || 0} instâncias no tabuleiro? Esta ação não pode ser desfeita.`,
+      confirmText: "Confirmar",
+      cancelText: "Cancelar",
+      onConfirm: () => {
+        deleteCharacter(characterId);
+        closeModal();
+      },
+      onCancel: () => {
+        closeModal();
+      },
+    });
+  };
 
   return (
     <div className="flex-grow p-4 overflow-y-scroll space-y-6 hide-scrollbar">
@@ -21,7 +40,7 @@ export function CharactersPanel() {
           <button
             onClick={() =>
               openModal("simpleName", {
-                characterType: CharacterType.PLAYER, // Renomeado
+                characterType: CharacterTypeEnum.enum.Player, // Renomeado
                 title: "Nome do Novo Jogador",
               })
             }
@@ -34,7 +53,7 @@ export function CharactersPanel() {
           <button
             onClick={() =>
               openModal("simpleName", {
-                characterType: CharacterType.MONSTER_NPC, // Renomeado
+                characterType: CharacterTypeEnum.enum["Monster/NPC"], // Renomeado
                 title: "Nome do Novo Monstro/NPC",
               })
             }
@@ -65,6 +84,7 @@ export function CharactersPanel() {
                 openSheetModal={() =>
                   openModal("sheet", { characterId: character.id })
                 }
+                onDelete={handleDeleteCharacter} // Pass the new onDelete prop
               />
             ))}
           </ul>

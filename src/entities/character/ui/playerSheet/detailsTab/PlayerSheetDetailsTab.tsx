@@ -2,14 +2,14 @@
 
 import { useFormContext } from 'react-hook-form'; // 1. Importar o hook
 import { cn } from "../../../../../shared/lib/utils/cn";
-import { PlayerCharacterSchema } from '../../../model/schemas/character.schema';
+import { PlayerCharacter } from '../../../model/schemas/character.schema';
 
 // 2. A interface de props agora está VAZIA! O componente é autossuficiente.
 interface PlayerSheetDetailsTabProps {}
 
 export function PlayerSheetDetailsTab({}: PlayerSheetDetailsTabProps) {
   // 3. Pegamos o método `register` do contexto do formulário.
-  const { register } = useFormContext<PlayerCharacterSchema>();
+  const { register } = useFormContext<PlayerCharacter>();
 
   return (
     <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]">

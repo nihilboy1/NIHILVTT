@@ -2,9 +2,9 @@ import { DiceRollDetails, DiceRollMessage, Message, TextMessage } from "@/shared
 import { DEFAULT_PLAYER_NAME } from "../../../../shared/config/constants";
 import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
 import { useCallback, useState } from "react";
-import { performDiceRoll } from "@/utils/dice/diceUtils";
 import { parseAndValidateChatCommand } from "../lib/chatCommandParser";
 import { ChatCommand } from "../schemas/chatCommands.schema";
+import { performDiceRoll } from "@/features/diceRolling/lib/diceUtils";
 
 export interface ChatState {
   messages: Message[];

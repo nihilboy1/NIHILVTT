@@ -2,20 +2,21 @@
 
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { useDiceRoller } from "../../../../../shared/lib/hooks/useDiceRoller";
 import {
   type DiceFormula,
   type RollCategory,
 } from "../../../../../shared/api/types";
 import {
-  type PlayerCharacterSchema,
+  type PlayerCharacter,
   type ProficiencyPath,
 } from "../../../model/schemas/character.schema";
+import { getProficiencyBonusFromLevel } from "@/entities/character/lib/utils/characterUtils";
+import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
 
 interface SkillProficiencyItemProps {
   skillLabel: string;
   name: ProficiencyPath;
-  parentAttributeName: `attributes.${keyof PlayerCharacterSchema["attributes"]}`;
+  parentAttributeName: `attributes.${keyof PlayerCharacter["attributes"]}`;
 }
 
 export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
@@ -23,14 +24,24 @@ export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
   name,
   parentAttributeName,
 }) => {
-  const { register, watch } = useFormContext<PlayerCharacterSchema>();
+  const { register, watch } = useFormContext<PlayerCharacter>();
 
   const isProficient = watch(name);
   const attributeValue = watch(parentAttributeName);
   const characterName = watch("name");
-  const proficiencyBonusFromForm = watch("proficiencyBonus"); // Obter o bônus de proficiência do formulário
 
-  const proficiencyBonus = proficiencyBonusFromForm ?? 0; // Usar 0 como fallback se for undefined
+  // --- CORREÇÃO APLICADA AQUI ---
+  // Antes:
+  // const proficiencyBonusFromForm = watch("proficiencyBonus");
+  // const proficiencyBonus = proficiencyBonusFromForm ?? 0;
+
+  // Depois:
+  // 2. Observamos o 'level', que é a nossa fonte da verdade.
+  const level = watch("level");
+  
+  // 3. Calculamos o bônus de proficiência usando a nossa função utilitária.
+  const proficiencyBonus = getProficiencyBonusFromLevel(level);
+  // --- FIM DA CORREÇÃO ---
   const attributeModifier = attributeValue
     ? Math.floor((attributeValue - 10) / 2)
     : 0;

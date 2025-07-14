@@ -1,134 +1,100 @@
+import React from 'react';
+import { InteractiveModal } from '../../../shared/ui/InteractiveModal';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { actionSchema } from '../../../entities/character/model/schemas/character.schema';
 
-import { useFormContext, useFieldArray } from "react-hook-form";
-import { Modal } from "../../../shared/ui/Modal";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
-import { type PlayerCharacterSchema } from "@/entities/character/model/schemas/character.schema";
+type ActionFormInputs = z.infer<typeof actionSchema>;
 
 interface ActionEditModalProps {
   isOpen: boolean;
-  actionId: string;
   onClose: () => void;
+  actionId: string;
   zIndex?: number;
+  initialData?: ActionFormInputs;
 }
 
-export function ActionEditModal({
+export const ActionEditModal: React.FC<ActionEditModalProps> = ({
   isOpen,
-  actionId,
   onClose,
+  actionId,
   zIndex,
-}: ActionEditModalProps) {
-  // 1. Conectamos ao formulário principal e ao array de 'actions'
-  const { control, register, watch } = useFormContext<PlayerCharacterSchema>();
-  const { remove } = useFieldArray({
-    control,
-    name: "actions",
+  initialData,
+}) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ActionFormInputs>({
+    resolver: zodResolver(actionSchema),
+    defaultValues: initialData || { id: actionId, name: '', bonus: '', damage: '' },
   });
-  const { openModal, closeModal } = useModal();
 
-  // 2. Encontramos o ÍNDICE da ação que estamos editando.
-  //    O índice é crucial para o react-hook-form saber qual item do array atualizar.
-  const actions = watch("actions");
-  const actionIndex = actions.findIndex((a) => a.id === actionId);
-
-  // 3. O estado local 'editedAction' foi COMPLETAMENTE REMOVIDO.
-  //    Os inputs agora leem e escrevem diretamente no estado global do formulário.
-
-  const handleSave = () => {
-    // 4. Salvar é simples: apenas fechamos o modal.
-    // O auto-save do `useCharacterSheetForm` já cuidará de persistir a mudança.
+  const onSubmit = (data: ActionFormInputs) => {
+    console.log("Form submitted:", data);
+    // Here you would typically save the data, e.g., to a backend or global state
     onClose();
   };
 
-  const handleDelete = () => {
-    openModal(
-      "confirmationModal",
-      {
-        title: "Confirmar Exclusão",
-        content: "Você tem certeza que deseja remover esta ação?",
-        onConfirm: () => {
-          if (actionIndex > -1) {
-            // 5. Usamos a função 'remove' do useFieldArray para deletar a ação.
-            remove(actionIndex);
-          }
-          closeModal(); // Fecha o confirmationModal
-          onClose(); // Fecha o ActionEditModal
-        },
-        onCancel: () => {
-          closeModal();
-        },
-      },
-      true
-    );
-  };
-
-  // Se a ação não for encontrada (ex: foi removida em outra aba), não renderiza nada.
-  if (!isOpen || actionIndex === -1) {
-    return null;
-  }
-
   return (
-    <Modal
+    <InteractiveModal
+      id={`action-edit-${actionId}`}
+      title={`Editar Ação: ${actionId}`}
       isOpen={isOpen}
       onClose={onClose}
-      title="Editar Ação"
-      onConfirm={handleSave}
-      confirmText="Salvar"
-      cancelText="Cancelar"
       zIndex={zIndex}
     >
-      <div className="p-4">
-        <div className="mb-4">
-          <label
-            htmlFor={`actions.${actionIndex}.name`}
-            className="block text-sm font-medium text-text-primary"
-          >
-            Nome
-          </label>
+      <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-4 bg-gray-800 text-white rounded-lg">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-300">Nome da Ação</label>
           <input
             type="text"
-            id={`actions.${actionIndex}.name`}
-            // 6. Registramos o campo DIRETAMENTE no formulário usando o índice.
-            {...register(`actions.${actionIndex}.name`)}
-            className="mt-1 block w-full rounded-md bg-surface-1 border-surface-2 shadow-sm focus:border-accent-primary focus:ring focus:ring-accent-primary focus:ring-opacity-50"
+            id="name"
+            {...register("name")}
+            className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
+          {errors.name && <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>}
         </div>
-        <div className="mb-4">
-          <label
-            htmlFor={`actions.${actionIndex}.bonus`}
-            className="block text-sm font-medium text-text-primary"
-          >
-            Bônus
-          </label>
+
+        <div>
+          <label htmlFor="bonus" className="block text-sm font-medium text-gray-300">Bônus (opcional)</label>
           <input
             type="text"
-            id={`actions.${actionIndex}.bonus`}
-            {...register(`actions.${actionIndex}.bonus`, { valueAsNumber: true })}
-            className="mt-1 block w-full rounded-md bg-surface-1 border-surface-2 shadow-sm focus:border-accent-primary focus:ring focus:ring-accent-primary focus:ring-opacity-50"
+            id="bonus"
+            {...register("bonus")}
+            className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
+          {errors.bonus && <p className="mt-1 text-sm text-red-400">{errors.bonus.message}</p>}
         </div>
-        <div className="mb-4">
-          <label
-            htmlFor={`actions.${actionIndex}.damage`}
-            className="block text-sm font-medium text-text-primary"
-          >
-            Dano
-          </label>
+
+        <div>
+          <label htmlFor="damage" className="block text-sm font-medium text-gray-300">Dano (opcional)</label>
           <input
             type="text"
-            id={`actions.${actionIndex}.damage`}
-            {...register(`actions.${actionIndex}.damage`, { valueAsNumber: true })}
-            className="mt-1 block w-full rounded-md bg-surface-1 border-surface-2 shadow-sm focus:border-accent-primary focus:ring focus:ring-accent-primary focus:ring-opacity-50"
+            id="damage"
+            {...register("damage")}
+            className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
+          {errors.damage && <p className="mt-1 text-sm text-red-400">{errors.damage.message}</p>}
         </div>
-        <div className="flex justify-start mt-4">
+
+        <div className="flex justify-end space-x-2">
           <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-feedback-negative text-text-primary rounded-md hover:bg-feedback-negative-hover"
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800"
           >
-            Deletar
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+          >
+            Salvar Ação
           </button>
         </div>
-      </div>
-    </Modal>
+      </form>
+    </InteractiveModal>
   );
-}
+};

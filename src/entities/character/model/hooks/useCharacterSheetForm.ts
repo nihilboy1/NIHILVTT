@@ -1,17 +1,16 @@
-// src/entities/character/model/hooks/useCharacterSheetForm.ts
-
 import { useEffect, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useDebouncedCallback } from 'use-debounce';
-import { characterSchema, type CharacterSchema, calculateProficiencyBonus, CharacterType } from '../schemas/character.schema';
+import { type Character, characterSchema } from '../schemas/character.schema';
+
+// A importação de 'getProficiencyBonusFromLevel' não é mais necessária neste arquivo.
 
 export interface UseCharacterSheetFormProps {
-  initialCharacterData: CharacterSchema | null;
-  onSave: (updatedData: Partial<CharacterSchema>) => void;
+  initialCharacterData: Character | null;
+  onSave: (updatedData: Partial<Character>) => void;
 }
 
-// 1. Adicionamos o novo estado 'error'
 export type SaveStatus = 'idle' | 'saving' | 'success' | 'error';
 
 export function useCharacterSheetForm({
@@ -19,60 +18,40 @@ export function useCharacterSheetForm({
   onSave,
 }: UseCharacterSheetFormProps) {
   
-  const form = useForm<CharacterSchema>({
+  const form = useForm<Character>({
     resolver: zodResolver(characterSchema),
     defaultValues: initialCharacterData || undefined,
   });
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
+  // Efeito para resetar o formulário quando o personagem inicial muda.
   useEffect(() => {
     if (initialCharacterData) {
       form.reset(initialCharacterData);
       setSaveStatus('idle');
-
-      // Se for um PlayerCharacter, calcule e defina o proficiencyBonus inicial
-      if (initialCharacterData.type === CharacterType.PLAYER && initialCharacterData.level !== undefined) {
-        const initialProficiencyBonus = calculateProficiencyBonus(initialCharacterData.level);
-        if (initialCharacterData.proficiencyBonus !== initialProficiencyBonus) {
-          form.setValue('proficiencyBonus', initialProficiencyBonus);
-        }
-      }
     }
-  }, [initialCharacterData, form.reset]);
+  }, [initialCharacterData, form]);
   
-  // Efeito para atualizar proficiencyBonus quando o nível muda
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      // Apenas para PlayerCharacters e quando o nível muda
-      if (name === 'level' && value.type === CharacterType.PLAYER && value.level !== undefined) {
-        const newProficiencyBonus = calculateProficiencyBonus(value.level);
-        // Evita loop infinito se o valor já for o correto
-        if (form.getValues('proficiencyBonus') !== newProficiencyBonus) {
-          form.setValue('proficiencyBonus', newProficiencyBonus, { shouldDirty: true });
-        }
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
+  // O useEffect que calculava e sincronizava o 'proficiencyBonus' foi completamente removido.
+  // A responsabilidade de calcular dados derivados agora pertence aos componentes que os consomem.
 
-  // 2. A lógica de auto-save agora valida os dados ANTES de salvar
-  const debouncedSave = useDebouncedCallback((data: CharacterSchema) => {
-    // Usamos 'safeParse' que não lança erro, mas retorna um objeto com o resultado
+  // Lógica de auto-save com debounce e validação.
+  const debouncedSave = useDebouncedCallback((data: Character) => {
     const result = characterSchema.safeParse(data);
 
     if (result.success) {
-      // SUCESSO: Os dados são válidos!
       setSaveStatus('saving');
-      onSave(result.data); // Enviamos os dados validados
+      console.log("useCharacterSheetForm: Saving data:", result.data); // Added log
+      onSave(result.data);
       setTimeout(() => setSaveStatus('success'), 500);
     } else {
-      // FALHA: Os dados são inválidos!
-      console.error("Validação falhou antes de salvar:", result.error.flatten());
-      setSaveStatus('error'); // Acionamos o estado de erro
+      console.error("Validação do Zod falhou antes de salvar:", result.error.flatten());
+      setSaveStatus('error');
     }
   }, 500);
 
+  // Observa todas as mudanças no formulário para acionar o auto-save.
   const watchedFields = form.watch();
 
   useEffect(() => {
@@ -81,17 +60,19 @@ export function useCharacterSheetForm({
     }
   }, [watchedFields, form.formState.isDirty, debouncedSave]);
 
-  // 3. O status de "sucesso" ou "erro" agora são temporários
+  // Efeito para resetar a mensagem de status ('Salvo!' ou 'Erro!') para 'idle' após um tempo.
   useEffect(() => {
     if (saveStatus === 'success' || saveStatus === 'error') {
       const timer = setTimeout(() => {
         setSaveStatus('idle');
-      }, 2500); // Mostra a mensagem por 2.5 segundos
+      }, 2500);
       return () => clearTimeout(timer);
     }
   }, [saveStatus]);
 
-  const processSubmit: SubmitHandler<CharacterSchema> = (validatedData) => {
+  // Handler para submissão manual, caso necessário.
+  const processSubmit: SubmitHandler<Character> = (validatedData) => {
+    console.log("useCharacterSheetForm: Manual submit data:", validatedData); // Added log
     onSave(validatedData);
   };
 

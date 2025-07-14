@@ -1,14 +1,14 @@
 import {GridSettings, MarqueeSelectionState, Point, Token } from "@/shared/api/types";
 import { parseTokenSize } from "../../../../shared/lib/utils/board/boardUtils";
 import { useCallback, useState } from "react";
-import { CharacterSchema } from "@/entities/character/model/schemas/character.schema";
+import { Character } from "@/entities/character/model/schemas/character.schema";
 
 
 interface UseMarqueeSelectionProps {
   activeTool: string; // Tool.SELECT
   getSVGPoint: (clientX: number, clientY: number) => Point;
   tokensOnBoard: Token[]; // Renomeado de gridInstances
-  characters: CharacterSchema[]; // Renomeado de tokens
+  characters: Character[]; // Renomeado de tokens
   gridSettings: GridSettings;
   onSetMultiSelectedTokenIds: (ids: string[]) => void; // Renomeado
   onClearMultiSelection: () => void;

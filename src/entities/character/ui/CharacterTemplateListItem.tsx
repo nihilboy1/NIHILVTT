@@ -3,22 +3,22 @@ import { characterTypeTranslations } from "../../../shared/config/constants";
 import { DotsThreeVerticalIcon } from "../../../shared/ui/Icons";
 import { OptionsPopover } from "../../../shared/ui/OptionsPopover";
 import { useCharacters } from "../model/contexts/CharactersContext"; // Caminho corrigido
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
-import { CharacterSchema } from "../model/schemas/character.schema";
+import { Character } from "../model/schemas/character.schema";
 
 interface CharacterTemplateListItemProps {
-  character: CharacterSchema;
+  character: Character;
   instanceCount: number;
   openSheetModal: (characterId: string) => void;
+  onDelete: (characterId: string) => void; // New prop for deletion
 }
 
 export function CharacterTemplateListItem({
   character,
   instanceCount,
   openSheetModal,
+  onDelete, // Destructure new prop
 }: CharacterTemplateListItemProps) {
-  const { deleteCharacter, duplicateCharacter } = useCharacters(); // Renomeado
-  const { openModal, closeModal } = useModal();
+  const { duplicateCharacter } = useCharacters(); // Renomeado
 
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const popoverAnchorRef = useRef<HTMLButtonElement>(null);
@@ -52,20 +52,7 @@ export function CharacterTemplateListItem({
 
   const handleDeleteClick = () => {
     handleClosePopover(); // Fecha o popover antes de abrir o modal
-    openModal("confirmationModal", {
-      // Passa o nome do modal e as props separadamente
-      title: "Confirmar Exclusão",
-      content: `Tem certeza que deseja excluir permanentemente o modelo "${character.name}" e todas as suas ${instanceCount} instâncias no tabuleiro? Esta ação não pode ser desfeita.`,
-      confirmText: "Confirmar",
-      cancelText: "Cancelar",
-      onConfirm: () => {
-        deleteCharacter(character.id);
-        closeModal();
-      },
-      onCancel: () => {
-        closeModal();
-      },
-    });
+    onDelete(character.id); // Call the new onDelete prop
   };
 
   return (

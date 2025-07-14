@@ -1,41 +1,37 @@
 // src/entities/character/ui/playerSheet/principalTab/HealthSection.tsx
 
 import React from "react";
-import { useFormContext, useFieldArray } from 'react-hook-form';
+import { useFormContext, FieldArrayWithId } from 'react-hook-form';
 import { cn } from "../../../../../shared/lib/utils/cn";
 import { generateUniqueId } from "../../../../../shared/lib/utils/id/idUtils";
 import { DeleteIcon, PlusCircleIcon } from "../../../../../shared/ui/Icons";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
-import { PlayerCharacterSchema } from "../../../model/schemas/character.schema";
+import { PlayerCharacter, HitDiceEntry } from "../../../model/schemas/character.schema";
 
-// A interface de props agora está vazia.
-export const HealthSection: React.FC = () => {
-  const { register, control } = useFormContext<PlayerCharacterSchema>();
-  const { openModal, closeModal } = useModal();
+interface HealthSectionProps {
+  onDeleteHitDice: (index: number) => void;
+  fields: FieldArrayWithId<PlayerCharacter, "hitDiceEntries", "id">[];
+  append: (value: HitDiceEntry) => void;
+  remove: (index?: number | number[]) => void;
+}
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "hitDiceEntries",
-  });
+export const HealthSection: React.FC<HealthSectionProps> = ({
+  onDeleteHitDice,
+  fields,
+  append,
+  
+}) => {
+  const { register } = useFormContext<PlayerCharacter>();
 
   const handleAddHitDice = () => {
+    console.log("HealthSection: handleAddHitDice called");
     append({ id: generateUniqueId(), type: "d6", quantity: 1 });
   };
 
-  const handleRemoveHitDice = (index: number) => {
-    remove(index);
-  };
+ 
 
   const handleDeleteConfirmation = (index: number) => {
-    openModal("confirmationModal", {
-      title: "Confirmar Exclusão",
-      content: "Você tem certeza que deseja remover esta linha de dados de vida?",
-      onConfirm: () => {
-        handleRemoveHitDice(index);
-        closeModal();
-      },
-      onCancel: closeModal,
-    });
+    console.log("HealthSection: handleDeleteConfirmation called for index:", index);
+    onDeleteHitDice(index);
   };
 
   return (

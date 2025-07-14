@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 // 1. DE: import { type Character, type Point, type Token } from "../../../../shared/api/types";
 //    PARA: Importamos o tipo do Zod e mantemos os tipos que não mudaram.
 import { type Point, type Token } from "../../../../shared/api/types";
-import { type CharacterSchema } from "@/entities/character/model/schemas/character.schema";
+import { type Character } from "@/entities/character/model/schemas/character.schema";
 
 import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
 import { useCharacters } from "@/entities/character/model/contexts/CharactersContext";
@@ -12,16 +12,12 @@ import { useCharacters } from "@/entities/character/model/contexts/CharactersCon
 export interface TokenState {
   tokensOnBoard: Token[];
   tokenInstanceCounts: Map<string, number>;
-  addToken: (
-    characterId: string,
-    position: Point,
-    currentHp?: number
-  ) => Token;
+  addToken: (characterId: string, position: Point, currentHp?: number) => Token;
   removeToken: (tokenId: string) => void;
   updateTokenPosition: (tokenId: string, newPosition: Point) => void;
   updateTokenHp: (tokenId: string, newHp: number) => void;
   // 2. A função agora retorna o tipo do Zod.
-  makeTokenIndependent: (tokenId: string) => CharacterSchema | null;
+  makeTokenIndependent: (tokenId: string) => Character | null;
 }
 
 export const useTokenState = (): TokenState => {
@@ -33,7 +29,7 @@ export const useTokenState = (): TokenState => {
 
   const addToken = useCallback(
     (characterId: string, position: Point, currentHp?: number): Token => {
-      // 3. O 'characters.some' agora funciona sem erro, pois `characters` já é do tipo `CharacterSchema[]`.
+      // 3. O 'characters.some' agora funciona sem erro, pois `characters` já é do tipo `Character[]`.
       const parentCharacterExists = characters.some(
         (char) => char.id === characterId
       );
@@ -76,7 +72,7 @@ export const useTokenState = (): TokenState => {
         const currentCount = newCounts.get(characterId) || 0;
         if (currentCount <= 1) {
           newCounts.delete(characterId);
-          // 4. `associatedCharacter` agora é do tipo `CharacterSchema | undefined`.
+          // 4. `associatedCharacter` agora é do tipo `Character | undefined`.
           const associatedCharacter = characters.find(
             (char) => char.id === characterId
           );
@@ -114,26 +110,28 @@ export const useTokenState = (): TokenState => {
   }, []);
 
   const makeTokenIndependent = useCallback(
-    (tokenId: string): CharacterSchema | null => {
+    (tokenId: string): Character | null => {
       const targetToken = tokensOnBoard.find((inst) => inst.id === tokenId);
       if (!targetToken) return null;
 
-      // 5. `originalCharacter` é do tipo `CharacterSchema | undefined`.
+      // 5. `originalCharacter` é do tipo `Character | undefined`.
       const originalCharacter = characters.find(
         (char) => char.id === targetToken.characterId
       );
       if (!originalCharacter) return null;
 
       // A cópia agora é do tipo do Zod.
-      const copiedCharacterData: CharacterSchema = JSON.parse(JSON.stringify(originalCharacter));
+      const copiedCharacterData: Character = JSON.parse(
+        JSON.stringify(originalCharacter)
+      );
 
-      // A função `addCharacter` espera um `Partial<Omit<CharacterSchema, "id">>`
-      const newIndependentCharacterData: Omit<CharacterSchema, "id"> = {
+      // A função `addCharacter` espera um `Partial<Omit<Character, "id">>`
+      const newIndependentCharacterData: Omit<Character, "id"> = {
         ...copiedCharacterData,
         name: `${originalCharacter.name} (Cópia)`,
       };
 
-      // `addCharacter` retorna o personagem completo, já do tipo `CharacterSchema`.
+      // `addCharacter` retorna o personagem completo, já do tipo `Character`.
       const addedCharacter = addCharacter(newIndependentCharacterData);
 
       setTokensOnBoard((prevTokens) =>
@@ -143,7 +141,7 @@ export const useTokenState = (): TokenState => {
             : token
         )
       );
-      
+
       setTokenInstanceCounts((prevCounts) => {
         const newCounts = new Map(prevCounts);
         const originalCharacterId = originalCharacter.id;

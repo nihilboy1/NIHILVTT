@@ -3,32 +3,29 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { cn } from "../../../../../shared/lib/utils/cn";
-import { type PlayerCharacterSchema } from "../../../model/schemas/character.schema";
-
-// Helper para calcular o modificador de um atributo
-const getModifier = (attributeValue: number | undefined) => {
-  if (typeof attributeValue !== "number") return 0;
-  return Math.floor((attributeValue - 10) / 2);
-};
-
-// Helper para calcular o bônus de proficiência (regra padrão 5e)
-const getProficiencyBonus = (level: number | undefined) => {
-  if (typeof level !== "number" || level < 1) return 2; // Retorna 2 como padrão se o nível for inválido
-  return Math.floor((level - 1) / 4) + 2;
-};
+import { type PlayerCharacter } from "../../../model/schemas/character.schema";
+import {
+  getModifier,
+  getProficiencyBonusFromLevel,
+  handleNumericInputKeyDown,
+} from "@/entities/character/lib/utils/characterUtils";
 
 export const CombatStats: React.FC = () => {
   // 1. "Observamos" todos os valores base que precisamos do formulário
-  const { register, watch } = useFormContext<PlayerCharacterSchema>();
+  const { register, watch } = useFormContext<PlayerCharacter>();
   const level = Number(watch("level") || 0);
   const dexterity = Number(watch("attributes.dexterity") || 0);
   const wisdom = Number(watch("attributes.wisdom") || 0);
   const isPerceptionProficient = watch("proficiencies.skills.perception");
+  const speedInFeet = Number(watch("combatStats.speed") || 0);
 
   // 2. Calculamos os valores derivados usando os valores base
   const dexModifier = getModifier(dexterity);
   const wisModifier = getModifier(wisdom);
-  const proficiencyBonus = getProficiencyBonus(level);
+  const proficiencyBonus = getProficiencyBonusFromLevel(level);
+  // NOVO: Calculamos os valores de deslocamento em metros e quadrados
+  const speedInMeters = (speedInFeet * 0.3).toFixed(2);
+  const speedInSquares = (speedInFeet / 5).toFixed(2);
 
   const calculatedInitiative = dexModifier;
   // Percepção passiva só adiciona o bônus de proficiência se o personagem for proficiente
@@ -51,12 +48,14 @@ export const CombatStats: React.FC = () => {
           </label>
           <input
             id="armorClass"
-            type="number"
+            type="text" // Changed to text to gain full control over input
             {...register("combatStats.armorClass", { valueAsNumber: true })}
             className={cn(
               "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
             )}
-            min="0"
+            onKeyDown={(e) => {
+              handleNumericInputKeyDown(e, { min: 1, max: 40 });
+            }}
           />
           <div className="pt-2 flex justify-between items-center">
             {/* Escudo */}
@@ -98,23 +97,42 @@ export const CombatStats: React.FC = () => {
               : calculatedInitiative}
           </div>
         </div>
-        {/* Deslocamento */}
+        {/* ALTERADO: Bloco de Deslocamento refatorado */}
         <div className="w-16 ">
           <label
             htmlFor="speed"
+            title="Deslocamento em FEET"
             className="block text-[0.8rem] font-medium mb-px"
           >
             DESLOC.
           </label>
           <input
             id="speed"
-            type="number"
+            type="text" // Alterado para 'text' para usar a validação onKeyDown
             {...register("combatStats.speed", { valueAsNumber: true })}
             className={cn(
               "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
             )}
-            min="0"
+            // Reutilizamos a lógica de validação com um range apropriado para deslocamento
+            onKeyDown={(e) =>
+              handleNumericInputKeyDown(e, { min: 0, max: 150 })
+            }
           />
+          {/* NOVO: Container para os valores calculados */}
+          <div className="text-center mt-1 flex flex-col justify-center items-center ">
+            <p
+              className="text-xs text-text-secondary/80  text-center cursor-default hover:text-text-secondary"
+              title="Deslocamento em METROS"
+            >
+              {speedInMeters} M
+            </p>
+            <p
+              className="text-xs text-text-secondary/80 text-center cursor-default hover:text-text-secondary"
+              title="Deslocamento em QUADRADOS"
+            >
+              {speedInSquares} Q
+            </p>
+          </div>
         </div>
         <div className="w-24">
           <label

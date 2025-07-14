@@ -1,11 +1,13 @@
 import React from "react";
-import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { BoardToken } from "../../../entities/token/ui/BoardToken";
-import { Point } from "../../../shared/api/types"; // Importar Point
-import { useGameBoard } from "../model/contexts/GameBoardContext";
+import { Point } from "../../../shared/api/types";
+import { useGameBoard } from "../model/contexts/GameBoardContext"; // Importar useGameBoard
 
-export const BoardTokenLayer: React.FC = () => {
-  const { updateTokenPosition } = useTokens();
+interface BoardTokenLayerProps {
+  updateTokenPosition: (tokenId: string, newPosition: Point) => void;
+}
+
+export const BoardTokenLayer: React.FC<BoardTokenLayerProps> = ({ updateTokenPosition }) => {
   const {
     tokensOnBoard,
     characters,
@@ -19,13 +21,7 @@ export const BoardTokenLayer: React.FC = () => {
     onTokenDragEnd,
     multiSelectedTokenIds,
     handleBoardTokenDoubleClick,
-    onSetMultiSelectedTokenIds, // Nova prop
-    // Removendo props relacionadas ao HPModal, pois ele será renderizado em outro lugar
-    // activeHPModalTokenId,
-    // onHPModalAnchorShouldUpdate,
-    // onHPChange,
-    // onRemoveFromBoard,
-    // onMakeIndependent,
+    onSetMultiSelectedTokenIds,
   } = useGameBoard();
 
   return (
@@ -39,14 +35,27 @@ export const BoardTokenLayer: React.FC = () => {
           floodOpacity="0.5"
         />
       </filter>
+      
       {tokensOnBoard.map((token) => {
         const character = characters.find((c) => c.id === token.characterId);
         if (!character) return null;
+
+        let inspirationValue = false; 
+
+        if (character.type === 'Player') {
+          inspirationValue = character.inspiration ?? false;
+        }
+        
+        const characterForToken = {
+          ...character,
+          inspiration: inspirationValue,
+        };
+
         return (
           <BoardToken
             key={`${token.id}-${token.characterId}`}
             token={token}
-            character={character}
+            character={characterForToken}
             cellSize={gridSettings.visualCellSize}
             zoomLevel={zoomLevel}
             onMove={(tokenId: string, newPosition: Point) =>
@@ -55,19 +64,12 @@ export const BoardTokenLayer: React.FC = () => {
             activeTool={activeTool}
             pageSettings={pageSettings}
             getSVGPoint={getSVGPoint}
-            // onTokenSelectForHPModal removido, pois a lógica agora é gerenciada pelo GameBoardContext
             onTokenDragStart={onTokenDragStart}
             onTokenDragMove={onTokenDragMove}
             onTokenDragEnd={onTokenDragEnd}
             isMultiSelected={multiSelectedTokenIds.includes(token.id)}
             onBoardTokenDoubleClick={handleBoardTokenDoubleClick}
             onSetMultiSelectedTokenIds={onSetMultiSelectedTokenIds}
-            // As props do HPModal não são mais passadas para BoardToken
-            // activeHPModalTokenId={activeHPModalTokenId}
-            // onHPModalAnchorShouldUpdate={onHPModalAnchorShouldUpdate}
-            // onHPChange={onHPChange}
-            // onRemoveFromBoard={onRemoveFromBoard}
-            // onMakeIndependent={onMakeIndependent}
           />
         );
       })}

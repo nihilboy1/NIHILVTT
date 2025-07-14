@@ -3,7 +3,7 @@ import rollNotificationSound from "@/shared/assets/sounds/rollNotification.wav";
 import { useChat } from "@/features/chat/model/contexts/ChatContext";
 import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 import { useCallback } from "react";
-import { performDiceRoll } from "@/utils/dice/diceUtils"; // Importar a nova função
+import { performDiceRoll } from "../../lib/diceUtils";
 
 export function useDiceRoller() {
   const { sendMessage } = useChat();

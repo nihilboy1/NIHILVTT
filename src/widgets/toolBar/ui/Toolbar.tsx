@@ -1,7 +1,6 @@
+import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
 import { RulerPopover } from "../../../features/boardRuler/ui/RulerPopover";
-import { useBoardSettings } from "../../../features/boardSettings/contexts/BoardSettingsContext";
 import { DiceRollPopover } from "../../../features/diceRolling/ui/DiceRollPopover";
-import { useDiceRoller } from "../../../shared/lib/hooks/useDiceRoller";
 import { Tool } from "../../../shared/api/types";
 import { DEFAULT_PLAYER_NAME } from "../../../shared/config/constants"; // Importar DEFAULT_PLAYER_NAME
 import {
@@ -15,6 +14,7 @@ import { ToolbarButton } from "../../../shared/ui/ToolbarButton";
 import { ToolbarPopoverButton } from "../../../shared/ui/ToolbarPopoverButton";
 import { useToolbarState } from "../model/hooks/useToolbarState";
 import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
+import { useBoardSettingsStore } from "@/features/boardSettings/model/store";
 
 // barra lateral esquerda com os botões de ferramentas
 export function Toolbar() {
@@ -24,7 +24,7 @@ export function Toolbar() {
     setRulerPlacementMode,
     rulerPersists,
     setRulerPersists,
-  } = useBoardSettings();
+  } = useBoardSettingsStore();
   const { activeTool, setActiveTool, setIsToolbarVisible } = useUI();
 
   const { activePopover, setActivePopover } = useToolbarState({ activeTool });

@@ -1,21 +1,33 @@
 // src/entities/character/ui/playerSheet/principalTab/PrincipalHealthAndCombat.tsx
 
 import { useFormContext, useFieldArray } from "react-hook-form"; // 1. Importar useFieldArray
-import { useDiceRoller } from "../../../../../shared/lib/hooks/useDiceRoller";
 import { EditIcon, PlusCircleIcon } from "../../../../../shared/ui/Icons";
 import { CombatStats } from "./CombatStats";
 import { HealthSection } from "./HealthSection";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
-import { PlayerCharacterSchema } from "../../../model/schemas/character.schema";
-import { type Action } from "../../../../../shared/api/types";
+import { PlayerCharacter, HitDiceEntry, actionSchema } from "../../../model/schemas/character.schema";
+import { FieldArrayWithId } from "react-hook-form";
+import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
+import z from "zod";
 
+type Action = z.infer<typeof actionSchema>
 interface PrincipalHealthAndCombatProps {
   className?: string;
+  onEditAction: (actionId: string) => void; // New prop for editing actions
+  onDeleteHitDice: (index: number) => void; // New prop for deleting hit dice
+  hitDiceFields: FieldArrayWithId<PlayerCharacter, "hitDiceEntries", "id">[];
+  onAddHitDice: (value: HitDiceEntry) => void;
+  onRemoveHitDice: (index?: number | number[]) => void;
 }
 
-export function PrincipalHealthAndCombat({ className }: PrincipalHealthAndCombatProps) {
-  const { control, watch } = useFormContext<PlayerCharacterSchema>();
-  const { openModal } = useModal();
+export function PrincipalHealthAndCombat({
+  className,
+  onEditAction,
+  onDeleteHitDice,
+  hitDiceFields,
+  onAddHitDice,
+  onRemoveHitDice,
+}: PrincipalHealthAndCombatProps) {
+  const { control, watch } = useFormContext<PlayerCharacter>();
   const { rollDice } = useDiceRoller();
   const characterName = watch("name");
 
@@ -36,7 +48,7 @@ export function PrincipalHealthAndCombat({ className }: PrincipalHealthAndCombat
   };
 
   const handleOpenEditModal = (actionId: string) => {
-    openModal("actionEdit", { actionId: actionId }, false);
+    onEditAction(actionId); // Call the new onEditAction prop
   };
 
   return (
@@ -45,7 +57,12 @@ export function PrincipalHealthAndCombat({ className }: PrincipalHealthAndCombat
       <div>
         {/* 3. Passamos os nomes dos campos para os filhos */}
         <CombatStats />
-        <HealthSection />
+        <HealthSection
+          onDeleteHitDice={onDeleteHitDice}
+          fields={hitDiceFields}
+          append={onAddHitDice}
+          remove={onRemoveHitDice}
+        />
 
         <fieldset
           id="Ações"

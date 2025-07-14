@@ -7,7 +7,7 @@ import {
 } from "../../../shared/config/constants";
 import { cn } from "../../../shared/lib/utils/cn";
 import { Modal } from "../../../shared/ui/Modal";
-import { useBoardSettings } from "../contexts/BoardSettingsContext"; // Import useBoardSettings
+import { useBoardSettingsStore } from "../model/store";
 
 interface PageAndGridSettingsModalProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ export function PageSettingsModal({
     gridSettings: contextGridSettings,
     updatePageSettings,
     updateGridSettings,
-  } = useBoardSettings(); // Use context
+  } = useBoardSettingsStore(); // Use context
 
   // Estado para configurações da página
   const [widthInUnits, setWidthInUnits] = useState(

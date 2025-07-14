@@ -1,5 +1,5 @@
-import { PageSettings, Point, Tool } from "../../../shared/api/types";
-import { parseTokenSize } from "../../../shared/lib/utils/board/boardUtils";
+import { PageSettings, Point, Tool } from "@/shared/api/types";
+import { parseTokenSize } from "@/shared/lib/utils/board/boardUtils";
 import { useCallback, useEffect, useState } from "react";
 
 const CLICK_THRESHOLD_MS = 200;

@@ -1,11 +1,11 @@
-import { GridSettings, PageSettings, Point, CharacterType } from "@/shared/api/types"; // Adicionado CharacterType
+import { GridSettings, PageSettings, Point } from "@/shared/api/types"; // Adicionado CharacterType
 import { parseTokenSize } from "../../../../shared/lib/utils/board/boardUtils";
 import { useCallback } from "react";
-import { CharacterSchema } from "@/entities/character/model/schemas/character.schema";
+import { Character, CharacterTypeEnum} from "@/entities/character/model/schemas/character.schema";
 
 interface UseCharacterDropProps {
   getSVGPoint: (clientX: number, clientY: number) => Point;
-  characters: CharacterSchema[]; // Renomeado tokens para characters
+  characters: Character[]; // Renomeado tokens para characters
   gridSettings: GridSettings;
   pageSettings: PageSettings;
   addToken: (characterId: string, position: Point, currentHp?: number) => void; // Renomeado addGridInstance para addToken
@@ -69,8 +69,8 @@ export const useCharacterDrop = ({
 
         // Determina o HP inicial com base no tipo de personagem
         const initialHp =
-          character.type === CharacterType.PLAYER ||
-          character.type === CharacterType.MONSTER_NPC
+          character.type === CharacterTypeEnum.enum.Player ||
+          character.type === CharacterTypeEnum.enum["Monster/NPC"]
             ? character.combatStats.maxHp
             : undefined;
 

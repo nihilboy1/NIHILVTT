@@ -9,6 +9,7 @@ import { useGameBoardInteractionContext } from "../../gameBoard/model/contexts/G
 import { SheetModal } from "../../sheetModal/ui/SheetModal";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 import { ModalEntry } from "@/features/modalManager/model/hooks/useModalStateManagement";
+import { ActionEditModal } from "../../../features/characterEditAction/ui/ActionEditModal"; // New import
 
 // 1. Novas Importações: Trocamos os tipos manuais pelo CharacterSchema do Zod.
 import { type Token } from "@/shared/api/types";
@@ -65,7 +66,15 @@ export function ModalManager() {
             );
           
           case "actionEdit": {
-            return null;
+            return (
+              <ActionEditModal
+                key={modalEntry.id}
+                isOpen={true}
+                onClose={closeModal}
+                actionId={props.actionId as string}
+                zIndex={1500 + index} // Action edit modal zIndex (between sheet and confirmation)
+              />
+            );
           }
 
           case "hpControl":

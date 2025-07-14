@@ -1,4 +1,6 @@
-import { PageSettings, CharacterType } from "../api/types";
+import z from "zod";
+import { PageSettings } from "../api/types";
+import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
 
 export const GRID_CELL_SIZE = 50; // Tamanho visual padrão de uma célula da grade em pixels com zoom 1.0
 export const INITIAL_ZOOM_LEVEL = 1.0;
@@ -25,15 +27,17 @@ export const DEFAULT_PLAYER_LEVEL = 1;
 // export const DEFAULT_PLAYER_XP = 0; // Removido - XP não é mais usado
 export const DEFAULT_PLAYER_INSPIRATION = false;
 
+type CharacterType = z.infer<typeof CharacterTypeEnum>;
+
 // Mapeamento para tradução dos tipos de personagem
 export const characterTypeTranslations: Record<CharacterType, string> = {
-  [CharacterType.PLAYER]: "Jogador",
-  [CharacterType.MONSTER_NPC]: "Monstro/NPC",
-  [CharacterType.OBJECT]: "Objeto",
+  Player: "Jogador",
+  "Monster/NPC": "Monstro/NPC",
+  Object: "Objeto",
 };
 
 // Esta constante pode ser usada para gerar opções em selects se necessário.
-export const CHARACTER_TYPES_OPTIONS = Object.values(CharacterType).map((type) => ({
+export const CHARACTER_TYPES_OPTIONS = CharacterTypeEnum.options.map((type) => ({
   value: type,
   label: characterTypeTranslations[type],
 }));

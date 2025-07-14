@@ -2,8 +2,8 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 // 1. MUDANÇA NA IMPORTAÇÃO: Removemos o 'Character' antigo e importamos o 'CharacterSchema' do Zod.
-import { type Point, CharacterType, type Token } from "../../../shared/api/types";
-import { type CharacterSchema } from "@/entities/character/model/schemas/character.schema";
+import { type Point, type Token } from "../../../shared/api/types";
+import { CharacterTypeEnum, type Character } from "@/entities/character/model/schemas/character.schema";
 import useDismissable from "../../../shared/lib/hooks/useDismissable";
 import { calculateNewHP } from "../../../shared/lib/utils/hpUtils";
 import { DetatchIcon, XMarkIcon } from "../../../shared/ui/Icons";
@@ -11,7 +11,7 @@ import { DetatchIcon, XMarkIcon } from "../../../shared/ui/Icons";
 interface HPControlModalProps {
   tokenId: string | null;
   // 2. MUDANÇA NA PROP: A prop 'character' agora espera o tipo do Zod.
-  character: CharacterSchema | null;
+  character: Character | null;
   token: Token | null;
   anchorPoint: Point | null;
   isOpen: boolean;
@@ -42,7 +42,7 @@ export function HPControlModal({
 
   useEffect(() => {
     if (isOpen && token && character) {
-      if (character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) {
+      if (character.type === CharacterTypeEnum.enum.Player || character.type === CharacterTypeEnum.enum["Monster/NPC"]) {
         // A lógica continua funcionando, pois a estrutura de 'combatStats' é a mesma.
         setEditableHP(String(token.currentHp ?? character.combatStats.maxHp));
       } else {
@@ -70,7 +70,7 @@ export function HPControlModal({
     let maxHp: number;
     let currentActualHp: number;
 
-    if (character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) {
+    if (character.type === CharacterTypeEnum.enum.Player || character.type === CharacterTypeEnum.enum["Monster/NPC"]) {
       maxHp = character.combatStats.maxHp;
       currentActualHp = parseInt(editableHP, 10); // currentActualHp é o valor digitado no input
     } else {
@@ -170,7 +170,7 @@ export function HPControlModal({
         data-testid="max-hp-display"
         className="text-sm font-medium min-w-[1.25rem] text-center select-none"
       >
-        {(character.type === CharacterType.PLAYER || character.type === CharacterType.MONSTER_NPC) ? character.combatStats.maxHp : "N/A"}
+        {(character.type === CharacterTypeEnum.enum.Player || character.type === CharacterTypeEnum.enum["Monster/NPC"]) ? character.combatStats.maxHp : "N/A"}
       </span>
 
       {showMakeIndependentButton && (

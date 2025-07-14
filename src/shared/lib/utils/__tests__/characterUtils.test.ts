@@ -1,7 +1,4 @@
-import {
-  getContrastingTextColor,
-  parseCharacterSize,
-} from "../characterUtils";
+import { getContrastingTextColor, parseCharacterSize } from "@/entities/character/lib/utils/characterUtils";
 
 describe("getContrastingTextColor", () => {
   test('deve retornar "var(--color-raisin-black)" para cores claras', () => {

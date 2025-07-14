@@ -1,8 +1,9 @@
 import React from "react";
-import { GameBoardProvider } from "../model/contexts/GameBoardContext";
 import { GameBoardContent } from "./GameBoardContent";
 import { DraggingVisuals, Point } from "../../../shared/api/types";
-import { HPModalRenderer } from "./HPModalRenderer"; // Importar o novo componente
+import { HPModalRenderer } from "./HPModalRenderer";
+import { GameBoardProvider, useGameBoard } from "../model/contexts/GameBoardContext"; // Importar GameBoardProvider e useGameBoard
+
 
 interface GameBoardProps {
   onBackgroundClick?: () => void;
@@ -16,13 +17,44 @@ interface GameBoardProps {
   onHPChange: (tokenId: string, newHP: number) => void;
   onRemoveFromBoard: (tokenId: string) => void;
   onMakeIndependent: (tokenId: string) => void;
+  onTokenSelectForHPModal?: (
+    tokenId: string,
+    tokenScreenRect: DOMRect | null
+  ) => void; // Adicionado
 }
 
 export const GameBoard: React.FC<GameBoardProps> = (props) => {
+  // Os hooks useBoardSettings, useUI, useCharacters, useTokens, useModal
+  // agora são consumidos dentro do GameBoardProvider, então não são necessários aqui.
+  // isPageAndGridSettingsModalOpen e setIsPageAndGridSettingsModalOpen também são gerenciados pelo contexto.
+
   return (
-    <GameBoardProvider {...props}>
-      <GameBoardContent />
-      <HPModalRenderer /> {/* Renderizar o HPModalRenderer aqui */}
+    <GameBoardProvider
+      onTokenSelectForHPModal={props.onTokenSelectForHPModal}
+      onBackgroundClick={props.onBackgroundClick}
+      draggingVisuals={props.draggingVisuals}
+      onTokenDragStart={props.onTokenDragStart}
+      onTokenDragMove={props.onTokenDragMove}
+      onTokenDragEnd={props.onTokenDragEnd}
+      multiSelectedTokenIds={props.multiSelectedTokenIds}
+      onSetMultiSelectedTokenIds={props.onSetMultiSelectedTokenIds}
+      onClearMultiSelection={props.onClearMultiSelection}
+      onHPChange={props.onHPChange}
+      onRemoveFromBoard={props.onRemoveFromBoard}
+      onMakeIndependent={props.onMakeIndependent}
+    >
+      <GameBoardOrchestrator />
     </GameBoardProvider>
+  );
+};
+
+const GameBoardOrchestrator: React.FC = () => { // Remover props aqui
+  const { updateTokenPosition } = useGameBoard(); // Apenas o que é usado diretamente aqui
+
+  return (
+    <>
+      <GameBoardContent updateTokenPosition={updateTokenPosition} />
+      <HPModalRenderer />
+    </>
   );
 };

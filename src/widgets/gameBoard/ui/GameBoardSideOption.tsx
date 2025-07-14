@@ -1,4 +1,4 @@
-import { ZoomControls } from "../../../features/boardPanningAndZoom/ui/ZoomControls";
+import { ZoomControls } from "@/entities/board/ui/ZoomControls";
 import { PageSettingsButton } from "../../../features/boardSettings/ui/PageSettingsButton";
 import { cn } from "../../../shared/lib/utils/cn";
 

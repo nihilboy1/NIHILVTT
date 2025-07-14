@@ -4,19 +4,18 @@ import {
   type PageSettings,
   type Point,
   type Token,
-  CharacterType, // Adicionado CharacterType
 } from "../../../shared/api/types";
-import { parseCharacterSize } from "../../../shared/lib/utils/characterUtils";
 import { getFirstName } from "../../../shared/lib/utils/nameUtils";
 import { useSelectedToken } from "../model/contexts/SelectedTokenContext";
 import { HealthBar } from "./HealthBar";
 import { TokenVisual, TokenVisualMetrics } from "./TokenVisual";
-import { useTokenDrag } from "../../../shared/lib/hooks/useTokenDrag";
-import { CharacterSchema } from "@/entities/character/model/schemas/character.schema";
+import { Character, CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
+import { parseCharacterSize } from "@/entities/character/lib/utils/characterUtils";
+import { useTokenDrag } from "../model/hooks/useTokenDrag";
 
 interface BoardTokenProps {
   token: Token;
-  character: CharacterSchema;
+  character: Character;
   cellSize: number;
   zoomLevel: number;
   onMove: (tokenId: string, newPosition: Point) => void;
@@ -188,8 +187,8 @@ export function BoardToken({
       data-token-id={token.id}
     >
       {/* Renderiza HealthBar apenas para PlayerCharacter ou MonsterNPCCharacter */}
-      {(character.type === CharacterType.PLAYER ||
-        character.type === CharacterType.MONSTER_NPC) && (
+      {(character.type === CharacterTypeEnum.enum.Player ||
+        character.type === CharacterTypeEnum.enum["Monster/NPC"]) && (
         <HealthBar
           currentHp={token.currentHp}
           maxHp={character.combatStats.maxHp}
