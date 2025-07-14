@@ -1,29 +1,41 @@
 import React from "react";
 import { BoardToken } from "../../../entities/token/ui/BoardToken";
-import { Point } from "../../../shared/api/types";
-import { useGameBoard } from "../model/contexts/GameBoardContext"; // Importar useGameBoard
+import { Point, GridSettings, PageSettings, Tool, Token } from "../../../shared/api/types";
+import { type Character } from "@/entities/character/model/schemas/character.schema";
 
 interface BoardTokenLayerProps {
   updateTokenPosition: (tokenId: string, newPosition: Point) => void;
+  tokensOnBoard: Token[];
+  characters: Character[];
+  gridSettings: GridSettings;
+  zoomLevel: number;
+  activeTool: Tool;
+  pageSettings: PageSettings;
+  getSVGPoint: (clientX: number, clientY: number) => Point;
+  onTokenDragStart: (tokenId: string) => void;
+  onTokenDragMove: (tokenId: string, visualSVGPoint: Point) => void;
+  onTokenDragEnd: (tokenId: string) => void;
+  multiSelectedTokenIds: string[];
+  handleBoardTokenDoubleClick: (tokenId: string, altKey: boolean) => void;
+  onSetMultiSelectedTokenIds: (ids: string[]) => void;
 }
 
-export const BoardTokenLayer: React.FC<BoardTokenLayerProps> = ({ updateTokenPosition }) => {
-  const {
-    tokensOnBoard,
-    characters,
-    gridSettings,
-    zoomLevel,
-    activeTool,
-    pageSettings,
-    getSVGPoint,
-    onTokenDragStart,
-    onTokenDragMove,
-    onTokenDragEnd,
-    multiSelectedTokenIds,
-    handleBoardTokenDoubleClick,
-    onSetMultiSelectedTokenIds,
-  } = useGameBoard();
-
+export const BoardTokenLayer: React.FC<BoardTokenLayerProps> = ({
+  updateTokenPosition,
+  tokensOnBoard,
+  characters,
+  gridSettings,
+  zoomLevel,
+  activeTool,
+  pageSettings,
+  getSVGPoint,
+  onTokenDragStart,
+  onTokenDragMove,
+  onTokenDragEnd,
+  multiSelectedTokenIds,
+  handleBoardTokenDoubleClick,
+  onSetMultiSelectedTokenIds,
+}) => {
   return (
     <>
       <filter id="tokenDragShadow" x="-50%" y="-50%" width="200%" height="200%">
@@ -36,8 +48,8 @@ export const BoardTokenLayer: React.FC<BoardTokenLayerProps> = ({ updateTokenPos
         />
       </filter>
       
-      {tokensOnBoard.map((token) => {
-        const character = characters.find((c) => c.id === token.characterId);
+      {tokensOnBoard.map((token: Token) => {
+        const character = characters.find((c: Character) => c.id === token.characterId);
         if (!character) return null;
 
         let inspirationValue = false; 

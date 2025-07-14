@@ -1,8 +1,13 @@
 import React from "react";
-import { useGameBoard } from "../model/contexts/GameBoardContext";
+import { GridSettings, PageSettings } from "@/shared/api/types";
 
-export const GridLayer: React.FC = () => {
-  const { gridSettings, pageSettings, zoomLevel } = useGameBoard();
+interface GridLayerProps {
+  gridSettings: GridSettings;
+  pageSettings: PageSettings;
+  zoomLevel: number;
+}
+
+export const GridLayer: React.FC<GridLayerProps> = ({ gridSettings, pageSettings, zoomLevel }) => {
   const gridStrokeWidth = 0.5 / zoomLevel;
   const dynamicGridStrokeWidth = Math.min(0.8, Math.max(0.2, gridStrokeWidth));
   const pageBorderStrokeWidth = Math.max(0.5, 1 / zoomLevel);

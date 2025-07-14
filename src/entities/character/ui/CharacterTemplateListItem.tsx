@@ -2,8 +2,8 @@ import React, { useRef, useState } from "react";
 import { characterTypeTranslations } from "../../../shared/config/constants";
 import { DotsThreeVerticalIcon } from "../../../shared/ui/Icons";
 import { OptionsPopover } from "../../../shared/ui/OptionsPopover";
-import { useCharacters } from "../model/contexts/CharactersContext"; // Caminho corrigido
 import { Character } from "../model/schemas/character.schema";
+import { useCharactersStore } from "../model/store";
 
 interface CharacterTemplateListItemProps {
   character: Character;
@@ -18,7 +18,7 @@ export function CharacterTemplateListItem({
   openSheetModal,
   onDelete, // Destructure new prop
 }: CharacterTemplateListItemProps) {
-  const { duplicateCharacter } = useCharacters(); // Renomeado
+  const { duplicateCharacter } = useCharactersStore(); // Renomeado
 
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const popoverAnchorRef = useRef<HTMLButtonElement>(null);

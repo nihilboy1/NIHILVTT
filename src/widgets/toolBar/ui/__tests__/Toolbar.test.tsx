@@ -2,8 +2,6 @@ import { Toolbar } from "@/widgets/toolBar/ui/Toolbar";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { ChatContext } from "@/features/chat/model/contexts/ChatContext"; // Corrigido
-import { BoardSettingsContext } from "@/features/boardSettings/contexts/BoardSettingsContext"; // Corrigido
-import { type BoardSettingsState } from "@/features/boardSettings/hooks/useBoardSettingsState"; // Corrigido
 import { type ChatState } from "@/features/chat/model/hooks/useChatState"; // Corrigido
 import { RulerPlacementMode, SidebarTab, Tool } from "@/shared/api/types"; // Corrigido
 import {
@@ -14,17 +12,18 @@ import {
 
 import { UIContext } from "@/features/layoutControls/model/contexts/UIProvider"; // Corrigido
 import { UIState } from "@/features/layoutControls/model/hooks/useUIState"; // Corrigido
+import { type BoardSettingsState } from "@/features/boardSettings/model/store";
 
 // Mock the actual hook modules and their return values
 const mockUseUIState = jest.fn();
-const mockUseBoardSettingsState = jest.fn();
+const mockUseBoardSettingsStore = jest.fn();
 const mockUseChatState = jest.fn();
 
 jest.mock("@/app/providers/useUIState", () => ({ // Corrigido
   useUIState: () => mockUseUIState(),
 }));
-jest.mock("@/features/boardSettings/hooks/useBoardSettingsState", () => ({ // Corrigido
-  useBoardSettingsState: () => mockUseBoardSettingsState(),
+jest.mock("@/features/boardSettings/model/store", () => ({
+  useBoardSettingsStore: () => mockUseBoardSettingsStore(),
 }));
 jest.mock("@/features/chat/model/hooks/useChatState", () => ({ // Corrigido
   useChatState: () => mockUseChatState(),
@@ -82,7 +81,7 @@ const renderToolbar = (
     ...defaultMockUIState,
     ...uiState,
   });
-  mockUseBoardSettingsState.mockReturnValue({
+  mockUseBoardSettingsStore.mockReturnValue({
     ...defaultMockBoardSettingsState,
     ...boardSettingsState,
   });
@@ -93,13 +92,9 @@ const renderToolbar = (
 
   return render(
     <UIContext.Provider value={{ ...defaultMockUIState, ...uiState }}>
-      <BoardSettingsContext.Provider
-        value={{ ...defaultMockBoardSettingsState, ...boardSettingsState }}
-      >
-        <ChatContext.Provider value={{ ...defaultMockChatState, ...chatState }}>
-          <Toolbar />
-        </ChatContext.Provider>
-      </BoardSettingsContext.Provider>
+      <ChatContext.Provider value={{ ...defaultMockChatState, ...chatState }}>
+        <Toolbar />
+      </ChatContext.Provider>
     </UIContext.Provider>
   );
 };
@@ -109,7 +104,7 @@ describe("Toolbar", () => {
     jest.clearAllMocks();
     // Reset mocks before each test
     mockUseUIState.mockClear();
-    mockUseBoardSettingsState.mockClear();
+    mockUseBoardSettingsStore.mockClear();
     mockUseChatState.mockClear();
   });
 

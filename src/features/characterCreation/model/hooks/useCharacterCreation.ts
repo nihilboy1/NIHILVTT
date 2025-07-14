@@ -1,15 +1,15 @@
 // src/features/characterCreation/model/hooks/useCharacterCreation.ts
 
 import { useCallback } from 'react';
-import { useCharacters } from "@/entities/character/model/contexts/CharactersContext";
 import {
   DEFAULT_PLAYER_DATA,
   DEFAULT_MONSTER_DATA,
 } from "@/shared/config/sheetDefaults";
 import { CharacterTypeEnum } from '@/entities/character/model/schemas/character.schema';
+import { useCharactersStore } from '@/entities/character/model/store';
 
 export function useCharacterCreation() {
-  const { addCharacter } = useCharacters();
+  const { addCharacter } = useCharactersStore();
 
   // As funções agora aceitam um 'name' como argumento
   const createPlayerCharacter = useCallback((name: string) => {

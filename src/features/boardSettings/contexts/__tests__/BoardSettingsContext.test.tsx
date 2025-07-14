@@ -1,134 +1,76 @@
-import "@testing-library/jest-dom"; // Importar para toHaveTextContent
-import { fireEvent, render, screen } from "@testing-library/react";
-import {
-  BoardSettingsProvider,
-  useBoardSettings,
-} from "@/features/boardSettings/contexts/BoardSettingsContext";
-import { useBoardSettingsState } from "@/features/boardSettings/hooks/useBoardSettingsState";
+import { act, renderHook } from "@testing-library/react";
+import { useBoardSettingsStore } from "../../model/store";
+import { RulerPlacementMode } from "@/shared/api/types";
 
-// Mock the useBoardSettingsState hook
-jest.mock("../hooks/useBoardSettingsState", () => ({
-  useBoardSettingsState: jest.fn(),
-}));
-
-const mockBoardSettingsState = {
-  gridSettings: {
-    visualCellSize: 50,
-    lineColor: "#000000",
-    metersPerSquare: 1.5,
-  },
-  pageSettings: {
-    widthInUnits: 30,
-    heightInUnits: 30,
-    backgroundColor: "#FFFFFF",
-  },
-  rulerPlacementMode: "SNAP_TO_CENTER",
-  rulerPersists: false,
-  updateGridSettings: jest.fn(),
-  updatePageSettings: jest.fn(),
-  setRulerPlacementMode: jest.fn(),
-  setRulerPersists: jest.fn(),
-};
-
-describe("BoardSettingsContext", () => {
+describe("useBoardSettingsStore (Context-like behavior)", () => {
+  // Reset the store to its initial state before each test
   beforeEach(() => {
-    // Reset mock before each test
-    (useBoardSettingsState as jest.Mock).mockReturnValue(
-      mockBoardSettingsState
-    );
+    // This is a common pattern with Zustand to reset the store for testing
+    // You might need to adjust this based on how your useBoardSettingsStore is implemented
+    // For example, if it has a `reset` method or if you can re-initialize it.
+    // For now, we'll assume a fresh hook render is enough for isolation.
   });
 
-  test("useBoardSettings deve lançar um erro se não for usado dentro de um BoardSettingsProvider", () => {
-    const TestComponent = () => {
-      useBoardSettings();
-      return null;
-    };
+  it("deve inicializar o estado com valores padrão", () => {
+    const { result } = renderHook(() => useBoardSettingsStore());
 
-    // Suprimir o erro do console para este teste específico
-    const consoleErrorSpy = jest
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-
-    expect(() => render(<TestComponent />)).toThrow(
-      "useBoardSettings must be used within a BoardSettingsProvider"
-    );
-
-    consoleErrorSpy.mockRestore(); // Restaurar o console.error
+    expect(result.current.gridSettings.visualCellSize).toBe(50);
+    expect(result.current.gridSettings.lineColor).toBe("#788475");
+    expect(result.current.gridSettings.metersPerSquare).toBe(1.5);
+    expect(result.current.pageSettings.widthInUnits).toBe(30);
+    expect(result.current.pageSettings.heightInUnits).toBe(30);
+    expect(result.current.pageSettings.backgroundColor).toBe("#FFFFFF");
+    expect(result.current.rulerPlacementMode).toBe(RulerPlacementMode.SNAP_TO_CENTER);
+    expect(result.current.rulerPersists).toBe(false);
   });
 
-  test("BoardSettingsProvider deve fornecer o estado do useBoardSettingsState", () => {
-    const TestComponent = () => {
-      const context = useBoardSettings();
-      return (
-        <div>
-          <span data-testid="visualCellSize">
-            {context.gridSettings.visualCellSize}
-          </span>
-          <span data-testid="lineColor">{context.gridSettings.lineColor}</span>
-          <span data-testid="widthInUnits">
-            {context.pageSettings.widthInUnits}
-          </span>
-        </div>
-      );
-    };
+  it("deve atualizar as configurações da grade com updateGridSettings", () => {
+    const { result } = renderHook(() => useBoardSettingsStore());
 
-    render(
-      <BoardSettingsProvider>
-        <TestComponent />
-      </BoardSettingsProvider>
-    );
-
-    expect(screen.getByTestId("visualCellSize")).toHaveTextContent("50");
-    expect(screen.getByTestId("lineColor")).toHaveTextContent("#000000");
-    expect(screen.getByTestId("widthInUnits")).toHaveTextContent("30");
-  });
-
-  test("as funções do contexto devem ser chamáveis", () => {
-    const TestComponent = () => {
-      const {
-        updateGridSettings,
-        updatePageSettings,
-        setRulerPlacementMode,
-        setRulerPersists,
-      } = useBoardSettings();
-      return (
-        <div>
-          <button onClick={() => updateGridSettings({ visualCellSize: 100 })}>
-            Update Grid
-          </button>
-          <button onClick={() => updatePageSettings({ widthInUnits: 50 })}>
-            Update Page
-          </button>
-          <button onClick={() => setRulerPlacementMode("FREE_PLACEMENT")}>
-            Set Mode
-          </button>
-          <button onClick={() => setRulerPersists(true)}>Set Persist</button>
-        </div>
-      );
-    };
-
-    render(
-      <BoardSettingsProvider>
-        <TestComponent />
-      </BoardSettingsProvider>
-    );
-
-    fireEvent.click(screen.getByText("Update Grid"));
-    expect(mockBoardSettingsState.updateGridSettings).toHaveBeenCalledWith({
-      visualCellSize: 100,
+    act(() => {
+      result.current.updateGridSettings({
+        visualCellSize: 100,
+        lineColor: "#FF0000",
+      });
     });
 
-    fireEvent.click(screen.getByText("Update Page"));
-    expect(mockBoardSettingsState.updatePageSettings).toHaveBeenCalledWith({
-      widthInUnits: 50,
+    expect(result.current.gridSettings.visualCellSize).toBe(100);
+    expect(result.current.gridSettings.lineColor).toBe("#FF0000");
+    expect(result.current.gridSettings.metersPerSquare).toBe(1.5);
+  });
+
+  it("deve atualizar as configurações da página com updatePageSettings", () => {
+    const { result } = renderHook(() => useBoardSettingsStore());
+
+    act(() => {
+      result.current.updatePageSettings({
+        widthInUnits: 50,
+        backgroundColor: "#0000FF",
+      });
     });
 
-    fireEvent.click(screen.getByText("Set Mode"));
-    expect(mockBoardSettingsState.setRulerPlacementMode).toHaveBeenCalledWith(
-      "FREE_PLACEMENT"
-    );
+    expect(result.current.pageSettings.widthInUnits).toBe(50);
+    expect(result.current.pageSettings.heightInUnits).toBe(30);
+    expect(result.current.pageSettings.backgroundColor).toBe("#0000FF");
+  });
 
-    fireEvent.click(screen.getByText("Set Persist"));
-    expect(mockBoardSettingsState.setRulerPersists).toHaveBeenCalledWith(true);
+  it("deve definir o modo de posicionamento da régua com setRulerPlacementMode", () => {
+    const { result } = renderHook(() => useBoardSettingsStore());
+
+    act(() => {
+      result.current.setRulerPlacementMode(RulerPlacementMode.FREE_PLACEMENT);
+    });
+
+    expect(result.current.rulerPlacementMode).toBe(RulerPlacementMode.FREE_PLACEMENT);
+  });
+
+  it("deve definir a persistência da régua com setRulerPersists", () => {
+    const { result } = renderHook(() => useBoardSettingsStore());
+
+    act(() => {
+      result.current.setRulerPersists(true);
+    });
+
+    expect(result.current.rulerPersists).toBe(true);
   });
 });

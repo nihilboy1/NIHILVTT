@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useCharacters } from "../../../../entities/character/model/contexts/CharactersContext";
 import { useTokens } from "../../../../entities/token/model/contexts/TokenContext";
 import { useSelectedToken } from "../../../../entities/token/model/contexts/SelectedTokenContext";
 import { HP_MODAL_ESTIMATED_HEIGHT_REM } from "../../../../features/characterUpdateHp/ui/HPControlModal";
@@ -12,6 +11,7 @@ import {
 import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 import { ModalEntry } from "@/features/modalManager/model/hooks/useModalStateManagement";
+import { useCharactersStore } from "@/entities/character/model/store";
 
 
 interface UseGameBoardInteractionProps {
@@ -45,7 +45,7 @@ interface UseGameBoardInteractionReturn {
 export const useGameBoardInteraction = ({
   gameBoardRef,
 }: UseGameBoardInteractionProps): UseGameBoardInteractionReturn => {
-  const { characters } = useCharacters();
+  const { characters } = useCharactersStore();
   const {
     tokensOnBoard,
     removeToken,

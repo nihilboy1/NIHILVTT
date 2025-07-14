@@ -1,15 +1,15 @@
 import React from "react";
-import { RulerPathState, RulerPointData } from "../../../shared/api/types";
+import { RulerPathState, RulerPointData, GridSettings } from "../../../shared/api/types";
 import { calculateDistanceInMeters } from "../../../shared/lib/utils/board/boardUtils";
-import { useGameBoard } from "../../../widgets/gameBoard/model/contexts/GameBoardContext"; // Importar useGameBoard
-
 // 2. A interface de props agora define que o componente deve receber o 'rulerPath'.
 interface RulerLayerProps {
   rulerPath: RulerPathState;
+  zoomLevel: number;
+  gridSettings: GridSettings;
 }
-export function RulerLayer({rulerPath}:RulerLayerProps)  {
+export function RulerLayer({rulerPath, zoomLevel, gridSettings}:RulerLayerProps)  {
    // 3. A chamada de hook agora busca apenas os dados GERAIS do tabuleiro no contexto da entidade 'board'.
-  const { zoomLevel, gridSettings } = useGameBoard(); // Usar useGameBoard
+  // const { zoomLevel, gridSettings } = useGameBoard(); // Usar useGameBoard
   
   // 4. A prop 'rulerPath' agora vem diretamente dos argumentos do componente.
   // const { rulerPath } = useGameBoard(); // Linha antiga removida.

@@ -1,7 +1,6 @@
 // src/widgets/sheetModal/ui/SheetModal.tsx
 
 import { FormProvider, useFieldArray } from "react-hook-form";
-import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
 import {
   useCharacterSheetForm,
   type SaveStatus,
@@ -12,6 +11,7 @@ import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
 import { DiceFormula } from "@/shared/api/types";
+import { useCharactersStore } from "@/entities/character/model/store";
 
 interface CharacterSheetModalProps {
   characterId: string | null;
@@ -59,7 +59,7 @@ export function SheetModal({
   onClose,
   zIndex,
 }: CharacterSheetModalProps) {
-  const { characters, updateCharacter } = useCharacters();
+  const { characters, updateCharacter } = useCharactersStore();
   const { openModal, closeModal } = useModal();
 
   const initialCharacterData = characterId

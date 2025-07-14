@@ -1,13 +1,11 @@
 import React from "react";
 import { MarqueeSelectionState } from "../../../shared/api/types";
-import { useGameBoard } from "../../../widgets/gameBoard/model/contexts/GameBoardContext"; // Importar useGameBoard
-
 interface MarqueeLayerProps {
   marqueeSelection: MarqueeSelectionState;
+  zoomLevel: number;
 }
 
-export const MarqueeLayer: React.FC<MarqueeLayerProps> = ({ marqueeSelection }) => {
-  const { zoomLevel } = useGameBoard(); // Usar useGameBoard
+export const MarqueeLayer: React.FC<MarqueeLayerProps> = ({ marqueeSelection, zoomLevel }) => {
 
   const marqueeRectProps =
     marqueeSelection.isActive &&

@@ -1,7 +1,6 @@
 // src/widgets/modalManager/ui/ModalManager.tsx
 
 import { HPControlModal } from "../../../features/characterUpdateHp/ui/HPControlModal";
-import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
 import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { SimpleNameModal } from "../../../features/characterCreation/ui/SimpleNameModal";
 import { ConfirmationModal } from "../../../shared/ui/ConfirmationModal";
@@ -13,13 +12,14 @@ import { ActionEditModal } from "../../../features/characterEditAction/ui/Action
 
 // 1. Novas Importações: Trocamos os tipos manuais pelo CharacterSchema do Zod.
 import { type Token } from "@/shared/api/types";
+import { useCharactersStore } from "@/entities/character/model/store";
 
 
 export function ModalManager() {
   const { handleHPChangeFromModal, handleRemoveInstanceFromBoard, handleMakeInstanceIndependent } = useGameBoardInteractionContext();
   const { modalStack, closeModal } = useModal();
   // `characters` agora é do tipo `CharacterSchema[]`
-  const { characters } = useCharacters();
+  const { characters } = useCharactersStore();
   const { tokensOnBoard } = useTokens();
 
   const topModal = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;

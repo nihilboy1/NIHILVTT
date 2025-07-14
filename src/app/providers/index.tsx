@@ -1,4 +1,3 @@
-import { CharactersProvider } from "../../entities/character/model/contexts/CharactersContext";
 import { SelectedTokenProvider } from "../../entities/token/model/contexts/SelectedTokenContext";
 import { TokenProvider } from "../../entities/token/model/contexts/TokenContext";
 import { ChatProvider } from "../../features/chat/model/contexts/ChatContext";
@@ -7,7 +6,6 @@ import { ModalProvider } from "../../features/modalManager/model/contexts/ModalP
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
   return (
-    <CharactersProvider>
       <TokenProvider>
         <ChatProvider>
             <UIProvider>
@@ -17,6 +15,5 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             </UIProvider>
         </ChatProvider>
       </TokenProvider>
-    </CharactersProvider>
   );
 }

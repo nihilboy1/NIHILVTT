@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
-import { useBoardSettingsState } from "../useBoardSettingsState";
+import { useBoardSettingsStore } from "../../model/store";
 
-describe("useBoardSettingsState", () => {
+describe("useBoardSettingsStore", () => {
   it("deve inicializar o estado com valores padrão", () => {
-    const { result } = renderHook(() => useBoardSettingsState());
+    const { result } = renderHook(() => useBoardSettingsStore());
 
     expect(result.current.gridSettings.visualCellSize).toBe(50); // GRID_CELL_SIZE
     expect(result.current.gridSettings.lineColor).toBe("#788475");
@@ -16,7 +16,7 @@ describe("useBoardSettingsState", () => {
   });
 
   it("deve atualizar as configurações da grade com updateGridSettings", () => {
-    const { result } = renderHook(() => useBoardSettingsState());
+    const { result } = renderHook(() => useBoardSettingsStore());
 
     act(() => {
       result.current.updateGridSettings({
@@ -31,7 +31,7 @@ describe("useBoardSettingsState", () => {
   });
 
   it("deve atualizar as configurações da página com updatePageSettings", () => {
-    const { result } = renderHook(() => useBoardSettingsState());
+    const { result } = renderHook(() => useBoardSettingsStore());
 
     act(() => {
       result.current.updatePageSettings({
@@ -46,7 +46,7 @@ describe("useBoardSettingsState", () => {
   });
 
   it("deve definir o modo de posicionamento da régua com setRulerPlacementMode", () => {
-    const { result } = renderHook(() => useBoardSettingsState());
+    const { result } = renderHook(() => useBoardSettingsStore());
 
     act(() => {
       result.current.setRulerPlacementMode("FREE_PLACEMENT");
@@ -56,7 +56,7 @@ describe("useBoardSettingsState", () => {
   });
 
   it("deve definir a persistência da régua com setRulerPersists", () => {
-    const { result } = renderHook(() => useBoardSettingsState());
+    const { result } = renderHook(() => useBoardSettingsStore());
 
     act(() => {
       result.current.setRulerPersists(true);

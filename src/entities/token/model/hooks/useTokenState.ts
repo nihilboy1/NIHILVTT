@@ -7,7 +7,7 @@ import { type Point, type Token } from "../../../../shared/api/types";
 import { type Character } from "@/entities/character/model/schemas/character.schema";
 
 import { generateUniqueId } from "../../../../shared/lib/utils/id/idUtils";
-import { useCharacters } from "@/entities/character/model/contexts/CharactersContext";
+import { useCharactersStore } from "@/entities/character/model/store";
 
 export interface TokenState {
   tokensOnBoard: Token[];
@@ -21,7 +21,7 @@ export interface TokenState {
 }
 
 export const useTokenState = (): TokenState => {
-  const { characters, addCharacter, deleteCharacter } = useCharacters();
+  const { characters, addCharacter, deleteCharacter } = useCharactersStore();
   const [tokensOnBoard, setTokensOnBoard] = useState<Token[]>([]);
   const [tokenInstanceCounts, setTokenInstanceCounts] = useState<
     Map<string, number>

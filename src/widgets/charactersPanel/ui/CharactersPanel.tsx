@@ -1,15 +1,15 @@
 import { GiAncientSword, GiNinjaHeroicStance } from "react-icons/gi";
-import { useCharacters } from "../../../entities/character/model/contexts/CharactersContext";
 import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { CharacterTemplateListItem } from "../../../entities/character/ui/CharacterTemplateListItem";
 import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
 import {
   CharacterTypeEnum,
 } from "@/entities/character/model/schemas/character.schema";
+import { useCharactersStore } from "@/entities/character/model/store";
 
 // painel de personagens geral
 export function CharactersPanel() {
-  const { characters, deleteCharacter } = useCharacters();
+  const { characters, deleteCharacter } = useCharactersStore();
   const { tokenInstanceCounts } = useTokens(); // Renomeado
   const { openModal, closeModal } = useModal();
 
