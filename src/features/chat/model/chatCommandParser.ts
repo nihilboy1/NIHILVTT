@@ -1,4 +1,4 @@
-import { chatCommandSchema, ChatCommand } from '../schemas/chatCommands.schema';
+import { chatCommandSchema, ChatCommand } from './chatCommands.schema';
 
 export function parseAndValidateChatCommand(input: string): ChatCommand | null {
   if (!input.startsWith('/')) {

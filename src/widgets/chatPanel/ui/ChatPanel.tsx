@@ -8,12 +8,12 @@ import {
 import { ChatInput } from "./ChatInput"; // Importar o novo componente
 import { MessageList } from "./MessageList";
 import { DEFAULT_PLAYER_NAME } from "../../../shared/config/constants";
-import { useChat } from "@/features/chat/model/contexts/ChatContext";
+import { useChatStore } from "@/features/chat/model/store";
 
 // inclui a caixa do chat, o popover de comandos e o formulário de envio
 export function ChatPanel() {
-  const { messages, sendMessage, rollAndSendMessage, clearMessages } =
-    useChat();
+  const { messages, sendMessage, rollAndSendMessage, clearMessages, handleChatInput } =
+    useChatStore();
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -74,7 +74,7 @@ export function ChatPanel() {
         );
       }
     } else {
-      sendMessage(trimmedInput, DEFAULT_PLAYER_NAME);
+      handleChatInput(trimmedInput, DEFAULT_PLAYER_NAME);
       finalizeCommandExecution();
     }
   };

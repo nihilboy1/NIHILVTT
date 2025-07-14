@@ -1,14 +1,22 @@
-import { renderHook, act } from '@testing-library/react';
-import { useModalStateManagement } from '../useModalStateManagement';
+import { act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react'; // Importar renderHook de @testing-library/react
+import { useModalStore } from '../store'; // Importar o store Zustand e a interface ModalEntry
 
-describe('useModalStateManagement', () => {
+describe('useModalStore', () => {
+  // Resetar o estado do store antes de cada teste
+  beforeEach(() => {
+    act(() => {
+      useModalStore.setState({ modalStack: [] });
+    });
+  });
+
   it('deve inicializar com uma pilha de modais vazia', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     expect(result.current.modalStack).toEqual([]);
   });
 
   it('deve adicionar um modal à pilha com openModal', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.openModal('testModal', { prop1: 'value1' });
     });
@@ -19,7 +27,7 @@ describe('useModalStateManagement', () => {
   });
 
   it('deve adicionar múltiplos modais à pilha', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.openModal('modal1');
     });
@@ -32,7 +40,7 @@ describe('useModalStateManagement', () => {
   });
 
   it('deve gerar um ID único para cada modal', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.openModal('modalA');
       result.current.openModal('modalB');
@@ -41,7 +49,7 @@ describe('useModalStateManagement', () => {
   });
 
   it('não deve abrir um modal "sheet" se já houver um aberto', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.openModal('sheet', { id: 'sheet1' });
     });
@@ -56,7 +64,7 @@ describe('useModalStateManagement', () => {
   });
 
   it('deve abrir um modal "sheet" se outro tipo de modal estiver aberto', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.openModal('otherModal');
     });
@@ -71,7 +79,7 @@ describe('useModalStateManagement', () => {
   });
 
   it('deve remover o último modal da pilha com closeModal', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.openModal('modal1');
       result.current.openModal('modal2');
@@ -86,7 +94,7 @@ describe('useModalStateManagement', () => {
   });
 
   it('não deve fazer nada se closeModal for chamado em uma pilha vazia', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.closeModal();
     });
@@ -94,7 +102,7 @@ describe('useModalStateManagement', () => {
   });
 
   it('deve atualizar as props do modal no topo da pilha com updateModalProps', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.openModal('modal1', { count: 0 });
       result.current.openModal('modal2', { text: 'hello' });
@@ -109,7 +117,7 @@ describe('useModalStateManagement', () => {
   });
 
   it('não deve fazer nada se updateModalProps for chamado em uma pilha vazia', () => {
-    const { result } = renderHook(() => useModalStateManagement());
+    const { result } = renderHook(() => useModalStore());
     act(() => {
       result.current.updateModalProps({ anyProp: 'anyValue' });
     });

@@ -1,13 +1,13 @@
 import { DiceFormula, RollCategory, SidebarTab } from "@/shared/api/types";
 import rollNotificationSound from "@/shared/assets/sounds/rollNotification.wav";
-import { useChat } from "@/features/chat/model/contexts/ChatContext";
-import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 import { useCallback } from "react";
 import { performDiceRoll } from "../../lib/diceUtils";
+import { useUIStore } from "@/features/layoutControls/model/store";
+import { useChatStore } from "@/features/chat/model/store";
 
 export function useDiceRoller() {
-  const { sendMessage } = useChat();
-  const { setActiveSidebarTab } = useUI();
+  const { sendMessage } = useChatStore();
+  const { setActiveSidebarTab } = useUIStore();
 
   const rollDice = useCallback(
     (

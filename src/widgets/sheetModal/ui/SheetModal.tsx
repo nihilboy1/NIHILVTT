@@ -8,7 +8,7 @@ import {
 import { PlayerSheetContent } from "../../../entities/character/ui/playerSheet/PlayerSheetContent";
 import { InteractiveModal } from "../../../shared/ui/InteractiveModal";
 import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import { useModalStore } from "@/features/modalManager/model/store";
 import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
 import { DiceFormula } from "@/shared/api/types";
 import { useCharactersStore } from "@/entities/character/model/store";
@@ -60,7 +60,7 @@ export function SheetModal({
   zIndex,
 }: CharacterSheetModalProps) {
   const { characters, updateCharacter } = useCharactersStore();
-  const { openModal, closeModal } = useModal();
+  const { openModal, closeModal } = useModalStore();
 
   const initialCharacterData = characterId
     ? characters.find((c) => c.id === characterId) || null

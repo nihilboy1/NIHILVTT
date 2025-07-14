@@ -8,10 +8,9 @@ import {
   type DraggingVisuals,
   type Token,
 } from "../../../../shared/api/types";
-import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
-import { ModalEntry } from "@/features/modalManager/model/hooks/useModalStateManagement";
 import { useCharactersStore } from "@/entities/character/model/store";
+import { useUIStore } from "@/features/layoutControls/model/store";
+import { ModalEntry, useModalStore } from "@/features/modalManager/model/store";
 
 
 interface UseGameBoardInteractionProps {
@@ -52,8 +51,8 @@ export const useGameBoardInteraction = ({
     updateTokenHp,
     makeTokenIndependent,
   } = useTokens();
-  const { activeTool } = useUI();
-  const { modalStack, openModal, closeModal, updateModalProps } = useModal();
+  const { activeTool } = useUIStore();
+  const { modalStack, openModal, closeModal, updateModalProps } = useModalStore();
   const { selectedTokenId, setSelectedTokenId } = useSelectedToken();
 
   const [draggingVisuals, setDraggingVisuals] = useState<DraggingVisuals>({

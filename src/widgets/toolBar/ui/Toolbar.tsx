@@ -13,8 +13,8 @@ import {
 import { ToolbarButton } from "../../../shared/ui/ToolbarButton";
 import { ToolbarPopoverButton } from "../../../shared/ui/ToolbarPopoverButton";
 import { useToolbarState } from "../model/hooks/useToolbarState";
-import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
 import { useBoardSettingsStore } from "@/features/boardSettings/model/store";
+import { useUIStore } from "@/features/layoutControls/model/store";
 
 // barra lateral esquerda com os botões de ferramentas
 export function Toolbar() {
@@ -25,9 +25,10 @@ export function Toolbar() {
     rulerPersists,
     setRulerPersists,
   } = useBoardSettingsStore();
-  const { activeTool, setActiveTool, setIsToolbarVisible } = useUI();
+  const { activeTool, setActiveTool, setIsToolbarVisible, setActivePopover } =
+    useUIStore();
 
-  const { activePopover, setActivePopover } = useToolbarState({ activeTool });
+  const { activePopover: toolbarActivePopover, setActivePopover: setToolbarActivePopover } = useToolbarState({ activeTool });
 
   const handleToolbarRoll = (notation: string) => {
     rollDice(notation, notation, "Generic", DEFAULT_PLAYER_NAME);
@@ -68,8 +69,8 @@ export function Toolbar() {
         activeTool={activeTool}
         setActiveTool={setActiveTool}
         toolType={Tool.RULER}
-        activePopover={activePopover}
-        setActivePopover={setActivePopover}
+        activePopover={toolbarActivePopover}
+        setActivePopover={setToolbarActivePopover}
         popoverName="ruler"
       />
 
@@ -84,8 +85,8 @@ export function Toolbar() {
         activeTool={activeTool}
         setActiveTool={setActiveTool}
         toolType={Tool.DICE}
-        activePopover={activePopover}
-        setActivePopover={setActivePopover}
+        activePopover={toolbarActivePopover}
+        setActivePopover={setToolbarActivePopover}
         popoverName="dice"
       />
 

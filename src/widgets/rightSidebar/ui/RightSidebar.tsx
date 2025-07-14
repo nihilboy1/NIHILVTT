@@ -1,4 +1,4 @@
-import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
+import { useUIStore } from "@/features/layoutControls/model/store";
 import { ChevronRightIcon } from "../../../shared/ui/Icons";
 import { SidebarTabs } from "./SidebarTabs";
 import { RightSidebarContent } from "./RightSidebarContent";
@@ -6,7 +6,7 @@ import { RightSidebarContent } from "./RightSidebarContent";
 // a barra lateral direita como um todo. botões de abas e as condicionais para exibir os painéis de chat e tokens
 export function RightSidebar() {
   const { activeSidebarTab, setActiveSidebarTab, setIsRightSidebarVisible } =
-    useUI();
+    useUIStore();
 
   return (
     <div

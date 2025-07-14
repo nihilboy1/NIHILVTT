@@ -6,7 +6,7 @@ import {
   RollCategory,
 } from "@/shared/api/types";
 import { DEFAULT_PLAYER_NAME } from "@/shared/config/constants";
-import { useChatState } from "../useChatState";
+import { useChatStore } from "../../store";
 
 // Mock para generateUniqueId para garantir IDs consistentes nos testes
 jest.mock("../../../../shared/lib/utils/id/idUtils", () => ({
@@ -26,14 +26,14 @@ jest.mock("@/utils/dice/diceUtils", () => ({
   }),
 }));
 
-describe("useChatState", () => {
+describe("useChatStore", () => {
   // Limpa os mocks antes de cada teste
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("deve inicializar o estado com a mensagem de boas-vindas", () => {
-    const { result } = renderHook(() => useChatState());
+    const { result } = renderHook(() => useChatStore());
 
     expect(result.current.messages.length).toBe(1);
     expect(result.current.messages[0].sender).toBe("Sistema");
@@ -43,7 +43,7 @@ describe("useChatState", () => {
   });
 
   it("deve enviar uma mensagem de texto", () => {
-    const { result } = renderHook(() => useChatState());
+    const { result } = renderHook(() => useChatStore());
 
     act(() => {
       result.current.sendMessage("Olá, mundo!");
@@ -57,7 +57,7 @@ describe("useChatState", () => {
   });
 
   it("deve enviar uma mensagem de rolagem de dados", () => {
-    const { result } = renderHook(() => useChatState());
+    const { result } = renderHook(() => useChatStore());
 
     const diceRollDetails: DiceRollDetails = {
       rollName: "2d6+5",
@@ -79,7 +79,7 @@ describe("useChatState", () => {
   });
 
   it("deve rolar dados e enviar a mensagem de resultado", () => {
-    const { result } = renderHook(() => useChatState());
+    const { result } = renderHook(() => useChatStore());
 
     act(() => {
       result.current.rollAndSendMessage("1d6");
@@ -95,7 +95,7 @@ describe("useChatState", () => {
   });
 
   it("deve enviar mensagem de erro para rolagem de dados inválida", () => {
-    const { result } = renderHook(() => useChatState());
+    const { result } = renderHook(() => useChatStore());
 
     act(() => {
       result.current.rollAndSendMessage("invalid");
@@ -109,7 +109,7 @@ describe("useChatState", () => {
   });
 
   it("deve limpar as mensagens e adicionar a mensagem de boas-vindas novamente", () => {
-    const { result } = renderHook(() => useChatState());
+    const { result } = renderHook(() => useChatStore());
 
     act(() => {
       result.current.sendMessage("Mensagem 1");

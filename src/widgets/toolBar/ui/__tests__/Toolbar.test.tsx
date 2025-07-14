@@ -1,8 +1,7 @@
 import { Toolbar } from "@/widgets/toolBar/ui/Toolbar";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { ChatContext } from "@/features/chat/model/contexts/ChatContext"; // Corrigido
-import { type ChatState } from "@/features/chat/model/hooks/useChatState"; // Corrigido
+import { type ChatState } from "@/features/chat/model/store"; // Importar a interface e o hook do store Zustand
 import { RulerPlacementMode, SidebarTab, Tool } from "@/shared/api/types"; // Corrigido
 import {
   DEFAULT_METERS_PER_SQUARE,
@@ -10,23 +9,22 @@ import {
   GRID_CELL_SIZE,
 } from "@/shared/config/constants"; // Corrigido
 
-import { UIContext } from "@/features/layoutControls/model/contexts/UIProvider"; // Corrigido
-import { UIState } from "@/features/layoutControls/model/hooks/useUIState"; // Corrigido
+import { UIState } from "@/features/layoutControls/model/store"; // Importar a interface do store Zustand
 import { type BoardSettingsState } from "@/features/boardSettings/model/store";
 
 // Mock the actual hook modules and their return values
-const mockUseUIState = jest.fn();
+const mockUseUIStore = jest.fn(); // Alterado para mockar useUIStore
 const mockUseBoardSettingsStore = jest.fn();
-const mockUseChatState = jest.fn();
+const mockUseChatStore = jest.fn(); // Alterado para mockar useChatStore
 
-jest.mock("@/app/providers/useUIState", () => ({ // Corrigido
-  useUIState: () => mockUseUIState(),
+jest.mock("@/features/layoutControls/model/store", () => ({
+  useUIStore: () => mockUseUIStore(), // Alterado para mockar useUIStore
 }));
 jest.mock("@/features/boardSettings/model/store", () => ({
   useBoardSettingsStore: () => mockUseBoardSettingsStore(),
 }));
-jest.mock("@/features/chat/model/hooks/useChatState", () => ({ // Corrigido
-  useChatState: () => mockUseChatState(),
+jest.mock("@/features/chat/model/store", () => ({
+  useChatStore: () => mockUseChatStore(), // Alterado para mockar useChatStore
 }));
 jest.mock("@/features/boardRuler/ui/RulerPopover", () => ({ // Corrigido
   RulerPopover: jest.fn(() => null), // Mock RulerPopover to return null
@@ -69,7 +67,8 @@ const defaultMockChatState: ChatState = {
   sendMessage: jest.fn(),
   rollAndSendMessage: jest.fn(),
   handleChatInput: jest.fn(),
-  clearMessages: jest.fn(), // Adicionado para satisfazer a interface ChatState
+  clearMessages: jest.fn(),
+  processChatCommand: jest.fn(), // Adicionado para satisfazer a interface ChatState
 };
 
 const renderToolbar = (
@@ -77,7 +76,7 @@ const renderToolbar = (
   boardSettingsState: Partial<BoardSettingsState> = {},
   chatState: Partial<ChatState> = {}
 ) => {
-  mockUseUIState.mockReturnValue({
+  mockUseUIStore.mockReturnValue({
     ...defaultMockUIState,
     ...uiState,
   });
@@ -85,27 +84,21 @@ const renderToolbar = (
     ...defaultMockBoardSettingsState,
     ...boardSettingsState,
   });
-  mockUseChatState.mockReturnValue({
+  mockUseChatStore.mockReturnValue({
     ...defaultMockChatState,
     ...chatState,
   });
 
-  return render(
-    <UIContext.Provider value={{ ...defaultMockUIState, ...uiState }}>
-      <ChatContext.Provider value={{ ...defaultMockChatState, ...chatState }}>
-        <Toolbar />
-      </ChatContext.Provider>
-    </UIContext.Provider>
-  );
+  return render(<Toolbar />);
 };
 
 describe("Toolbar", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset mocks before each test
-    mockUseUIState.mockClear();
+    mockUseUIStore.mockClear(); // Alterado para mockUseUIStore
     mockUseBoardSettingsStore.mockClear();
-    mockUseChatState.mockClear();
+    mockUseChatStore.mockClear(); // Alterado para mockUseChatStore
   });
 
   test("deve renderizar os botões de ferramenta corretos", () => {

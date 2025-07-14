@@ -5,7 +5,7 @@ import { MarqueeLayer } from "../../../features/boardMarqueeSelection/ui/Marquee
 import { RulerLayer } from "../../../features/boardRuler/ui/RulerLayer";
 import { PageSettingsModal } from "../../../features/boardSettings/ui/PageSettingsModal";
 import { GameBoardSideOption } from "./GameBoardSideOption";
-import { useUI } from "@/features/layoutControls/model/contexts/UIProvider";
+import { useUIStore } from "@/features/layoutControls/model/store";
 import {
   GridSettings,
   MarqueeSelectionState,
@@ -79,7 +79,7 @@ export const GameBoardContent: React.FC<GameBoardContentProps> = ({
   marqueeSelection,
   rulerPath,
 }) => {
-  const { isRightSidebarVisible } = useUI();
+  const { isRightSidebarVisible } = useUIStore();
 
   return (
     <div className="flex-grow bg-surface-0 relative overflow-hidden">

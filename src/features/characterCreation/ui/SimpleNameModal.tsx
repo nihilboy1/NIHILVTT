@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCharacterCreation } from "../model/hooks/useCharacterCreation";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import { useModalStore } from "@/features/modalManager/model/store";
 import { simpleNameSchema, type SimpleNameSchema } from "../model/schemas/simpleName.schema";
 import z from "zod";
 import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
@@ -38,7 +38,7 @@ export function SimpleNameModal({
   });
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { modalStack } = useModal();
+  const { modalStack } = useModalStore();
   // 1. Desestruturamos as novas funções do hook
   const { createPlayerCharacter, createMonsterNpc } = useCharacterCreation();
 

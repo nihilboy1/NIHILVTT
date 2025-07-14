@@ -1,7 +1,7 @@
 import { GiAncientSword, GiNinjaHeroicStance } from "react-icons/gi";
 import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { CharacterTemplateListItem } from "../../../entities/character/ui/CharacterTemplateListItem";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
+import { useModalStore } from "@/features/modalManager/model/store";
 import {
   CharacterTypeEnum,
 } from "@/entities/character/model/schemas/character.schema";
@@ -11,7 +11,7 @@ import { useCharactersStore } from "@/entities/character/model/store";
 export function CharactersPanel() {
   const { characters, deleteCharacter } = useCharactersStore();
   const { tokenInstanceCounts } = useTokens(); // Renomeado
-  const { openModal, closeModal } = useModal();
+  const { openModal, closeModal } = useModalStore();
 
   const handleDeleteCharacter = (characterId: string) => {
     const characterToDelete = characters.find((char) => char.id === characterId);

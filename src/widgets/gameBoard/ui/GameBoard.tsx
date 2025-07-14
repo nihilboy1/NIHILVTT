@@ -4,10 +4,10 @@ import { DraggingVisuals, Point, Token } from "../../../shared/api/types";
 import { HPModalRenderer } from "./HPModalRenderer";
 import { useBoardStore } from "../../../entities/board/model/store";
 import { useBoardSettingsStore } from "../../../features/boardSettings/model/store";
-import { useUI } from "../../../features/layoutControls/model/contexts/UIProvider";
+import { useUIStore } from "../../../features/layoutControls/model/store";
 import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
 import { useCharactersStore } from "../../../entities/character/model/store";
-import { useModal } from "../../../features/modalManager/model/contexts/ModalProvider";
+import { useModalStore } from "../../../features/modalManager/model/store";
 import { useMarqueeSelection } from "../../../features/boardMarqueeSelection/model/hooks/useMarqueeSelection";
 import { useRuler } from "../../../features/boardRuler/model/hooks/useRuler";
 import { useCharacterDrop } from "../../../features/characterDropOnBoard/model/hooks/useCharacterDrop";
@@ -47,8 +47,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const { tokensOnBoard, addToken, updateTokenPosition } = useTokens();
   const { gridSettings, pageSettings, rulerPlacementMode, rulerPersists } =
     useBoardSettingsStore();
-  const { activeTool } = useUI();
-  const { openModal } = useModal();
+  const { activeTool } = useUIStore();
+  const { openModal } = useModalStore();
 
   const svgRef = useRef<SVGSVGElement>(null);
   const [isPageAndGridSettingsModalOpen, setIsPageAndGridSettingsModalOpen] =

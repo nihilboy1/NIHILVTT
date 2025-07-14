@@ -6,8 +6,7 @@ import { SimpleNameModal } from "../../../features/characterCreation/ui/SimpleNa
 import { ConfirmationModal } from "../../../shared/ui/ConfirmationModal";
 import { useGameBoardInteractionContext } from "../../gameBoard/model/contexts/GameBoardInteractionContext";
 import { SheetModal } from "../../sheetModal/ui/SheetModal";
-import { useModal } from "@/features/modalManager/model/contexts/ModalProvider";
-import { ModalEntry } from "@/features/modalManager/model/hooks/useModalStateManagement";
+import { useModalStore, ModalEntry } from "@/features/modalManager/model/store"; // Importar o store Zustand e a interface ModalEntry
 import { ActionEditModal } from "../../../features/characterEditAction/ui/ActionEditModal"; // New import
 
 // 1. Novas Importações: Trocamos os tipos manuais pelo CharacterSchema do Zod.
@@ -17,7 +16,7 @@ import { useCharactersStore } from "@/entities/character/model/store";
 
 export function ModalManager() {
   const { handleHPChangeFromModal, handleRemoveInstanceFromBoard, handleMakeInstanceIndependent } = useGameBoardInteractionContext();
-  const { modalStack, closeModal } = useModal();
+  const { modalStack, closeModal } = useModalStore();
   // `characters` agora é do tipo `CharacterSchema[]`
   const { characters } = useCharactersStore();
   const { tokensOnBoard } = useTokens();

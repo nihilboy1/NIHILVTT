@@ -1,9 +1,9 @@
-import { useChat } from "@/features/chat/model/contexts/ChatContext";
 import { performDiceRoll } from "@/features/diceRolling/lib/diceUtils";
+import { ChatState } from "@/features/chat/model/store"; // Importar a interface do store Zustand
 
-type SendMessageFn = ReturnType<typeof useChat>['sendMessage'];
-type ClearMessagesFn = ReturnType<typeof useChat>['clearMessages'];
-type RollAndSendMessageFn = ReturnType<typeof useChat>['rollAndSendMessage'];
+type SendMessageFn = ChatState['sendMessage'];
+type ClearMessagesFn = ChatState['clearMessages'];
+type RollAndSendMessageFn = ChatState['rollAndSendMessage'];
 
 /**
  * @interface CommandContext

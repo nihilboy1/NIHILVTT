@@ -5,12 +5,12 @@ import { ToggleSidebarButton } from "../features/toggleSidebar/ui/ToggleSidebarB
 import { GameBoardInteractionProvider } from "../widgets/gameBoard/model/contexts/GameBoardInteractionContext";
 import { useGameBoardInteraction } from "../widgets/gameBoard/model/hooks/useGameBoardInteraction";
 import { GameBoard } from "../widgets/gameBoard/ui/GameBoard";
-import { useUI } from "../features/layoutControls/model/contexts/UIProvider"; // Importar useUI
-import { useModal } from "../features/modalManager/model/contexts/ModalProvider";
+import { useUIStore } from "../features/layoutControls/model/store";
+import { useModalStore } from "../features/modalManager/model/store";
 import { ModalManager } from "../widgets/modalManager/ui/ModalManager";
 
 export function GameBoardPage() {
-  const { closeModal } = useModal();
+  const { closeModal } = useModalStore();
   useSelectedToken(); // Apenas chamar o hook para garantir que o contexto esteja disponível
 
   const gameBoardRef = useRef<HTMLDivElement>(null);
@@ -19,7 +19,7 @@ export function GameBoardPage() {
     setIsToolbarVisible,
     isRightSidebarVisible,
     setIsRightSidebarVisible,
-  } = useUI(); // Obter estados e setters de visibilidade
+  } = useUIStore(); // Obter estados e setters de visibilidade
 
   const {
     draggingVisuals,
