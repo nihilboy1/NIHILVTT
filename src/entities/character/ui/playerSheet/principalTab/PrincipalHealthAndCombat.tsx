@@ -6,8 +6,8 @@ import { CombatStats } from "./CombatStats";
 import { HealthSection } from "./HealthSection";
 import { PlayerCharacter, HitDiceEntry, actionSchema } from "../../../model/schemas/character.schema";
 import { FieldArrayWithId } from "react-hook-form";
-import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
 import z from "zod";
+import { useDiceRollingStore } from "@/features/diceRolling/model/store";
 
 type Action = z.infer<typeof actionSchema>
 interface PrincipalHealthAndCombatProps {
@@ -28,7 +28,7 @@ export function PrincipalHealthAndCombat({
   onRemoveHitDice,
 }: PrincipalHealthAndCombatProps) {
   const { control, watch } = useFormContext<PlayerCharacter>();
-  const { rollDice } = useDiceRoller();
+  const { rollDice } = useDiceRollingStore();
   const characterName = watch("name");
 
   // 2. useFieldArray para gerenciar a lista de ações

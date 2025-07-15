@@ -62,19 +62,19 @@ export const DEFAULT_PLAYER_DATA: Omit<PlayerCharacter, "id" | "type"> = {
   attributes: defaultAttributes,
   proficiencies: defaultProficiencies,
   combatStats: {
-    maxHp: 10,
-    currentHp: 10,
+    maxHp: 1,
+    currentHp: 0,
     armorClass: 10,
-    speed: 30,
+    speed: 0,
     shieldEquipped: false,
     tempHp: 0,
   },
   level: 1,
   inspiration: false,
-  charClass: "Guerreiro", // Adicionado valores padrão para campos obrigatórios
+  charClass: "", // Adicionado valores padrão para campos obrigatórios
   subclass: "",
   background: "",
-  species: "Humano",
+  species: "",
   actions: [],
   hitDiceEntries: [
     {
@@ -97,10 +97,10 @@ export const DEFAULT_MONSTER_DATA: Omit<
   attributes: defaultAttributes,
   proficiencies: defaultProficiencies,
   combatStats: {
-    maxHp: 10,
-    currentHp: 10,
+    maxHp: 1,
+    currentHp: 0,
     armorClass: 10,
-    speed: 30,
+    speed: 0,
     shieldEquipped: false,
     tempHp: 0,
   },

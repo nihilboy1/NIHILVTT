@@ -201,3 +201,17 @@ export type ProficiencyPath =
   | `proficiencies.savingThrows.${SavingThrowName}`;
 
 export type HitDiceEntry = z.infer<typeof hitDiceEntrySchema>;
+
+export type CharacterType = z.infer<typeof CharacterTypeEnum>;
+
+
+export const characterTypeTranslations: Record<CharacterType, string> = {
+  Player: "Jogador",
+  "Monster/NPC": "Monstro/NPC",
+  Object: "Objeto",
+};
+// Esta constante pode ser usada para gerar opções em selects se necessário.
+export const CHARACTER_TYPES_OPTIONS = CharacterTypeEnum.options.map((type) => ({
+  value: type,
+  label: characterTypeTranslations[type],
+}));

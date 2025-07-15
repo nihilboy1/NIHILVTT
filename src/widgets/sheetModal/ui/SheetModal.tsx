@@ -9,11 +9,9 @@ import { PlayerSheetContent } from "../../../entities/character/ui/playerSheet/P
 import { InteractiveModal } from "../../../shared/ui/InteractiveModal";
 import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
 import { useModalStore } from "@/features/modalManager/model/store";
-import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
-import { DiceFormula } from "@/shared/api/types";
 import { useCharactersStore } from "@/entities/character/model/store";
 
-interface CharacterSheetModalProps {
+interface SheetModalProps {
   characterId: string | null;
   isOpen: boolean;
   onClose: () => void;
@@ -58,7 +56,7 @@ export function SheetModal({
   isOpen,
   onClose,
   zIndex,
-}: CharacterSheetModalProps) {
+}: SheetModalProps) {
   const { characters, updateCharacter } = useCharactersStore();
   const { openModal, closeModal } = useModalStore();
 
@@ -74,15 +72,6 @@ export function SheetModal({
       }
     },
   });
-
-  // NOVO: Invocamos o hook da feature e pegamos o nome do personagem
-  const { rollDice } = useDiceRoller();
-  const characterName = form.watch("name");
-
-   // NOVO: Criamos a função de callback que será injetada para baixo
-  const handleAttributeRoll = (formula: DiceFormula, attributeLabel: string) => {
-    rollDice(formula, attributeLabel, "Attribute", characterName);
-  };
 
   const { isDirty } = form.formState;
   const modalTitle = form.watch("name") || "";
@@ -159,8 +148,6 @@ export function SheetModal({
               hitDiceFields={hitDiceFields}
               onAddHitDice={appendHitDiceEntry}
               onRemoveHitDice={removeHitDiceEntry}
-              onAttributeRoll={handleAttributeRoll}
-
             />
           ) : (
             <div>

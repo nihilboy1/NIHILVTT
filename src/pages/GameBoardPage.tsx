@@ -1,8 +1,6 @@
 import { useRef } from "react";
-import { useSelectedToken } from "../entities/token/model/contexts/SelectedTokenContext";
 import { ChevronLeftIcon, ChevronRightIcon } from "../shared/ui/Icons";
 import { ToggleSidebarButton } from "../features/toggleSidebar/ui/ToggleSidebarButton";
-import { GameBoardInteractionProvider } from "../widgets/gameBoard/model/contexts/GameBoardInteractionContext";
 import { useGameBoardInteraction } from "../widgets/gameBoard/model/hooks/useGameBoardInteraction";
 import { GameBoard } from "../widgets/gameBoard/ui/GameBoard";
 import { useUIStore } from "../features/layoutControls/model/store";
@@ -11,7 +9,8 @@ import { ModalManager } from "../widgets/modalManager/ui/ModalManager";
 
 export function GameBoardPage() {
   const { closeModal } = useModalStore();
-  useSelectedToken(); // Apenas chamar o hook para garantir que o contexto esteja disponível
+  // Não é mais necessário chamar o hook aqui apenas para "garantir que o contexto esteja disponível"
+  // O Zustand store pode ser acessado diretamente onde for necessário.
 
   const gameBoardRef = useRef<HTMLDivElement>(null);
   const {
@@ -41,12 +40,7 @@ export function GameBoardPage() {
   };
 
   return (
-    <GameBoardInteractionProvider
-      gameBoardRef={gameBoardRef}
-      handleHPChangeFromModal={handleHPChangeFromModal}
-      handleRemoveInstanceFromBoard={handleRemoveInstanceFromBoard}
-      handleMakeInstanceIndependent={handleMakeInstanceIndependent}
-    >
+    <>
       <GameBoard
         onBackgroundClick={handleBoardBackgroundClick}
         draggingVisuals={draggingVisuals}
@@ -60,7 +54,11 @@ export function GameBoardPage() {
         onRemoveFromBoard={handleRemoveInstanceFromBoard} // Passar a função do useGameBoardInteraction
         onMakeIndependent={handleMakeInstanceIndependent} // Passar a função do useGameBoardInteraction
       />
-      <ModalManager />
+      <ModalManager
+        handleHPChangeFromModal={handleHPChangeFromModal}
+        handleRemoveInstanceFromBoard={handleRemoveInstanceFromBoard}
+        handleMakeInstanceIndependent={handleMakeInstanceIndependent}
+      />
 
       {/* Botão para mostrar a Toolbar */}
       <ToggleSidebarButton
@@ -81,6 +79,6 @@ export function GameBoardPage() {
         icon={<ChevronLeftIcon className="w-6 h-6 text-text-1" />}
         position="right"
       />
-    </GameBoardInteractionProvider>
+    </>
   );
 }

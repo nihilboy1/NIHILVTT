@@ -6,7 +6,7 @@ import {
   type Token,
 } from "../../../shared/api/types";
 import { getFirstName } from "../../../shared/lib/utils/nameUtils";
-import { useSelectedToken } from "../model/contexts/SelectedTokenContext";
+import { useSelectedTokenStore } from "../model/store/selectedTokenStore";
 import { HealthBar } from "./HealthBar";
 import { TokenVisual, TokenVisualMetrics } from "./TokenVisual";
 import { Character, CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
@@ -53,16 +53,10 @@ export function BoardToken({
   onTokenDragEnd,
   isMultiSelected,
   onBoardTokenDoubleClick,
-  // Removendo props relacionadas ao HPModal
-  // activeHPModalTokenId,
-  // onHPModalAnchorShouldUpdate,
-  // onHPChange,
-  // onRemoveFromBoard,
-  // onMakeIndependent,
   onSetMultiSelectedTokenIds,
 }: BoardTokenProps) {
   const tokenGroupRef = useRef<SVGGElement>(null);
-  const { selectedTokenId, setSelectedTokenId } = useSelectedToken();
+  const { selectedTokenId, setSelectedTokenId } = useSelectedTokenStore();
 
   const handleSelectThisToken = useCallback(
     (tokenId: string) => {

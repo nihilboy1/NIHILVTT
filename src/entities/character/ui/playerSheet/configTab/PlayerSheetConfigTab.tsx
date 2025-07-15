@@ -1,9 +1,8 @@
 // src/entities/character/ui/playerSheet/configTab/PlayerSheetConfigTab.tsx
 
 import { useFormContext } from 'react-hook-form'; // 1. Importar
-import { characterTypeTranslations } from "../../../../../shared/config/constants";
 import { cn } from "../../../../../shared/lib/utils/cn";
-import { CharacterTypeEnum, PlayerCharacter } from '../../../model/schemas/character.schema';
+import { CharacterTypeEnum, characterTypeTranslations, PlayerCharacter } from '../../../model/schemas/character.schema';
 
 // 2. Interface de props agora está VAZIA
 interface PlayerSheetConfigTabProps {}

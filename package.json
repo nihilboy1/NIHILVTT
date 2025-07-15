@@ -9,9 +9,12 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dep-cruise:graph": "npx depcruise src -T json -f dependency-graph.json",
+    "dep-cruise:validate": "npx depcruise --validate .dependency-cruiser.cjs src",
     "dep-cruise:errors": "npx depcruise src -T err-long",
-    "dep-cruise:circular": "npx depcruise src --max-depth 0"
+    "dep-cruise:circular": "npx depcruise src --max-depth 0",
+    "dep-cruise:graph-json": "npx depcruise src -T json -f dependency-graph.json",
+    "dep-cruise:graph-svg": "npx depcruise src -T dot | dot -T svg > dependency-graph.svg",
+    "dep-cruise:report-html": "npx depcruise src -T html -f dependency-report.html"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

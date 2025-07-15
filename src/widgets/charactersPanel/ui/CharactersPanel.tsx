@@ -1,16 +1,16 @@
 import { GiAncientSword, GiNinjaHeroicStance } from "react-icons/gi";
-import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
-import { CharacterTemplateListItem } from "../../../entities/character/ui/CharacterTemplateListItem";
+import { useTokenStore } from "../../../entities/token/model/store/tokenStore";
 import { useModalStore } from "@/features/modalManager/model/store";
 import {
   CharacterTypeEnum,
 } from "@/entities/character/model/schemas/character.schema";
 import { useCharactersStore } from "@/entities/character/model/store";
+import { CharacterCardOnList } from "@/entities/character/ui/CharacterCardOnList";
 
 // painel de personagens geral
 export function CharactersPanel() {
   const { characters, deleteCharacter } = useCharactersStore();
-  const { tokenInstanceCounts } = useTokens(); // Renomeado
+  const { tokenInstanceCounts } = useTokenStore();
   const { openModal, closeModal } = useModalStore();
 
   const handleDeleteCharacter = (characterId: string) => {
@@ -77,7 +77,7 @@ export function CharactersPanel() {
         ) : (
           <ul className="space-y-2" aria-label="Lista de modelos de personagem">
             {characters.map((character) => (
-              <CharacterTemplateListItem
+              <CharacterCardOnList
                 key={character.id}
                 character={character}
                 instanceCount={tokenInstanceCounts.get(character.id) || 0} // Renomeado

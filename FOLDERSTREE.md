@@ -1,8 +1,6 @@
 NIHILVTT/
 ├─ src/
 │ ├─ app/
-│ │ ├─ providers/
-│ │ │ └─ index.tsx
 │ │ ├─ styles/
 │ │ │ └─ index.css
 │ │ ├─ App.tsx
@@ -12,8 +10,6 @@ NIHILVTT/
 │ ├─ entities/
 │ │ ├─ board/
 │ │ │ ├─ model/
-│ │ │ │ ├─ contexts/
-│ │ │ │ ├─ hooks/
 │ │ │ │ └─ store.ts
 │ │ │ └─ ui/
 │ │ │ └─ ZoomControls.tsx
@@ -22,9 +18,7 @@ NIHILVTT/
 │ │ │ │ └─ utils/
 │ │ │ │ └─ characterUtils.ts
 │ │ │ ├─ model/
-│ │ │ │ ├─ contexts/
 │ │ │ │ ├─ hooks/
-│ │ │ │ │ ├─ **tests**/
 │ │ │ │ │ └─ useCharacterSheetForm.ts
 │ │ │ │ ├─ schemas/
 │ │ │ │ │ └─ character.schema.ts
@@ -51,12 +45,11 @@ NIHILVTT/
 │ │ │ └─ CreatureSheet.tsx
 │ │ └─ token/
 │ │ ├─ model/
-│ │ │ ├─ contexts/
-│ │ │ │ ├─ SelectedTokenContext.tsx
-│ │ │ │ └─ TokenContext.tsx
-│ │ │ └─ hooks/
-│ │ │ ├─ useTokenDrag.ts
-│ │ │ └─ useTokenState.ts
+│ │ │ ├─ hooks/
+│ │ │ │ └─ useTokenDrag.ts
+│ │ │ └─ store/
+│ │ │ ├─ selectedTokenStore.ts
+│ │ │ └─ tokenStore.ts
 │ │ └─ ui/
 │ │ ├─ BoardToken.tsx
 │ │ ├─ HealthBar.tsx
@@ -68,10 +61,6 @@ NIHILVTT/
 │ │ │ │ └─ useMarqueeSelection.ts
 │ │ │ └─ ui/
 │ │ │ └─ MarqueeLayer.tsx
-│ │ ├─ boardPanningAndZoom/
-│ │ │ ├─ model/
-│ │ │ │ └─ hooks/
-│ │ │ └─ ui/
 │ │ ├─ boardRuler/
 │ │ │ ├─ model/
 │ │ │ │ └─ hooks/
@@ -111,22 +100,15 @@ NIHILVTT/
 │ │ │ └─ ActionEditModal.tsx
 │ │ ├─ characterUpdateHp/
 │ │ │ └─ ui/
-│ │ │ ├─ **tests**/
 │ │ │ └─ HPControlModal.tsx
 │ │ ├─ chat/
 │ │ │ └─ model/
-│ │ │ ├─ contexts/
-│ │ │ │ ├─ **tests**/
-│ │ │ │ │ └─ ChatContext.test.tsx
-│ │ │ │ └─ ChatContext.tsx
 │ │ │ ├─ hooks/
-│ │ │ │ ├─ **tests**/
-│ │ │ │ │ └─ useChatState.test.ts
-│ │ │ │ └─ useChatState.ts
-│ │ │ ├─ lib/
-│ │ │ │ └─ chatCommandParser.ts
-│ │ │ └─ schemas/
-│ │ │ └─ chatCommands.schema.ts
+│ │ │ │ └─ **tests**/
+│ │ │ │ └─ useChatState.test.ts
+│ │ │ ├─ chatCommandParser.ts
+│ │ │ ├─ chatCommands.schema.ts
+│ │ │ └─ store.ts
 │ │ ├─ diceRolling/
 │ │ │ ├─ lib/
 │ │ │ │ ├─ **tests**/
@@ -142,28 +124,15 @@ NIHILVTT/
 │ │ │ └─ index.ts
 │ │ ├─ layoutControls/
 │ │ │ └─ model/
-│ │ │ ├─ contexts/
-│ │ │ │ ├─ **tests**/
-│ │ │ │ │ └─ UIProvider.test.tsx
-│ │ │ │ └─ UIProvider.tsx
-│ │ │ └─ hooks/
-│ │ │ ├─ **tests**/
-│ │ │ │ └─ useUIState.test.ts
-│ │ │ └─ useUIState.ts
+│ │ │ └─ store.ts
 │ │ ├─ modalManager/
 │ │ │ └─ model/
-│ │ │ ├─ contexts/
-│ │ │ │ └─ ModalProvider.tsx
-│ │ │ └─ hooks/
 │ │ │ ├─ **tests**/
-│ │ │ │ └─ useModalStateManagement.test.ts
-│ │ │ └─ useModalStateManagement.ts
-│ │ ├─ toggleSidebar/
-│ │ │ └─ ui/
-│ │ │ └─ ToggleSidebarButton.tsx
-│ │ └─ tokenDrag/
-│ │ └─ model/
-│ │ └─ hooks/
+│ │ │ │ └─ modalStore.test.ts
+│ │ │ └─ store.ts
+│ │ └─ toggleSidebar/
+│ │ └─ ui/
+│ │ └─ ToggleSidebarButton.tsx
 │ ├─ pages/
 │ │ └─ GameBoardPage.tsx
 │ ├─ shared/
@@ -251,8 +220,6 @@ NIHILVTT/
 │ │ │ └─ MessageList.tsx
 │ │ ├─ gameBoard/
 │ │ │ ├─ model/
-│ │ │ │ ├─ contexts/
-│ │ │ │ │ └─ GameBoardInteractionContext.tsx
 │ │ │ │ └─ hooks/
 │ │ │ │ ├─ useGameBoardEvents.ts
 │ │ │ │ └─ useGameBoardInteraction.ts
@@ -272,9 +239,6 @@ NIHILVTT/
 │ │ │ ├─ RightSidebarContent.tsx
 │ │ │ └─ SidebarTabs.tsx
 │ │ ├─ sheetModal/
-│ │ │ ├─ model/
-│ │ │ │ └─ contexts/
-│ │ │ │ └─ SheetContext.tsx
 │ │ │ └─ ui/
 │ │ │ └─ SheetModal.tsx
 │ │ └─ toolBar/
@@ -288,7 +252,6 @@ NIHILVTT/
 │ └─ README.md
 ├─ .dependency-cruiser.cjs
 ├─ .gitignore
-├─ depcruise.md
 ├─ dependency-graph.json
 ├─ eslint.config.js
 ├─ index.html

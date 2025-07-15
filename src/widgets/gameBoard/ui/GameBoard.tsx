@@ -5,7 +5,7 @@ import { HPModalRenderer } from "./HPModalRenderer";
 import { useBoardStore } from "../../../entities/board/model/store";
 import { useBoardSettingsStore } from "../../../features/boardSettings/model/store";
 import { useUIStore } from "../../../features/layoutControls/model/store";
-import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
+import { useTokenStore } from "../../../entities/token/model/store/tokenStore";
 import { useCharactersStore } from "../../../entities/character/model/store";
 import { useModalStore } from "../../../features/modalManager/model/store";
 import { useMarqueeSelection } from "../../../features/boardMarqueeSelection/model/hooks/useMarqueeSelection";
@@ -44,7 +44,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   onMakeIndependent,
 }) => {
   const { characters } = useCharactersStore();
-  const { tokensOnBoard, addToken, updateTokenPosition } = useTokens();
+  const { tokensOnBoard, addToken, updateTokenPosition } = useTokenStore();
   const { gridSettings, pageSettings, rulerPlacementMode, rulerPersists } =
     useBoardSettingsStore();
   const { activeTool } = useUIStore();

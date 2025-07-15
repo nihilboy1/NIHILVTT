@@ -11,18 +11,18 @@ import {
   type ProficiencyPath,
 } from "../../../model/schemas/character.schema";
 import { getProficiencyBonusFromLevel } from "@/entities/character/lib/utils/characterUtils";
-import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
-
 interface SkillProficiencyItemProps {
   skillLabel: string;
   name: ProficiencyPath;
   parentAttributeName: `attributes.${keyof PlayerCharacter["attributes"]}`;
+  onRoll: (formula: DiceFormula, rollName: string, category: RollCategory, characterName: string) => void;
 }
 
 export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
   skillLabel,
   name,
   parentAttributeName,
+  onRoll,
 }) => {
   const { register, watch } = useFormContext<PlayerCharacter>();
 
@@ -49,8 +49,6 @@ export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
     ? attributeModifier + proficiencyBonus
     : attributeModifier;
 
-  const { rollDice } = useDiceRoller();
-
   const handleRoll = () => {
     const isSavingThrow = name.includes("savingThrows");
     let rollName = skillLabel;
@@ -67,7 +65,7 @@ export const SkillProficiencyItem: React.FC<SkillProficiencyItemProps> = ({
     const formula: DiceFormula = `1d20${
       totalBonus >= 0 ? "+" : ""
     }${totalBonus}`;
-    rollDice(formula, rollName, category, characterName);
+    onRoll(formula, rollName, category, characterName);
   };
 
   const checkboxId = `skill-prof-${name}`;

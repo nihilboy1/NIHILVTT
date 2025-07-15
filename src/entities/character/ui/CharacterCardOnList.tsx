@@ -1,23 +1,22 @@
 import React, { useRef, useState } from "react";
-import { characterTypeTranslations } from "../../../shared/config/constants";
 import { DotsThreeVerticalIcon } from "../../../shared/ui/Icons";
 import { OptionsPopover } from "../../../shared/ui/OptionsPopover";
-import { Character } from "../model/schemas/character.schema";
+import { Character, characterTypeTranslations } from "../model/schemas/character.schema";
 import { useCharactersStore } from "../model/store";
 
-interface CharacterTemplateListItemProps {
+interface CharacterCardOnListProps {
   character: Character;
   instanceCount: number;
   openSheetModal: (characterId: string) => void;
   onDelete: (characterId: string) => void; // New prop for deletion
 }
 
-export function CharacterTemplateListItem({
+export function CharacterCardOnList({
   character,
   instanceCount,
   openSheetModal,
   onDelete, // Destructure new prop
-}: CharacterTemplateListItemProps) {
+}: CharacterCardOnListProps) {
   const { duplicateCharacter } = useCharactersStore(); // Renomeado
 
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);

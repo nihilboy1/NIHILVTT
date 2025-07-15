@@ -1,7 +1,6 @@
 import z from "zod";
-import { CHARACTER_TYPES_OPTIONS } from "../../../shared/config/constants";
 import { cn } from "../../../shared/lib/utils/cn";
-import { CharacterTypeEnum } from "../model/schemas/character.schema";
+import { CHARACTER_TYPES_OPTIONS, CharacterTypeEnum } from "../model/schemas/character.schema";
 type CharacterType = z.infer<typeof CharacterTypeEnum>;
 
 interface CreatureSheetProps {

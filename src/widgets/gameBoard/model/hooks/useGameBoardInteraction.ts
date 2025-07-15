@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { useTokens } from "../../../../entities/token/model/contexts/TokenContext";
-import { useSelectedToken } from "../../../../entities/token/model/contexts/SelectedTokenContext";
+import { useTokenStore } from "../../../../entities/token/model/store/tokenStore";
+import { useSelectedTokenStore } from "../../../../entities/token/model/store/selectedTokenStore";
 import { HP_MODAL_ESTIMATED_HEIGHT_REM } from "../../../../features/characterUpdateHp/ui/HPControlModal";
 import {
   Tool,
@@ -50,10 +50,10 @@ export const useGameBoardInteraction = ({
     removeToken,
     updateTokenHp,
     makeTokenIndependent,
-  } = useTokens();
+  } = useTokenStore();
   const { activeTool } = useUIStore();
   const { modalStack, openModal, closeModal, updateModalProps } = useModalStore();
-  const { selectedTokenId, setSelectedTokenId } = useSelectedToken();
+  const { selectedTokenId, setSelectedTokenId } = useSelectedTokenStore();
 
   const [draggingVisuals, setDraggingVisuals] = useState<DraggingVisuals>({
     tokenId: null, // Renomeado

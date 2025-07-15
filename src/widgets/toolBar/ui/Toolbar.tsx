@@ -1,4 +1,4 @@
-import { useDiceRoller } from "@/features/diceRolling/model/hooks/useDiceRoller";
+import { useDiceRollingStore } from "@/features/diceRolling/model/store";
 import { RulerPopover } from "../../../features/boardRuler/ui/RulerPopover";
 import { DiceRollPopover } from "../../../features/diceRolling/ui/DiceRollPopover";
 import { Tool } from "../../../shared/api/types";
@@ -18,7 +18,7 @@ import { useUIStore } from "@/features/layoutControls/model/store";
 
 // barra lateral esquerda com os botões de ferramentas
 export function Toolbar() {
-  const { rollDice } = useDiceRoller(); // Usar o novo hook
+  const { rollDice } = useDiceRollingStore(); // Usar o novo hook
   const {
     rulerPlacementMode,
     setRulerPlacementMode,

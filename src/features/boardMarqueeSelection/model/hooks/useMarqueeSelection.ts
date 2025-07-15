@@ -1,16 +1,20 @@
-import {GridSettings, MarqueeSelectionState, Point, Token } from "@/shared/api/types";
+import {
+  GridSettings,
+  MarqueeSelectionState,
+  Point,
+  Token,
+} from "@/shared/api/types";
 import { parseTokenSize } from "../../../../shared/lib/utils/board/boardUtils";
 import { useCallback, useState } from "react";
 import { Character } from "@/entities/character/model/schemas/character.schema";
 
-
 interface UseMarqueeSelectionProps {
-  activeTool: string; // Tool.SELECT
+  activeTool: string;
   getSVGPoint: (clientX: number, clientY: number) => Point;
-  tokensOnBoard: Token[]; // Renomeado de gridInstances
-  characters: Character[]; // Renomeado de tokens
+  tokensOnBoard: Token[];
+  characters: Character[];
   gridSettings: GridSettings;
-  onSetMultiSelectedTokenIds: (ids: string[]) => void; // Renomeado
+  onSetMultiSelectedTokenIds: (ids: string[]) => void;
   onClearMultiSelection: () => void;
 }
 
@@ -68,7 +72,8 @@ export const useMarqueeSelection = ({
       const marqueeHeight = Math.abs(startPoint.y - currentPoint.y);
 
       const selectedIds: string[] = [];
-      tokensOnBoard.forEach((token) => { // Renomeado
+      tokensOnBoard.forEach((token) => {
+        // Renomeado
         const character = characters.find((c) => c.id === token.characterId); // Renomeado
         if (!character) return;
 

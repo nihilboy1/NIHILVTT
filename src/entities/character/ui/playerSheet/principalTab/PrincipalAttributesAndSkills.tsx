@@ -1,14 +1,11 @@
-// src/entities/character/ui/playerSheet/principalTab/PrincipalAttributesAndSkills.tsx
 
 import { AttributeBlock } from "./AttributeBlock";
 import { SkillProficiencyItem } from "./SkillProficiencyItem";
 import { Character, ProficiencyPath } from "../../../model/schemas/character.schema";
-import { DiceFormula } from "@/shared/api/types";
-import { useFormContext } from "react-hook-form"; // 1. PRECISAMOS DO FORM CONTEXT AQUI
+import { DiceFormula, RollCategory } from "@/shared/api/types";
+import { useFormContext } from "react-hook-form";
+import { useDiceRollingStore } from "@/features/diceRolling/model/store";
 
-// 1. A NOVA FONTE DA VERDADE PARA A UI
-// Em vez de um SKILLS_CONFIG genérico, criamos um objeto de configuração explícito.
-// As chaves ('strength', 'dexterity', etc.) correspondem aos nomes no schema Zod.
 const ATTRIBUTES_CONFIG = {
   strength: {
     label: "Força",
@@ -59,35 +56,32 @@ type AttributeName = keyof typeof ATTRIBUTES_CONFIG;
 
 interface PrincipalAttributesAndSkillsProps {
   className?: string;
-  onAttributeRoll: (formula: DiceFormula, attributeLabel: string) => void; // NOVO
 }
 
 export function PrincipalAttributesAndSkills({
   className,
-  onAttributeRoll,
 }: PrincipalAttributesAndSkillsProps) {
-  // 2. Note que removemos o useFormContext daqui.
-  // Os componentes filhos (`AttributeBlock`, `SkillProficiencyItem`) serão responsáveis
-  // por chamar `useFormContext` eles mesmos. Isso limpa o componente pai.
   const { watch } = useFormContext<Character>();
+  const { rollDice } = useDiceRollingStore();
+  const characterName = watch("name");
+
+  const handleSkillRoll = (formula: DiceFormula, rollName: string, category: RollCategory) => {
+    rollDice(formula, rollName, category, characterName);
+  };
 
   return (
     <div className={`flex flex-col space-y-2 rounded-md ${className}`}>
-      {/* 3. Iteramos sobre as chaves da nossa nova configuração */}
       {(Object.keys(ATTRIBUTES_CONFIG) as AttributeName[]).map((attrName) => {
         const { label, skills } = ATTRIBUTES_CONFIG[attrName];
 
-        // 3. DENTRO DO LOOP, OBSERVAMOS O VALOR E CALCULAMOS O MODIFICADOR
         const attrValue = watch(`attributes.${attrName}`);
         const modifier = attrValue ? Math.floor((attrValue - 10) / 2) : 0;
 
-        // 4. AQUI ESTÁ A MÁGICA: CRIAMOS A FUNÇÃO SIMPLES PARA O FILHO
-        const handleRoll = () => {
+        const handleAttributeRoll = () => {
           const formula: DiceFormula = `1d20${
             modifier >= 0 ? "+" : ""
           }${modifier}`;
-          // E dentro dela, chamamos a função complexa do pai com os dados corretos
-          onAttributeRoll(formula, label);
+          rollDice(formula, label, "Attribute", characterName);
         };
 
         const savingThrowInfo = {
@@ -110,12 +104,11 @@ export function PrincipalAttributesAndSkills({
             <AttributeBlock
               name={`attributes.${attrName}`}
               label={label}
-              onRoll={handleRoll}
+              onRoll={handleAttributeRoll}
             />
 
             <div className="mt-1.5 space-y-0.5">
               {allSkills.map((skillInfo) => {
-                // 4. Construímos o `name` do campo de forma segura
                 const fieldName = skillInfo.isSavingThrow
                   ? `proficiencies.savingThrows.${skillInfo.key}`
                   : `proficiencies.skills.${skillInfo.key}`;
@@ -124,9 +117,9 @@ export function PrincipalAttributesAndSkills({
                   <SkillProficiencyItem
                     key={skillInfo.key}
                     skillLabel={skillInfo.label}
-                    // O tipo exato que o `name` precisa ter é definido pelo componente filho
-                    name={fieldName as ProficiencyPath} // Usamos 'as any' temporariamente para desabilitar o erro aqui, pois a correção é no filho
+                    name={fieldName as ProficiencyPath}
                     parentAttributeName={`attributes.${attrName}`}
+                    onRoll={handleSkillRoll}
                   />
                 );
               })}

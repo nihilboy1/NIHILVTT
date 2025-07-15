@@ -1,10 +1,9 @@
 // src/widgets/modalManager/ui/ModalManager.tsx
 
 import { HPControlModal } from "../../../features/characterUpdateHp/ui/HPControlModal";
-import { useTokens } from "../../../entities/token/model/contexts/TokenContext";
+import { useTokenStore } from "../../../entities/token/model/store/tokenStore";
 import { SimpleNameModal } from "../../../features/characterCreation/ui/SimpleNameModal";
 import { ConfirmationModal } from "../../../shared/ui/ConfirmationModal";
-import { useGameBoardInteractionContext } from "../../gameBoard/model/contexts/GameBoardInteractionContext";
 import { SheetModal } from "../../sheetModal/ui/SheetModal";
 import { useModalStore, ModalEntry } from "@/features/modalManager/model/store"; // Importar o store Zustand e a interface ModalEntry
 import { ActionEditModal } from "../../../features/characterEditAction/ui/ActionEditModal"; // New import
@@ -13,13 +12,21 @@ import { ActionEditModal } from "../../../features/characterEditAction/ui/Action
 import { type Token } from "@/shared/api/types";
 import { useCharactersStore } from "@/entities/character/model/store";
 
+interface ModalManagerProps {
+  handleHPChangeFromModal: (tokenId: string, newHP: number) => void;
+  handleRemoveInstanceFromBoard: (tokenId: string) => void;
+  handleMakeInstanceIndependent: (tokenId: string) => void;
+}
 
-export function ModalManager() {
-  const { handleHPChangeFromModal, handleRemoveInstanceFromBoard, handleMakeInstanceIndependent } = useGameBoardInteractionContext();
+export function ModalManager({
+  handleHPChangeFromModal,
+  handleRemoveInstanceFromBoard,
+  handleMakeInstanceIndependent,
+}: ModalManagerProps) {
   const { modalStack, closeModal } = useModalStore();
   // `characters` agora é do tipo `CharacterSchema[]`
   const { characters } = useCharactersStore();
-  const { tokensOnBoard } = useTokens();
+  const { tokensOnBoard } = useTokenStore();
 
   const topModal = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
   const shouldRenderOverlay = topModal && topModal.name !== "hpControl";

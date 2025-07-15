@@ -3,7 +3,6 @@ import { PrincipalAttributesAndSkills } from "./PrincipalAttributesAndSkills";
 import { PrincipalHealthAndCombat } from "./PrincipalHealthAndCombat";
 import { FieldArrayWithId } from "react-hook-form";
 import { PlayerCharacter, HitDiceEntry } from "../../../model/schemas/character.schema";
-import { DiceFormula } from "@/shared/api/types";
 
 interface PrincipalTabProps {
   onEditAction: (actionId: string) => void;
@@ -11,8 +10,6 @@ interface PrincipalTabProps {
   hitDiceFields: FieldArrayWithId<PlayerCharacter, "hitDiceEntries", "id">[];
   onAddHitDice: (value: HitDiceEntry) => void;
   onRemoveHitDice: (index?: number | number[]) => void;
-    onAttributeRoll: (formula: DiceFormula, attributeLabel: string) => void; // NOVO
-
 }
 
 export function PrincipalTab({
@@ -20,15 +17,14 @@ export function PrincipalTab({
   onDeleteHitDice,
   hitDiceFields,
   onAddHitDice,
-  onRemoveHitDice,onAttributeRoll
+  onRemoveHitDice,
 }: PrincipalTabProps) {
   return (
     <div className="flex flex-col p-0.5 overflow-y-auto max-h-[calc(100vh-12rem)] hide-scrollbar">
       <PrincipalHeader />
 
       <div className="flex flex-wrap gap-2 w-full">
-        <PrincipalAttributesAndSkills className="flex-1 min-w-[300px]"         onAttributeRoll={onAttributeRoll} // NOVO
- />
+        <PrincipalAttributesAndSkills className="flex-1 min-w-[300px]" />
         <PrincipalHealthAndCombat
           className="flex-1 min-w-[300px]"
           onEditAction={onEditAction}

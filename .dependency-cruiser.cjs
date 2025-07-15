@@ -55,6 +55,70 @@ module.exports = {
         path: ["^src/app"],
       },
     },
+    {
+      name: "no-circular",
+      severity: "error",
+      comment:
+        "Dependências circulares são proibidas pois tornam o código frágil e imprevisível.",
+      from: {},
+      to: {
+        circular: true,
+      },
+    },
+    {
+      name: "no-orphans",
+      severity: "warn", // 'warn' é uma boa opção para não quebrar o build durante uma refatoração
+      comment:
+        "Módulos órfãos (não utilizados) devem ser removidos para manter a base de código limpa.",
+      from: {
+        orphan: true,
+        pathNot: [
+          "\\.d\\.ts$", // Arquivos de declaração de tipos
+          "\\.stories\\.tsx$", // Arquivos do Storybook (se usar)
+          "vite.config.ts", // Arquivos de configuração que não são importados
+          "tailwind.config.ts",
+          "jest.config.ts",
+          ".dependency-cruiser.cjs",
+          "eslint.config.js",
+        ],
+      },
+      to: {},
+    },
+    {
+      name: "not-to-dev-dep",
+      severity: "error",
+      comment:
+        "Não importe pacotes de desenvolvimento (devDependencies) no código fonte da aplicação (src).",
+      from: {
+        path: "^src",
+        // ADICIONE ESTA LINHA:
+        pathNot: "\\.test\\.(ts|tsx|js|jsx)$",
+      },
+      to: {
+        dependencyTypes: ["npm-dev"],
+      },
+    },
+    {
+      name: "no-deprecated",
+      severity: "warn",
+      comment: "Evite usar dependências marcadas como deprecadas.",
+      from: {},
+      to: {
+        dependencyTypes: ["deprecated"],
+      },
+    },
+    {
+      name: "not-to-spec",
+      severity: "error",
+      comment: "O código fonte não deve importar módulos de teste.",
+      from: {
+        path: "^src",
+        pathNot: "\\.test\\.(ts|tsx|js|jsx)$", // O próprio arquivo de teste pode importar outros helpers
+      },
+      to: {
+        path: "\\.test\\.(ts|tsx|js|jsx)$", // Mas não pode importar um outro arquivo de teste
+      },
+    },
   ],
 
   options: {
@@ -65,19 +129,7 @@ module.exports = {
     tsConfig: {
       fileName: "tsconfig.app.json",
     },
+
+    metrics: true,
   },
 };
-
-/*
-
-
-
-### O que foi feito:
-
-1.  **Adição do Bloco `forbidden`**: Inseri a chave `forbidden` no nível principal do objeto de configuração. É aqui que o `dependency-cruiser` procura por regras de importação proibidas.
-2.  **Criação de Regras por Camada**: Criei uma regra para cada camada da sua arquitetura (`shared`, `entities`, `features`, `widgets`, `pages`), proibindo-as de importar módulos de qualquer camada acima delas.
-3.  **Clareza e Severidade**: Cada regra tem um `name` e um `comment` para explicar seu propósito e uma `severity` definida como `"error"`. Isso significa que, se uma dessas regras for violada, o `dependency-cruiser` irá falhar (o que é ideal para pipelines de CI/CD, por exemplo), forçando a correção da arquitetura.
-
-Com este arquivo, seu projeto agora não apenas funciona corretamente, mas também possui um mecanismo automático para **manter a qualidade da arquitetura** a longo pra
-
-*/
