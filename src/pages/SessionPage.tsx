@@ -6,11 +6,11 @@ import { GameBoard } from "../widgets/gameBoard/ui/GameBoard";
 import { useUIStore } from "../features/layoutControls/model/store";
 import { useModalStore } from "../features/modalManager/model/store";
 import { ModalManager } from "../widgets/modalManager/ui/ModalManager";
+import { RightSidebar } from "@/widgets/rightSidebar/ui/RightSidebar";
+import { Toolbar } from "@/widgets/toolBar/ui/Toolbar";
 
-export function GameBoardPage() {
+export function SessionPage() {
   const { closeModal } = useModalStore();
-  // Não é mais necessário chamar o hook aqui apenas para "garantir que o contexto esteja disponível"
-  // O Zustand store pode ser acessado diretamente onde for necessário.
 
   const gameBoardRef = useRef<HTMLDivElement>(null);
   const {
@@ -18,7 +18,7 @@ export function GameBoardPage() {
     setIsToolbarVisible,
     isRightSidebarVisible,
     setIsRightSidebarVisible,
-  } = useUIStore(); // Obter estados e setters de visibilidade
+  } = useUIStore();
 
   const {
     draggingVisuals,
@@ -36,11 +36,11 @@ export function GameBoardPage() {
   const handleBoardBackgroundClick = () => {
     closeModal();
     handleClearMultiSelection();
-    // Ao clicar no background, handleClearMultiSelection já desativa o HPModal
   };
 
   return (
-    <>
+    <div className="flex h-screen">
+      {isToolbarVisible && <Toolbar />}
       <GameBoard
         onBackgroundClick={handleBoardBackgroundClick}
         draggingVisuals={draggingVisuals}
@@ -50,9 +50,9 @@ export function GameBoardPage() {
         multiSelectedTokenIds={multiSelectedTokenIds}
         onSetMultiSelectedTokenIds={handleSetMultiSelectedTokenIds}
         onClearMultiSelection={handleClearMultiSelection}
-        onHPChange={handleHPChangeFromModal} // Passar a função do useGameBoardInteraction
-        onRemoveFromBoard={handleRemoveInstanceFromBoard} // Passar a função do useGameBoardInteraction
-        onMakeIndependent={handleMakeInstanceIndependent} // Passar a função do useGameBoardInteraction
+        onHPChange={handleHPChangeFromModal}
+        onRemoveFromBoard={handleRemoveInstanceFromBoard}
+        onMakeIndependent={handleMakeInstanceIndependent}
       />
       <ModalManager
         handleHPChangeFromModal={handleHPChangeFromModal}
@@ -60,7 +60,6 @@ export function GameBoardPage() {
         handleMakeInstanceIndependent={handleMakeInstanceIndependent}
       />
 
-      {/* Botão para mostrar a Toolbar */}
       <ToggleSidebarButton
         isVisible={isToolbarVisible}
         onClick={() => setIsToolbarVisible(true)}
@@ -70,7 +69,6 @@ export function GameBoardPage() {
         position="left"
       />
 
-      {/* Botão para mostrar a RightSidebar */}
       <ToggleSidebarButton
         isVisible={isRightSidebarVisible}
         onClick={() => setIsRightSidebarVisible(true)}
@@ -79,6 +77,7 @@ export function GameBoardPage() {
         icon={<ChevronLeftIcon className="w-6 h-6 text-text-1" />}
         position="right"
       />
-    </>
+      {isRightSidebarVisible && <RightSidebar />}
+    </div>
   );
 }

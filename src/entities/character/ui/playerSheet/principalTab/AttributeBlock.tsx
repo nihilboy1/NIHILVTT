@@ -1,4 +1,4 @@
-// ARQUIVO REVISADO E FINAL PARA O PASSO 1
+
 
 import { cn } from "../../../../../shared/lib/utils/cn";
 import { handleNumericInputKeyDown } from "@/entities/character/lib/utils/characterUtils";

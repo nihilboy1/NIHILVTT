@@ -1,25 +1,28 @@
 import { GiAncientSword, GiNinjaHeroicStance } from "react-icons/gi";
 import { useTokenStore } from "../../../entities/token/model/store/tokenStore";
 import { useModalStore } from "@/features/modalManager/model/store";
-import {
-  CharacterTypeEnum,
-} from "@/entities/character/model/schemas/character.schema";
+import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
 import { useCharactersStore } from "@/entities/character/model/store";
-import { CharacterCardOnList } from "@/entities/character/ui/CharacterCardOnList";
+import { CharacterCard } from "./CharacterCard";
 
-// painel de personagens geral
 export function CharactersPanel() {
   const { characters, deleteCharacter } = useCharactersStore();
   const { tokenInstanceCounts } = useTokenStore();
   const { openModal, closeModal } = useModalStore();
 
   const handleDeleteCharacter = (characterId: string) => {
-    const characterToDelete = characters.find((char) => char.id === characterId);
+    const characterToDelete = characters.find(
+      (char) => char.id === characterId
+    );
     if (!characterToDelete) return;
 
     openModal("confirmationModal", {
       title: "Confirmar Exclusão",
-      content: `Tem certeza que deseja excluir permanentemente o modelo "${characterToDelete.name}" e todas as suas ${tokenInstanceCounts.get(characterId) || 0} instâncias no tabuleiro? Esta ação não pode ser desfeita.`,
+      content: `Tem certeza que deseja excluir permanentemente o modelo "${
+        characterToDelete.name
+      }" e todas as suas ${
+        tokenInstanceCounts.get(characterId) || 0
+      } instâncias no tabuleiro? Esta ação não pode ser desfeita.`,
       confirmText: "Confirmar",
       cancelText: "Cancelar",
       onConfirm: () => {
@@ -40,7 +43,7 @@ export function CharactersPanel() {
           <button
             onClick={() =>
               openModal("simpleName", {
-                characterType: CharacterTypeEnum.enum.Player, // Renomeado
+                characterType: CharacterTypeEnum.enum.Player,
                 title: "Nome do Novo Jogador",
               })
             }
@@ -53,7 +56,7 @@ export function CharactersPanel() {
           <button
             onClick={() =>
               openModal("simpleName", {
-                characterType: CharacterTypeEnum.enum["Monster/NPC"], // Renomeado
+                characterType: CharacterTypeEnum.enum["Monster/NPC"],
                 title: "Nome do Novo Monstro/NPC",
               })
             }
@@ -77,14 +80,14 @@ export function CharactersPanel() {
         ) : (
           <ul className="space-y-2" aria-label="Lista de modelos de personagem">
             {characters.map((character) => (
-              <CharacterCardOnList
+              <CharacterCard
                 key={character.id}
                 character={character}
-                instanceCount={tokenInstanceCounts.get(character.id) || 0} // Renomeado
+                instanceCount={tokenInstanceCounts.get(character.id) || 0}
                 openSheetModal={() =>
                   openModal("sheet", { characterId: character.id })
                 }
-                onDelete={handleDeleteCharacter} // Pass the new onDelete prop
+                onDelete={handleDeleteCharacter}
               />
             ))}
           </ul>

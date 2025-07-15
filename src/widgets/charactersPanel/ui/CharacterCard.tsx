@@ -1,23 +1,26 @@
 import React, { useRef, useState } from "react";
 import { DotsThreeVerticalIcon } from "../../../shared/ui/Icons";
 import { OptionsPopover } from "../../../shared/ui/OptionsPopover";
-import { Character, characterTypeTranslations } from "../model/schemas/character.schema";
-import { useCharactersStore } from "../model/store";
+import { useCharactersStore } from "@/entities/character/model/store";
+import {
+  Character,
+  characterTypeTranslations,
+} from "@/entities/character/model/schemas/character.schema";
 
-interface CharacterCardOnListProps {
+interface CharacterCardProps {
   character: Character;
   instanceCount: number;
   openSheetModal: (characterId: string) => void;
-  onDelete: (characterId: string) => void; // New prop for deletion
+  onDelete: (characterId: string) => void;
 }
 
-export function CharacterCardOnList({
+export function CharacterCard({
   character,
   instanceCount,
   openSheetModal,
-  onDelete, // Destructure new prop
-}: CharacterCardOnListProps) {
-  const { duplicateCharacter } = useCharactersStore(); // Renomeado
+  onDelete,
+}: CharacterCardProps) {
+  const { duplicateCharacter } = useCharactersStore();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const popoverAnchorRef = useRef<HTMLButtonElement>(null);
@@ -26,7 +29,7 @@ export function CharacterCardOnList({
     event: React.DragEvent<HTMLLIElement>,
     characterId: string
   ) => {
-    event.dataTransfer.setData("application/vtt-character-id", characterId); // Renomeado
+    event.dataTransfer.setData("application/vtt-character-id", characterId);
     event.dataTransfer.effectAllowed = "move";
     event.currentTarget.style.opacity = "0.5";
   };
@@ -36,7 +39,7 @@ export function CharacterCardOnList({
   };
 
   const handleOpenPopover = (event: React.MouseEvent) => {
-    event.stopPropagation(); // Impede que o clique no botão feche o popover imediatamente
+    event.stopPropagation();
     setIsPopoverOpen(true);
   };
 
@@ -50,8 +53,8 @@ export function CharacterCardOnList({
   };
 
   const handleDeleteClick = () => {
-    handleClosePopover(); // Fecha o popover antes de abrir o modal
-    onDelete(character.id); // Call the new onDelete prop
+    handleClosePopover();
+    onDelete(character.id);
   };
 
   return (
@@ -78,7 +81,7 @@ export function CharacterCardOnList({
         <img
           src={character.image}
           alt={`Imagem do personagem ${character.name}`}
-          className="w-10 h-10 rounded-sm flex-shrink-0 shadow-sm object-cover " // Adicionado object-cover para garantir que a imagem preencha o espaço
+          className="w-10 h-10 rounded-sm flex-shrink-0 shadow-sm object-cover "
           aria-hidden="true"
         />
         <div
@@ -138,5 +141,3 @@ export function CharacterCardOnList({
     </li>
   );
 }
-
-// visto

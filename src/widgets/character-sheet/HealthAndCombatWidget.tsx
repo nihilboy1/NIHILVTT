@@ -1,16 +1,25 @@
 import { PrincipalHealthAndCombat } from "@/entities/character/ui/playerSheet/principalTab/PrincipalHealthAndCombat";
 import { useCharactersStore } from "@/entities/character/model/store";
 import { useDiceRollingStore } from "@/features/diceRolling/model/store";
-import { PlayerCharacter, CharacterTypeEnum, HitDiceEntry, Action } from "@/entities/character/model/schemas/character.schema";
+import {
+  PlayerCharacter,
+  CharacterTypeEnum,
+  HitDiceEntry,
+  Action,
+} from "@/entities/character/model/schemas/character.schema";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
 
 interface HealthAndCombatWidgetProps {
   characterId: string;
   onEditAction: (actionId: string) => void;
-  className?: string; // Adicionar className
+  className?: string;
 }
 
-export function HealthAndCombatWidget({ characterId, onEditAction, className }: HealthAndCombatWidgetProps) {
+export function HealthAndCombatWidget({
+  characterId,
+  onEditAction,
+  className,
+}: HealthAndCombatWidgetProps) {
   const { characters, updateCharacter } = useCharactersStore();
   const { rollDice } = useDiceRollingStore();
 
@@ -26,7 +35,10 @@ export function HealthAndCombatWidget({ characterId, onEditAction, className }: 
 
   const character: PlayerCharacter = foundCharacter;
 
-  const handleCombatStatChange = (key: keyof PlayerCharacter["combatStats"], value: number | boolean) => {
+  const handleCombatStatChange = (
+    key: keyof PlayerCharacter["combatStats"],
+    value: number | boolean
+  ) => {
     updateCharacter(character.id, {
       combatStats: {
         ...character.combatStats,
@@ -42,7 +54,9 @@ export function HealthAndCombatWidget({ characterId, onEditAction, className }: 
   };
 
   const handleDeleteHitDice = (index: number) => {
-    const newHitDiceEntries = character.hitDiceEntries.filter((_, i) => i !== index);
+    const newHitDiceEntries = character.hitDiceEntries.filter(
+      (_, i) => i !== index
+    );
     updateCharacter(character.id, { hitDiceEntries: newHitDiceEntries });
   };
 
@@ -53,22 +67,28 @@ export function HealthAndCombatWidget({ characterId, onEditAction, className }: 
   };
 
   const handleRemoveHitDice = (index?: number | number[]) => {
-    // A implementação de 'remove' do useFieldArray é mais complexa.
-    // Para simplificar, vamos apenas usar 'onDeleteHitDice' que já lida com um único índice.
-    // Se 'remove' precisar de funcionalidade de array, precisaria de mais lógica aqui.
-    if (typeof index === 'number') {
+    if (typeof index === "number") {
       handleDeleteHitDice(index);
     } else if (Array.isArray(index)) {
-      // Implementar lógica para remover múltiplos índices se necessário
-      console.warn("Remoção de múltiplos dados de vida não implementada neste widget.");
+      console.warn(
+        "Remoção de múltiplos dados de vida não implementada neste widget."
+      );
     }
   };
 
-  const handleRollDice = (formula: DiceFormula, rollName: string, category: RollCategory, charName: string) => {
+  const handleRollDice = (
+    formula: DiceFormula,
+    rollName: string,
+    category: RollCategory,
+    charName: string
+  ) => {
     rollDice(formula, rollName, category, charName);
   };
 
-  const handleHitDiceTypeChange = (index: number, type: HitDiceEntry["type"]) => {
+  const handleHitDiceTypeChange = (
+    index: number,
+    type: HitDiceEntry["type"]
+  ) => {
     const newHitDiceEntries = [...character.hitDiceEntries];
     newHitDiceEntries[index] = { ...newHitDiceEntries[index], type };
     updateCharacter(character.id, { hitDiceEntries: newHitDiceEntries });
@@ -80,14 +100,13 @@ export function HealthAndCombatWidget({ characterId, onEditAction, className }: 
     updateCharacter(character.id, { hitDiceEntries: newHitDiceEntries });
   };
 
-  // Propriedades para CombatStats
   const dexterity = character.attributes.dexterity;
   const wisdom = character.attributes.wisdom;
   const isPerceptionProficient = character.proficiencies.skills.perception;
 
   return (
     <PrincipalHealthAndCombat
-      className={className} // Passar className para o componente burro
+      className={className}
       characterName={character.name}
       level={character.level}
       dexterity={dexterity}

@@ -18,22 +18,19 @@ export function PlayerSheetContent({
   >("principal");
 
   return (
-    <>
+    <div className="w-[40rem] h-[30rem]">
       <PlayerSheetTabs
         activeTab={playerSheetActiveTab}
         onTabChange={setPlayerSheetActiveTab}
       />
 
       {playerSheetActiveTab === "principal" ? (
-        <PrincipalTab
-          characterId={characterId}
-          onEditAction={onEditAction}
-        />
+        <PrincipalTab characterId={characterId} onEditAction={onEditAction} />
       ) : playerSheetActiveTab === "detalhes" ? (
         <PlayerSheetDetailsTab />
       ) : (
         <PlayerSheetConfigTab />
       )}
-    </>
+    </div>
   );
 }
