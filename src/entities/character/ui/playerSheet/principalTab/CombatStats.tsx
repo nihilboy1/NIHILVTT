@@ -1,37 +1,32 @@
-// src/entities/character/ui/playerSheet/principalTab/CombatStats.tsx
-
 import React from "react";
-import { useFormContext } from "react-hook-form";
 import { cn } from "../../../../../shared/lib/utils/cn";
-import { type PlayerCharacter } from "../../../model/schemas/character.schema";
-import {
-  getModifier,
-  getProficiencyBonusFromLevel,
-  handleNumericInputKeyDown,
-} from "@/entities/character/lib/utils/characterUtils";
+import { handleNumericInputKeyDown } from "@/entities/character/lib/utils/characterUtils";
 
-export const CombatStats: React.FC = () => {
-  // 1. "Observamos" todos os valores base que precisamos do formulário
-  const { register, watch } = useFormContext<PlayerCharacter>();
-  const level = Number(watch("level") || 0);
-  const dexterity = Number(watch("attributes.dexterity") || 0);
-  const wisdom = Number(watch("attributes.wisdom") || 0);
-  const isPerceptionProficient = watch("proficiencies.skills.perception");
-  const speedInFeet = Number(watch("combatStats.speed") || 0);
+interface CombatStatsProps {
+  armorClass: number;
+  shieldEquipped: boolean;
+  speed: number;
+  calculatedInitiative: number;
+  calculatedPassivePerception: number;
+  speedInMeters: string;
+  speedInSquares: string;
+  onArmorClassChange: (value: number) => void;
+  onShieldEquippedChange: (checked: boolean) => void;
+  onSpeedChange: (value: number) => void;
+}
 
-  // 2. Calculamos os valores derivados usando os valores base
-  const dexModifier = getModifier(dexterity);
-  const wisModifier = getModifier(wisdom);
-  const proficiencyBonus = getProficiencyBonusFromLevel(level);
-  // NOVO: Calculamos os valores de deslocamento em metros e quadrados
-  const speedInMeters = (speedInFeet * 0.3).toFixed(2);
-  const speedInSquares = (speedInFeet / 5).toFixed(2);
-
-  const calculatedInitiative = dexModifier;
-  // Percepção passiva só adiciona o bônus de proficiência se o personagem for proficiente
-  const calculatedPassivePerception =
-    10 + wisModifier + (isPerceptionProficient ? proficiencyBonus : 0);
-
+export const CombatStats: React.FC<CombatStatsProps> = ({
+  armorClass,
+  shieldEquipped,
+  speed,
+  calculatedInitiative,
+  calculatedPassivePerception,
+  speedInMeters,
+  speedInSquares,
+  onArmorClassChange,
+  onShieldEquippedChange,
+  onSpeedChange,
+}) => {
   return (
     <fieldset className="p-2 rounded-md bg-surface-1 border">
       <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
@@ -48,8 +43,9 @@ export const CombatStats: React.FC = () => {
           </label>
           <input
             id="armorClass"
-            type="text" // Changed to text to gain full control over input
-            {...register("combatStats.armorClass", { valueAsNumber: true })}
+            type="text"
+            value={armorClass}
+            onChange={(e) => onArmorClassChange(Number(e.target.value))}
             className={cn(
               "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
             )}
@@ -66,7 +62,8 @@ export const CombatStats: React.FC = () => {
               <input
                 id="shieldEquipped"
                 type="checkbox"
-                {...register("combatStats.shieldEquipped")}
+                checked={shieldEquipped}
+                onChange={(e) => onShieldEquippedChange(e.target.checked)}
                 className="h-3.5 w-3.5 rounded-sm focus:ring-accent-primary bg-surface-1"
               />
               <span
@@ -108,12 +105,12 @@ export const CombatStats: React.FC = () => {
           </label>
           <input
             id="speed"
-            type="text" // Alterado para 'text' para usar a validação onKeyDown
-            {...register("combatStats.speed", { valueAsNumber: true })}
+            type="text"
+            value={speed}
+            onChange={(e) => onSpeedChange(Number(e.target.value))}
             className={cn(
               "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
             )}
-            // Reutilizamos a lógica de validação com um range apropriado para deslocamento
             onKeyDown={(e) =>
               handleNumericInputKeyDown(e, { min: 0, max: 150 })
             }

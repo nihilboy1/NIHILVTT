@@ -1,6 +1,6 @@
 // src/widgets/sheetModal/ui/SheetModal.tsx
 
-import { FormProvider, useFieldArray } from "react-hook-form";
+import { FormProvider } from "react-hook-form";
 import {
   useCharacterSheetForm,
   type SaveStatus,
@@ -58,7 +58,7 @@ export function SheetModal({
   zIndex,
 }: SheetModalProps) {
   const { characters, updateCharacter } = useCharactersStore();
-  const { openModal, closeModal } = useModalStore();
+  const { openModal } = useModalStore();
 
   const initialCharacterData = characterId
     ? characters.find((c) => c.id === characterId) || null
@@ -76,47 +76,19 @@ export function SheetModal({
   const { isDirty } = form.formState;
   const modalTitle = form.watch("name") || "";
 
-  const {
-    fields: hitDiceFields,
-    append: appendHitDiceEntry,
-    remove: removeHitDiceEntry,
-  } = useFieldArray({
-    control: form.control,
-    name: "hitDiceEntries",
-  });
+ 
 
   const handleEditAction = (actionId: string) => {
     console.log("SheetModal: handleEditAction called for actionId:", actionId);
     openModal("actionEdit", { actionId }, false);
   };
 
-  const handleDeleteHitDice = (index: number) => {
-    console.log("SheetModal: handleDeleteHitDice called for index:", index);
-    openModal("confirmationModal", {
-      title: "Confirmar Exclusão",
-      content:
-        "Você tem certeza que deseja remover esta linha de dados de vida?",
-      onConfirm: () => {
-        console.log(
-          "SheetModal: Confirming hit dice deletion for index:",
-          index
-        );
-        removeHitDiceEntry(index);
-        closeModal();
-        console.log(
-          "SheetModal: After removeHitDiceEntry, current hitDiceFields:",
-          form.getValues("hitDiceEntries")
-        );
-      },
-      onCancel: () => {
-        console.log(
-          "SheetModal: Cancelling hit dice deletion for index:",
-          index
-        );
-        closeModal();
-      },
-    });
-  };
+  // A lógica de handleDeleteHitDice será inlined
+  // const handleDeleteHitDice = (index: number) => { ... };
+
+  if (!characterId || !initialCharacterData || !isOpen) {
+    return null;
+  }
 
   if (!characterId || !initialCharacterData || !isOpen) {
     return null;
@@ -143,11 +115,10 @@ export function SheetModal({
           {initialCharacterData.type === CharacterTypeEnum.enum.Player ? (
             // 3. A prop 'onClose' foi removida de PlayerSheetContent.
             <PlayerSheetContent
+              characterId={characterId} // Passar characterId
               onEditAction={handleEditAction}
-              onDeleteHitDice={handleDeleteHitDice}
-              hitDiceFields={hitDiceFields}
-              onAddHitDice={appendHitDiceEntry}
-              onRemoveHitDice={removeHitDiceEntry}
+              // A lógica de handleDeleteHitDice foi movida para HealthAndCombatWidget
+              // As props de hitDice e actions não são mais necessárias aqui
             />
           ) : (
             <div>

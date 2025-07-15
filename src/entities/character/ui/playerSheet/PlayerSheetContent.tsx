@@ -1,28 +1,17 @@
-// src/entities/character/ui/playerSheet/PlayerSheetContent.tsx
-
 import { useState } from "react";
-import { FieldArrayWithId } from "react-hook-form";
 import { PlayerSheetConfigTab } from "./configTab/PlayerSheetConfigTab";
 import { PlayerSheetDetailsTab } from "./detailsTab/PlayerSheetDetailsTab";
 import { PlayerSheetTabs } from "./PlayerSheetTabs";
-import { PrincipalTab } from "./principalTab/PrincipalTab";
-import { PlayerCharacter } from "../../model/schemas/character.schema";
-import { HitDiceEntry } from "../../model/schemas/character.schema"; // Assuming HitDiceEntry type is here
+import { PrincipalTab } from "@/widgets/character-sheet/PrincipalTab";
 
 interface PlayerSheetContentProps {
+  characterId: string;
   onEditAction: (actionId: string) => void;
-  onDeleteHitDice: (index: number) => void;
-  hitDiceFields: FieldArrayWithId<PlayerCharacter, "hitDiceEntries", "id">[];
-  onAddHitDice: (value: HitDiceEntry) => void;
-  onRemoveHitDice: (index?: number | number[]) => void;
 }
 
 export function PlayerSheetContent({
+  characterId,
   onEditAction,
-  onDeleteHitDice,
-  hitDiceFields,
-  onAddHitDice,
-  onRemoveHitDice,
 }: PlayerSheetContentProps) {
   const [playerSheetActiveTab, setPlayerSheetActiveTab] = useState<
     "principal" | "detalhes" | "configuracoes"
@@ -37,11 +26,8 @@ export function PlayerSheetContent({
 
       {playerSheetActiveTab === "principal" ? (
         <PrincipalTab
+          characterId={characterId}
           onEditAction={onEditAction}
-          onDeleteHitDice={onDeleteHitDice}
-          hitDiceFields={hitDiceFields}
-          onAddHitDice={onAddHitDice}
-          onRemoveHitDice={onRemoveHitDice}
         />
       ) : playerSheetActiveTab === "detalhes" ? (
         <PlayerSheetDetailsTab />

@@ -1,33 +1,41 @@
-// src/entities/character/ui/playerSheet/principalTab/HealthSection.tsx
-
 import React from "react";
-import { useFormContext, FieldArrayWithId } from 'react-hook-form';
 import { cn } from "../../../../../shared/lib/utils/cn";
 import { generateUniqueId } from "../../../../../shared/lib/utils/id/idUtils";
 import { DeleteIcon, PlusCircleIcon } from "../../../../../shared/ui/Icons";
-import { PlayerCharacter, HitDiceEntry } from "../../../model/schemas/character.schema";
+import { HitDiceEntry } from "../../../model/schemas/character.schema";
 
 interface HealthSectionProps {
   onDeleteHitDice: (index: number) => void;
-  fields: FieldArrayWithId<PlayerCharacter, "hitDiceEntries", "id">[];
+  fields: HitDiceEntry[]; // Alterado para HitDiceEntry[]
   append: (value: HitDiceEntry) => void;
   remove: (index?: number | number[]) => void;
+  currentHp: number;
+  tempHp: number;
+  maxHp: number;
+  onCurrentHpChange: (value: number) => void;
+  onTempHpChange: (value: number) => void;
+  onMaxHpChange: (value: number) => void;
+  onHitDiceTypeChange: (index: number, type: HitDiceEntry["type"]) => void;
+  onHitDiceQuantityChange: (index: number, quantity: number) => void;
 }
 
 export const HealthSection: React.FC<HealthSectionProps> = ({
   onDeleteHitDice,
   fields,
   append,
-  
+  currentHp,
+  tempHp,
+  maxHp,
+  onCurrentHpChange,
+  onTempHpChange,
+  onMaxHpChange,
+  onHitDiceTypeChange,
+  onHitDiceQuantityChange,
 }) => {
-  const { register } = useFormContext<PlayerCharacter>();
-
   const handleAddHitDice = () => {
     console.log("HealthSection: handleAddHitDice called");
     append({ id: generateUniqueId(), type: "d6", quantity: 1 });
   };
-
- 
 
   const handleDeleteConfirmation = (index: number) => {
     console.log("HealthSection: handleDeleteConfirmation called for index:", index);
@@ -45,7 +53,8 @@ export const HealthSection: React.FC<HealthSectionProps> = ({
           <input
             id="currentHp"
             type="number"
-            {...register("combatStats.currentHp", { valueAsNumber: true })}
+            value={currentHp}
+            onChange={(e) => onCurrentHpChange(Number(e.target.value))}
             className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary placeholder-text-secondary", "text-center hide-arrows")}
           />
         </div>
@@ -55,7 +64,8 @@ export const HealthSection: React.FC<HealthSectionProps> = ({
             <input
               id="tempHp"
               type="number"
-              {...register("combatStats.tempHp", { valueAsNumber: true })}
+              value={tempHp}
+              onChange={(e) => onTempHpChange(Number(e.target.value))}
               className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-arrows")}
               min="0"
             />
@@ -65,7 +75,8 @@ export const HealthSection: React.FC<HealthSectionProps> = ({
             <input
               id="maxHp"
               type="number"
-              {...register("combatStats.maxHp", { valueAsNumber: true })}
+              value={maxHp}
+              onChange={(e) => onMaxHpChange(Number(e.target.value))}
               className={cn("w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-arrows")}
               min="1"
             />
@@ -83,7 +94,8 @@ export const HealthSection: React.FC<HealthSectionProps> = ({
           {fields.map((field, index) => (
             <li key={field.id} className="flex items-center space-x-2 mb-2">
               <select
-                {...register(`hitDiceEntries.${index}.type`)}
+                value={field.type}
+                onChange={(e) => onHitDiceTypeChange(index, e.target.value as HitDiceEntry["type"])}
                 className={cn("p-1 bg-surface-1 border font-bold border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary", "w-20")}
               >
                 <option value="d4">D4</option>
@@ -94,7 +106,8 @@ export const HealthSection: React.FC<HealthSectionProps> = ({
               </select>
               <input
                 type="number"
-                {...register(`hitDiceEntries.${index}.quantity`, { valueAsNumber: true })}
+                value={field.quantity}
+                onChange={(e) => onHitDiceQuantityChange(index, Number(e.target.value))}
                 className={cn("w-full p-1 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary", "text-center hide-arrows")}
                 min="1"
               />

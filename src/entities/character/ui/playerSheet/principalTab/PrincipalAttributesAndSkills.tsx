@@ -1,10 +1,8 @@
 
 import { AttributeBlock } from "./AttributeBlock";
 import { SkillProficiencyItem } from "./SkillProficiencyItem";
-import { Character, ProficiencyPath } from "../../../model/schemas/character.schema";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
-import { useFormContext } from "react-hook-form";
-import { useDiceRollingStore } from "@/features/diceRolling/model/store";
+import { getProficiencyBonusFromLevel } from "@/entities/character/lib/utils/characterUtils";
 
 const ATTRIBUTES_CONFIG = {
   strength: {
@@ -49,24 +47,45 @@ const ATTRIBUTES_CONFIG = {
       { key: "persuasion", label: "Persuasão" },
     ],
   },
-} as const; // 'as const' ajuda o TypeScript a inferir os tipos mais estritos possíveis
+} as const;
 
-// Definimos um tipo para as chaves do nosso objeto de configuração
 type AttributeName = keyof typeof ATTRIBUTES_CONFIG;
 
 interface PrincipalAttributesAndSkillsProps {
   className?: string;
+  characterName: string;
+  level: number;
+  attributes: {
+    strength: number;
+    dexterity: number;
+    constitution: number;
+    intelligence: number;
+    wisdom: number;
+    charisma: number;
+  };
+  proficiencies: {
+    savingThrows: Record<string, boolean>;
+    skills: Record<string, boolean>;
+  };
+  onRollDice: (formula: DiceFormula, rollName: string, category: RollCategory, characterName: string) => void;
+  onAttributeChange: (attributeName: AttributeName, value: number) => void;
+  onToggleProficiency: (proficiencyPath: string, isProficient: boolean) => void;
 }
 
 export function PrincipalAttributesAndSkills({
   className,
+  characterName,
+  level,
+  attributes,
+  proficiencies,
+  onRollDice,
+  onAttributeChange,
+  onToggleProficiency,
 }: PrincipalAttributesAndSkillsProps) {
-  const { watch } = useFormContext<Character>();
-  const { rollDice } = useDiceRollingStore();
-  const characterName = watch("name");
+  const proficiencyBonus = getProficiencyBonusFromLevel(level);
 
   const handleSkillRoll = (formula: DiceFormula, rollName: string, category: RollCategory) => {
-    rollDice(formula, rollName, category, characterName);
+    onRollDice(formula, rollName, category, characterName);
   };
 
   return (
@@ -74,14 +93,14 @@ export function PrincipalAttributesAndSkills({
       {(Object.keys(ATTRIBUTES_CONFIG) as AttributeName[]).map((attrName) => {
         const { label, skills } = ATTRIBUTES_CONFIG[attrName];
 
-        const attrValue = watch(`attributes.${attrName}`);
-        const modifier = attrValue ? Math.floor((attrValue - 10) / 2) : 0;
+        const attrValue = attributes[attrName];
+        const attributeModifier = attrValue ? Math.floor((attrValue - 10) / 2) : 0;
 
         const handleAttributeRoll = () => {
           const formula: DiceFormula = `1d20${
-            modifier >= 0 ? "+" : ""
-          }${modifier}`;
-          rollDice(formula, label, "Attribute", characterName);
+            attributeModifier >= 0 ? "+" : ""
+          }${attributeModifier}`;
+          onRollDice(formula, label, "Attribute", characterName);
         };
 
         const savingThrowInfo = {
@@ -104,7 +123,10 @@ export function PrincipalAttributesAndSkills({
             <AttributeBlock
               name={`attributes.${attrName}`}
               label={label}
+              value={attrValue}
+              modifier={attributeModifier}
               onRoll={handleAttributeRoll}
+              onChange={(value) => onAttributeChange(attrName, value)}
             />
 
             <div className="mt-1.5 space-y-0.5">
@@ -113,13 +135,24 @@ export function PrincipalAttributesAndSkills({
                   ? `proficiencies.savingThrows.${skillInfo.key}`
                   : `proficiencies.skills.${skillInfo.key}`;
 
+                const isProficient = skillInfo.isSavingThrow
+                  ? proficiencies.savingThrows[skillInfo.key]
+                  : proficiencies.skills[skillInfo.key];
+
+                const totalBonus = isProficient
+                  ? attributeModifier + proficiencyBonus
+                  : attributeModifier;
+
                 return (
                   <SkillProficiencyItem
                     key={skillInfo.key}
                     skillLabel={skillInfo.label}
-                    name={fieldName as ProficiencyPath}
-                    parentAttributeName={`attributes.${attrName}`}
+                    name={fieldName}
+                    isProficient={isProficient}
+                    totalBonus={totalBonus}
+                    characterName={characterName}
                     onRoll={handleSkillRoll}
+                    onToggleProficiency={onToggleProficiency}
                   />
                 );
               })}

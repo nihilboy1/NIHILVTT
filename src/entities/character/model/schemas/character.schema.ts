@@ -189,6 +189,7 @@ export type PlayerCharacter = z.infer<typeof playerCharacterSchema>;
 export type MonsterNpcCharacter = z.infer<typeof monsterNpcCharacterSchema>;
 export type ObjectCharacter = z.infer<typeof objectCharacterSchema>;
 export type Character = z.infer<typeof characterSchema>;
+export type Action = z.infer<typeof actionSchema>; // Exportar o tipo Action
 
 // --- Tipos Auxiliares para Proficiências (se necessário) ---
 type SkillName = keyof z.infer<typeof proficienciesSchema>["skills"];

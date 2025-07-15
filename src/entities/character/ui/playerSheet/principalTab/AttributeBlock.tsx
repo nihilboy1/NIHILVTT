@@ -1,36 +1,32 @@
 // ARQUIVO REVISADO E FINAL PARA O PASSO 1
 
-import { useFormContext } from "react-hook-form";
 import { cn } from "../../../../../shared/lib/utils/cn";
-import { type PlayerCharacter } from "../../../model/schemas/character.schema";
 import { handleNumericInputKeyDown } from "@/entities/character/lib/utils/characterUtils";
 
-// 1. A dependência da feature 'diceRolling' foi REMOVIDA.
-
 interface AttributeBlockProps {
-  name: `attributes.${keyof PlayerCharacter["attributes"]}`;
+  name: string;
   label: string;
-  onRoll?: () => void; // 2. A única mudança na interface é esta nova prop.
+  value: number;
+  modifier: number;
+  onRoll?: () => void;
+  onChange: (value: number) => void;
 }
 
 export const AttributeBlock: React.FC<AttributeBlockProps> = ({
   name,
   label,
-  onRoll, // 3. Recebemos o callback 'onRoll' como prop.
+  value,
+  modifier,
+  onRoll,
+  onChange,
 }) => {
-  const { register, watch } = useFormContext<PlayerCharacter>();
-  const attrValue = watch(name);
-  const modifier = attrValue ? Math.floor((attrValue - 10) / 2) : 0;
-
-  // 4. Toda a lógica de `handleRoll` e `useDiceRoller` foi REMOVIDA.
-
   return (
     <div
       className={cn(
         "flex items-end transition-colors duration-200 rounded-md p-1 gap-2 w-fit",
-        onRoll && "cursor-pointer hover:bg-surface-2" // 5. Estilos de clique são condicionais.
+        onRoll && "cursor-pointer hover:bg-surface-2"
       )}
-      onClick={onRoll} // 6. O onClick agora chama a função vinda do pai.
+      onClick={onRoll}
     >
       <div className="flex flex-col">
         <label
@@ -45,9 +41,8 @@ export const AttributeBlock: React.FC<AttributeBlockProps> = ({
         <input
           id={name}
           type="text"
-          {...register(name, {
-            valueAsNumber: true,
-          })}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
           className={cn(
             "text-center hide-arrows w-12 text-lg font-semibold p-0",
             "w-[6rem] p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary h-10"
