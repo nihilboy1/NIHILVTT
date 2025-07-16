@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Iceberg&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Iceberg&display=swap");
 @import "tailwindcss";
 
 @layer base {
@@ -9,6 +9,7 @@
   html,
   body {
     @apply bg-surface-0;
+    font-family: "Work Sans", sans-serif;
   }
 
   button {
@@ -16,7 +17,7 @@
   }
 
   * {
-    @apply  transition-colors duration-200 ease-in-out;
+    @apply transition-colors duration-200 ease-in-out;
   }
 }
 
@@ -50,6 +51,13 @@
 .iceberg-regular {
   font-family: "Iceberg", sans-serif;
   font-weight: 400;
+  font-style: normal;
+}
+
+.work-sans-base {
+  font-family: "Work Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: normal; /* Assuming a default weight if not specified */
   font-style: normal;
 }
 

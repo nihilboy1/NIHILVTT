@@ -2,31 +2,36 @@ import { DiceIcon } from "@/shared/ui/Icons";
 import { Squares } from "@/shared/ui/SquaresBackground";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { PiMathOperationsBold } from "react-icons/pi";
+import { LuScrollText } from "react-icons/lu";
+import { FaDragon } from "react-icons/fa";
+import { LuMousePointerClick } from "react-icons/lu";
+const MotionLink = motion(Link);
 
 const features = [
   {
-    icon: "💬",
-    title: "Chat com Comandos",
+    icon: <LuMousePointerClick />,
+    title: "Combate em um Clique",
     description:
-      "Um chat de texto integrado com suporte a rolagem de dados e comandos para agilizar sua sessão.",
+      "Clique no seu token, na sua ação e no seu alvo. É só isso. O NIHILVTT faz todo o resto por você.",
   },
   {
-    icon: "📜",
-    title: "Fichas Interativas",
+    icon: <PiMathOperationsBold />,
+    title: "Motor de Regras Inteligente",
     description:
-      "Fichas de personagem digitais que se atualizam em tempo real. Chega de apagar e reescrever!",
+      "Nossa automação calcula rolagens, dano, bônus, e penalidades, e anuncia o resultado completo no chat.",
   },
   {
-    icon: "🎲",
-    title: "Tokens de Combate",
+    icon: <LuScrollText />,
+    title: "Fichas Vivas",
     description:
-      "Movimente seus tokens em grids táticos, controle status e execute ações de forma visual e intuitiva.",
+      "HP, espaços de magia, condições... Tudo é atualizado em tempo real na ficha dos jogadores e dos monstros. Sem anotações manuais.",
   },
   {
-    icon: "⚙️",
-    title: "Cálculos Automáticos",
+    icon: <FaDragon />,
+    title: "Feito para D&D 5e (2024)",
     description:
-      "Modificadores, bônus e penalidades são aplicados automaticamente. Foco total na interpretação.",
+      "Plataforma leve e integrada com as regras mais recentes do D&D, criada por quem joga e entende o que um mestre precisa.",
   },
 ];
 
@@ -76,27 +81,30 @@ export default function HomePage() {
             className="text-text-secondary mt-4 text-lg max-w-2xl"
             variants={itemVariants}
           >
-            Uma Virtual Tabletop minimalista e poderosa, projetada para não
-            atrapalhar sua história. Mergulhe no vazio e narre suas melhores
-            aventuras.
+            Foque no jogo. Nós cuidamos das regras. <br />
+            <span className="font-bold tracking-wider">
+              Crie uma conta e narre suas melhores aventuras.
+            </span>
           </motion.p>
 
           <motion.div
             className="flex flex-col items-center gap-4 mt-10"
             variants={itemVariants}
           >
-            <Link to="/register">
-              <motion.button className="hover:bg-accent-primary flex justify-items-center items-center gap-3 bg-surface-3  text-text-primary text-3xl font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-110 transition-all border-b-3 border-text-primary iceberg-regular pointer-events-auto">
-                <span className="mt-1">CRIAR CONTA</span>
-                <DiceIcon className="w-10 h-10" />
-              </motion.button>
-            </Link>
-            <motion.button
+            <MotionLink
+              to="/register"
+              className="hover:bg-accent-primary flex justify-items-center items-center gap-3 bg-surface-3  text-text-primary text-3xl font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-110 transition-all border-b-3 border-text-primary iceberg-regular pointer-events-auto"
+            >
+              <span className="mt-1">CRIAR CONTA</span>
+              <DiceIcon className="w-10 h-10" />
+            </MotionLink>
+            <MotionLink
+              to="/login"
               className="iceberg-regular bg-text-primary text-surface-3 text-lg font-bold py-2 rounded-xs shadow-md  hover:scale-105 transition-all hover:bg-surface-3 hover:text-text-primary w-full hover:w-[110%] border-b-2 border-text-primary hover:border-accent-secondary pointer-events-auto"
               whileTap={{ scale: 0.95 }}
             >
               ENTRAR
-            </motion.button>
+            </MotionLink>
           </motion.div>
         </motion.header>
 

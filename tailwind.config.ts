@@ -9,6 +9,7 @@ export default {
     extend: {
       fontFamily: {
         iceberg: ['Iceberg', 'sans-serif'],
+        'work-sans': ['Work Sans', 'sans-serif'],
       },
     },
   },
