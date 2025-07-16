@@ -1,64 +1,40 @@
-import { EditIcon, PlusCircleIcon } from "../../../../../shared/ui/Icons";
-import { HitDiceEntry, Action } from "../../../model/schemas/character.schema";
+import { useFormContext, useFieldArray } from 'react-hook-form';
+import { EditIcon, PlusCircleIcon, DeleteIcon } from "../../../../../shared/ui/Icons";
+import { Action, PlayerCharacter } from "../../../model/schemas/character.schema";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
 import { CombatStats } from "./CombatStats";
 import { HealthSection } from "./HealthSection";
-import { getModifier, getProficiencyBonusFromLevel } from "@/entities/character/lib/utils/characterUtils"; // Importar funções de utilidade
+import { getModifier, getProficiencyBonusFromLevel } from "@/entities/character/lib/utils/characterUtils";
 
 interface PrincipalHealthAndCombatProps {
   className?: string;
-  characterName: string;
-  level: number;
-  dexterity: number;
-  wisdom: number;
-  isPerceptionProficient: boolean;
-  combatStats: {
-    armorClass: number;
-    shieldEquipped?: boolean; // Tornar opcional
-    speed: number;
-    currentHp: number;
-    tempHp?: number; // Tornar opcional
-    maxHp: number;
-  };
-  hitDiceEntries: HitDiceEntry[];
-  actions: Action[];
   onEditAction: (actionId: string) => void;
-  onDeleteHitDice: (index: number) => void;
-  onAddHitDice: (value: HitDiceEntry) => void;
-  onRemoveHitDice: (index?: number | number[]) => void;
-  onCombatStatChange: (key: keyof PrincipalHealthAndCombatProps["combatStats"], value: number | boolean) => void;
-  onAddAction: (action: Action) => void;
   onRollDice: (formula: DiceFormula, rollName: string, category: RollCategory, characterName: string) => void;
-  onHitDiceTypeChange: (index: number, type: HitDiceEntry["type"]) => void;
-  onHitDiceQuantityChange: (index: number, quantity: number) => void;
 }
 
 export function PrincipalHealthAndCombat({
   className,
-  characterName,
-  level,
-  dexterity,
-  wisdom,
-  isPerceptionProficient,
-  combatStats,
-  hitDiceEntries,
-  actions,
   onEditAction,
-  onDeleteHitDice,
-  onAddHitDice,
-  onRemoveHitDice,
-  onCombatStatChange,
-  onAddAction,
   onRollDice,
-  onHitDiceTypeChange,
-  onHitDiceQuantityChange,
 }: PrincipalHealthAndCombatProps) {
-  // Cálculos que antes estavam em CombatStats, agora aqui
+  const { watch, control } = useFormContext<PlayerCharacter>();
+  const { fields: actions, append: appendAction, remove: removeAction } = useFieldArray({
+    control,
+    name: "actions",
+  });
+
+  const level = watch('level');
+  const dexterity = watch('attributes.dexterity');
+  const wisdom = watch('attributes.wisdom');
+  const isPerceptionProficient = watch('proficiencies.skills.perception');
+  const characterName = watch('name');
+  const speed = watch('combatStats.speed');
+
   const dexModifier = getModifier(dexterity);
   const wisModifier = getModifier(wisdom);
   const proficiencyBonus = getProficiencyBonusFromLevel(level);
-  const speedInMeters = (combatStats.speed * 0.3).toFixed(2);
-  const speedInSquares = (combatStats.speed / 5).toFixed(2);
+  const speedInMeters = (speed * 0.3).toFixed(2);
+  const speedInSquares = (speed / 5).toFixed(2);
 
   const calculatedInitiative = dexModifier;
   const calculatedPassivePerception =
@@ -85,31 +61,12 @@ export function PrincipalHealthAndCombat({
       <h2 className="sr-only">Dados de Saúde e Combate do Personagem</h2>
       <div>
         <CombatStats
-          armorClass={combatStats.armorClass}
-          shieldEquipped={combatStats.shieldEquipped ?? false} // Adicionar fallback
-          speed={combatStats.speed}
           calculatedInitiative={calculatedInitiative}
           calculatedPassivePerception={calculatedPassivePerception}
           speedInMeters={speedInMeters}
           speedInSquares={speedInSquares}
-          onArmorClassChange={(value) => onCombatStatChange("armorClass", value)}
-          onShieldEquippedChange={(checked) => onCombatStatChange("shieldEquipped", checked)}
-          onSpeedChange={(value) => onCombatStatChange("speed", value)}
         />
-        <HealthSection
-          onDeleteHitDice={onDeleteHitDice}
-          fields={hitDiceEntries}
-          append={onAddHitDice}
-          remove={onRemoveHitDice}
-          currentHp={combatStats.currentHp}
-          tempHp={combatStats.tempHp ?? 0} // Adicionar fallback
-          maxHp={combatStats.maxHp}
-          onCurrentHpChange={(value) => onCombatStatChange("currentHp", value)}
-          onTempHpChange={(value) => onCombatStatChange("tempHp", value)}
-          onMaxHpChange={(value) => onCombatStatChange("maxHp", value)}
-          onHitDiceTypeChange={onHitDiceTypeChange}
-          onHitDiceQuantityChange={onHitDiceQuantityChange}
-        />
+        <HealthSection />
 
         <fieldset
           id="Ações"
@@ -118,7 +75,7 @@ export function PrincipalHealthAndCombat({
           <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold">
             AÇÕES
           </legend>
-          {actions.map((action) => (
+          {actions.map((action, index) => (
             <div key={action.id} className="relative group">
               <button
                 type="button"
@@ -143,10 +100,18 @@ export function PrincipalHealthAndCombat({
                 >
                   <EditIcon height={4} width={4} />
                 </button>
+                <button
+                  type="button"
+                  title="Remover ação"
+                  onClick={() => removeAction(index)}
+                  className="p-2 hover:text-surface-0 bg-feedback-negative rounded-md hover:bg-feedback-negative-hover flex items-center justify-center text-sm font-bold"
+                >
+                  <DeleteIcon className="w-10 h-5" />
+                </button>
               </div>
             </div>
           ))}
-          <button type="button" onClick={() => onAddAction({ id: crypto.randomUUID(), name: "Nova Ação", bonus: "", damage: "" })} /* ... */>
+          <button type="button" onClick={() => appendAction({ id: crypto.randomUUID(), name: "Nova Ação", bonus: "", damage: "" })}>
             <PlusCircleIcon />
           </button>
         </fieldset>

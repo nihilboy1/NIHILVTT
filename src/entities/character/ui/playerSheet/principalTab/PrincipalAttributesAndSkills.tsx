@@ -1,8 +1,9 @@
-
+import { useFormContext, Path } from 'react-hook-form';
 import { AttributeBlock } from "./AttributeBlock";
 import { SkillProficiencyItem } from "./SkillProficiencyItem";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
-import { getProficiencyBonusFromLevel } from "@/entities/character/lib/utils/characterUtils";
+import { getModifier } from "@/entities/character/lib/utils/characterUtils";
+import { PlayerCharacter } from '../../../model/schemas/character.schema';
 
 const ATTRIBUTES_CONFIG = {
   strength: {
@@ -53,36 +54,16 @@ type AttributeName = keyof typeof ATTRIBUTES_CONFIG;
 
 interface PrincipalAttributesAndSkillsProps {
   className?: string;
-  characterName: string;
-  level: number;
-  attributes: {
-    strength: number;
-    dexterity: number;
-    constitution: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-  };
-  proficiencies: {
-    savingThrows: Record<string, boolean>;
-    skills: Record<string, boolean>;
-  };
   onRollDice: (formula: DiceFormula, rollName: string, category: RollCategory, characterName: string) => void;
-  onAttributeChange: (attributeName: AttributeName, value: number) => void;
-  onToggleProficiency: (proficiencyPath: string, isProficient: boolean) => void;
 }
 
 export function PrincipalAttributesAndSkills({
   className,
-  characterName,
-  level,
-  attributes,
-  proficiencies,
   onRollDice,
-  onAttributeChange,
-  onToggleProficiency,
 }: PrincipalAttributesAndSkillsProps) {
-  const proficiencyBonus = getProficiencyBonusFromLevel(level);
+  const { watch } = useFormContext<PlayerCharacter>();
+
+  const characterName = watch('name');
 
   const handleSkillRoll = (formula: DiceFormula, rollName: string, category: RollCategory) => {
     onRollDice(formula, rollName, category, characterName);
@@ -93,8 +74,8 @@ export function PrincipalAttributesAndSkills({
       {(Object.keys(ATTRIBUTES_CONFIG) as AttributeName[]).map((attrName) => {
         const { label, skills } = ATTRIBUTES_CONFIG[attrName];
 
-        const attrValue = attributes[attrName];
-        const attributeModifier = attrValue ? Math.floor((attrValue - 10) / 2) : 0;
+        const attrValue = watch(`attributes.${attrName}`);
+        const attributeModifier = getModifier(attrValue);
 
         const handleAttributeRoll = () => {
           const formula: DiceFormula = `1d20${
@@ -121,12 +102,10 @@ export function PrincipalAttributesAndSkills({
             aria-label="bloco de atributo externo"
           >
             <AttributeBlock
-              name={`attributes.${attrName}`}
+              name={`attributes.${attrName}` as Path<PlayerCharacter>}
               label={label}
-              value={attrValue}
               modifier={attributeModifier}
               onRoll={handleAttributeRoll}
-              onChange={(value) => onAttributeChange(attrName, value)}
             />
 
             <div className="mt-1.5 space-y-0.5">
@@ -135,24 +114,13 @@ export function PrincipalAttributesAndSkills({
                   ? `proficiencies.savingThrows.${skillInfo.key}`
                   : `proficiencies.skills.${skillInfo.key}`;
 
-                const isProficient = skillInfo.isSavingThrow
-                  ? proficiencies.savingThrows[skillInfo.key]
-                  : proficiencies.skills[skillInfo.key];
-
-                const totalBonus = isProficient
-                  ? attributeModifier + proficiencyBonus
-                  : attributeModifier;
-
                 return (
                   <SkillProficiencyItem
                     key={skillInfo.key}
                     skillLabel={skillInfo.label}
-                    name={fieldName}
-                    isProficient={isProficient}
-                    totalBonus={totalBonus}
+                    name={fieldName as Path<PlayerCharacter>}
                     characterName={characterName}
                     onRoll={handleSkillRoll}
-                    onToggleProficiency={onToggleProficiency}
                   />
                 );
               })}

@@ -9,7 +9,7 @@ import { ModalManager } from "../widgets/modalManager/ui/ModalManager";
 import { RightSidebar } from "@/widgets/rightSidebar/ui/RightSidebar";
 import { Toolbar } from "@/widgets/toolBar/ui/Toolbar";
 
-export function SessionPage() {
+export default function SessionPage() {
   const { closeModal } = useModalStore();
 
   const gameBoardRef = useRef<HTMLDivElement>(null);

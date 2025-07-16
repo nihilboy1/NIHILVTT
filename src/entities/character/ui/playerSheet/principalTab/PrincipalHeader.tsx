@@ -1,4 +1,3 @@
-// src/entities/character/ui/playerSheet/principalTab/PrincipalHeader.tsx
 
 import { useFormContext } from 'react-hook-form';
 import { PlayerCharacter } from '../../../model/schemas/character.schema';

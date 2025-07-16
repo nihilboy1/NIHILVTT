@@ -1,32 +1,24 @@
-import React from "react";
+import { useFormContext } from 'react-hook-form';
 import { cn } from "../../../../../shared/lib/utils/cn";
 import { handleNumericInputKeyDown } from "@/entities/character/lib/utils/characterUtils";
+import { PlayerCharacter } from '../../../model/schemas/character.schema';
 
 interface CombatStatsProps {
-  armorClass: number;
-  shieldEquipped: boolean;
-  speed: number;
   calculatedInitiative: number;
   calculatedPassivePerception: number;
   speedInMeters: string;
   speedInSquares: string;
-  onArmorClassChange: (value: number) => void;
-  onShieldEquippedChange: (checked: boolean) => void;
-  onSpeedChange: (value: number) => void;
 }
 
 export const CombatStats: React.FC<CombatStatsProps> = ({
-  armorClass,
-  shieldEquipped,
-  speed,
   calculatedInitiative,
   calculatedPassivePerception,
   speedInMeters,
   speedInSquares,
-  onArmorClassChange,
-  onShieldEquippedChange,
-  onSpeedChange,
 }) => {
+  const { register } = useFormContext<PlayerCharacter>();
+
+ 
   return (
     <fieldset className="p-2 rounded-md bg-surface-1 border">
       <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold uppercase">
@@ -43,9 +35,8 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
           </label>
           <input
             id="armorClass"
-            type="text"
-            value={armorClass}
-            onChange={(e) => onArmorClassChange(Number(e.target.value))}
+            type="number"
+            {...register("combatStats.armorClass", { valueAsNumber: true })}
             className={cn(
               "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
             )}
@@ -62,8 +53,7 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
               <input
                 id="shieldEquipped"
                 type="checkbox"
-                checked={shieldEquipped}
-                onChange={(e) => onShieldEquippedChange(e.target.checked)}
+                {...register("combatStats.shieldEquipped")}
                 className="h-3.5 w-3.5 rounded-sm focus:ring-accent-primary bg-surface-1"
               />
               <span
@@ -105,9 +95,8 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
           </label>
           <input
             id="speed"
-            type="text"
-            value={speed}
-            onChange={(e) => onSpeedChange(Number(e.target.value))}
+            type="number"
+            {...register("combatStats.speed", { valueAsNumber: true })}
             className={cn(
               "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
             )}

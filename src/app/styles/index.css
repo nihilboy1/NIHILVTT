@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Iceberg&display=swap');
 @import "tailwindcss";
 
 @layer base {
@@ -44,6 +45,12 @@
 
   --color-feedback-negative: #ff5555; /* Vermelho para ações negativas */
   --color-feedback-negative-hover: #e04444; /* Vermelho mais escuro para hover */
+}
+
+.iceberg-regular {
+  font-family: "Iceberg", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 @layer utilities {

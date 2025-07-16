@@ -7,11 +7,7 @@ const RegisterPage = lazy(() => import("../pages/RegisterPage"));
 const DashboardPage = lazy(() => import("../pages/DashboardPage"));
 const CampaignsPage = lazy(() => import("../pages/CampaignsPage"));
 const CreateCampaignPage = lazy(() => import("../pages/CreateCampaignPage"));
-const SessionPage = lazy(() =>
-  import("../pages/SessionPage").then((module) => ({
-    default: module.SessionPage,
-  }))
-);
+const SessionPage = lazy(() => import("../pages/SessionPage"));
 
 export default function AppRouter() {
   return (

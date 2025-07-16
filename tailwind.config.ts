@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        iceberg: ['Iceberg', 'sans-serif'],
+      },
     },
   },
   plugins: [],
