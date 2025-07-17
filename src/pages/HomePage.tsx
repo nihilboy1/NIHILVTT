@@ -6,6 +6,9 @@ import { PiMathOperationsBold } from "react-icons/pi";
 import { LuScrollText } from "react-icons/lu";
 import { FaDragon } from "react-icons/fa";
 import { LuMousePointerClick } from "react-icons/lu";
+import { useAuthStore } from "@/features/auth/model/authStore";
+import { useEffect } from "react";
+
 const MotionLink = motion(Link);
 
 const features = [
@@ -57,6 +60,12 @@ const itemVariants = {
 };
 
 export default function HomePage() {
+  const { user, initializeAuth } = useAuthStore();
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
   return (
     <div className="relative bg-surface-0 text-text-primary min-h-screen w-full flex flex-col items-center p-4 sm:p-8 overflow-x-hidden">
       <div className="absolute top-0 left-0 w-full h-full">
@@ -91,20 +100,32 @@ export default function HomePage() {
             className="flex flex-col items-center gap-4 mt-10"
             variants={itemVariants}
           >
-            <MotionLink
-              to="/register"
-              className="hover:bg-accent-primary flex justify-items-center items-center gap-3 bg-surface-3  text-text-primary text-3xl font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-110 transition-all border-b-3 border-text-primary iceberg-regular pointer-events-auto"
-            >
-              <span className="mt-1">CRIAR CONTA</span>
-              <DiceIcon className="w-10 h-10" />
-            </MotionLink>
-            <MotionLink
-              to="/login"
-              className="iceberg-regular bg-text-primary text-surface-3 text-lg font-bold py-2 rounded-xs shadow-md  hover:scale-105 transition-all hover:bg-surface-3 hover:text-text-primary w-full hover:w-[110%] border-b-2 border-text-primary hover:border-accent-secondary pointer-events-auto"
-              whileTap={{ scale: 0.95 }}
-            >
-              ENTRAR
-            </MotionLink>
+            {user ? (
+              <MotionLink
+                to="/dashboard"
+                className="hover:bg-accent-primary flex justify-items-center items-center gap-3 bg-surface-3  text-text-primary text-3xl font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-110 transition-all border-b-3 border-text-primary iceberg-regular pointer-events-auto"
+              >
+                <span className="mt-1">IR PARA O DASHBOARD</span>
+                <DiceIcon className="w-10 h-10" />
+              </MotionLink>
+            ) : (
+              <>
+                <MotionLink
+                  to="/register"
+                  className="hover:bg-accent-primary flex justify-items-center items-center gap-3 bg-surface-3  text-text-primary text-3xl font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-110 transition-all border-b-3 border-text-primary iceberg-regular pointer-events-auto"
+                >
+                  <span className="mt-1">CRIAR CONTA</span>
+                  <DiceIcon className="w-10 h-10" />
+                </MotionLink>
+                <MotionLink
+                  to="/login"
+                  className="iceberg-regular bg-text-primary text-surface-3 text-lg font-bold py-2 rounded-xs shadow-md  hover:scale-105 transition-all hover:bg-surface-3 hover:text-text-primary w-full hover:w-[110%] border-b-2 border-text-primary hover:border-accent-secondary pointer-events-auto"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  ENTRAR
+                </MotionLink>
+              </>
+            )}
           </motion.div>
         </motion.header>
 

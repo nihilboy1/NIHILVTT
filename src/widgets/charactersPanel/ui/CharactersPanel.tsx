@@ -3,7 +3,7 @@ import { useTokenStore } from "../../../entities/token/model/store/tokenStore";
 import { useModalStore } from "@/features/modalManager/model/store";
 import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
 import { useCharactersStore } from "@/entities/character/model/store";
-import { CharacterCard } from "./CharacterCard";
+import { CharacterCard } from "@/entities/character/ui/CharacterCard";
 
 export function CharactersPanel() {
   const { characters, deleteCharacter } = useCharactersStore();

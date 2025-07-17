@@ -1,91 +1,143 @@
-# Estrutura do Projeto (Feature-Sliced Design - FSD)
+## 🧠 Resumo Técnico — NIHILVTT
 
-Este projeto segue a metodologia arquitetural Feature-Sliced Design (FSD) para organizar o código-fonte. O FSD visa tornar o projeto mais compreensível, escalável e estável diante de requisitos de negócios em constante mudança, promovendo a separação de responsabilidades e a reutilização de código.
+**NIHILVTT** é uma aplicação VTT (Virtual Tabletop) construída com **React**, **TypeScript**, **Zustand** e **Feature-Sliced Design (FSD)**. Este documento serve como referência estruturada para agentes de IA que consumam ou modifiquem este projeto.
 
-## Camadas Principais
-
-O projeto é dividido nas seguintes camadas, organizadas em fatias verticais (slices):
-
-*   **`app/`**: Contém a lógica de inicialização da aplicação, provedores globais e estilos globais. É a camada mais alta e orquestra a aplicação.
-    *   `App.tsx`: Componente raiz da aplicação.
-    *   `index.tsx`: Ponto de entrada da aplicação.
-    *   `providers/`: Provedores de contexto globais (ex: `ModalProvider`, `UIProvider`, `ChatProvider`).
-    *   `styles/`: Estilos CSS globais.
-
-*   **`pages/`**: Representa as páginas da aplicação. Cada página é uma composição de widgets e features.
-    *   `GameBoardPage.tsx`: Exemplo de uma página específica.
-
-*   **`widgets/`**: Componentes de UI complexos e reutilizáveis que combinam várias features ou entidades para formar uma parte significativa da interface.
-    *   `ModalManager.tsx`: Gerenciador de modais.
-    *   `RightSidebar.tsx`: Componente da barra lateral direita.
-    *   `charactersPanel/`, `chatPanel/`, `gameBoard/`, `sheetModal/`, `toolBar/`: Exemplos de widgets específicos.
-
-*   **`features/`**: Implementa funcionalidades de negócios específicas e interativas. Uma feature geralmente contém sua própria lógica (model), UI e, ocasionalmente, integrações com entidades.
-    *   `boardMarqueeSelection/`: Seleção de área no tabuleiro.
-    *   `boardPanningAndZoom/`: Pan e zoom do tabuleiro.
-    *   `boardRuler/`: Ferramenta de régua no tabuleiro.
-    *   `boardSettings/`: Configurações do tabuleiro.
-    *   `characterCreation/`: Criação de personagens.
-    *   `characterDropOnBoard/`: Arrastar e soltar personagens no tabuleiro.
-    *   `characterEditAction/`: Edição de ações de personagem.
-    *   `characterUpdateHp/`: Atualização de HP de personagem.
-    *   `diceRolling/`: Rolagem de dados.
-
-*   **`entities/`**: Representa os modelos de dados e a lógica de negócios central. Entidades são independentes de UI e de features específicas.
-    *   `character/`: Entidade de personagem (model, ui).
-    *   `token/`: Entidade de token (model, ui).
-
-*   **`shared/`**: Contém código genérico e reutilizável que não pertence a nenhuma camada específica. Deve ser o mais agnóstico possível.
-    *   `api/`: Definições de tipos de API.
-    *   `assets/`: Ativos estáticos (imagens, ícones, sons).
-    *   `config/`: Constantes de configuração.
-    *   `lib/`: Funções utilitárias, hooks genéricos, helpers.
-        *   `hooks/`: Hooks reutilizáveis (ex: `useCommandHistory`, `useDismissable`).
-        *   `utils/`: Funções utilitárias (ex: `characterUtils`, `cn`, `hpUtils`, `nameUtils`, `sheetUtils`, `board/`, `dice/`, `id/`).
-    *   `ui/`: Componentes de UI genéricos e reutilizáveis (ex: botões, modais básicos, ícones).
-
-## Convenções de Nomenclatura e Estrutura Interna
-
-Dentro de cada "slice" (feature, entity, widget), a estrutura interna geralmente segue:
-
-*   **`model/`**: Contém a lógica de negócios, estados, hooks de gerenciamento de estado e contextos específicos da fatia.
-    *   `contexts/`: Contextos React específicos da fatia.
-    *   `hooks/`: Hooks React específicos da fatia.
-*   **`ui/`**: Contém os componentes de interface do usuário específicos da fatia.
-*   **`lib/`**: Funções utilitárias ou helpers específicos da fatia.
-
-## Regra da "Fatia Vertical" (Vertical Slice Rule)
-
-A regra fundamental do FSD é que as importações devem seguir uma hierarquia estrita:
-
-`app` <- `pages` <- `widgets` <- `features` <- `entities` <- `shared`
-
-*   Uma camada superior pode importar de camadas inferiores (ex: `pages` pode importar de `widgets`, `features`, `entities`, `shared`).
-*   Uma camada inferior **NÃO** pode importar de camadas superiores (ex: `features` não pode importar de `widgets` ou `pages`).
-*   Dentro da mesma camada, as importações devem ser feitas com cautela para evitar dependências circulares.
-
-## Como Criar Novas Fatias (Slices)
-
-Ao criar uma nova feature, entidade ou widget, siga a estrutura interna padrão:
+### 🗂️ Organização Geral (Feature-Sliced Design)
 
 ```
 src/
-└── [camada]/
-    └── [nome-da-fatia]/
-        ├── model/
-        │   ├── contexts/
-        │   └── hooks/
-        ├── ui/
-        └── lib/ (opcional, para utilitários específicos da fatia)
+├─ app/         # Bootstrap da aplicação (entrypoints, estilos, roteamento)
+├─ pages/       # Composição de rotas da aplicação
+├─ widgets/     # Componentes grandes e reutilizáveis (UI significativa)
+├─ features/    # Funcionalidades interativas e de negócio
+├─ entities/    # Modelos de domínio (state, lógica e UI atômica)
+├─ shared/      # Utilitários genéricos, UI base, tipos e config
 ```
 
-## Manutenção e Evolução
+#### 🧩 Regra de Importação FSD
 
-*   **Evite `any` e tipagens genéricas:** Sempre que possível, utilize tipagens explícitas em TypeScript para garantir a segurança e clareza do código.
-*   **Reutilize:** Antes de criar um novo código, verifique se já existe um utilitário, hook ou componente em `shared/` ou em outras fatias que possa ser reutilizado.
-*   **Context API:** Utilize a Context API para gerenciar estados que precisam ser compartilhados entre vários componentes, evitando prop drilling.
-*   **Componentes pequenos:** Mantenha os componentes pequenos e com responsabilidades únicas.
-*   **Comentários em PT-BR:** Todos os comentários no código devem ser escritos em português do Brasil.
-*   **Tecnologias:** O projeto utiliza React, TypeScript, Vite e Tailwind CSS.
+Importações válidas (de cima para baixo):
 
-Ao seguir estas diretrizes, garantimos um projeto organizado, manutenível e fácil de estender.
+```
+app
+ └─ pages
+      └─ widgets
+           └─ features
+                └─ entities
+                     └─ shared
+```
+
+Camadas **não podem importar para cima**.
+
+---
+
+### ⚙️ Tecnologias Principais
+
+| Área               | Tecnologias                           |
+| ------------------ | ------------------------------------- |
+| UI                 | React 18, Tailwind CSS, Framer Motion |
+| Estado             | Zustand (sem Context API)             |
+| Formulários        | React Hook Form + Zod                 |
+| Validação de Tipos | Zod                                   |
+| Roteamento         | React Router DOM v7                   |
+| Notificações       | Sonner                                |
+| Testes             | Jest + React Testing Library          |
+| Build              | Vite                                  |
+| Tipagem            | TypeScript                            |
+| Análise            | Dependency Cruiser                    |
+
+---
+
+### 🧱 Estrutura de Diretórios (Expandido)
+
+#### `app/`
+
+- Entrypoints (`index.tsx`, `App.tsx`)
+- Estilos globais (`styles/`)
+- Roteamento central (`router.tsx`)
+
+#### `pages/`
+
+- Define rotas (ex: `HomePage`, `DashboardPage`, `SessionPage`).
+- Composição de `widgets` + `features`.
+
+#### `widgets/`
+
+Componentes de alto nível que integram múltiplas features. Exemplos:
+
+- `gameBoard/`
+- `charactersPanel/`
+- `rightSidebar/`
+- `toolBar/`
+- `characterSheet/`
+
+#### `features/`
+
+Unidades funcionais independentes e interativas. Exemplos:
+
+- `diceRolling/` → lib + store + UI
+- `boardRuler/` → régua do tabuleiro
+- `characterCreation/` → criação de personagens
+- `auth/` → autenticação + proteção de rota
+- `chat/` → estado e parsing de comandos
+
+Cada feature pode conter:
+
+```
+model/ → Zustand store, hooks, schemas
+ui/    → Componentes específicos
+lib/   → Helpers e lógica auxiliar
+```
+
+#### `entities/`
+
+Modelos centrais como `character/`, `token/`, `board/`. Padrão:
+
+```
+model/
+  ├─ schemas/ → zod
+  ├─ store.ts → zustand
+  └─ hooks/
+lib/
+ui/          → componentes reutilizáveis
+```
+
+#### `shared/`
+
+Código genérico, sem acoplamento de domínio.
+
+- `api/` → tipagens globais
+- `config/` → constantes (`sheetDefaults`, etc.)
+- `lib/` → `hooks/`, `utils/` (ex: `boardUtils`, `hpUtils`, `idUtils`)
+- `ui/` → componentes genéricos (ex: `Modal`, `Button`, `Popover`)
+- `assets/` → imagens e sons
+
+---
+
+### 🧢 Estado Global
+
+- Todas as stores são baseadas em **Zustand**.
+- Stores vivem em `model/store.ts` dentro de `features/` ou `entities/`.
+- Exemplo de slice: `features/chat/model/store.ts`
+
+---
+
+### 📊 Conformidade e Análise Estática
+
+- **ESLint** com suporte para React + TypeScript.
+- **Dependency Cruiser** usado com regras que impõem a hierarquia FSD:
+
+  - Validação: `npm run dep-cruise:validate`
+  - Ciclos: `npm run dep-cruise:circular`
+  - HTML: `npm run dep-cruise:report-html`
+
+---
+
+### ✅ Conformidade para IAs
+
+- Tipagem consistente com `Zod` + `TypeScript`.
+- Sem uso de Context API.
+- Componentes com responsabilidade única.
+- Comentários em português.
+- Componentes de UI agrupados em `ui/`, sem lógica de negócio.
+- Utilitários genéricos centralizados em `shared/lib/utils/`.

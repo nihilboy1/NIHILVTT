@@ -5,8 +5,10 @@ import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormInput } from "@/shared/ui/FormInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuthStore } from "@/features/auth/model/authStore";
+import { useEffect } from "react";
 
 const MotionLink = motion(Link);
 
@@ -51,14 +53,31 @@ export default function RegisterPage() {
   });
 
   const {
-    register,
+    register: registerField, // Renamed to avoid conflict with auth store's register
     handleSubmit,
     formState: { errors },
   } = methods;
 
-  const onSubmit = (data: RegisterFormInputs) => {
-    console.log("Formulário enviado:", data);
-    // Aqui você faria a lógica de registro, como enviar para uma API
+  const { register, user, isLoading, error } = useAuthStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
+  const onSubmit = async (data: RegisterFormInputs) => {
+    try {
+      await register({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+    } catch (err) {
+      // Error handling is done in the store, but you can add more specific UI feedback here if needed
+      console.error("Registration submission error:", err);
+    }
   };
 
   return (
@@ -87,7 +106,7 @@ export default function RegisterPage() {
               id="name"
               type="text"
               placeholder="Seu nome de usuário"
-              register={register}
+              register={registerField}
               error={errors.name}
             />
 
@@ -97,7 +116,7 @@ export default function RegisterPage() {
               id="email"
               type="email"
               placeholder="seu-email@dominio.com"
-              register={register}
+              register={registerField}
               error={errors.email}
             />
 
@@ -107,7 +126,7 @@ export default function RegisterPage() {
               id="password"
               type="password"
               placeholder="••••••••"
-              register={register}
+              register={registerField}
               error={errors.password}
             />
 
@@ -117,7 +136,7 @@ export default function RegisterPage() {
               id="confirmPassword"
               type="password"
               placeholder="••••••••"
-              register={register}
+              register={registerField}
               error={errors.confirmPassword}
             />
 
@@ -126,7 +145,7 @@ export default function RegisterPage() {
               <input
                 type="checkbox"
                 id="terms"
-                {...register("terms")}
+                {...registerField("terms")}
                 className="h-4 w-4 rounded bg-surface-3 border-surface-3 text-accent-primary focus:ring-accent-secondary"
               />
               <label htmlFor="terms" className="text-sm text-text-secondary">
@@ -150,10 +169,16 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 className="w-full hover:bg-accent-primary flex justify-center items-center gap-3 bg-surface-3 text-text-primary text-2xl font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-105 transition-all border-b-3 border-text-primary iceberg-regular"
+                disabled={isLoading}
               >
-                REGISTRAR
+                {isLoading ? "REGISTRANDO..." : "REGISTRAR"}
               </button>
             </div>
+            {error && (
+              <p className="text-feedback-negative text-center text-sm mt-4">
+                {error}
+              </p>
+            )}
           </form>
         </FormProvider>
 

@@ -5,11 +5,11 @@ import {
   useCharacterSheetForm,
   type SaveStatus,
 } from "../../../entities/character/model/hooks/useCharacterSheetForm";
-import { PlayerSheetContent } from "../../../entities/character/ui/playerSheet/PlayerSheetContent";
 import { InteractiveModal } from "../../../shared/ui/InteractiveModal";
 import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
 import { useModalStore } from "@/features/modalManager/model/store";
 import { useCharactersStore } from "@/entities/character/model/store";
+import { PlayerSheetContent } from "@/widgets/characterSheet/playerSheet/PlayerSheetContent";
 
 interface SheetModalProps {
   characterId: string | null;
@@ -75,8 +75,6 @@ export function SheetModal({
 
   const { isDirty } = form.formState;
   const modalTitle = form.watch("name") || "";
-
- 
 
   const handleEditAction = (actionId: string) => {
     console.log("SheetModal: handleEditAction called for actionId:", actionId);

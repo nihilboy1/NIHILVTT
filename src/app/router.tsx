@@ -1,16 +1,23 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Spinner from "../shared/ui/Spinner";
+import ProtectedRoute from "@/features/auth/ui/ProtectedRoute";
+import { useAuthStore } from "@/features/auth/model/authStore";
+import Spinner from "@/shared/ui/Spinner/Spinner";
 
 const HomePage = lazy(() => import("../pages/HomePage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage"));
 const DashboardPage = lazy(() => import("../pages/DashboardPage"));
 const CampaignsPage = lazy(() => import("../pages/CampaignsPage"));
-const CreateCampaignPage = lazy(() => import("../pages/CreateCampaignPage"));
 const SessionPage = lazy(() => import("../pages/SessionPage"));
 
 export default function AppRouter() {
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
   return (
     <BrowserRouter>
       <Suspense fallback={<Spinner />}>
@@ -18,10 +25,14 @@ export default function AppRouter() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/campaigns" element={<CampaignsPage />} />
-          <Route path="/create-campaign" element={<CreateCampaignPage />} />
-          <Route path="/session/:id" element={<SessionPage />} />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/campaigns" element={<CampaignsPage />} />
+            <Route path="/session/:id" element={<SessionPage />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Suspense>

@@ -3,6 +3,7 @@ import { GameBoardContent } from "./GameBoardContent";
 import { DraggingVisuals, Point, Token } from "../../../shared/api/types";
 import { HPModalRenderer } from "./HPModalRenderer";
 import { useBoardStore } from "../../../entities/board/model/store";
+import { useBoardZoomStore } from "@/features/boardZoom/model/store"; // Import the new zoom store
 import { useBoardSettingsStore } from "../../../features/boardSettings/model/store";
 import { useUIStore } from "../../../features/layoutControls/model/store";
 import { useTokenStore } from "../../../entities/token/model/store/tokenStore";
@@ -71,10 +72,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   const {
     viewBox,
-    zoomLevel,
     isPanning,
     getSVGPoint,
-    handleWheel,
     handlePanStart,
     handlePanMove,
     handlePanEnd,
@@ -83,6 +82,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     setPageSettings,
     initializeViewBox,
   } = useBoardStore();
+
+  const { zoomLevel, handleWheel, setZoomLevel } = useBoardZoomStore(); // Get zoomLevel and handleWheel from useBoardZoomStore
 
   useEffect(() => {
     setSvgRef(svgRef);
@@ -97,8 +98,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }, [pageSettings, setPageSettings]);
 
   useEffect(() => {
-    initializeViewBox();
-  }, [initializeViewBox]);
+    initializeViewBox(setZoomLevel);
+  }, [initializeViewBox, setZoomLevel]);
+
+  const getSVGPointWithZoom = useCallback(
+    (clientX: number, clientY: number) => {
+      return getSVGPoint(clientX, clientY, zoomLevel);
+    },
+    [getSVGPoint, zoomLevel]
+  );
 
   const {
     rulerPath,
@@ -111,7 +119,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     rulerPlacementMode,
     rulerPersists,
     gridSettings,
-    getSVGPoint,
+    getSVGPoint: getSVGPointWithZoom,
   });
 
   const handleSetMultiSelectedTokenIds = useCallback(
@@ -139,7 +147,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     handleMarqueeMouseUp,
   } = useMarqueeSelection({
     activeTool,
-    getSVGPoint,
+    getSVGPoint: getSVGPointWithZoom,
     tokensOnBoard,
     characters,
     gridSettings,
@@ -148,19 +156,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   });
 
   const { handleDragOver, handleCharacterDrop } = useCharacterDrop({
-    getSVGPoint,
+    getSVGPoint: getSVGPointWithZoom,
     characters,
     gridSettings,
     pageSettings,
     addToken,
   });
 
+  const handlePanMoveWithZoom = useCallback(
+    (event: MouseEvent) => {
+      handlePanMove(event, zoomLevel);
+    },
+    [handlePanMove, zoomLevel]
+  );
+
   const { handleMouseDown } = useGameBoardEvents({
     svgRef,
     activeTool,
     isPanning,
     handlePanStart,
-    handlePanMove,
+    handlePanMove: handlePanMoveWithZoom,
     handlePanEnd,
     handleRulerMouseDown,
     handleRulerMouseMove,
@@ -317,7 +332,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         svgRef={svgRef}
         viewBox={viewBox}
         zoomLevel={zoomLevel}
-        getSVGPoint={getSVGPoint}
+        getSVGPoint={getSVGPointWithZoom}
         handleWheel={handleWheel}
         handleDragOver={handleDragOver}
         handleCharacterDrop={handleCharacterDrop}

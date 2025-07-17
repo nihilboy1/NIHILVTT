@@ -12,11 +12,11 @@ export interface Roll {
 }
 
 export interface DiceRollDetails {
-  rollName: string; // Ex: "Força", "Acrobacia", "Espada Longa"
-  category: RollCategory; // A categoria da rolagem
+  rollName: string;
+  category: RollCategory;
   parts: (Roll | number)[];
   finalResult: number;
-  naturalRollResult?: number; // Adicionado para armazenar o resultado natural do dado principal (ex: d20)
+  naturalRollResult?: number;
 }
 
 export type DiceFormula = string | number;
@@ -43,7 +43,7 @@ export const Tool = {
   SELECT: "SELECT",
   PAN: "PAN",
   RULER: "RULER",
-  DICE: "DICE", // Adicionado para o botão de dados
+  DICE: "DICE",
 } as const;
 export type Tool = (typeof Tool)[keyof typeof Tool];
 
@@ -53,13 +53,12 @@ export const SidebarTab = {
 } as const;
 export type SidebarTab = (typeof SidebarTab)[keyof typeof SidebarTab];
 
-
 export interface Token {
-  id: string; // ID único para esta instância específica no tabuleiro (tokenId/instanceId)
-  characterId: string; // Chave estrangeira para Character.id
-  sceneId: string; // Em qual mapa ele está
-  position: Point; // Coordenadas X, Y no grid
-  currentHp?: number; // Pode ser diferente do HP da ficha do personagem
+  id: string;
+  characterId: string;
+  sceneId: string;
+  position: Point;
+  currentHp?: number;
 }
 
 export interface GridSettings {
@@ -98,18 +97,17 @@ export interface RulerPathState {
 }
 
 export interface HPControlModalState {
-  tokenId: string | null; // Referência ao ID do Token no tabuleiro
+  tokenId: string | null;
   anchorPoint: Point | null;
 }
 
-// Para rastrear a instância do token sendo arrastada e sua posição visual
 export interface DraggingVisuals {
-  tokenId: string | null; // ID do Token sendo arrastado
-  visualSVGPoint: Point | null; // Sua posição visual SVG atual durante o arrasto
+  tokenId: string | null;
+  visualSVGPoint: Point | null;
 }
 
 export interface MarqueeSelectionState {
   isActive: boolean;
-  startPoint: Point | null; // SVG coordinates
-  currentPoint: Point | null; // SVG coordinates
+  startPoint: Point | null;
+  currentPoint: Point | null;
 }

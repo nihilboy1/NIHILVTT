@@ -12,6 +12,7 @@ interface FormInputProps<TFieldValues extends FieldValues> {
   placeholder: string;
   register: UseFormRegister<TFieldValues>;
   error?: FieldError;
+  disabled?: boolean; // Add disabled prop
 }
 
 export const FormInput = <TFieldValues extends FieldValues>({
@@ -21,6 +22,7 @@ export const FormInput = <TFieldValues extends FieldValues>({
   placeholder,
   register,
   error,
+  disabled, // Destructure disabled prop
 }: FormInputProps<TFieldValues>) => {
   return (
     <div>
@@ -34,8 +36,9 @@ export const FormInput = <TFieldValues extends FieldValues>({
         type={type}
         id={id}
         {...register(id)}
-        className="w-full bg-surface-2 p-2 rounded-sm border border-surface-3 focus:outline-none focus:ring-2 focus:ring-accent-secondary transition-all"
+        className="w-full bg-surface-2 p-2 rounded-sm border border-surface-3 focus:outline-none focus:ring-2 focus:ring-accent-secondary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         placeholder={placeholder}
+        disabled={disabled} // Pass disabled prop to input element
       />
       {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
     </div>

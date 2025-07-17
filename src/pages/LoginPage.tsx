@@ -5,8 +5,10 @@ import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormInput } from "@/shared/ui/FormInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuthStore } from "@/features/auth/model/authStore";
+import { useEffect } from "react";
 
 const MotionLink = motion(Link);
 
@@ -38,14 +40,29 @@ export default function LoginPage() {
   });
 
   const {
-    register,
+    register: registerField, // Renamed to avoid conflict with auth store's register
     handleSubmit,
     formState: { errors },
   } = methods;
 
-  const onSubmit = (data: LoginFormInputs) => {
-    console.log("Formulário de Login enviado:", data);
-    // Aqui você faria a lógica de login, como enviar para uma API
+  const { login, user, isLoading, error } = useAuthStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
+  const onSubmit = async (data: LoginFormInputs) => {
+    try {
+      await login({
+        email: data.email,
+        password: data.password,
+      });
+    } catch (err) {
+      console.error("Login submission error:", err);
+    }
   };
 
   return (
@@ -75,7 +92,7 @@ export default function LoginPage() {
               id="email"
               type="email"
               placeholder="seu-email@dominio.com"
-              register={register}
+              register={registerField}
               error={errors.email}
             />
 
@@ -85,7 +102,7 @@ export default function LoginPage() {
               id="password"
               type="password"
               placeholder="••••••••"
-              register={register}
+              register={registerField}
               error={errors.password}
             />
 
@@ -94,10 +111,16 @@ export default function LoginPage() {
               <button
                 type="submit"
                 className="w-full hover:bg-accent-primary flex justify-center items-center gap-3 bg-surface-3 text-text-primary text-2xl font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-105 transition-all border-b-3 border-text-primary iceberg-regular"
+                disabled={isLoading}
               >
-                ENTRAR
+                {isLoading ? "ENTRANDO..." : "ENTRAR"}
               </button>
             </div>
+            {error && (
+              <p className="text-feedback-negative text-center text-sm mt-4">
+                {error}
+              </p>
+            )}
           </form>
         </FormProvider>
 
