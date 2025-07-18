@@ -87,17 +87,17 @@ export const useCharactersStore = create<CharactersState>((set, get) => ({
                 JSON.stringify(e.flatten(), null, 2)
               );
             } else {
-              console.error("ERRO INESPERADO:", e);
-            }
-            console.log(
-              "--- OBJETO QUE FALHOU NA VALIDAÇÃO (de updatedObject) ---"
-            );
-            console.log(updatedObject);
-            return char;
+            console.error("ERRO INESPERADO:", e);
           }
+          console.log(
+            "--- OBJETO QUE FALHOU NA VALIDAÇÃO (de updatedObject) ---"
+          );
+          console.log(updatedObject);
+          throw e; // Re-throw the error so react-hook-form can catch it
         }
-        return char;
-      }),
+      }
+      return char;
+    }),
     }));
   },
 

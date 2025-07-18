@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/features/auth/model/authStore";
-import Spinner from "@/shared/ui/Spinner/Spinner";
 import { ProfileModal } from "@/widgets/profileModal";
 import { Squares } from "@/shared/ui/SquaresBackground";
+import { Link } from "react-router-dom";
+import { Spinner } from "@/shared/ui/Spinner";
 
 export default function DashboardPage() {
   const { user, isLoading, logout, initializeAuth } = useAuthStore();
@@ -74,9 +75,17 @@ export default function DashboardPage() {
         >
           Sair
         </button>
+        <Link to="/session/1">
+          <button className="ml-3 bg-accent-primary text-text-primary text-xl font-bold py-2 px-6 rounded-lg shadow-lg hover:scale-105 transition-all border-b-3 border-text-primary iceberg-regular">
+            IR PARA SESSÃO
+          </button>
+        </Link>
       </div>
 
-      <ProfileModal isOpen={isProfileModalOpen} onClose={handleCloseProfileModal} />
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={handleCloseProfileModal}
+      />
     </div>
   );
 }

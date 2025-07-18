@@ -33,18 +33,19 @@ Camadas **não podem importar para cima**.
 
 ### ⚙️ Tecnologias Principais
 
-| Área               | Tecnologias                           |
-| ------------------ | ------------------------------------- |
-| UI                 | React 18, Tailwind CSS, Framer Motion |
-| Estado             | Zustand (sem Context API)             |
-| Formulários        | React Hook Form + Zod                 |
-| Validação de Tipos | Zod                                   |
-| Roteamento         | React Router DOM v7                   |
-| Notificações       | Sonner                                |
-| Testes             | Jest + React Testing Library          |
-| Build              | Vite                                  |
-| Tipagem            | TypeScript                            |
-| Análise            | Dependency Cruiser                    |
+| Área               | Tecnologias                                                                                                                   |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| UI                 | React 18, Tailwind CSS, Framer Motion                                                                                         |
+| Estado             | Zustand (sem Context API)                                                                                                     |
+| Formulários        | React Hook Form + Zod                                                                                                         |
+| Validação de Tipos | Zod                                                                                                                           |
+| Roteamento         | React Router DOM v7                                                                                                           |
+| Notificações       | Sonner                                                                                                                        |
+| Testes             | Jest + React Testing Library                                                                                                  |
+| Build              | Vite                                                                                                                          |
+| Tipagem            | TypeScript                                                                                                                    |
+| Análise            | Dependency Cruiser                                                                                                            |
+| Debug              | use a função logDev() sempre que estiver resolvendo um problema, para termos o log no console (D:\CODE\NIHILVTT\lib\utils.ts) |
 
 ---
 

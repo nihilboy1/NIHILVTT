@@ -5,11 +5,13 @@ import { DeleteIcon, PlusCircleIcon } from "@/shared/ui/Icons";
 import { useFormContext, useFieldArray } from "react-hook-form";
 
 export const HealthSection = () => {
-  const { register, control } = useFormContext<PlayerCharacter>();
+  const { register, control, formState } = useFormContext<PlayerCharacter>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "hitDiceEntries",
   });
+
+  const currentHpError = formState.errors.combatStats?.currentHp?.message;
 
   const handleAddHitDice = () => {
     append({ id: generateUniqueId(), type: "d6", quantity: 1 });
@@ -28,7 +30,6 @@ export const HealthSection = () => {
         PONTOS DE VIDA
       </legend>
 
-      {/* SEÇÃO DE HP - AGORA COMPLETA E REGISTRADA */}
       <div>
         <div>
           <label
@@ -46,9 +47,15 @@ export const HealthSection = () => {
             {...register("combatStats.currentHp", { valueAsNumber: true })}
             className={cn(
               "w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-text-primary placeholder-text-secondary",
-              "text-center hide-arrows"
+              "text-center hide-arrows",
+              currentHpError && "border-feedback-negative"
             )}
           />
+          {currentHpError && (
+            <p className="text-feedback-negative text-xs mt-1">
+              {currentHpError}
+            </p>
+          )}
         </div>
         <div className="flex space-x-1.5 mt-1.5">
           <div className="flex-1">
@@ -96,7 +103,6 @@ export const HealthSection = () => {
         </div>
       </div>
 
-      {/* SEÇÃO DE DADOS DE VIDA - SEM MUDANÇAS, JÁ ESTAVA CORRETA */}
       <fieldset className="flex-1 rounded bg-surface-1 relative">
         <legend className="bg-surface-1 rounded text-sm font-bold">
           Dados de Vida

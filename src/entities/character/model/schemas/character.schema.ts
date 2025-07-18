@@ -15,6 +15,7 @@ export const TokenSizeEnum = z.enum([
   "Gargantuan",
 ]);
 export const HitDiceTypeEnum = z.enum(["d4", "d6", "d8", "d10", "d12", "d20"]);
+export const ProficiencyLevelEnum = z.enum(["none", "proficient", "expertise"]);
 
 // =================================================================
 // --- 2. SCHEMAS MODULAREs E REUTILIZÁVEIS ---
@@ -32,32 +33,32 @@ const attributesSchema = z.object({
 
 const proficienciesSchema = z.object({
   savingThrows: z.object({
-    strength: z.boolean(),
-    dexterity: z.boolean(),
-    constitution: z.boolean(),
-    intelligence: z.boolean(),
-    wisdom: z.boolean(),
-    charisma: z.boolean(),
+    strength: ProficiencyLevelEnum,
+    dexterity: ProficiencyLevelEnum,
+    constitution: ProficiencyLevelEnum,
+    intelligence: ProficiencyLevelEnum,
+    wisdom: ProficiencyLevelEnum,
+    charisma: ProficiencyLevelEnum,
   }),
   skills: z.object({
-    acrobatics: z.boolean(),
-    animalHandling: z.boolean(),
-    arcana: z.boolean(),
-    athletics: z.boolean(),
-    deception: z.boolean(),
-    history: z.boolean(),
-    insight: z.boolean(),
-    intimidation: z.boolean(),
-    investigation: z.boolean(),
-    medicine: z.boolean(),
-    nature: z.boolean(),
-    perception: z.boolean(),
-    performance: z.boolean(),
-    persuasion: z.boolean(),
-    religion: z.boolean(),
-    sleightOfHand: z.boolean(),
-    stealth: z.boolean(),
-    survival: z.boolean(),
+    acrobatics: ProficiencyLevelEnum,
+    animalHandling: ProficiencyLevelEnum,
+    arcana: ProficiencyLevelEnum,
+    athletics: ProficiencyLevelEnum,
+    deception: ProficiencyLevelEnum,
+    history: ProficiencyLevelEnum,
+    insight: ProficiencyLevelEnum,
+    intimidation: ProficiencyLevelEnum,
+    investigation: ProficiencyLevelEnum,
+    medicine: ProficiencyLevelEnum,
+    nature: ProficiencyLevelEnum,
+    perception: ProficiencyLevelEnum,
+    performance: ProficiencyLevelEnum,
+    persuasion: ProficiencyLevelEnum,
+    religion: ProficiencyLevelEnum,
+    sleightOfHand: ProficiencyLevelEnum,
+    stealth: ProficiencyLevelEnum,
+    survival: ProficiencyLevelEnum,
   }),
 });
 
@@ -72,6 +73,9 @@ const combatStatsSchema = z.object({
     .max(40, "Classe de Armadura deve ser entre 1 e 40"),
   speed: z.number().int().min(0, "Velocidade não pode ser negativa"),
   shieldEquipped: z.boolean().optional(),
+}).refine((data) => data.currentHp <= data.maxHp, {
+  message: "O HP atual não pode ser maior que o HP máximo.",
+  path: ["currentHp"], // Onde o erro será mostrado no formulário
 });
 
 export const actionSchema = z.object({

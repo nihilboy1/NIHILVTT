@@ -1,6 +1,7 @@
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { handleNumericInputKeyDown } from "@/entities/character/lib/utils/characterUtils";
 import { PlayerCharacter } from "@/entities/character/model/schemas/character.schema";
+
 import { cn } from "@/shared/lib/utils/cn";
 
 interface CombatStatsProps {
@@ -16,7 +17,17 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
   speedInMeters,
   speedInSquares,
 }) => {
-  const { register } = useFormContext<PlayerCharacter>();
+  const { register, control } = useFormContext<PlayerCharacter>();
+  const armorClassValue = useWatch({ name: "combatStats.armorClass", control });
+  const speedValue = useWatch({ name: "combatStats.speed", control });
+
+  const isArmorClassEmpty =
+    armorClassValue === undefined ||
+    armorClassValue === null ||
+    Number.isNaN(armorClassValue);
+
+  const isSpeedEmpty =
+    speedValue === undefined || speedValue === null || Number.isNaN(speedValue);
 
   return (
     <fieldset className="p-2 rounded-md bg-surface-1 border">
@@ -37,12 +48,18 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
             type="number"
             {...register("combatStats.armorClass", { valueAsNumber: true })}
             className={cn(
-              "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
+              "w-full p-2 text-center hide-arrows border rounded h-10",
+              isArmorClassEmpty ? "border-red-500" : "border-text-secondary"
             )}
             onKeyDown={(e) => {
               handleNumericInputKeyDown(e, { min: 1, max: 40 });
             }}
           />
+          {isArmorClassEmpty && (
+            <p className="text-red-500 text-xs mt-1 text-center">
+              Não pode ser vazio
+            </p>
+          )}
           <div className="pt-2 flex justify-between items-center">
             {/* Escudo */}
             <label
@@ -78,7 +95,9 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
               "w-full p-2 text-center text-lg font-semibold border rounded border-text-secondary h-10 flex justify-center items-center"
             )}
           >
-            {calculatedInitiative >= 0
+            {Number.isNaN(calculatedInitiative)
+              ? 0
+              : calculatedInitiative >= 0
               ? `+${calculatedInitiative}`
               : calculatedInitiative}
           </div>
@@ -97,25 +116,30 @@ export const CombatStats: React.FC<CombatStatsProps> = ({
             type="number"
             {...register("combatStats.speed", { valueAsNumber: true })}
             className={cn(
-              "w-full p-2 text-center hide-arrows border rounded border-text-secondary h-10"
+              "w-full p-2 text-center hide-arrows border rounded h-10",
+              isSpeedEmpty ? "border-red-500" : "border-text-secondary"
             )}
             onKeyDown={(e) =>
               handleNumericInputKeyDown(e, { min: 0, max: 150 })
             }
           />
-          {/* NOVO: Container para os valores calculados */}
+          {isSpeedEmpty && (
+            <p className="text-red-500 text-xs mt-1 text-center">
+              Não pode ser vazio
+            </p>
+          )}
           <div className="text-center mt-1 flex flex-col justify-center items-center ">
             <p
               className="text-xs text-text-secondary/80  text-center cursor-default hover:text-text-secondary"
               title="Deslocamento em METROS"
             >
-              {speedInMeters} M
+              {Number.isNaN(Number(speedInMeters)) ? 0 : speedInMeters} M
             </p>
             <p
               className="text-xs text-text-secondary/80 text-center cursor-default hover:text-text-secondary"
               title="Deslocamento em QUADRADOS"
             >
-              {speedInSquares} Q
+              {Number.isNaN(Number(speedInSquares)) ? 0 : speedInSquares} Q
             </p>
           </div>
         </div>

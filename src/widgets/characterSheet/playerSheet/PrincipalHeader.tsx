@@ -1,8 +1,11 @@
 import { PlayerCharacter } from "@/entities/character/model/schemas/character.schema";
+import { cn } from "@/shared/lib/utils/cn";
 import { useFormContext } from "react-hook-form";
 
 export function PrincipalHeader() {
-  const { register, watch } = useFormContext<PlayerCharacter>();
+  const { register, watch, formState } = useFormContext<PlayerCharacter>();
+
+  const nameError = formState.errors.name?.message;
 
   const level = watch("level");
   const calculatedProficiencyBonus = level
@@ -22,10 +25,18 @@ export function PrincipalHeader() {
           id="characterName"
           type="text"
           {...register("name")}
-          className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-[1rem]"
+          className={cn(
+            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md text-[1rem]",
+            nameError && "border-feedback-negative"
+          )}
           required
           maxLength={28}
         />
+        {nameError && (
+          <p className="text-feedback-negative text-xs mt-1">
+            {nameError}
+          </p>
+        )}
       </div>
 
       <div id="classAndSubclass" className="flex flex-col gap-1">

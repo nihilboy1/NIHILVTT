@@ -37,16 +37,17 @@ export function useCharacterSheetForm({
   // A responsabilidade de calcular dados derivados agora pertence aos componentes que os consomem.
 
   // Lógica de auto-save com debounce e validação.
-  const debouncedSave = useDebouncedCallback((data: Character) => {
-    const result = characterSchema.safeParse(data);
+  const debouncedSave = useDebouncedCallback(async (data: Character) => {
+    // Trigger validation to populate formState.errors
+    const isValid = await form.trigger();
 
-    if (result.success) {
+    if (isValid) {
       setSaveStatus('saving');
-      console.log("useCharacterSheetForm: Saving data:", result.data); // Added log
-      onSave(result.data);
+      console.log("useCharacterSheetForm: Saving data:", data); // Added log
+      onSave(data);
       setTimeout(() => setSaveStatus('success'), 500);
     } else {
-      console.error("Validação do Zod falhou antes de salvar:", result.error.flatten());
+      console.error("Validação do Zod falhou antes de salvar:", form.formState.errors);
       setSaveStatus('error');
     }
   }, 500);

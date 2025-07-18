@@ -1,9 +1,11 @@
 // src/shared/config/sheetDefaults.ts
 
 // 1. Importamos os tipos INFERIDOS do Zod, nossa nova fonte da verdade.
+import { z } from "zod"; // Import z
 import {
   type PlayerCharacter,
   type MonsterNpcCharacter,
+  playerCharacterSchema, // Import playerCharacterSchema to infer proficienciesSchema
 } from "@/entities/character/model/schemas/character.schema";
 import defaultTokenImage from "../assets/defaultToken.png";
 import { generateUniqueId } from "@/shared/lib/utils/id/idUtils";
@@ -19,34 +21,38 @@ const defaultAttributes = {
   charisma: 10,
 };
 
-const defaultProficiencies = {
+type ProficienciesSchemaType = z.infer<
+  typeof playerCharacterSchema
+>["proficiencies"];
+
+const defaultProficiencies: ProficienciesSchemaType = {
   savingThrows: {
-    strength: false,
-    dexterity: false,
-    constitution: false,
-    intelligence: false,
-    wisdom: false,
-    charisma: false,
+    strength: "none",
+    dexterity: "none",
+    constitution: "none",
+    intelligence: "none",
+    wisdom: "none",
+    charisma: "none",
   },
   skills: {
-    acrobatics: false,
-    animalHandling: false,
-    arcana: false,
-    athletics: false,
-    deception: false,
-    history: false,
-    insight: false,
-    intimidation: false,
-    investigation: false,
-    medicine: false,
-    nature: false,
-    perception: false,
-    performance: false,
-    persuasion: false,
-    religion: false,
-    sleightOfHand: false,
-    stealth: false,
-    survival: false,
+    acrobatics: "none",
+    animalHandling: "none",
+    arcana: "none",
+    athletics: "none",
+    deception: "none",
+    history: "none",
+    insight: "none",
+    intimidation: "none",
+    investigation: "none",
+    medicine: "none",
+    nature: "none",
+    perception: "none",
+    performance: "none",
+    persuasion: "none",
+    religion: "none",
+    sleightOfHand: "none",
+    stealth: "none",
+    survival: "none",
   },
 };
 
