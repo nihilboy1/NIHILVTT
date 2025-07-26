@@ -5,14 +5,14 @@ import {
   AttackTypeEnum,
   RechargeEventEnum,
   ResourceCostIdEnum,
-} from "./primitives.js";
+} from "../../shared/primitives.js";
 import {
   DcSchema,
   AreaSchema,
   RangeSchema,
   TargetSchema,
-} from "./blocks.schema.js";
-import { ActionOutcomeSchema } from "./outcomes.schema.js";
+} from "../../shared/blocks.schema.js";
+import { ActionOutcomeSchema } from "../../shared/outcomes.schema.js";
 
 export const ActionParametersSchema = z.object({
   activation: z

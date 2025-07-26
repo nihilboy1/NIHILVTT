@@ -9,6 +9,20 @@ export const AbilityScoreEnum = z.enum([
   "charisma",
 ]);
 
+// Adicionar em primitives.ts
+export const MagicSchoolEnum = z.enum([
+  "abjuration",
+  "conjuration",
+  "divination",
+  "enchantment",
+  "evocation",
+  "illusion",
+  "necromancy",
+  "transmutation",
+]);
+
+export const SpellComponentSchema = z.enum(["V", "S", "M"]);
+
 export const SkillEnum = z.enum([
   "acrobatics",
   "animalHandling",
@@ -163,11 +177,10 @@ export const ResourceCostIdEnum = z.enum([
   "bonusAction",
   "reaction",
   "itemCharge", // Carga do próprio item
-  "spellSlot",  // Espaço de magia de um determinado nível
+  "spellSlot", // Espaço de magia de um determinado nível
 ]);
 
-
 export const ItemPropertyEnum = z.enum([
-  "pickLockDC",   // Dificuldade para arrombar (lockpicking)
-  "burstDC",  // Dificuldade para arrebentar com Força
+  "pickLockDC", // Dificuldade para arrombar (lockpicking)
+  "burstDC", // Dificuldade para arrebentar com Força
 ]);

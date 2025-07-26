@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { FinalItemDataSchema } from "../schemas/items.schema.js";
+import { FinalItemDataSchema } from "../item/items.schema";
 
 type ItemArray = z.infer<typeof FinalItemDataSchema>;
 

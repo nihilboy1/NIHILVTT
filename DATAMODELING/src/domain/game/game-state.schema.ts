@@ -1,8 +1,8 @@
 // Em src/schemas/game-state.schema.ts
 
 import { z } from "zod";
-import { AreaSchema, DurationSchema } from "./blocks.schema.js";
-import { ActionOutcomeSchema } from "./outcomes.schema.js";
+import { ActionOutcomeSchema } from "../../shared/outcomes.schema";
+import { AreaSchema, DurationSchema } from "../../shared/blocks.schema";
 // Este arquivo agora importa de outros, mas não é importado por eles,
 // quebrando a dependência circular.
 

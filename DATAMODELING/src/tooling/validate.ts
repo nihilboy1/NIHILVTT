@@ -1,5 +1,5 @@
-import { FinalItemDataSchema } from "../schemas/items.schema.js";
-import { PHB2024ITEMS } from "../data/items.data.js";
+import { FinalItemDataSchema } from "../domain/item/items.schema.js";
+import { PHB2024ITEMS } from "../domain/item/items.data.js";
 console.log("Iniciando a validação dos dados...");
 
 const result = FinalItemDataSchema.safeParse(PHB2024ITEMS);

@@ -1,9 +1,6 @@
 import { z } from "zod";
-import { FinalActionDataSchema } from "../schemas/actions.schema"; // Mantemos para validar a estrutura
+import { FinalActionDataSchema } from "../action/actions.schema";
 
-// O truque mágico é o "as const" no final.
-// Ele diz ao TypeScript para tratar este array como um valor imutável
-// e inferir os tipos mais específicos possíveis (ex: "action-throw-item" em vez de string).
 export const ACTIONS = [
   {
     id: "action-throw-item",
@@ -46,14 +43,10 @@ export const ACTIONS = [
     name: "Usar Carga de Kit",
     description: "Gasta um uso de um kit para um efeito específico.",
   },
-] as const; // <-- A MÁGICA ACONTECE AQUI!
+] as const;
 
-// Validando se os dados estão corretos com o schema (boa prática)
 FinalActionDataSchema.parse(ACTIONS);
 
-// Agora, vamos derivar o enum a partir dos dados!
-// 1. Pegamos todos os IDs do nosso array de dados.
 const allActionIds = ACTIONS.map((action) => action.id);
 
-// 2. Criamos o enum Zod a partir dessa lista.
 export const ActionIdEnum = z.enum(allActionIds);

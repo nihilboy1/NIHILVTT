@@ -16,9 +16,9 @@ import {
   RangeSchema,
   WeaponPropertySchema,
 } from "./blocks.schema.js";
-import { ActionParametersSchema } from "./actions.schema.js";
-import { ActionOutcomeSchema } from "./outcomes.schema.js";
-import { ActionIdEnum } from "../data/actions.data.js";
+import { ActionParametersSchema } from "../domain/action/actions.schema.js";
+import { ActionOutcomeSchema } from "../shared/outcomes.schema.js";
+import { ActionIdEnum } from "../domain/action/actions.data.js";
 
 export const EffectSchema = z.discriminatedUnion("type", [
   z.object({

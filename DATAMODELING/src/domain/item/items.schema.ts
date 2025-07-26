@@ -5,9 +5,9 @@ import {
   ArmorTypeEnum,
   RarityEnum,
   SourceEnum,
-} from "./primitives.js";
-import { RequirementSchema } from "./blocks.schema.js";
-import { EffectSchema } from "./effects.schema.js";
+} from "../../shared/primitives.js";
+import { RequirementSchema } from "../../shared/blocks.schema.js";
+import { EffectSchema } from "../../shared/effects.schema.js";
 
 const BaseItemSchema = z.object({
   id: z.string().min(1),
