@@ -3,6 +3,7 @@ import {
   AbilityScoreEnum,
   ActionTypeEnum,
   AttackTypeEnum,
+  ReactionTriggerEnum,
   RechargeEventEnum,
   ResourceCostIdEnum,
 } from "../../shared/primitives.js";
@@ -11,8 +12,9 @@ import {
   AreaSchema,
   RangeSchema,
   TargetSchema,
+  DiceRollSchema,
 } from "../../shared/blocks.schema.js";
-import { ActionOutcomeSchema } from "../../shared/outcomes.schema.js";
+import { ActionOutcomesSchema } from "../../shared/outcomes.schema.js";
 
 export const ActionParametersSchema = z.object({
   activation: z
@@ -25,7 +27,7 @@ export const ActionParametersSchema = z.object({
           resourceId: ResourceCostIdEnum,
         })
         .optional(),
-      trigger: z.string().optional(),
+      trigger: ReactionTriggerEnum.optional(),
     })
     .optional(),
   attackType: AttackTypeEnum.optional(),
@@ -38,13 +40,13 @@ export const ActionParametersSchema = z.object({
       dc: DcSchema,
     })
     .optional(),
-  effects: z.array(ActionOutcomeSchema).optional(),
+  outcomes: z.array(ActionOutcomesSchema).optional(),
   charges: z
     .object({
       max: z.number().int(),
       recharge: z
         .object({
-          amount: z.string(),
+          amount: DiceRollSchema,
           event: RechargeEventEnum,
         })
         .optional(),

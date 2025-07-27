@@ -1,5 +1,25 @@
 import { z } from "zod";
 
+// ============================================================================
+// PRIMITIVOS GERAIS E DE JOGO
+// ============================================================================
+
+export const SourceEnum = z.enum(["LDJ2024"]);
+
+export const RarityEnum = z.enum([
+  "none",
+  "common",
+  "uncommon",
+  "rare",
+  "veryRare",
+  "legendary",
+  "artifact",
+]);
+
+// ============================================================================
+// PRIMITIVOS DE PERSONAGEM
+// ============================================================================
+
 export const AbilityScoreEnum = z.enum([
   "strength",
   "dexterity",
@@ -8,20 +28,6 @@ export const AbilityScoreEnum = z.enum([
   "wisdom",
   "charisma",
 ]);
-
-// Adicionar em primitives.ts
-export const MagicSchoolEnum = z.enum([
-  "abjuration",
-  "conjuration",
-  "divination",
-  "enchantment",
-  "evocation",
-  "illusion",
-  "necromancy",
-  "transmutation",
-]);
-
-export const SpellComponentSchema = z.enum(["V", "S", "M"]);
 
 export const SkillEnum = z.enum([
   "acrobatics",
@@ -44,16 +50,6 @@ export const SkillEnum = z.enum([
   "survival",
 ]);
 
-export const RarityEnum = z.enum([
-  "none",
-  "common",
-  "uncommon",
-  "rare",
-  "veryRare",
-  "legendary",
-  "artifact",
-]);
-
 export const ConditionEnum = z.enum([
   "blinded",
   "charmed",
@@ -71,7 +67,27 @@ export const ConditionEnum = z.enum([
   "unconscious",
 ]);
 
-export const SourceEnum = z.enum(["LDJ2024"]);
+// ============================================================================
+// PRIMITIVOS DE COMBATE E AÇÕES
+// ============================================================================
+
+export const ActionTypeEnum = z.enum([
+  "action",
+  "bonusAction",
+  "reaction",
+  "free",
+  "special",
+]);
+
+export const AttackTypeEnum = z.enum([
+  "meleeWeaponAttack",
+  "rangedWeaponAttack",
+  "meleeSpellAttack",
+  "rangedSpellAttack",
+  "rangedItemAttack",
+  "meleeItemAttack",
+]);
+
 export const DamageTypeEnum = z.enum([
   "slashing",
   "piercing",
@@ -88,22 +104,54 @@ export const DamageTypeEnum = z.enum([
   "psychic",
 ]);
 
-export const ActionTypeEnum = z.enum([
+export const EffectOutcomeEnum = z.enum(["fail", "success", "hit", "miss"]);
+
+export const ReactionTriggerEnum = z.enum([
+  "targetEntersReach",
+  "targetLeavesReach",
+  "allyIsHit",
+  "selfIsDamaged",
+]);
+
+export const ResourceCostIdEnum = z.enum([
   "action",
   "bonusAction",
   "reaction",
-  "free",
-  "special",
+  "itemCharge",
+  "spellSlot",
 ]);
 
-export const EffectOutcomeEnum = z.enum(["fail", "success", "hit", "miss"]);
-
-export const CostUnitEnum = z.enum([
-  "CooperPiece",
-  "SilverPiece",
-  "GoldPiece",
-  "PlatinumPiece",
+export const RechargeEventEnum = z.enum([
+  "dawn",
+  "dusk",
+  "shortRest",
+  "longRest",
 ]);
+
+// ============================================================================
+// PRIMITIVOS DE MAGIA
+// ============================================================================
+
+export const MagicSchoolEnum = z.enum([
+  "abjuration",
+  "conjuration",
+  "divination",
+  "enchantment",
+  "evocation",
+  "illusion",
+  "necromancy",
+  "transmutation",
+]);
+
+// SUGESTÃO: Renomeado de SpellComponentSchema para consistência
+export const SpellComponentEnum = z.enum(["verbal", "somatic", "material"]);
+
+// ============================================================================
+// PRIMITIVOS DE ITEM
+// ============================================================================
+export const WeaponTypeEnum = z.enum(["melee", "ranged"]);
+
+export const ItemTypeEnum = z.enum(["gear", "tool", "weapon", "armor"]);
 
 export const ArmorTypeEnum = z.enum(["light", "medium", "heavy", "shield"]);
 
@@ -130,57 +178,53 @@ export const WeaponMasteryEnum = z.enum([
   "cleave",
 ]);
 
+export const WeaponCategoryEnum = z.enum(["simple", "martial"]);
+
+export const ItemPropertyEnum = z.enum(["pickLockDC", "burstDC"]);
+
+// ============================================================================
+// PRIMITIVOS DE MEDIDA E AMBIENTE
+// ============================================================================
+
 export const DurationUnitEnum = z.enum([
   "round",
   "minute",
   "hour",
   "day",
-  "turn", // Ex: até o final do próximo turno
-  "instantaneous", // Para efeitos imediatos
-  "special", // Para durações como "até ser dissipada"
-  "unlimited", // Para efeitos permanentes
+  "turn",
+  "instantaneous",
+  "special",
+  "unlimited",
 ]);
 
-export const WeaponCategoryEnum = z.enum(["simple", "martial"]);
+// SUGESTÃO: Removidos valores que não são unidades de medida para maior precisão.
+export const DistanceUnitEnum = z.enum(["ft", "mile"]);
 
-export const WeaponTypeEnum = z.enum(["melee", "ranged"]);
+export const ScalablePropertyEnum = z.enum([
+  "dice", // Para modificar o dado de um DiceRollSchema
+  "bonus", // Para modificar o bónus de um DiceRollSchema
+  "value", // Para modificar um valor numérico genérico
+  "radius", // Para modificar o raio de uma AreaSchema
+  "length", // Para modificar o comprimento de uma AreaSchema
+]);
 
 export const WeightUnitEnum = z.enum(["lb"]);
 
-export const DistanceUnitEnum = z.enum([
-  "ft", // Pés (feet)
-  "mile", // Milhas
-  "self", // O alcance é o próprio lançador
-  "touch", // Alcance de toque
-  "special", // Para alcances especiais descritos no texto
-  "unlimited", // Alcance ilimitado
+// SUGESTÃO: Corrigido erro de digitação de "Cooper" para "Copper"
+export const CostUnitEnum = z.enum(["copper", "silver", "gold", "platinum"]);
+
+export const SurfaceTypeEnum = z.enum([
+  "fire",
+  "ice",
+  "acid",
+  "grease",
+  "water",
+  "web",
+  "darkness",
 ]);
 
-export const AttackTypeEnum = z.enum([
-  "meleeWeaponAttack",
-  "rangedWeaponAttack",
-  "meleeSpellAttack",
-  "rangedSpellAttack",
-  "rangedItemAttack", // Usado pelo item "Ácido" e outros
-  "meleeItemAttack",
-]);
-
-export const RechargeEventEnum = z.enum([
-  "dawn", // Ao amanhecer
-  "dusk", // Ao anoitecer
-  "shortRest", // Após um descanso curto
-  "longRest", // Após um descanso longo
-]);
-
-export const ResourceCostIdEnum = z.enum([
-  "action",
-  "bonusAction",
-  "reaction",
-  "itemCharge", // Carga do próprio item
-  "spellSlot", // Espaço de magia de um determinado nível
-]);
-
-export const ItemPropertyEnum = z.enum([
-  "pickLockDC", // Dificuldade para arrombar (lockpicking)
-  "burstDC", // Dificuldade para arrebentar com Força
+export const SurfaceTriggerEnum = z.enum([
+  "onEnterArea",
+  "onStartTurnInArea",
+  "onEndTurnInArea",
 ]);

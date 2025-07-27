@@ -1,77 +1,81 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import { build } from "esbuild";
+import { writeFileSync, mkdirSync, existsSync } from "fs";
 import path from "path";
+import { pathToFileURL } from "url";
 
-// --- Configuration ---
-const numberOfFiles = 48; // You can change this value to control the number of output files
-const inputFilePath = "./src/data/spells.json";
+// --- Configurações ---
+const inputFilePath = "./src/domain/spell/spells.data.ts";
 const outputDirectory = "./src/data/generated";
-// --- End Configuration ---
+const tempOutfile = "./.temp/spells.bundle.mjs";
+// ---------------------
 
-async function splitSpells() {
-  console.log(`Starting to split spells from: ${inputFilePath}`);
+async function bundleWithEsbuild() {
+  await build({
+    entryPoints: [inputFilePath],
+    bundle: true,
+    platform: "node",
+    format: "esm",
+    outfile: tempOutfile,
+    external: [], // pode adicionar libs externas se quiser ignorar
+  });
+}
 
-  // Ensure output directory exists
+async function loadSpellsArray() {
+  const module = await import(pathToFileURL(tempOutfile));
+  // Detecta qualquer exportação que seja um array
+  const key = Object.keys(module).find((k) => Array.isArray(module[k]));
+  if (!key)
+    throw new Error(
+      "Nenhuma exportação de array encontrada no módulo compilado."
+    );
+  return module[key];
+}
+
+async function splitSpellsByLevel() {
+  console.log(`🔧 Bundling com esbuild...`);
+  await bundleWithEsbuild();
+
+  console.log(`📦 Importando módulo compilado...`);
+  const spells = await loadSpellsArray();
+
+  console.log(`🔍 Magias encontradas: ${spells.length}`);
+
   if (!existsSync(outputDirectory)) {
     mkdirSync(outputDirectory, { recursive: true });
-    console.log(`Created output directory: ${outputDirectory}`);
+    console.log(`📁 Criado diretório: ${outputDirectory}`);
   }
 
-  // Read the large JSON file
-  let rawData;
-  try {
-    rawData = readFileSync(inputFilePath, "utf8");
-  } catch (error) {
-    console.error(`Error reading input file ${inputFilePath}:`, error);
-    return;
-  }
+  const grouped = {};
+  for (let lvl = 0; lvl <= 9; lvl++) grouped[lvl] = [];
 
-  let spells;
-  try {
-    spells = JSON.parse(rawData).spell; // Assuming the JSON has a top-level "spell" array
-    if (!Array.isArray(spells)) {
-      throw new Error("Expected 'spell' to be an array in the JSON data.");
-    }
-  } catch (error) {
-    console.error("Error parsing JSON data:", error);
-    return;
-  }
-
-  console.log(`Found ${spells.length} spells.`);
-
-  const spellsPerFile = Math.ceil(spells.length / numberOfFiles);
-  console.log(
-    `Splitting into ${numberOfFiles} files, with approximately ${spellsPerFile} spells per file.`
-  );
-
-  for (let i = 0; i < numberOfFiles; i++) {
-    const start = i * spellsPerFile;
-    const end = Math.min(start + spellsPerFile, spells.length);
-    const chunk = spells.slice(start, end);
-
-    if (chunk.length === 0) {
-      console.log(`Skipping empty chunk for file part ${i + 1}`);
+  for (const spell of spells) {
+    if (typeof spell.level !== "number") {
+      console.warn(`⚠️ Spell sem level numérico:`, spell.name);
       continue;
     }
+    const lvl = spell.level;
+    if (lvl >= 0 && lvl <= 9) {
+      grouped[lvl].push(spell);
+    } else {
+      console.warn(`⚠️ Level inválido: ${lvl} (spell: ${spell.name})`);
+    }
+  }
 
-    const outputFileName = `spells-part-${i + 1}.ts`;
+  for (let lvl = 0; lvl <= 9; lvl++) {
+    const outputFileName = `spells-level-${lvl}.ts`;
     const outputPath = path.join(outputDirectory, outputFileName);
-
-    // Convert JSON structure to TypeScript array with explicit type
-    const tsContent = `export const spellsPart${i + 1}= ${JSON.stringify(
-      chunk,
+    const tsContent = `export const spellsLevel${lvl} = ${JSON.stringify(
+      grouped[lvl],
       null,
       2
     )};\n`;
-
-    try {
-      writeFileSync(outputPath, tsContent, "utf8");
-      console.log(`Successfully wrote ${chunk.length} spells to ${outputPath}`);
-    } catch (error) {
-      console.error(`Error writing file ${outputPath}:`, error);
-    }
+    writeFileSync(outputPath, tsContent, "utf8");
+    console.log(`✅ ${outputFileName} (${grouped[lvl].length} magias)`);
   }
 
-  console.log("Spell splitting complete.");
+  console.log("🏁 Divisão por nível concluída.");
 }
 
-splitSpells();
+splitSpellsByLevel().catch((err) => {
+  console.error("❌ Erro durante execução:", err);
+});

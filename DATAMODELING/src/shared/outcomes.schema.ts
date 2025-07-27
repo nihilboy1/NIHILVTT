@@ -1,44 +1,129 @@
 import { z } from "zod";
-import { EffectOutcomeEnum, ConditionEnum } from "./primitives.js";
-import { DamageFormulaSchema, DurationSchema } from "./blocks.schema.js";
+import { ConditionEnum, EffectOutcomeEnum } from "./primitives.js";
+import {
+  AreaSchema,
+  DamageFormulaSchema,
+  DiceRollSchema,
+  DurationSchema,
+} from "./blocks.schema.js";
+// CORREÇÃO: Importamos o Hub central 'Schemas' em vez de membros individuais.
+import { Schemas } from "../domain/schemas.js";
 
-export const NoneOutcomeSchema = z.object({
-  on: EffectOutcomeEnum,
+const NoneOutcomeSchema = z.object({
+  id: z.string().optional(),
   type: z.literal("none"),
+  on: EffectOutcomeEnum,
 });
 
-export const DamageOutcomeSchema = z.object({
+/**
+ * Outcome que causa dano direto.
+ * - 'on' indica se é aplicado em 'fail', 'success', 'hit' etc.
+ * - 'formula' define o dano (dados, tipo, bônus).
+ */
+const DamageOutcomeSchema = z.object({
+  id: z.string().optional(),
   type: z.literal("damage"),
   on: EffectOutcomeEnum,
   formula: DamageFormulaSchema,
 });
-
-export const ApplyConditionOutcomeSchema = z.object({
-  type: z.literal("applyCondition"),
+const ModifyVitalsOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("modifyVitals"),
   on: EffectOutcomeEnum,
-  condition: ConditionEnum,
-  duration: DurationSchema.optional(), // <-- MUITO MAIS LIMPO!
+  vitals: z.array(z.enum(["maxHp", "currentHp", "tempHp"])),
+  formula: DiceRollSchema,
 });
 
-export const ApplyCustomEffectOutcomeSchema = z.object({
-  type: z.literal("applyCustomEffect"),
+const conditionsThatRequireDuration = new Set([
+  "poisoned",
+  "frightened",
+  "restrained",
+]);
+const ApplyConditionOutcomeSchema = z
+  .object({
+    id: z.string().optional(),
+    type: z.literal("applyCondition"),
+    on: EffectOutcomeEnum,
+    condition: ConditionEnum,
+    duration: DurationSchema.optional(),
+  })
+  .refine(
+    (data) =>
+      !conditionsThatRequireDuration.has(data.condition) ||
+      data.duration !== undefined,
+    {
+      message: "Duration is required for this condition",
+      path: ["duration"],
+    }
+  );
+const ApplyEffectOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("applyEffect"),
   on: EffectOutcomeEnum,
-  effect: z.string(),
-  value: z.union([z.string(), z.number(), z.boolean()]).optional(),
-  duration: DurationSchema.optional(), // <-- MUITO MAIS LIMPO!
+  effect: z.lazy(() => Schemas.ApplicableEffectSchema),
 });
-
-export const CustomMechanicOutcomeSchema = z.object({
+const SummonTokenOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("summonToken"),
+  on: EffectOutcomeEnum,
+  token: z.object({
+    name: z.string(),
+    quantity: z.number().int().min(1, "Quantity must be at least 1"),
+    effects: z.array(z.lazy(() => Schemas.EffectSchema)),
+  }),
+  duration: DurationSchema,
+});
+const PlaySoundOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("playSound"),
+  on: EffectOutcomeEnum,
+  soundId: z.string(),
+});
+const NotifyPlayerOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("notifyPlayer"),
+  on: EffectOutcomeEnum,
+  message: z.string(),
+  target: z.enum(["caster", "targetCreature", "allPCs"]),
+});
+const CreateNarrativeTriggerOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("createNarrativeTrigger"),
+  on: EffectOutcomeEnum,
+  triggerId: z.string(),
+  duration: DurationSchema,
+  area: AreaSchema.optional(),
+  gmActions: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        outcome: z.discriminatedUnion("type", [
+          PlaySoundOutcomeSchema,
+          NotifyPlayerOutcomeSchema,
+          DamageOutcomeSchema,
+          ApplyConditionOutcomeSchema,
+        ]),
+      })
+    )
+    .nonempty("gmActions must have at least one action"),
+});
+const CustomMechanicOutcomeSchema = z.object({
+  id: z.string().optional(),
   type: z.literal("customMechanic"),
   on: EffectOutcomeEnum,
   mechanic: z.string(),
   details: z.record(z.string(), z.any()).optional(),
 });
-
-export const ActionOutcomeSchema = z.discriminatedUnion("type", [
+export const ActionOutcomesSchema = z.discriminatedUnion("type", [
   DamageOutcomeSchema,
+  ModifyVitalsOutcomeSchema,
   ApplyConditionOutcomeSchema,
-  ApplyCustomEffectOutcomeSchema,
-  CustomMechanicOutcomeSchema,
+  ApplyEffectOutcomeSchema,
+  SummonTokenOutcomeSchema,
   NoneOutcomeSchema,
+  CreateNarrativeTriggerOutcomeSchema,
+  PlaySoundOutcomeSchema,
+  NotifyPlayerOutcomeSchema,
+  CustomMechanicOutcomeSchema,
 ]);

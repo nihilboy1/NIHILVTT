@@ -1,41 +1,50 @@
-import { FinalItemDataSchema } from "../domain/item/items.schema.js";
-import { PHB2024ITEMS } from "../domain/item/items.data.js";
-console.log("Iniciando a validação dos dados...");
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
 
-const result = FinalItemDataSchema.safeParse(PHB2024ITEMS);
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
 
-if (result.success) {
-  console.log("✅ Validação concluída com sucesso!");
-} else {
-  console.error("❌ Erro de validação encontrado!");
+import { spellsLevel0 } from "../data/generated/spells-level-0.js";
+import { FinalSpellDataSchema } from "../domain/schemas.js";
 
-  const flatErrors = result.error.flatten().fieldErrors;
-  const errorsById: Record<string, string[]> = {};
+console.log("🔍 Iniciando a validação dos dados...");
 
-  for (const [path, messages] of Object.entries(flatErrors)) {
-    const indexStr = path.match(/^\d+/)?.[0];
-    if (indexStr) {
-      const index = parseInt(indexStr, 10);
-      const itemWithError = PHB2024ITEMS[index];
-      const itemId = itemWithError?.id || `Índice ${index} (ID não encontrado)`;
+try {
+  const result = FinalSpellDataSchema.safeParse(spellsLevel0);
 
-      const cleanPath = path.substring(indexStr.length + 1);
+  if (result.success) {
+    console.log("✅ Validação concluída com sucesso!");
+  } else {
+    console.error("❌ Erro(s) de validação encontrado(s)!\n");
 
-      if (!errorsById[itemId]) {
-        errorsById[itemId] = [];
+    const errorsById: Record<string, string[]> = {};
+
+    for (const issue of result.error.issues) {
+      const [index, ...fieldPathParts] = issue.path;
+      const fieldPath = fieldPathParts.join(".");
+
+      const spellWithError = spellsLevel0[index as number];
+      const spellId =
+        spellWithError?.id || `Índice ${String(index)} (ID não encontrado)`;
+
+      const readableField = fieldPath || "(campo não identificado)";
+      const message = `- Campo '${readableField}': ${issue.message}`;
+
+      if (!errorsById[spellId]) {
+        errorsById[spellId] = [];
       }
 
-      // Mensagem de erro simplificada, sem o valor do campo
-      const errorMessage = `- Campo '${cleanPath || "(item inteiro)"}': ${(
-        messages || []
-      ).join(", ")}`;
-      errorsById[itemId].push(errorMessage);
+      errorsById[spellId].push(message);
+    }
+
+    console.log("\n--- Resumo dos Erros por Spell ---");
+    for (const [id, errorMessages] of Object.entries(errorsById)) {
+      console.error(`\n🚨 Spell: ${id}`);
+      errorMessages.forEach((msg) => console.error(`  ${msg}`));
     }
   }
-
-  console.log("\n--- Resumo dos Erros por Item ---");
-  for (const [id, errorMessages] of Object.entries(errorsById)) {
-    console.error(`\n🚨 Item: ${id}`);
-    errorMessages.forEach((msg) => console.error(`  ${msg}`));
-  }
+} catch (e) {
+  console.error("Erro inesperado durante a validação:", e);
 }

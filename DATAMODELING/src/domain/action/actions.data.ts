@@ -1,11 +1,17 @@
 import { z } from "zod";
-import { FinalActionDataSchema } from "../action/actions.schema";
+import { FinalActionDataSchema } from "../action/actions.schema.js";
 
 export const ACTIONS = [
   {
     id: "action-throw-item",
     name: "Arremessar Item",
     description: "Uma ação para arremessar um item em um alvo ou área.",
+  },
+  {
+    id: "action-move-summoned-token",
+    name: "Mover Invocação",
+    description:
+      "Usa uma ação para mover uma criatura ou objeto invocado que você controla.",
   },
   {
     id: "action-consume-item",
@@ -42,6 +48,11 @@ export const ACTIONS = [
     id: "action-use-kit-charge",
     name: "Usar Carga de Kit",
     description: "Gasta um uso de um kit para um efeito específico.",
+  },
+  {
+    id: "action-cast-spell",
+    name: "Conjurar Magia",
+    description: "Conjura uma magia de nivel 0 a 9",
   },
 ] as const;
 

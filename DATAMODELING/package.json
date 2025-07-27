@@ -1,20 +1,27 @@
 {
-  "name": "processdata",
+  "name": "datamodeling",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "validate:data": "node --loader ts-node/esm src/tooling/validate.ts"
+    "validate:data": "npx tsx src/tooling/validate.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@types/lodash": "^4.17.20",
+    "@types/node": "^24.1.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "zod": "^4.0.8"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "esbuild": "^0.25.8",
+    "lodash": "^4.17.21",
+    "slugify": "^1.6.6"
   }
 }
