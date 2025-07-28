@@ -31,7 +31,7 @@ export const spellsLevel0: FinalSpellDataSchemaProps = [
             unit: "ft",
           },
           area: {
-            shape: "sphere",
+            shape: "",
             radius: 5,
           },
           save: {

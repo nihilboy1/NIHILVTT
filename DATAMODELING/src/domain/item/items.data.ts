@@ -778,7 +778,7 @@ export const PHB2024ITEMS: FinalItemDataSchemaProps = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: ["light"],
+        properties: [{ property: "versatile" }],
         mastery: ["slow"],
         damage: {
           primary: { dice: "1d4", damageType: "bludgeoning" },

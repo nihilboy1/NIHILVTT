@@ -21,6 +21,7 @@ import * as outcomes from "../shared/outcomes.schema.js";
 const effects = createEffectSchemas({
   ActionIdEnum,
   ActionParametersSchema,
+  ActionOutcomesSchema: outcomes.ActionOutcomesSchema,
 });
 
 // --- Passo 3: Construir as Magias ---

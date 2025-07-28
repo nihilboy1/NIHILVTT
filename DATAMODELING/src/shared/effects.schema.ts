@@ -16,7 +16,6 @@ import {
   WeightUnitEnum,
   ScalablePropertyEnum,
 } from "./primitives.js";
-import { Schemas } from "../domain/schemas.js";
 
 // ============================================================================
 // FACTORY DE SCHEMAS DE EFEITO
@@ -29,9 +28,11 @@ import { Schemas } from "../domain/schemas.js";
 export function createEffectSchemas(dependencies: {
   ActionIdEnum: z.ZodType<string>;
   ActionParametersSchema: z.ZodObject<any>;
+  ActionOutcomesSchema: z.ZodType<any>;
 }) {
   // Desestruturamos as dependências injetadas da camada de domínio.
-  const { ActionIdEnum, ActionParametersSchema } = dependencies;
+  const { ActionIdEnum, ActionParametersSchema, ActionOutcomesSchema } =
+    dependencies;
 
   // O resto do ficheiro permanece o mesmo, mas agora dentro do escopo da fábrica.
 
@@ -89,7 +90,7 @@ export function createEffectSchemas(dependencies: {
       .optional(),
     range: RangeSchema.optional(),
     // z.lazy ainda é crucial para quebrar o ciclo interno com outcomes.schema.ts
-    outcomes: z.array(z.lazy(() => Schemas.ActionOutcomesSchema)).optional(),
+    outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
     cost: z
       .object({
         amount: z.number(),

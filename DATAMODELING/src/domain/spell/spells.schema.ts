@@ -13,20 +13,13 @@ import { DurationSchema } from "../../shared/blocks.schema.js";
 // uma fábrica. Ele recebe o EffectSchema já construído como dependência.
 // ----------------------------------------------------------------------------
 
-// CORREÇÃO: Conforme a sua sugestão, definimos a "forma mínima" que um efeito
-// precisa de ter para que a nossa lógica de validação funcione.
-const RefinableEffectShape = z.object({
-  type: z.string(),
-  scaling: z.any().optional(),
-  parameters: z.any().optional(),
-});
+// Definimos uma "forma" base para o efeito para ajudar o TypeScript.
+type BaseEffect = { type: string; [key: string]: any };
+type EffectZodType = z.ZodType<BaseEffect, any, any>;
 
-// Usamos esta forma para restringir o nosso tipo genérico. Isto garante que
-// qualquer EffectSchema passado para esta fábrica irá produzir um output
-// que o TypeScript consegue entender, resolvendo os erros de tipo.
-export function createSpellSchemas<
-  EffectSchemaType extends z.ZodType<z.infer<typeof RefinableEffectShape>>
->(dependencies: { EffectSchema: EffectSchemaType }) {
+export function createSpellSchemas<T extends EffectZodType>(dependencies: {
+  EffectSchema: T;
+}) {
   const { EffectSchema } = dependencies;
 
   /** uma magia NÃO É uma ação. Uma magia TEM uma ação. */
@@ -56,8 +49,8 @@ export function createSpellSchemas<
     effects: z.array(EffectSchema),
   });
 
-  const SpellSchemaWithRefinement = SpellSchema.superRefine((spell, ctx) => {
-    // Agora, o TypeScript sabe que cada 'effect' tem as propriedades 'type', 'scaling', etc.
+  const SpellSchemaWithRefinement = SpellSchema.check((ctx) => {
+    const spell = ctx.value;
     const scalingEffects = spell.effects.filter(
       (effect) => effect.type === "activatableCastSpell" && effect.scaling
     );
@@ -88,7 +81,7 @@ export function createSpellSchemas<
       ) {
         effect.scaling.rules.forEach((rule, index) => {
           if (!definedOutcomeIds.has(rule.outcomeId)) {
-            ctx.addIssue({
+            ctx.issues.push({
               code: "custom",
               message: `ID de outcome inválido: "${rule.outcomeId}". Não foi encontrado nenhum outcome com este ID na definição da magia.`,
               path: [
@@ -99,6 +92,7 @@ export function createSpellSchemas<
                 index,
                 "outcomeId",
               ],
+              input: spell, // ou outro valor de entrada relevante para o erro
             });
           }
         });
