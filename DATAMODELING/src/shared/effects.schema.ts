@@ -197,6 +197,5 @@ export function createEffectSchemas(dependencies: {
   return {
     EffectSchema,
     ApplicableEffectSchema,
-    SpellScalingSchema,
   };
 }

@@ -2,9 +2,9 @@ import z from "zod";
 
 import { FinalItemDataSchema } from "../item/items.schema";
 
-type ItemArray = z.infer<typeof FinalItemDataSchema>;
+type FinalItemDataSchemaProps = z.infer<typeof FinalItemDataSchema>;
 
-export const PHB2024ITEMS: ItemArray = [
+export const PHB2024ITEMS: FinalItemDataSchemaProps = [
   {
     id: "item-acido",
     name: "Ácido",

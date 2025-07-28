@@ -22,7 +22,7 @@ const BaseItemSchema = z.object({
   weight: z.object({ value: z.number(), unit: WeightUnitEnum }),
   price: z.object({ quantity: z.number(), unit: CostUnitEnum }).optional(),
   requirements: z.array(RequirementSchema).optional(),
-  effects: z.array(Schemas.effects),
+  effects: z.array(Schemas.EffectSchema),
 });
 
 const GearItemSchema = BaseItemSchema.extend({ type: z.literal("gear") });
