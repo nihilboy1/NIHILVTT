@@ -1,10 +1,6 @@
-import z from "zod";
+import { Item } from "./items.schema";
 
-import { FinalItemDataSchema } from "../item/items.schema";
-
-type FinalItemDataSchemaProps = z.infer<typeof FinalItemDataSchema>;
-
-export const PHB2024ITEMS: FinalItemDataSchemaProps = [
+export const PHB2024ITEMS: Item[] = [
   {
     id: "item-acido",
     name: "Ácido",
@@ -474,7 +470,7 @@ export const PHB2024ITEMS: FinalItemDataSchemaProps = [
         weaponType: "ranged",
         properties: [
           {
-            name: "special",
+            property: "special",
             condition:
               "A Large or smaller creature hit by a net is restrained until it is freed.",
           },

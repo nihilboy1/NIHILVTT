@@ -1,8 +1,6 @@
-import z from "zod";
-import { FinalSpellDataSchema } from "../../domain/schemas.js";
+import type { Spell } from "../../domain/schemas.js"; // Ajuste o caminho se necessário
 
-type FinalSpellDataSchemaProps = z.infer<typeof FinalSpellDataSchema>;
-export const spellsLevel0: FinalSpellDataSchemaProps = [
+export const spellsLevel0: Spell[] = [
   {
     id: "spell-bolha-acida",
     name: "Bolha Ácida",
@@ -31,7 +29,7 @@ export const spellsLevel0: FinalSpellDataSchemaProps = [
             unit: "ft",
           },
           area: {
-            shape: "",
+            shape: "sphere",
             radius: 5,
           },
           save: {
@@ -439,4 +437,4 @@ export const spellsLevel0: FinalSpellDataSchemaProps = [
       },
     ],
   },
-] as const;
+];

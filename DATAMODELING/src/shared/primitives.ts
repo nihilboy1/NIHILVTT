@@ -165,6 +165,7 @@ export const WeaponPropertyEnum = z.enum([
   "reach",
   "twoHanded",
   "light",
+  "special",
 ]);
 
 export const WeaponMasteryEnum = z.enum([
