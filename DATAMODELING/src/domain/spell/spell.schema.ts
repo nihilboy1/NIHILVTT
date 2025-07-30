@@ -10,7 +10,8 @@ import { ActionOutcomeType } from "../../shared/outcome.schema.js";
 
 const SpellSchema = z.object({
   id: z.string().min(1),
-  name: z.string().min(1),
+  // Permite que o nome seja uma string ou um array de strings
+  name: z.union([z.string().min(1), z.array(z.string().min(1))]),
   description: z.string(),
   source: SourceEnum,
   page: z.number(),
@@ -61,21 +62,25 @@ const SpellSchemaWithRefinement = SpellSchema.check((ctx) => {
       effect.type === "activatableCastSpell" &&
       effect.scaling?.type === "characterLevel"
     ) {
+      // AQUI ESTÁ A CORREÇÃO
       effect.scaling.rules.forEach((rule: any, index: number) => {
-        if (!definedOutcomeIds.has(rule.outcomeId)) {
-          ctx.issues.push({
-            input: ctx.value,
-            code: "custom",
-            message: `ID de outcome inválido: "${rule.outcomeId}". Não foi encontrado nenhum outcome com este ID na definição da magia.`,
-            path: [
-              "effects",
-              spell.effects.indexOf(effect),
-              "scaling",
-              "rules",
-              index,
-              "outcomeId",
-            ],
-          });
+        // Nós só validamos o 'outcomeId' se a regra for do tipo que o utiliza.
+        if (rule.type === "modifyOutcomeFormula") {
+          if (!definedOutcomeIds.has(rule.outcomeId)) {
+            ctx.issues.push({
+              input: ctx.value,
+              code: "custom",
+              message: `ID de outcome inválido: "${rule.outcomeId}". Não foi encontrado nenhum outcome com este ID na definição da magia.`,
+              path: [
+                "effects",
+                spell.effects.indexOf(effect),
+                "scaling",
+                "rules",
+                index,
+                "outcomeId",
+              ],
+            });
+          }
         }
       });
     }

@@ -84,10 +84,9 @@ function ask(question: string): Promise<string> {
 async function main() {
   let choice: string;
 
-  // Loop até o usuário digitar 1 ou 2
   while (true) {
     choice = (
-      await ask("\nO que você quer testar? \n[1] Magias \n[2] Itens\nInforme: ")
+      await ask("\nO que você quer testar?\n[1] Magias\n[2] Itens\nInforme: ")
     ).trim();
 
     if (choice === "1" || choice === "2") break;

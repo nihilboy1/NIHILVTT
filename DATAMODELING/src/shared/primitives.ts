@@ -6,6 +6,27 @@ import { z } from "zod";
 
 export const SourceEnum = z.enum(["LDJ2024"]);
 
+export const ActionParameterPaths = z.enum([
+  // Caminhos para Activation
+  "activation.type",
+  "activation.cost.amount",
+  // Caminhos para Range
+  "range.normal",
+  "range.long",
+  // Caminhos para Area
+  "area.radius", // Para esferas
+  "area.size", // Para cubos
+  "area.length", // Para cones e linhas
+  "area.width", // Para linhas
+  // Caminhos para Target
+  "target.quantity",
+  // Caminhos para Save
+  "save.ability",
+  "save.dc", // Note: 'dc' pode ser um número ou um objeto. Modificar o objeto inteiro é mais simples.
+  // Caminhos para Charges
+  "charges.max",
+]);
+
 export const RarityEnum = z.enum([
   "none",
   "common",

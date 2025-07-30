@@ -1,5 +1,5 @@
 // ============================================================================
-// >> INÍCIO: src/domain/shared/effect.schema.ts
+// >> INÍCIO: src/shared/effect.schema.ts
 // Este é o coração do sistema. Define todos os Efeitos.
 // Ele depende de Ações e Outcomes.
 // ============================================================================
@@ -9,13 +9,16 @@ import { z } from "zod";
 import {
   AcSchema,
   DamageFormulaSchema,
+  DiceRollSchema,
   DurationSchema,
   RangeSchema,
   WeaponPropertySchema,
-} from "../shared/blocks.schema.js";
-import { ActionIdEnum } from "../domain/action/actions.data.js";
+} from "./blocks.schema.js";
+const ActionIdEnum = z.string(); // Usando um placeholder seguro
+
 import {
   AbilityScoreEnum,
+  ActionParameterPaths, // <-- Sua alteração mantida
   ItemPropertyEnum,
   ScalablePropertyEnum,
   SkillEnum,
@@ -23,12 +26,16 @@ import {
   WeaponMasteryEnum,
   WeaponTypeEnum,
   WeightUnitEnum,
-} from "./primitives.js";
+} from "./primitives.js"; // <-- Sua alteração mantida
 import { actionOutcomesSchema, ActionOutcomeType } from "./outcome.schema.js";
 import {
   actionParametersSchema,
   ActionParametersType,
 } from "./actions.schema.js";
+
+// ============================================================================
+// INTERFACES DE TIPO
+// ============================================================================
 
 interface OnEquipSetACEffectType {
   type: "onEquip_setAC";
@@ -75,6 +82,13 @@ interface PassiveProvidesLightEffectType {
     duration?: z.infer<typeof DurationSchema>;
   };
 }
+interface GrantConditionalBonusEffectType {
+  type: "grantConditionalBonus";
+  on: "abilityCheck" | "skillCheck";
+  modifier: z.infer<typeof DiceRollSchema>; // <-- ALTERADO de string para DiceRollSchema
+  requiresChoice: "skill";
+  duration: z.infer<typeof DurationSchema>;
+}
 interface PassivePropertyEffectType {
   type: "passive_property";
   property: z.infer<typeof ItemPropertyEnum>;
@@ -95,7 +109,8 @@ interface TriggeredModifierEffectType {
     | "onTakingDamage"
     | "onSavingThrow";
   modifier: {
-    dice: string;
+    operation: "add" | "subtract"; // <-- NOVA PROPRIEDADE
+    dice: z.infer<typeof DiceRollSchema>; // <-- MUDOU DE string PARA DiceRollSchema
     target: "attackRoll" | "damageRoll" | "saveRoll" | "ac";
     appliesTo: "self" | "attacker" | "targetCreature";
   };
@@ -129,14 +144,40 @@ export type EffectType =
   | PassiveGrantBonusEffectType
   | TriggeredModifierEffectType
   | PreventsHealingEffectType
+  | GrantConditionalBonusEffectType
   | ActivatableActionEffectType
   | ActivatableCastSpellEffectType;
 
-const SpellScalingRuleSchema = z.object({
+// Definindo o tipo explícito para 'ApplicableEffect'
+export type ApplicableEffectType =
+  | TriggeredModifierEffectType
+  | PreventsHealingEffectType
+  | ActivatableActionEffectType
+  | GrantConditionalBonusEffectType;
+
+// ============================================================================
+// SCHEMAS ZOD
+// ============================================================================
+
+const ModifyOutcomeFormulaRuleSchema = z.object({
+  type: z.literal("modifyOutcomeFormula"),
   level: z.number().int(),
   outcomeId: z.string(),
   newFormula: DamageFormulaSchema,
 });
+
+const ModifyActionParameterRuleSchema = z.object({
+  type: z.literal("modifyActionParameter"),
+  level: z.number().int(),
+  propertyPath: ActionParameterPaths,
+  newValue: z.any(),
+});
+
+const SpellScalingRuleSchema = z.discriminatedUnion("type", [
+  ModifyOutcomeFormulaRuleSchema,
+  ModifyActionParameterRuleSchema,
+]);
+
 const SpellScalingSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("characterLevel"),
@@ -151,6 +192,15 @@ const SpellScalingSchema = z.discriminatedUnion("type", [
     }),
   }),
 ]);
+
+const GrantConditionalBonusEffectSchema = z.object({
+  type: z.literal("grantConditionalBonus"),
+  on: z.enum(["abilityCheck", "skillCheck"]),
+  modifier: DiceRollSchema, // ex: "1d4"
+  requiresChoice: z.enum(["skill"]),
+  duration: DurationSchema,
+});
+
 const OnEquipSetACEffectSchema = z.object({
   type: z.literal("onEquip_setAC"),
   calculation: AcSchema,
@@ -207,7 +257,8 @@ const TriggeredModifierEffectSchema = z.object({
     "onSavingThrow",
   ]),
   modifier: z.object({
-    dice: z.string().regex(/^-?\d+d\d+(\+\d+)?$/),
+    operation: z.enum(["add", "subtract"]), // <-- NOVA PROPRIEDADE
+    dice: DiceRollSchema, // <-- MUDOU DE z.string() PARA DiceRollSchema
     target: z.enum(["attackRoll", "damageRoll", "saveRoll", "ac"]),
     appliesTo: z.enum(["self", "attacker", "targetCreature"]),
   }),
@@ -267,19 +318,23 @@ export const effectSchema: z.ZodType<EffectType> = z.discriminatedUnion(
     TriggeredModifierEffectSchema,
     PreventsHealingEffectSchema,
     ActivatableActionEffectSchema,
+    GrantConditionalBonusEffectSchema,
     ActivatableCastSpellEffectSchema,
   ]
 );
-export const applicableEffectSchema: z.ZodType<EffectType> =
+
+// CORREÇÃO: Usando o tipo explícito que definimos no início do arquivo.
+export const applicableEffectSchema: z.ZodType<ApplicableEffectType> =
   z.discriminatedUnion("type", [
     TriggeredModifierEffectSchema,
     PreventsHealingEffectSchema,
     ActivatableActionEffectSchema,
+    GrantConditionalBonusEffectSchema,
   ]);
 
 export type Effect = z.infer<typeof effectSchema>;
 export type ApplicableEffect = z.infer<typeof applicableEffectSchema>;
 
 // ============================================================================
-// >> FIM: src/domain/shared/effect.schema.ts
+// >> FIM: src/shared/effect.schema.ts
 // ============================================================================

@@ -1,9 +1,9 @@
-import type { Spell } from "../../domain/spell/spell.schema.js"; // Ajuste o caminho se necessário
+import type { Spell } from "../../domain/spell/spell.schema.js";
 
 export const spellsLevel0: Spell[] = [
   {
     id: "spell-bolha-acida",
-    name: "Bolha Ácida",
+    name: ["Bolha Ácida", "Acid Splash"],
     source: "LDJ2024",
     page: 239,
     level: 0,
@@ -59,6 +59,7 @@ export const spellsLevel0: Spell[] = [
           type: "characterLevel",
           rules: [
             {
+              type: "modifyOutcomeFormula",
               level: 5,
               outcomeId: "acid-splash-damage",
               newFormula: {
@@ -67,6 +68,8 @@ export const spellsLevel0: Spell[] = [
               },
             },
             {
+              type: "modifyOutcomeFormula",
+
               level: 11,
               outcomeId: "acid-splash-damage",
               newFormula: {
@@ -75,6 +78,8 @@ export const spellsLevel0: Spell[] = [
               },
             },
             {
+              type: "modifyOutcomeFormula",
+
               level: 17,
               outcomeId: "acid-splash-damage",
               newFormula: {
@@ -89,7 +94,7 @@ export const spellsLevel0: Spell[] = [
   },
   {
     id: "spell-protecao-contra-laminas",
-    name: "Proteção Contra Lâminas",
+    name: ["Proteção Contra Lâminas", "Blade Ward"],
     source: "LDJ2024",
     page: 247,
     level: 0,
@@ -113,7 +118,8 @@ export const spellsLevel0: Spell[] = [
                 type: "triggeredModifier",
                 trigger: "onBeingAttacked",
                 modifier: {
-                  dice: "-1d4",
+                  operation: "subtract",
+                  dice: { count: 1, faces: 4 },
                   target: "attackRoll",
                   appliesTo: "attacker",
                 },
@@ -131,7 +137,7 @@ export const spellsLevel0: Spell[] = [
   },
   {
     id: "spell-toque-arrepiante",
-    name: "Toque Arrepiante",
+    name: ["Toque Arrepiante", "Chill Touch"],
     source: "LDJ2024",
     page: 249,
     level: 0,
@@ -139,7 +145,7 @@ export const spellsLevel0: Spell[] = [
     components: { types: ["verbal", "somatic"] },
     duration: { unit: "instantaneous" },
     description:
-      "Você cria uma mão esquelética fantasmagórica no espaço de uma criatura ao seu alcance. Faça um ataque mágico corpo a corpo contra a criatura. Se acertar, o alvo sofre 1d10 de dano necrótico e não pode recuperar pontos de vida até o início do seu próximo turno. Se você acertar um morto-vivo, ele também tem desvantagem nas jogadas de ataque contra você até o final do seu próximo turno.",
+      "Canalizando o frio da sepultura, você realiza um ataque corpo a corpo com magia contra uma criatura ao seu alcance. Em um acerto, o alvo sofre **1d10 de dano necrótico** e **não pode recuperar pontos de vida** até o final do seu próximo turno.\n\n**Aprimoramento de Truque:** O dano aumenta em **1d10** quando você alcança os níveis **5 (2d10)**, **11 (3d10)** e **17 (4d10)**.",
     effects: [
       {
         type: "activatableCastSpell",
@@ -172,26 +178,30 @@ export const spellsLevel0: Spell[] = [
           type: "characterLevel",
           rules: [
             {
+              type: "modifyOutcomeFormula",
               level: 5,
               outcomeId: "chill-touch-damage",
               newFormula: {
-                roll: { count: 2, faces: 6 },
+                roll: { count: 2, faces: 10 },
                 damageType: "necrotic",
               },
             },
             {
+              type: "modifyOutcomeFormula",
+
               level: 11,
               outcomeId: "chill-touch-damage",
               newFormula: {
-                roll: { count: 3, faces: 6 },
+                roll: { count: 3, faces: 10 },
                 damageType: "necrotic",
               },
             },
             {
+              type: "modifyOutcomeFormula",
               level: 17,
               outcomeId: "chill-touch-damage",
               newFormula: {
-                roll: { count: 4, faces: 6 },
+                roll: { count: 4, faces: 10 },
                 damageType: "necrotic",
               },
             },
@@ -202,7 +212,7 @@ export const spellsLevel0: Spell[] = [
   },
   {
     id: "spell-luzes-dancantes",
-    name: "Luzes Dançantes",
+    name: ["Luzes Dançantes", "Dancing Lights"],
     source: "LDJ2024",
     page: 259,
     level: 0,
@@ -258,7 +268,7 @@ export const spellsLevel0: Spell[] = [
   },
   {
     id: "spell-druidismo",
-    name: "Druidismo",
+    name: ["Druidismo", "Druidcraft"],
     source: "LDJ2024",
     page: 266,
     level: 0,
@@ -275,13 +285,13 @@ export const spellsLevel0: Spell[] = [
   },
   {
     id: "spell-rajada-mistica",
-    name: "Rajada Mística",
+    name: ["Rajada Mística", "Eldritch Blast"],
     source: "LDJ2024",
     page: 267,
     level: 0,
     school: "evocation",
     description:
-      "Você arremessa um raio de energia crepitante. Faça um ataque mágico à distância contra uma criatura ou objeto no alcance. Em caso de acerto, o alvo sofre 1d10 de dano de Força.",
+      "Você arremessa um raio de energia crepitante. Faça um ataque mágico à distância contra uma criatura ou objeto no alcance. Em caso de acerto, o alvo sofre 1d10 de dano de Força. A magia cria mais de um raio quando você alcança níveis mais altos: dois raios no 5º nível, três raios no 11º nível e quatro raios no 17º nível. Você pode direcionar os raios para o mesmo alvo ou para alvos diferentes. Faça uma jogada de ataque separada para cada raio.",
     components: {
       types: ["verbal", "somatic"],
     },
@@ -300,11 +310,13 @@ export const spellsLevel0: Spell[] = [
             normal: 120,
             unit: "ft",
           },
+
           target: {
             type: "creature",
             quantity: 1,
           },
           attackType: "rangedSpellAttack",
+
           outcomes: [
             {
               id: "eldritch-blast-damage",
@@ -321,28 +333,24 @@ export const spellsLevel0: Spell[] = [
           type: "characterLevel",
           rules: [
             {
+              type: "modifyActionParameter",
               level: 5,
-              outcomeId: "eldritch-blast-damage",
-              newFormula: {
-                roll: { count: 2, faces: 10 },
-                damageType: "force",
-              },
+              propertyPath: "target.quantity",
+              newValue: 2,
             },
+
             {
+              type: "modifyActionParameter",
               level: 11,
-              outcomeId: "eldritch-blast-damage",
-              newFormula: {
-                roll: { count: 3, faces: 10 },
-                damageType: "force",
-              },
+              propertyPath: "target.quantity",
+              newValue: 3,
             },
+
             {
+              type: "modifyActionParameter",
               level: 17,
-              outcomeId: "eldritch-blast-damage",
-              newFormula: {
-                roll: { count: 4, faces: 10 },
-                damageType: "force",
-              },
+              propertyPath: "target.quantity",
+              newValue: 4,
             },
           ],
         },
@@ -351,7 +359,7 @@ export const spellsLevel0: Spell[] = [
   },
   {
     id: "spell-elementalismo",
-    name: "Elementalismo",
+    name: ["Elementalismo", "Elementalism"],
     source: "LDJ2024",
     page: 267,
     level: 0,
@@ -369,7 +377,7 @@ export const spellsLevel0: Spell[] = [
   },
   {
     id: "spell-raio-de-fogo",
-    name: "Raio de Fogo",
+    name: ["Raio de Fogo", "Fire Bolt"],
     source: "LDJ2024",
     page: 274,
     level: 0,
@@ -421,6 +429,7 @@ export const spellsLevel0: Spell[] = [
           type: "characterLevel",
           rules: [
             {
+              type: "modifyOutcomeFormula",
               level: 5,
               outcomeId: "fire-bolt-damage",
               newFormula: {
@@ -429,6 +438,7 @@ export const spellsLevel0: Spell[] = [
               },
             },
             {
+              type: "modifyOutcomeFormula",
               level: 11,
               outcomeId: "fire-bolt-damage",
               newFormula: {
@@ -437,6 +447,7 @@ export const spellsLevel0: Spell[] = [
               },
             },
             {
+              type: "modifyOutcomeFormula",
               level: 17,
               outcomeId: "fire-bolt-damage",
               newFormula: {
@@ -450,83 +461,122 @@ export const spellsLevel0: Spell[] = [
     ],
   },
   {
-    name: "Friends",
+    id: "spell-friends",
+    name: ["Amizade", "Friends"],
     source: "LDJ2024",
     page: 277,
     level: 0,
     school: "enchantment",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 10,
-      },
-    },
+    description:
+      "Você emana magicamente uma sensação de amizade para uma criatura que você possa ver dentro do alcance. O alvo deve ser bem-sucedido em um teste de resistência de Sabedoria ou ficará com a condição Encantado (Charmed) pela duração. Quando a magia termina, o alvo sabe que foi encantado por você.",
     components: {
-      s: true,
-      m: "some makeup",
+      types: ["somatic", "material"],
+      material: {
+        description: "um pouco de maquiagem",
+        isConsumed: false,
+      },
     },
-    duration: [
+    duration: {
+      unit: "minute",
+      value: 1,
+      isConcentration: true,
+    },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell-friends",
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          range: {
+            normal: 10,
+            unit: "ft",
+          },
+          target: {
+            type: "creature",
+            quantity: 1,
+          },
+          save: {
+            ability: "wisdom",
+            dc: {
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "friends-charmed",
+              type: "applyCondition",
+              on: "fail",
+              condition: "charmed",
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+            {
+              id: "friends-special-rules",
+              type: "descriptive",
+              on: "success",
+              text: "O alvo tem sucesso automaticamente se não for um Humanoide, se você estiver lutando com ele, ou se você já usou esta magia nele nas últimas 24 horas. A magia termina antes se o alvo sofrer dano ou se você atacar, causar dano ou forçar um teste de resistência em qualquer pessoa. Ao final da magia, o alvo sabe que foi encantado por você.",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "You magically emanate a sense of friendship toward one creature you can see within range. The target must succeed on a Wisdom saving throw or have the {@condition Charmed|XPHB} condition for the duration. The target succeeds automatically if it isn't a Humanoid, if you're fighting it, or if you have cast this spell on it within the past 24 hours.",
-      "The spell ends early if the target takes damage or if you make an attack roll, deal damage, or force anyone to make a saving throw. When the spell ends, the target knows it was {@condition Charmed|XPHB} by you.",
-    ],
-    conditionInflict: ["charmed"],
-    savingThrow: ["wisdom"],
-    affectsCreatureType: ["humanoid"],
-    areaTags: ["ST"],
   },
   {
-    name: "Guidance",
+    id: "spell-guidance",
+    name: ["Orientação", "Guidance"],
     source: "LDJ2024",
     page: 282,
     level: 0,
     school: "divination",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
+    description:
+      "Você toca uma criatura voluntária e escolhe uma perícia. Até o fim da magia, a criatura adiciona 1d4 a qualquer teste de perícia usando a perícia escolhida.",
     components: {
-      v: true,
-      s: true,
+      types: ["verbal", "somatic"],
     },
-    duration: [
+    duration: {
+      unit: "minute",
+      value: 1,
+      isConcentration: true,
+    },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell-guidance",
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          target: {
+            type: "touch",
+          },
+
+          outcomes: [
+            {
+              id: "guidance-buff",
+              type: "applyEffect",
+              on: "success",
+              effect: {
+                type: "grantConditionalBonus",
+                on: "skillCheck",
+                modifier: { count: 1, faces: 4 },
+                requiresChoice: "skill",
+
+                duration: {
+                  unit: "minute",
+                  value: 1,
+                  isConcentration: true,
+                },
+              },
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "You touch a willing creature and choose a skill. Until the spell ends, the creature adds {@dice 1d4} to any ability check using the chosen skill.",
-    ],
-    areaTags: ["ST"],
   },
   {
     name: "Light",

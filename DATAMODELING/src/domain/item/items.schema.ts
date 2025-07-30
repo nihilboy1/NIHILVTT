@@ -20,7 +20,7 @@ import { effectSchema, EffectType } from "../../shared/effect.schema.js";
 // --- Tipo Base para todos os Itens ---
 interface BaseItemType {
   id: string;
-  name: string;
+  name: string[];
   source: z.infer<typeof SourceEnum>;
   page: number;
   type: z.infer<typeof ItemTypeEnum>;
@@ -64,7 +64,7 @@ type ItemTypeUnion = GearItemType | ToolItemType | ArmorItemType | WeaponItemTyp
 // Este é o seu schema original, que já era excelente.
 const BaseItemSchema = z.object({
   id: z.string().min(1),
-  name: z.string().min(1),
+  name: z.string().min(1).array(),
   source: SourceEnum,
   page: z.number(),
   type: ItemTypeEnum,
