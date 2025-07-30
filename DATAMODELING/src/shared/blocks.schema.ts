@@ -19,11 +19,21 @@ export const DcSchema = z.union([
   }),
 ]);
 export const DiceRollSchema = z.object({
-  dice: z.string().regex(/^\d+d\d+$/),
-  bonus: z.union([z.number().int(), AbilityScoreEnum]).optional(),
+  count: z.number().int().min(1, "A quantidade de dados deve ser no mínimo 1."),
+  faces: z.number().int().min(1, "O número de faces do dado deve ser no mínimo 1."),
+  modifier: z.number().int().optional(),
 });
-export const DamageFormulaSchema = DiceRollSchema.extend({
+
+/**
+ * REATORADO: Define uma fórmula de dano que pode ser uma rolagem de dados
+ * ou um valor fixo.
+ */
+export const DamageFormulaSchema = z.object({
+  roll: DiceRollSchema.optional(),
+  fixed: z.number().int().optional(),
   damageType: DamageTypeEnum,
+}).refine(data => data.roll || data.fixed !== undefined, {
+  message: "A fórmula de dano precisa ter pelo menos uma rolagem (roll) ou um valor fixo (fixed).",
 });
 export const AcSchema = z.discriminatedUnion("calculation", [
   z.object({ calculation: z.literal("base"), value: z.number() }),
@@ -36,7 +46,7 @@ export const AcSchema = z.discriminatedUnion("calculation", [
   }),
 ]);
 export const WeaponPropertySchema = z.object({
-  property: WeaponPropertyEnum,
+  property: WeaponPropertyEnum.array(),
   condition: z.string().optional(),
 });
 export const AreaSchema = z.discriminatedUnion("shape", [

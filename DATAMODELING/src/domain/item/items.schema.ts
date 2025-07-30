@@ -9,9 +9,9 @@ import {
   ItemTypeEnum,
 } from "../../shared/primitives.js";
 import { RequirementSchema } from "../../shared/blocks.schema.js";
+import { effectSchema, EffectType } from "../../shared/effect.schema.js";
 // A MÁGICA ACONTECE AQUI: Reutilizamos o schema de efeitos que já criamos!
 // CORREÇÃO: Ajustando o caminho para o arquivo de schema principal, conforme o padrão anterior.
-import { effectSchema, EffectType } from "../schemas.js"; 
 
 // ============================================================================
 // PASSO 1: DECLARAR OS TIPOS FINAIS (INTERFACES)

@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+// 1. Defina o schema para UM objeto de ação
+const ActionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+});
+
+// 2. Defina o schema para o ARRAY de ações
+const FinalActionDataSchema = z.array(ActionSchema);
 
 export const ACTIONS = [
   {
