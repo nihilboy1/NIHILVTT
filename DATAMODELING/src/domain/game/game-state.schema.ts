@@ -9,8 +9,7 @@ import {
   SurfaceTriggerEnum,
   SurfaceTypeEnum,
 } from "../../shared/primitives.js";
-
-import {ActionOutcomesSchema} from "../../shared/outcomes.schema.js"
+import { actionOutcomesSchema } from "../../shared/outcome.schema.js";
 
 export const SurfaceRuleSchema = z.object({
   trigger: SurfaceTriggerEnum,
@@ -20,7 +19,7 @@ export const SurfaceRuleSchema = z.object({
       dc: DcSchema,
     })
     .optional(),
-  outcomes: z.array(ActionOutcomesSchema),
+  outcomes: z.array(actionOutcomesSchema),
 });
 export const ActiveSurfaceSchema = z.object({
   id: z.string(),

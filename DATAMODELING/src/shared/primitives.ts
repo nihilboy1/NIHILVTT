@@ -71,7 +71,7 @@ export const SkillEnum = z.enum([
   "survival",
 ]);
 
-export const ConditionEnum = z.enum([
+export const BaseConditionEnum = z.enum([
   "blinded",
   "charmed",
   "deafened",
@@ -87,6 +87,19 @@ export const ConditionEnum = z.enum([
   "stunned",
   "unconscious",
 ]);
+export type BaseCondition = z.infer<typeof BaseConditionEnum>;
+
+// Condições do sistema / pseudoConditions
+export const PseudoConditionEnum = z.enum([
+  "inflamable", // ex: alvo coberto de óleo, resina, etc
+  "wet", // ex: encharcado, pode tomar choque ou gelo
+  "frozen", // ex: temporário, facilita quebrar
+  "burning", // ex: está em chamas, dano por turno
+]);
+export type PseudoCondition = z.infer<typeof PseudoConditionEnum>;
+
+export const ConditionEnum = z.union([BaseConditionEnum, PseudoConditionEnum]);
+export type Condition = z.infer<typeof ConditionEnum>;
 
 // ============================================================================
 // PRIMITIVOS DE COMBATE E AÇÕES
@@ -125,7 +138,13 @@ export const DamageTypeEnum = z.enum([
   "psychic",
 ]);
 
-export const EffectOutcomeEnum = z.enum(["fail", "success", "hit", "miss"]);
+export const EffectOutcomeEnum = z.enum([
+  "fail",
+  "success",
+  "hit",
+  "miss",
+  "custom",
+]);
 
 export const ReactionTriggerEnum = z.enum([
   "targetEntersReach",
@@ -140,6 +159,15 @@ export const ResourceCostIdEnum = z.enum([
   "reaction",
   "itemCharge",
   "spellSlot",
+]);
+
+export const CreatureSizeEnum = z.enum([
+  "tiny",
+  "small",
+  "medium",
+  "large",
+  "huge",
+  "gargantuan",
 ]);
 
 export const RechargeEventEnum = z.enum([

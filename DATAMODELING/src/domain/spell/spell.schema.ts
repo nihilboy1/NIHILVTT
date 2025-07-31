@@ -4,13 +4,16 @@ import {
   SourceEnum,
   SpellComponentEnum,
 } from "../../shared/primitives.js";
-import { DurationSchema } from "../../shared/blocks.schema.js";
+import {
+  SpellRequirementsSchema,
+  DurationSchema,
+} from "../../shared/blocks.schema.js";
 import { effectSchema, EffectType } from "../../shared/effect.schema.js";
 import { ActionOutcomeType } from "../../shared/outcome.schema.js";
 
-const SpellSchema = z.object({
+// 1. O schema base define a estrutura fundamental de uma magia.
+const baseSpellSchema = z.object({
   id: z.string().min(1),
-  // Permite que o nome seja uma string ou um array de strings
   name: z.union([z.string().min(1), z.array(z.string().min(1))]),
   description: z.string(),
   source: SourceEnum,
@@ -24,20 +27,24 @@ const SpellSchema = z.object({
       .object({
         description: z.string(),
         costGp: z.number().optional(),
-        isConsumed: z.boolean().default(false),
+        isConsumed: z.boolean().default(false).optional(),
       })
       .optional(),
   }),
+  requirements: SpellRequirementsSchema.optional(),
   duration: DurationSchema,
   effects: z.array(effectSchema),
 });
 
-const SpellSchemaWithRefinement = SpellSchema.check((ctx) => {
+// 2. O schema final e exportado é a versão com o refinamento.
+//    A lógica de validação foi restaurada para a sua versão original.
+export const SpellSchema = baseSpellSchema.check((ctx) => {
   const spell = ctx.value;
   const scalingEffects = spell.effects.filter(
     (effect: EffectType) =>
       effect.type === "activatableCastSpell" && effect.scaling
   );
+
   if (scalingEffects.length === 0) {
     return;
   }
@@ -62,9 +69,7 @@ const SpellSchemaWithRefinement = SpellSchema.check((ctx) => {
       effect.type === "activatableCastSpell" &&
       effect.scaling?.type === "characterLevel"
     ) {
-      // AQUI ESTÁ A CORREÇÃO
       effect.scaling.rules.forEach((rule: any, index: number) => {
-        // Nós só validamos o 'outcomeId' se a regra for do tipo que o utiliza.
         if (rule.type === "modifyOutcomeFormula") {
           if (!definedOutcomeIds.has(rule.outcomeId)) {
             ctx.issues.push({
@@ -87,8 +92,6 @@ const SpellSchemaWithRefinement = SpellSchema.check((ctx) => {
   });
 });
 
-export const FinalSpellDataSchema = z.array(SpellSchemaWithRefinement);
-
-export { SpellSchema, SpellSchemaWithRefinement };
+// 3. Tipos e schemas finais, inferidos diretamente do schema principal.
+export const FinalSpellDataSchema = z.array(SpellSchema);
 export type Spell = z.infer<typeof SpellSchema>;
-export type FinalSpellData = Spell[];

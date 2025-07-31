@@ -1,10 +1,9 @@
 // ============================================================================
 // >> INÍCIO: src/shared/effect.schema.ts
 // Este é o coração do sistema. Define todos os Efeitos.
-// Ele depende de Ações e Outcomes.
+// Os schemas Zod são a única fonte da verdade para a estrutura dos dados.
 // ============================================================================
 
-// --- Importações necessárias para este arquivo ---
 import { z } from "zod";
 import {
   AcSchema,
@@ -14,11 +13,11 @@ import {
   RangeSchema,
   WeaponPropertySchema,
 } from "./blocks.schema.js";
-const ActionIdEnum = z.string(); // Usando um placeholder seguro
-
+import { ActionIdEnum } from "../data/actions/actions.data.js";
 import {
   AbilityScoreEnum,
-  ActionParameterPaths, // <-- Sua alteração mantida
+  ActionParameterPaths,
+  ArmorTypeEnum,
   ItemPropertyEnum,
   ScalablePropertyEnum,
   SkillEnum,
@@ -26,138 +25,161 @@ import {
   WeaponMasteryEnum,
   WeaponTypeEnum,
   WeightUnitEnum,
-} from "./primitives.js"; // <-- Sua alteração mantida
-import { actionOutcomesSchema, ActionOutcomeType } from "./outcome.schema.js";
-import {
-  actionParametersSchema,
-  ActionParametersType,
-} from "./actions.schema.js";
+} from "./primitives.js";
+import { actionOutcomesSchema } from "./outcome.schema.js";
+import { ActionParametersSchema } from "../domain/action/actions.schema.js";
 
 // ============================================================================
-// INTERFACES DE TIPO
+// SEÇÃO: SCHEMAS DE EFEITOS INDIVIDUAIS
+// Cada schema representa um tipo de efeito único no sistema.
 // ============================================================================
 
-interface OnEquipSetACEffectType {
-  type: "onEquip_setAC";
-  calculation: z.infer<typeof AcSchema>;
-}
-interface OnEquipImposeDisadvantageEffectType {
-  type: "onEquip_imposeDisadvantage";
-  on: "skillCheck";
-  skill: z.infer<typeof SkillEnum>;
-}
-interface OnEquipProvidesContainerEffectType {
-  type: "onEquip_providesContainer";
-  properties: {
-    capacity: { value: number; unit: z.infer<typeof WeightUnitEnum> };
-    volume?: { value: number; unit: string };
-  };
-}
-interface OnWieldGrantWeaponAttackEffectType {
-  type: "onWield_grantWeaponAttack";
-  weaponCategory: z.infer<typeof WeaponCategoryEnum>;
-  weaponType: z.infer<typeof WeaponTypeEnum>;
-  properties: z.infer<typeof WeaponPropertySchema>[];
-  mastery: z.infer<typeof WeaponMasteryEnum>[];
-  damage?: {
-    primary: z.infer<typeof DamageFormulaSchema>;
-    versatile?: z.infer<typeof DamageFormulaSchema>;
-  };
-  range?: z.infer<typeof RangeSchema>;
-  outcomes?: ActionOutcomeType[];
-  cost?: { amount: number; source: "inventory"; resourceId: string };
-}
-interface PassiveGrantAdvantageEffectType {
-  type: "passive_grantAdvantage";
-  on: "abilityCheck" | "skillCheck" | "savingThrow";
-  ability?: z.infer<typeof AbilityScoreEnum>;
-  skill?: z.infer<typeof SkillEnum>;
-  condition?: string;
-}
-interface PassiveProvidesLightEffectType {
-  type: "passive_providesLight";
-  properties: {
-    bright: number;
-    dim: number;
-    duration?: z.infer<typeof DurationSchema>;
-  };
-}
-interface GrantConditionalBonusEffectType {
-  type: "grantConditionalBonus";
-  on: "abilityCheck" | "skillCheck";
-  modifier: z.infer<typeof DiceRollSchema>; // <-- ALTERADO de string para DiceRollSchema
-  requiresChoice: "skill";
-  duration: z.infer<typeof DurationSchema>;
-}
-interface PassivePropertyEffectType {
-  type: "passive_property";
-  property: z.infer<typeof ItemPropertyEnum>;
-  value: string | number | boolean;
-}
-interface PassiveGrantBonusEffectType {
-  type: "passive_grantBonus";
-  on: "attackRoll" | "damageRoll" | "ac" | "savingThrow";
-  value: number;
-  condition?: string;
-}
-interface TriggeredModifierEffectType {
-  type: "triggeredModifier";
-  trigger:
-    | "onBeingAttacked"
-    | "onAttackRoll"
-    | "onDealingDamage"
-    | "onTakingDamage"
-    | "onSavingThrow";
-  modifier: {
-    operation: "add" | "subtract"; // <-- NOVA PROPRIEDADE
-    dice: z.infer<typeof DiceRollSchema>; // <-- MUDOU DE string PARA DiceRollSchema
-    target: "attackRoll" | "damageRoll" | "saveRoll" | "ac";
-    appliesTo: "self" | "attacker" | "targetCreature";
-  };
-  duration: z.infer<typeof DurationSchema>;
-}
-interface PreventsHealingEffectType {
-  type: "preventsHealing";
-  duration: z.infer<typeof DurationSchema>;
-}
-interface ActivatableActionEffectType {
-  type: "activatableAction";
-  actionId: z.infer<typeof ActionIdEnum>;
-  parameters?: ActionParametersType;
-  duration?: z.infer<typeof DurationSchema>;
-}
-interface ActivatableCastSpellEffectType {
-  type: "activatableCastSpell";
-  actionId: z.infer<typeof ActionIdEnum>;
-  parameters: ActionParametersType;
-  scaling?: z.infer<typeof SpellScalingSchema>;
-}
+// --- Efeitos Ativáveis ---
 
-export type EffectType =
-  | OnEquipSetACEffectType
-  | OnEquipImposeDisadvantageEffectType
-  | OnEquipProvidesContainerEffectType
-  | OnWieldGrantWeaponAttackEffectType
-  | PassiveGrantAdvantageEffectType
-  | PassiveProvidesLightEffectType
-  | PassivePropertyEffectType
-  | PassiveGrantBonusEffectType
-  | TriggeredModifierEffectType
-  | PreventsHealingEffectType
-  | GrantConditionalBonusEffectType
-  | ActivatableActionEffectType
-  | ActivatableCastSpellEffectType;
+const ActivatableActionEffectSchema = z.object({
+  type: z.literal("activatableAction"),
+  actionId: ActionIdEnum,
+  parameters: z.lazy(() => ActionParametersSchema).optional(),
+  duration: DurationSchema.optional(),
+  scaling: z.lazy(() => SpellScalingSchema).optional(),
+});
 
-// Definindo o tipo explícito para 'ApplicableEffect'
-export type ApplicableEffectType =
-  | TriggeredModifierEffectType
-  | PreventsHealingEffectType
-  | ActivatableActionEffectType
-  | GrantConditionalBonusEffectType;
+const ActivatableCastSpellEffectSchema = z.object({
+  type: z.literal("activatableCastSpell"),
+  actionId: ActionIdEnum,
+  parameters: z.lazy(() => ActionParametersSchema),
+  scaling: z.lazy(() => SpellScalingSchema).optional(),
+});
 
-// ============================================================================
-// SCHEMAS ZOD
-// ============================================================================
+// --- Efeitos de Equipar/Empunhar ---
+
+const OnEquipSetACEffectSchema = z.object({
+  type: z.literal("onEquip_setAC"),
+  armorType: ArmorTypeEnum,
+  calculation: AcSchema,
+});
+
+const OnEquipImposeDisadvantageEffectSchema = z.object({
+  type: z.literal("onEquip_imposeDisadvantage"),
+  on: z.literal("skillCheck"),
+  skill: SkillEnum,
+});
+
+const OnEquipProvidesContainerEffectSchema = z.object({
+  type: z.literal("onEquip_providesContainer"),
+  properties: z.object({
+    capacity: z.object({ value: z.number(), unit: WeightUnitEnum }),
+    volume: z.object({ value: z.number(), unit: z.string() }).optional(),
+  }),
+});
+
+const OnWieldGrantWeaponAttackEffectSchema = z.object({
+  type: z.literal("onWield_grantWeaponAttack"),
+  weaponCategory: WeaponCategoryEnum,
+  weaponType: WeaponTypeEnum,
+  properties: z.array(WeaponPropertySchema),
+  mastery: z.array(WeaponMasteryEnum),
+  damage: z
+    .object({
+      primary: DamageFormulaSchema,
+      versatile: DamageFormulaSchema.optional(),
+    })
+    .optional(),
+  range: RangeSchema.optional(),
+  outcomes: z.array(z.lazy(() => actionOutcomesSchema)).optional(),
+  cost: z
+    .object({
+      amount: z.number(),
+      source: z.enum(["inventory"]),
+      resourceId: z.string(),
+    })
+    .optional(),
+});
+
+// --- Efeitos Passivos ---
+
+const PassiveGrantAdvantageEffectSchema = z
+  .object({
+    type: z.literal("passive_grantAdvantage"),
+    on: z.enum(["abilityCheck", "skillCheck", "savingThrow"]),
+    ability: AbilityScoreEnum.optional(),
+    skill: SkillEnum.optional(),
+    condition: z.string().optional(),
+    duration: DurationSchema.optional(),
+  })
+  .refine((data) => data.ability || data.skill || data.condition, {
+    message: "Deve ter pelo menos ability, skill ou condition",
+  });
+
+const PassiveProvidesLightEffectSchema = z.object({
+  type: z.literal("passive_providesLight"),
+  properties: z.object({
+    bright: z.number().int(),
+    dim: z.number().int(),
+    duration: DurationSchema.optional(),
+  }),
+});
+
+const PassivePropertyEffectSchema = z.object({
+  type: z.literal("passive_property"),
+  property: ItemPropertyEnum,
+  value: z.union([z.string(), z.number(), z.boolean()]),
+});
+
+const PassiveGrantBonusEffectSchema = z.object({
+  type: z.literal("passive_grantBonus"),
+  on: z.enum(["attackRoll", "damageRoll", "ac", "savingThrow"]),
+  value: z.number().int(),
+  condition: z.string().optional(),
+});
+
+// --- Efeitos de Buff/Debuff e Modificadores ---
+
+const GrantConditionalBonusEffectSchema = z.object({
+  type: z.literal("grantConditionalBonus"),
+  on: z.enum(["abilityCheck", "skillCheck"]),
+  modifier: DiceRollSchema,
+  requiresChoice: z.enum(["skill"]),
+  duration: DurationSchema.optional(),
+});
+
+const TriggeredModifierEffectSchema = z.object({
+  type: z.literal("triggeredModifier"),
+  trigger: z.enum([
+    "onBeingAttacked",
+    "onAttackRoll",
+    "onDealingDamage",
+    "onTakingDamage",
+    "onSavingThrow",
+  ]),
+  modifier: z.object({
+    operation: z.enum(["add", "subtract"]),
+    dice: DiceRollSchema,
+    target: z.enum(["attackRoll", "damageRoll", "saveRoll", "ac"]),
+    appliesTo: z.enum(["self", "attacker", "targetCreature"]),
+  }),
+  duration: DurationSchema,
+  requiresChoice: z.literal("damageType").optional(),
+});
+
+const PreventsHealingEffectSchema = z.object({
+  type: z.literal("preventsHealing"),
+  duration: DurationSchema,
+});
+
+const ImposeDisadvantageEffectSchema = z.object({
+  type: z.literal("imposeDisadvantage"),
+  on: z.enum(["attackRoll", "abilityCheck", "skillCheck", "savingThrow"]),
+  count: z.number().int().positive().default(1),
+  duration: DurationSchema,
+});
+
+const PreventsReactionEffectSchema = z.object({
+  type: z.literal("preventsReaction"),
+  duration: DurationSchema,
+});
+
+// --- Schemas de Escalonamento (usados nos efeitos acima) ---
 
 const ModifyOutcomeFormulaRuleSchema = z.object({
   type: z.literal("modifyOutcomeFormula"),
@@ -193,148 +215,44 @@ const SpellScalingSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
-const GrantConditionalBonusEffectSchema = z.object({
-  type: z.literal("grantConditionalBonus"),
-  on: z.enum(["abilityCheck", "skillCheck"]),
-  modifier: DiceRollSchema, // ex: "1d4"
-  requiresChoice: z.enum(["skill"]),
-  duration: DurationSchema,
-});
-
-const OnEquipSetACEffectSchema = z.object({
-  type: z.literal("onEquip_setAC"),
-  calculation: AcSchema,
-});
-const OnEquipImposeDisadvantageEffectSchema = z.object({
-  type: z.literal("onEquip_imposeDisadvantage"),
-  on: z.literal("skillCheck"),
-  skill: SkillEnum,
-});
-const OnEquipProvidesContainerEffectSchema = z.object({
-  type: z.literal("onEquip_providesContainer"),
-  properties: z.object({
-    capacity: z.object({ value: z.number(), unit: WeightUnitEnum }),
-    volume: z.object({ value: z.number(), unit: z.string() }).optional(),
-  }),
-});
-const PassiveGrantAdvantageEffectSchema = z
-  .object({
-    type: z.literal("passive_grantAdvantage"),
-    on: z.enum(["abilityCheck", "skillCheck", "savingThrow"]),
-    ability: AbilityScoreEnum.optional(),
-    skill: SkillEnum.optional(),
-    condition: z.string().optional(),
-  })
-  .refine((data) => data.ability || data.skill || data.condition, {
-    message: "Deve ter pelo menos ability, skill ou condition",
-  });
-const PassiveProvidesLightEffectSchema = z.object({
-  type: z.literal("passive_providesLight"),
-  properties: z.object({
-    bright: z.number().int(),
-    dim: z.number().int(),
-    duration: DurationSchema.optional(),
-  }),
-});
-const PassivePropertyEffectSchema = z.object({
-  type: z.literal("passive_property"),
-  property: ItemPropertyEnum,
-  value: z.union([z.string(), z.number(), z.boolean()]),
-});
-const PassiveGrantBonusEffectSchema = z.object({
-  type: z.literal("passive_grantBonus"),
-  on: z.enum(["attackRoll", "damageRoll", "ac", "savingThrow"]),
-  value: z.number().int(),
-  condition: z.string().optional(),
-});
-const TriggeredModifierEffectSchema = z.object({
-  type: z.literal("triggeredModifier"),
-  trigger: z.enum([
-    "onBeingAttacked",
-    "onAttackRoll",
-    "onDealingDamage",
-    "onTakingDamage",
-    "onSavingThrow",
-  ]),
-  modifier: z.object({
-    operation: z.enum(["add", "subtract"]), // <-- NOVA PROPRIEDADE
-    dice: DiceRollSchema, // <-- MUDOU DE z.string() PARA DiceRollSchema
-    target: z.enum(["attackRoll", "damageRoll", "saveRoll", "ac"]),
-    appliesTo: z.enum(["self", "attacker", "targetCreature"]),
-  }),
-  duration: DurationSchema,
-});
-const PreventsHealingEffectSchema = z.object({
-  type: z.literal("preventsHealing"),
-  duration: DurationSchema,
-});
-
-const ActivatableActionEffectSchema = z.object({
-  type: z.literal("activatableAction"),
-  actionId: ActionIdEnum,
-  parameters: z.lazy(() => actionParametersSchema).optional(),
-  duration: DurationSchema.optional(),
-});
-const ActivatableCastSpellEffectSchema = z.object({
-  type: z.literal("activatableCastSpell"),
-  actionId: ActionIdEnum,
-  parameters: z.lazy(() => actionParametersSchema),
-  scaling: SpellScalingSchema.optional(),
-});
-const OnWieldGrantWeaponAttackEffectSchema = z.object({
-  type: z.literal("onWield_grantWeaponAttack"),
-  weaponCategory: WeaponCategoryEnum,
-  weaponType: WeaponTypeEnum,
-  properties: z.array(WeaponPropertySchema),
-  mastery: z.array(WeaponMasteryEnum),
-  damage: z
-    .object({
-      primary: DamageFormulaSchema,
-      versatile: DamageFormulaSchema.optional(),
-    })
-    .optional(),
-  range: RangeSchema.optional(),
-  outcomes: z.array(z.lazy(() => actionOutcomesSchema)).optional(),
-  cost: z
-    .object({
-      amount: z.number(),
-      source: z.enum(["inventory"]),
-      resourceId: z.string(),
-    })
-    .optional(),
-});
-
-export const effectSchema: z.ZodType<EffectType> = z.discriminatedUnion(
-  "type",
-  [
-    OnEquipSetACEffectSchema,
-    OnEquipImposeDisadvantageEffectSchema,
-    OnEquipProvidesContainerEffectSchema,
-    OnWieldGrantWeaponAttackEffectSchema,
-    PassiveGrantAdvantageEffectSchema,
-    PassiveProvidesLightEffectSchema,
-    PassivePropertyEffectSchema,
-    PassiveGrantBonusEffectSchema,
-    TriggeredModifierEffectSchema,
-    PreventsHealingEffectSchema,
-    ActivatableActionEffectSchema,
-    GrantConditionalBonusEffectSchema,
-    ActivatableCastSpellEffectSchema,
-  ]
-);
-
-// CORREÇÃO: Usando o tipo explícito que definimos no início do arquivo.
-export const applicableEffectSchema: z.ZodType<ApplicableEffectType> =
-  z.discriminatedUnion("type", [
-    TriggeredModifierEffectSchema,
-    PreventsHealingEffectSchema,
-    ActivatableActionEffectSchema,
-    GrantConditionalBonusEffectSchema,
-  ]);
-
-export type Effect = z.infer<typeof effectSchema>;
-export type ApplicableEffect = z.infer<typeof applicableEffectSchema>;
-
 // ============================================================================
-// >> FIM: src/shared/effect.schema.ts
+// SEÇÃO: UNIÕES DE SCHEMAS E TIPOS FINAIS
+// Agrupamos os schemas individuais em uniões para criar os tipos finais.
 // ============================================================================
+
+// --- Schema para TODOS os efeitos possíveis ---
+export const effectSchema = z.discriminatedUnion("type", [
+  ActivatableActionEffectSchema,
+  ActivatableCastSpellEffectSchema,
+  OnEquipSetACEffectSchema,
+  OnEquipImposeDisadvantageEffectSchema,
+  OnEquipProvidesContainerEffectSchema,
+  OnWieldGrantWeaponAttackEffectSchema,
+  PassiveGrantAdvantageEffectSchema,
+  PassiveProvidesLightEffectSchema,
+  PassivePropertyEffectSchema,
+  PassiveGrantBonusEffectSchema,
+  GrantConditionalBonusEffectSchema,
+  TriggeredModifierEffectSchema,
+  PreventsHealingEffectSchema,
+  ImposeDisadvantageEffectSchema,
+  PreventsReactionEffectSchema,
+]);
+
+// --- Schema para efeitos que podem ser APLICADOS a um alvo (ex: um buff) ---
+export const applicableEffectSchema = z.discriminatedUnion("type", [
+  ActivatableActionEffectSchema,
+  GrantConditionalBonusEffectSchema,
+  ImposeDisadvantageEffectSchema,
+  PassiveGrantAdvantageEffectSchema,
+  PassiveProvidesLightEffectSchema,
+  PreventsHealingEffectSchema,
+  PreventsReactionEffectSchema,
+  TriggeredModifierEffectSchema,
+]);
+
+// --- Tipos Finais (Inferidos) ---
+// Os tipos TypeScript são gerados automaticamente a partir dos schemas,
+// eliminando a necessidade de interfaces manuais.
+export type EffectType = z.infer<typeof effectSchema>;
+export type ApplicableEffectType = z.infer<typeof applicableEffectSchema>;

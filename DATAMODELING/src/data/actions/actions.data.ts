@@ -1,16 +1,14 @@
 import { z } from "zod";
+import { ActionSchema } from "../../domain/action/actions.schema";
 
-// 1. Defina o schema para UM objeto de ação
-const ActionSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-});
-
-// 2. Defina o schema para o ARRAY de ações
-const FinalActionDataSchema = z.array(ActionSchema);
+export const FinalActionDataSchema = z.array(ActionSchema);
 
 export const ACTIONS = [
+  {
+    id: "action-attack",
+    name: "Atacar",
+    description: "Realiza um ataque com uma arma ou corpo a corpo.",
+  },
   {
     id: "action-throw-item",
     name: "Arremessar Item",
@@ -69,4 +67,6 @@ FinalActionDataSchema.parse(ACTIONS);
 
 const allActionIds = ACTIONS.map((action) => action.id);
 
-export const ActionIdEnum = z.enum(allActionIds);
+const [firstId, ...restIds] = allActionIds;
+
+export const ActionIdEnum = z.enum([firstId, ...restIds]);

@@ -17,7 +17,11 @@ process.on("unhandledRejection", (reason) => {
 
 function validateData(data: any[], schema: z.ZodSchema<any>, dataName: string) {
   console.log(
-    chalk.cyan(`\n🔍 Iniciando a validação dos dados de: ${dataName}...`)
+    chalk.cyan(
+      `\n🔍 Iniciando a validação dos dados de: ${chalk.bold.underline(
+        dataName
+      )}...`
+    )
   );
 
   try {
@@ -25,14 +29,20 @@ function validateData(data: any[], schema: z.ZodSchema<any>, dataName: string) {
 
     if (result.success) {
       console.log(
-        chalk.green(`✅ Validação de ${dataName} concluída com sucesso!`)
+        chalk.green(
+          `✅ Validação de ${chalk.bold.underline(
+            dataName
+          )} concluída com sucesso!`
+        )
       );
       return;
     }
 
     console.error(
       chalk.redBright(
-        `\n❌ Erro(s) de validação encontrado(s) em ${dataName}!\n`
+        `\n❌ Erro(s) de validação encontrado(s) em ${chalk.bold.underline(
+          dataName
+        )}!\n`
       )
     );
 
@@ -57,7 +67,7 @@ function validateData(data: any[], schema: z.ZodSchema<any>, dataName: string) {
       errorsById[itemId].push(message);
     }
 
-    console.log(chalk.bold("\n--- Resumo dos Erros ---"));
+    console.log(chalk.bold.underline("\n--- Resumo dos Erros ---"));
     for (const [id, errorMessages] of Object.entries(errorsById)) {
       console.error(chalk.bgRed.white(`\n🚨 Em '${id}':`));
       errorMessages.forEach((msg) => console.error(`  ${msg}`));
@@ -65,7 +75,9 @@ function validateData(data: any[], schema: z.ZodSchema<any>, dataName: string) {
   } catch (e) {
     console.error(
       chalk.bgRed.white(
-        ` Erro inesperado durante a validação de ${dataName}: `
+        ` Erro inesperado durante a validação de ${chalk.bold.underline(
+          dataName
+        )}: `
       ),
       e
     );
@@ -86,21 +98,25 @@ async function main() {
 
   while (true) {
     choice = (
-      await ask("\nO que você quer testar?\n[1] Magias\n[2] Itens\nInforme: ")
+      await ask(
+        "\nO que você quer testar?\n[1] Magias\n[2] Itens\n[3] Testar todos\nInforme: "
+      )
     ).trim();
 
-    if (choice === "1" || choice === "2") break;
+    if (["1", "2", "3"].includes(choice)) break;
 
-    console.log(chalk.red("❌ Opção inválida! Digite 1 ou 2."));
+    console.log(chalk.red("❌ Opção inválida! Digite 1, 2 ou 3."));
   }
 
-  if (choice === "1") {
+  if (choice === "1" || choice === "3") {
     console.log(chalk.blue("Carregando dados de magias..."));
-    const { spellsLevel0 } = await import("../data/spell/spells-level-0.js");
-    validateData(spellsLevel0, FinalSpellDataSchema, "Magias");
-  } else {
+    const { PHB2024SPELLS } = await import("../data/spell/spells-union.js");
+    validateData(PHB2024SPELLS, FinalSpellDataSchema, "Magias");
+  }
+
+  if (choice === "2" || choice === "3") {
     console.log(chalk.blue("Carregando dados de itens..."));
-    const { PHB2024ITEMS } = await import("../data/item/items.data.js");
+    const { PHB2024ITEMS } = await import("../data/item/items-union.js");
     validateData(PHB2024ITEMS, FinalItemDataSchema, "Itens");
   }
 

@@ -1,92 +1,21 @@
-// ============================================================================
-// >> INÍCIO: src/domain/shared/outcome.schema.ts
-// Este arquivo definirá todos os possíveis resultados de uma ação.
-// Ele dependerá de Efeitos, então precisará importá-los.
-// ============================================================================
-
 import { z } from "zod";
-import { ConditionEnum, EffectOutcomeEnum } from "../shared/primitives.js";
+import {
+  ConditionEnum,
+  CreatureSizeEnum,
+  DistanceUnitEnum,
+  EffectOutcomeEnum,
+} from "../shared/primitives.js";
 import {
   DamageFormulaSchema,
   DiceRollSchema,
   DurationSchema,
+  HPFormulaSchema,
 } from "../shared/blocks.schema.js";
 import {
   effectSchema,
-  EffectType,
+  ApplicableEffectType,
   applicableEffectSchema,
 } from "../shared/effect.schema.js";
-
-interface NoneOutcomeType {
-  id?: string;
-  type: "none";
-  on: z.infer<typeof EffectOutcomeEnum>;
-}
-interface DamageOutcomeType {
-  id?: string;
-  type: "damage";
-  on: z.infer<typeof EffectOutcomeEnum>;
-  formula: z.infer<typeof DamageFormulaSchema>;
-}
-interface ModifyVitalsOutcomeType {
-  id?: string;
-  type: "modifyVitals";
-  on: z.infer<typeof EffectOutcomeEnum>;
-  vitals: Array<"maxHp" | "currentHp" | "tempHp">;
-  formula: z.infer<typeof DiceRollSchema>;
-}
-interface ApplyConditionOutcomeType {
-  id?: string;
-  type: "applyCondition";
-  on: z.infer<typeof EffectOutcomeEnum>;
-  condition: z.infer<typeof ConditionEnum>;
-  duration?: z.infer<typeof DurationSchema>;
-}
-interface DescriptiveOutcomeType {
-  id?: string;
-  type: "descriptive";
-  on: z.infer<typeof EffectOutcomeEnum>;
-  text: string;
-}
-interface ApplyEffectOutcomeType {
-  id?: string;
-  type: "applyEffect";
-  on: z.infer<typeof EffectOutcomeEnum>;
-  effect: EffectType;
-}
-interface SummonTokenOutcomeType {
-  id?: string;
-  type: "summonToken";
-  on: z.infer<typeof EffectOutcomeEnum>;
-  token: { name: string; quantity: number; effects: EffectType[] };
-  duration: z.infer<typeof DurationSchema>;
-}
-interface CustomMechanicOutcomeType {
-  id?: string;
-  type: "customMechanic";
-  on: z.infer<typeof EffectOutcomeEnum>;
-  mechanic: string;
-  details?: any;
-}
-// Adicionado de volta, conforme solicitado
-interface ApplyCustomEffectOutcomeType {
-  id?: string;
-  type: "applyCustomEffect";
-  on: z.infer<typeof EffectOutcomeEnum>;
-  effect: string;
-  value?: number;
-}
-
-export type ActionOutcomeType =
-  | NoneOutcomeType
-  | DamageOutcomeType
-  | ModifyVitalsOutcomeType
-  | ApplyConditionOutcomeType
-  | DescriptiveOutcomeType
-  | ApplyEffectOutcomeType
-  | SummonTokenOutcomeType
-  | CustomMechanicOutcomeType
-  | ApplyCustomEffectOutcomeType; // Adicionado de volta
 
 export const NoneOutcomeSchema = z.object({
   id: z.string().optional(),
@@ -99,12 +28,26 @@ export const DamageOutcomeSchema = z.object({
   on: EffectOutcomeEnum,
   formula: DamageFormulaSchema,
 });
-export const ModifyVitalsOutcomeSchema = z.object({
+
+export const MoveTargetOutcomeSchema = z.object({
   id: z.string().optional(),
-  type: z.literal("modifyVitals"),
+  type: z.literal("moveTarget"),
+  on: EffectOutcomeEnum,
+  direction: z.enum(["towards", "away"]), // Para puxar ou empurrar
+  distance: z.object({
+    value: z.number().int().positive(),
+    unit: DistanceUnitEnum, // Reutilizando o enum de distância
+  }),
+  allowedSizes: z.array(CreatureSizeEnum).optional(), // <-- SUA SUGESTÃO APLICADA
+});
+
+export const ModifyHPOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("modifyHP"),
   on: EffectOutcomeEnum,
   vitals: z.array(z.enum(["maxHp", "currentHp", "tempHp"])),
-  formula: DiceRollSchema,
+  operation: z.enum(["add", "subtract", "set"]), // <-- OPERAÇÃO EXPLÍCITA
+  formula: HPFormulaSchema, // <-- FÓRMULA FLEXÍVEL
 });
 export const ApplyConditionOutcomeSchema = z.object({
   id: z.string().optional(),
@@ -117,8 +60,9 @@ export const DescriptiveOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("descriptive"),
   on: EffectOutcomeEnum,
-  text: z.string(),
+  details: z.string(),
 });
+
 export const CustomMechanicOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("customMechanic"),
@@ -126,48 +70,99 @@ export const CustomMechanicOutcomeSchema = z.object({
   mechanic: z.string(),
   details: z.any().optional(),
 });
-// Adicionado de volta, conforme solicitado
+
 export const ApplyCustomEffectOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("applyCustomEffect"),
   on: EffectOutcomeEnum,
   effect: z.string(),
-  value: z.number().optional(), // CORREÇÃO APLICADA AQUI
+  value: z.number().optional(),
 });
 
 export const BaseActionOutcomesSchema = z.discriminatedUnion("type", [
   NoneOutcomeSchema,
   DamageOutcomeSchema,
-  ModifyVitalsOutcomeSchema,
+  ModifyHPOutcomeSchema,
   ApplyConditionOutcomeSchema,
   DescriptiveOutcomeSchema,
   CustomMechanicOutcomeSchema,
-  ApplyCustomEffectOutcomeSchema, // Adicionado de volta
+  ApplyCustomEffectOutcomeSchema,
 ]);
 
 const ApplyEffectOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("applyEffect"),
-  on: z.enum(["success", "fail", "hit", "miss"]),
+  on: EffectOutcomeEnum,
   effect: z.lazy(() => applicableEffectSchema),
 });
 const SummonTokenOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("summonToken"),
-  on: z.enum(["success", "fail", "hit", "miss"]),
+  on: EffectOutcomeEnum,
   token: z.object({
     name: z.string(),
     quantity: z.number().int().min(1),
     effects: z.array(z.lazy(() => effectSchema)),
   }),
+  duration: DurationSchema.optional(),
+});
+
+export const ModifyAttributeOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("modifyAttribute"),
+  on: EffectOutcomeEnum,
+  attribute: z.enum(["speed"]),
+  operation: z.enum(["add", "subtract"]),
+  value: z.number().int().positive("O valor da modificação deve ser positivo."),
   duration: DurationSchema,
 });
+
+type NoneOutcomeType = z.infer<typeof NoneOutcomeSchema>;
+type DamageOutcomeType = z.infer<typeof DamageOutcomeSchema>;
+type ModifyHPOutcomeType = z.infer<typeof ModifyHPOutcomeSchema>;
+type ApplyConditionOutcomeType = z.infer<typeof ApplyConditionOutcomeSchema>;
+type ModifyAttributeOutcomeType = z.infer<typeof ModifyAttributeOutcomeSchema>;
+type CustomMechanicOutcomeType = z.infer<typeof CustomMechanicOutcomeSchema>;
+type ApplyCustomEffectOutcomeType = z.infer<
+  typeof ApplyCustomEffectOutcomeSchema
+>;
+type DescriptiveOutcomeType = z.infer<typeof DescriptiveOutcomeSchema>;
+type MoveTargetOutcomeType = z.infer<typeof MoveTargetOutcomeSchema>;
+
+type ApplyEffectOutcomeType = {
+  id?: string;
+  type: "applyEffect";
+  on: z.infer<typeof EffectOutcomeEnum>;
+  effect: ApplicableEffectType;
+};
+type SummonTokenOutcomeType = {
+  id?: string;
+  type: "summonToken";
+  on: z.infer<typeof EffectOutcomeEnum>;
+  token: { name: string; quantity: number; effects: ApplicableEffectType[] };
+  duration?: z.infer<typeof DurationSchema>;
+};
+
+export type ActionOutcomeType =
+  | NoneOutcomeType
+  | DamageOutcomeType
+  | ModifyHPOutcomeType
+  | ApplyConditionOutcomeType
+  | DescriptiveOutcomeType
+  | ApplyEffectOutcomeType
+  | SummonTokenOutcomeType
+  | CustomMechanicOutcomeType
+  | ModifyAttributeOutcomeType
+  | MoveTargetOutcomeType
+  | ApplyCustomEffectOutcomeType;
 
 export const actionOutcomesSchema: z.ZodType<ActionOutcomeType> =
   z.discriminatedUnion("type", [
     ...BaseActionOutcomesSchema.options,
     ApplyEffectOutcomeSchema,
     SummonTokenOutcomeSchema,
+    ModifyAttributeOutcomeSchema,
+    MoveTargetOutcomeSchema,
   ] as any);
 
 export type ActionOutcome = z.infer<typeof actionOutcomesSchema>;
