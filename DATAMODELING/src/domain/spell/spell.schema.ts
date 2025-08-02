@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  DurationUnitEnum,
   MagicSchoolEnum,
   SourceEnum,
   SpellComponentEnum,
@@ -20,6 +21,7 @@ const baseSpellSchema = z.object({
   page: z.number(),
   level: z.number().int().min(0).max(9),
   school: MagicSchoolEnum,
+  additionalRules: z.object({id: z.string(), details: z.string()}).array().optional(),
   isRitual: z.boolean().default(false).optional(),
   components: z.object({
     types: z.array(SpellComponentEnum),
@@ -32,7 +34,10 @@ const baseSpellSchema = z.object({
       .optional(),
   }),
   requirements: SpellRequirementsSchema.optional(),
-  duration: DurationSchema,
+  duration: DurationSchema.optional(),
+  castingTime: DurationSchema.default({
+    unit: "instantaneous",
+  }).optional(),
   effects: z.array(effectSchema),
 });
 

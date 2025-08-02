@@ -44,6 +44,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "fail",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["acid"],
               },
@@ -62,6 +63,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "acid-splash-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["acid"],
               },
@@ -71,6 +73,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "acid-splash-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 6 },
                 damageTypeOptions: ["acid"],
               },
@@ -80,6 +83,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "acid-splash-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 6 },
                 damageTypeOptions: ["acid"],
               },
@@ -97,13 +101,13 @@ export const spellsLevel0 = [
     level: 0,
     school: "abjuration",
     components: { types: ["verbal", "somatic"] },
-    duration: { unit: "minute", value: 1, isConcentration: true },
     description:
       "Sempre que uma criatura fizer uma jogada de ataque contra você antes do fim da magia, o atacante subtrai 1d4 da jogada de ataque.",
     effects: [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [{ trigger: "onLoseConcentration" }],
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
@@ -157,6 +161,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 10 },
                 damageTypeOptions: ["necrotic"],
               },
@@ -179,6 +184,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "chill-touch-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 10 },
                 damageTypeOptions: ["necrotic"],
               },
@@ -188,6 +194,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "chill-touch-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 10 },
                 damageTypeOptions: ["necrotic"],
               },
@@ -197,6 +204,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "chill-touch-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 10 },
                 damageTypeOptions: ["necrotic"],
               },
@@ -365,6 +373,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 10 },
                 damageTypeOptions: ["force"],
               },
@@ -511,6 +520,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 10 },
                 damageTypeOptions: ["fire"],
               },
@@ -532,6 +542,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "fire-bolt-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 10 },
                 damageTypeOptions: ["fire"],
               },
@@ -541,6 +552,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "fire-bolt-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 10 },
                 damageTypeOptions: ["fire"],
               },
@@ -550,6 +562,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "fire-bolt-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 10 },
                 damageTypeOptions: ["fire"],
               },
@@ -583,6 +596,10 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [
+          { trigger: "onLoseConcentration" },
+          { trigger: "onTakingDamage" },
+        ],
         parameters: {
           activation: {
             type: "action",
@@ -613,15 +630,15 @@ export const spellsLevel0 = [
               type: "none",
               on: "success",
             },
-            {
-              id: "friends-special-rules",
-              type: "descriptive",
-              on: "custom",
-              details:
-                "O alvo tem sucesso automaticamente se não for um Humanoide, se você estiver lutando com ele, ou se você já usou esta magia nele nas últimas 24 horas. A magia termina antes se o alvo sofrer dano ou se você atacar, causar dano ou forçar um teste de resistência em qualquer pessoa. Ao final da magia, o alvo sabe que foi encantado por você.",
-            },
           ],
         },
+        additionalRules: [
+          {
+            id: "friends-special-rules",
+            details:
+              "O alvo tem sucesso automaticamente se não for um Humanoide, se você estiver lutando com ele, ou se você já usou esta magia nele nas últimas 24 horas. A magia termina antes se o alvo sofrer dano ou se você atacar, causar dano ou forçar um teste de resistência em qualquer pessoa. Ao final da magia, o alvo sabe que foi encantado por você.",
+          },
+        ],
       },
     ],
   },
@@ -646,6 +663,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [{ trigger: "onLoseConcentration" }],
         parameters: {
           activation: {
             type: "action",
@@ -695,6 +713,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [{ trigger: "onCastingSpellAgain" }],
         parameters: {
           activation: {
             type: "action",
@@ -752,6 +771,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [{ trigger: "onCastingSpellAgain" }],
         parameters: {
           activation: {
             type: "action",
@@ -833,6 +853,10 @@ export const spellsLevel0 = [
     },
     duration: {
       unit: "instantaneous",
+    },
+    castingTime: {
+      value: 1,
+      unit: "minute",
     },
     effects: [
       {
@@ -957,6 +981,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "fail",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["psychic"],
               },
@@ -990,6 +1015,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "mind-sliver-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["psychic"],
               },
@@ -999,6 +1025,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "mind-sliver-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 6 },
                 damageTypeOptions: ["psychic"],
               },
@@ -1008,6 +1035,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "mind-sliver-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 6 },
                 damageTypeOptions: ["psychic"],
               },
@@ -1040,6 +1068,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [{ trigger: "onCastingSpellAgain" }],
         parameters: {
           activation: {
             type: "action",
@@ -1124,6 +1153,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 12 },
                 damageTypeOptions: ["poison"],
               },
@@ -1143,6 +1173,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "poison-spray-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 12 },
                 damageTypeOptions: ["poison"],
               },
@@ -1152,6 +1183,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "poison-spray-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 12 },
                 damageTypeOptions: ["poison"],
               },
@@ -1161,6 +1193,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "poison-spray-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 12 },
                 damageTypeOptions: ["poison"],
               },
@@ -1265,6 +1298,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [{ trigger: "onCastingSpellAgain" }],
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "self" },
@@ -1301,6 +1335,7 @@ export const spellsLevel0 = [
                       type: "damage",
                       on: "hit",
                       formula: {
+                        type: "damage",
                         roll: { count: 1, faces: 8 },
                         damageTypeOptions: ["fire"],
                       },
@@ -1315,6 +1350,7 @@ export const spellsLevel0 = [
                       level: 5,
                       outcomeId: "produce-flame-damage",
                       newFormula: {
+                        type: "damage",
                         roll: { count: 2, faces: 8 },
                         damageTypeOptions: ["fire"],
                       },
@@ -1324,6 +1360,7 @@ export const spellsLevel0 = [
                       level: 11,
                       outcomeId: "produce-flame-damage",
                       newFormula: {
+                        type: "damage",
                         roll: { count: 3, faces: 8 },
                         damageTypeOptions: ["fire"],
                       },
@@ -1333,6 +1370,7 @@ export const spellsLevel0 = [
                       level: 17,
                       outcomeId: "produce-flame-damage",
                       newFormula: {
+                        type: "damage",
                         roll: { count: 4, faces: 8 },
                         damageTypeOptions: ["fire"],
                       },
@@ -1390,6 +1428,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 8 },
                 damageTypeOptions: ["cold"],
               },
@@ -1416,6 +1455,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "rof-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 8 },
                 damageTypeOptions: ["cold"],
               },
@@ -1425,6 +1465,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "rof-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 8 },
                 damageTypeOptions: ["cold"],
               },
@@ -1434,6 +1475,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "rof-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 8 },
                 damageTypeOptions: ["cold"],
               },
@@ -1458,6 +1500,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [{ trigger: "onLoseConcentration" }],
         parameters: {
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
@@ -1524,6 +1567,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "fail",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
@@ -1545,6 +1589,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "sacred-flame-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
@@ -1554,6 +1599,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "sacred-flame-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
@@ -1563,6 +1609,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "sacred-flame-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
@@ -1599,6 +1646,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
+        endConditions: [{ trigger: "onCastingSpellAgain" }],
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "self" },
@@ -1621,6 +1669,7 @@ export const spellsLevel0 = [
                       type: "damage",
                       on: "hit",
                       formula: {
+                        type: "damage",
                         roll: { count: 1, faces: 8 },
                         damageTypeOptions: ["bludgeoning", "force"],
                       },
@@ -1635,6 +1684,7 @@ export const spellsLevel0 = [
                       level: 5,
                       outcomeId: "shillelagh-damage",
                       newFormula: {
+                        type: "damage",
                         roll: { count: 1, faces: 10 },
                         damageTypeOptions: ["bludgeoning", "force"],
                       },
@@ -1644,6 +1694,7 @@ export const spellsLevel0 = [
                       level: 11,
                       outcomeId: "shillelagh-damage",
                       newFormula: {
+                        type: "damage",
                         roll: { count: 1, faces: 12 },
                         damageTypeOptions: ["bludgeoning", "force"],
                       },
@@ -1653,6 +1704,7 @@ export const spellsLevel0 = [
                       level: 17,
                       outcomeId: "shillelagh-damage",
                       newFormula: {
+                        type: "damage",
                         roll: { count: 2, faces: 6 },
                         damageTypeOptions: ["bludgeoning", "force"],
                       },
@@ -1699,6 +1751,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 8 },
                 damageTypeOptions: ["lightning"],
               },
@@ -1725,6 +1778,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "shocking-grasp-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 8 },
                 damageTypeOptions: ["lightning"],
               },
@@ -1734,6 +1788,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "shocking-grasp-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 8 },
                 damageTypeOptions: ["lightning"],
               },
@@ -1743,6 +1798,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "shocking-grasp-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 8 },
                 damageTypeOptions: ["lightning"],
               },
@@ -1778,6 +1834,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: {
                   count: 1,
                   faces: 8,
@@ -1805,6 +1862,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "sorcerous-burst-damage",
               newFormula: {
+                type: "damage",
                 roll: {
                   count: 2,
                   faces: 8,
@@ -1827,6 +1885,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "sorcerous-burst-damage",
               newFormula: {
+                type: "damage",
                 roll: {
                   count: 3,
                   faces: 8,
@@ -1849,6 +1908,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "sorcerous-burst-damage",
               newFormula: {
+                type: "damage",
                 roll: {
                   count: 4,
                   faces: 8,
@@ -1906,9 +1966,7 @@ export const spellsLevel0 = [
               on: "success",
               operation: "set",
               vitals: ["currentHp"],
-              formula: {
-                fixed: 1,
-              },
+              formula: { fixed: 1, addSpellcastingModifier: false },
             },
           ],
         },
@@ -1964,6 +2022,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
@@ -1999,6 +2058,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "starry-wisp-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2008,6 +2068,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "starry-wisp-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2017,6 +2078,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "starry-wisp-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2136,6 +2198,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["piercing"],
               },
@@ -2161,6 +2224,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "thorn-whip-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["piercing"],
               },
@@ -2170,6 +2234,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "thorn-whip-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 6 },
                 damageTypeOptions: ["piercing"],
               },
@@ -2179,6 +2244,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "thorn-whip-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 6 },
                 damageTypeOptions: ["piercing"],
               },
@@ -2220,6 +2286,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "fail",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["thunder"],
               },
@@ -2241,6 +2308,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "thunderclap-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["thunder"],
               },
@@ -2250,6 +2318,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "thunderclap-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 6 },
                 damageTypeOptions: ["thunder"],
               },
@@ -2259,6 +2328,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "thunderclap-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 6 },
                 damageTypeOptions: ["thunder"],
               },
@@ -2302,10 +2372,14 @@ export const spellsLevel0 = [
               formula: {
                 condition: "targetIsWounded",
                 ifTrue: {
+                  type: "damage",
+
                   roll: { count: 1, faces: 12 },
                   damageTypeOptions: ["necrotic"],
                 },
                 ifFalse: {
+                  type: "damage",
+
                   roll: { count: 1, faces: 8 },
                   damageTypeOptions: ["necrotic"],
                 },
@@ -2330,10 +2404,13 @@ export const spellsLevel0 = [
               newFormula: {
                 condition: "targetIsWounded",
                 ifTrue: {
+                  type: "damage",
                   roll: { count: 2, faces: 12 },
                   damageTypeOptions: ["necrotic"],
                 },
                 ifFalse: {
+                  type: "damage",
+
                   roll: { count: 2, faces: 8 },
                   damageTypeOptions: ["necrotic"],
                 },
@@ -2346,10 +2423,14 @@ export const spellsLevel0 = [
               newFormula: {
                 condition: "targetIsWounded",
                 ifTrue: {
+                  type: "damage",
+
                   roll: { count: 3, faces: 12 },
                   damageTypeOptions: ["necrotic"],
                 },
                 ifFalse: {
+                  type: "damage",
+
                   roll: { count: 3, faces: 8 },
                   damageTypeOptions: ["necrotic"],
                 },
@@ -2362,10 +2443,14 @@ export const spellsLevel0 = [
               newFormula: {
                 condition: "targetIsWounded",
                 ifTrue: {
+                  type: "damage",
+
                   roll: { count: 4, faces: 12 },
                   damageTypeOptions: ["necrotic"],
                 },
                 ifFalse: {
+                  type: "damage",
+
                   roll: { count: 4, faces: 8 },
                   damageTypeOptions: ["necrotic"],
                 },
@@ -2421,6 +2506,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "hit",
               formula: {
+                type: "damage",
                 fixed: 0,
                 damageTypeOptions: ["radiant"],
               },
@@ -2435,6 +2521,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "true-strike-extra-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2444,6 +2531,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "true-strike-extra-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2453,6 +2541,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "true-strike-extra-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2494,6 +2583,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "fail",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["psychic"],
               },
@@ -2522,6 +2612,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "vicious-mockery-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["psychic"],
               },
@@ -2531,6 +2622,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "vicious-mockery-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 6 },
                 damageTypeOptions: ["psychic"],
               },
@@ -2540,6 +2632,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "vicious-mockery-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 6 },
                 damageTypeOptions: ["psychic"],
               },
@@ -2584,6 +2677,7 @@ export const spellsLevel0 = [
               type: "damage",
               on: "fail",
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2605,6 +2699,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "word-of-radiance-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2614,6 +2709,7 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "word-of-radiance-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 3, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },
@@ -2623,6 +2719,7 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "word-of-radiance-damage",
               newFormula: {
+                type: "damage",
                 roll: { count: 4, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },

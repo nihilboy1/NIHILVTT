@@ -110,13 +110,13 @@ async function main() {
 
   if (choice === "1" || choice === "3") {
     console.log(chalk.blue("Carregando dados de magias..."));
-    const { PHB2024SPELLS } = await import("../data/spell/spells-union.js");
+    const { PHB2024SPELLS } = await import("../data/spells/spells-union.js");
     validateData(PHB2024SPELLS, FinalSpellDataSchema, "Magias");
   }
 
   if (choice === "2" || choice === "3") {
     console.log(chalk.blue("Carregando dados de itens..."));
-    const { PHB2024ITEMS } = await import("../data/item/items-union.js");
+    const { PHB2024ITEMS } = await import("../data/items/items-union.js");
     validateData(PHB2024ITEMS, FinalItemDataSchema, "Itens");
   }
 

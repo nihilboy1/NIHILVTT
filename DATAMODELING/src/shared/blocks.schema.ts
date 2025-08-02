@@ -1,12 +1,13 @@
 import { z } from "zod";
 import {
   AbilityScoreEnum,
+  CreatureTypeEnum,
   DamageTypeEnum,
   DistanceUnitEnum,
   DurationUnitEnum,
   WeaponPropertyEnum,
 } from "./primitives.js";
-import { WeaponIdEnum } from "../data/item/items-weapon.js";
+import { WeaponIdEnum } from "../data/items/items-weapon.js";
 
 // ============================================================================
 // SEÇÃO: Fórmulas e Cálculos
@@ -39,16 +40,24 @@ export const DiceRollSchema = z.object({
 });
 
 const BaseDamageFormulaSchema = z
-  .object({
-    roll: DiceRollSchema.optional(),
-    fixed: z.number().int().optional(),
-    damageTypeOptions: z
-      .array(DamageTypeEnum)
-      .min(1, "É necessário especificar pelo menos um tipo de dano."),
-  })
+  .discriminatedUnion("type", [
+    z.object({
+      type: z.literal("damage"),
+      roll: DiceRollSchema.optional(),
+      fixed: z.number().int().optional(),
+      damageTypeOptions: z
+        .array(DamageTypeEnum)
+        .min(1, "É necessário especificar pelo menos um tipo de dano."),
+    }),
+    z.object({
+      type: z.literal("healing"),
+      roll: DiceRollSchema.optional(),
+      fixed: z.number().int().optional(),
+    }),
+  ])
   .refine((data) => data.roll || data.fixed !== undefined, {
     message:
-      "A fórmula de dano precisa ter pelo menos uma rolagem (roll) ou um valor fixo (fixed).",
+      "A fórmula precisa ter pelo menos uma rolagem (roll) ou um valor fixo (fixed).",
   });
 
 const ConditionalDamageFormulaSchema = z.object({
@@ -77,6 +86,7 @@ export const HPFormulaSchema = z
   .object({
     roll: DiceRollSchema.optional(),
     fixed: z.number().int().optional(),
+    addSpellcastingModifier: z.boolean()
   })
   .refine((data) => data.roll || data.fixed !== undefined, {
     message:
@@ -151,8 +161,15 @@ const TargetHasZeroHPSchema = z.object({
   details: z.string().optional(),
 });
 
+const TargetIsCreatureType = z.object({
+  type: z.literal("isCreatureType"),
+  creatureType: CreatureTypeEnum,
+  details: z.string().optional(),
+});
+
 const TargetConditionSchema = z.discriminatedUnion("type", [
   TargetHasZeroHPSchema,
+  TargetIsCreatureType,
 ]);
 
 // --- Schema Principal de Requisitos de Magia ---
@@ -182,4 +199,9 @@ export const DurationSchema = z.object({
   unit: DurationUnitEnum,
   value: z.number().int().optional(),
   isConcentration: z.boolean().default(false).optional(),
+});
+
+export const AdditionalRulesSchema = z.object({
+  id: z.string(),
+  details: z.string(),
 });

@@ -7,7 +7,6 @@ import {
 } from "../shared/primitives.js";
 import {
   DamageFormulaSchema,
-  DiceRollSchema,
   DurationSchema,
   HPFormulaSchema,
 } from "../shared/blocks.schema.js";
@@ -116,6 +115,7 @@ export const ModifyAttributeOutcomeSchema = z.object({
   value: z.number().int().positive("O valor da modificação deve ser positivo."),
   duration: DurationSchema,
 });
+type AnyEffect = Record<string, any>;
 
 type NoneOutcomeType = z.infer<typeof NoneOutcomeSchema>;
 type DamageOutcomeType = z.infer<typeof DamageOutcomeSchema>;
@@ -129,13 +129,13 @@ type ApplyCustomEffectOutcomeType = z.infer<
 type DescriptiveOutcomeType = z.infer<typeof DescriptiveOutcomeSchema>;
 type MoveTargetOutcomeType = z.infer<typeof MoveTargetOutcomeSchema>;
 
-type ApplyEffectOutcomeType = {
+export type ApplyEffectOutcomeType = {
   id?: string;
   type: "applyEffect";
   on: z.infer<typeof EffectOutcomeEnum>;
   effect: ApplicableEffectType;
 };
-type SummonTokenOutcomeType = {
+export type SummonTokenOutcomeType = {
   id?: string;
   type: "summonToken";
   on: z.infer<typeof EffectOutcomeEnum>;
@@ -164,5 +164,6 @@ export const actionOutcomesSchema: z.ZodType<ActionOutcomeType> =
     ModifyAttributeOutcomeSchema,
     MoveTargetOutcomeSchema,
   ] as any);
+
 
 export type ActionOutcome = z.infer<typeof actionOutcomesSchema>;

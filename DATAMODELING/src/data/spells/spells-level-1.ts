@@ -3,7 +3,7 @@ import type { Spell } from "../../domain/spell/spell.schema.js";
 export const spellsLevel1 = [
   {
     id: "spell-alarme",
-    name: "Alarme",
+    name: ["Alarme", "Alarm"],
     description:
       "Você prepara um alarme contra invasões. Escolha uma porta, uma janela ou uma área dentro do alcance que não seja maior que um cubo de 6 metros (20 pés). Até o fim da magia, um alarme alerta você sempre que uma criatura designada tocar ou entrar na área protegida. Ao conjurar a magia, você pode designar criaturas que não ativarão o alarme. Você também escolhe se o alarme será audível ou mental.",
     source: "LDJ2024",
@@ -11,9 +11,16 @@ export const spellsLevel1 = [
     level: 1,
     school: "abjuration",
     isRitual: true,
+    castingTime: {
+      value: 1,
+      unit: "minute",
+    },
     components: {
       types: ["verbal", "somatic", "material"],
-      material: "Um sininho e um fio de prata que são consumidos pela magia.",
+      material: {
+        description: "Um sininho e um fio de prata",
+        isConsumed: true,
+      },
     },
     duration: {
       unit: "hour",
@@ -21,20 +28,18 @@ export const spellsLevel1 = [
     },
     effects: [
       {
-        type: "createNarrativeTrigger",
+        type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
             type: "special",
-            trigger: "1 minuto de conjuração",
           },
           range: {
             normal: 30,
             unit: "ft",
           },
           target: {
-            type: "descriptive",
-            text: "Uma porta, janela ou ponto no espaço que se torna o centro da área protegida.",
+            type: "pointInSpace",
           },
           area: {
             shape: "cube",
@@ -42,45 +47,12 @@ export const spellsLevel1 = [
           },
           outcomes: [
             {
+              id: "alarm-create-ward",
               type: "customMechanic",
               on: "success",
               mechanic: "createAlarmWard",
-              details: {
-                duration: {
-                  unit: "hour",
-                  value: 8,
-                },
-                area: {
-                  shape: "cube",
-                  size: 20,
-                },
-                actions: [
-                  {
-                    id: "trigger-audible-alarm",
-                    name: "Ativar Alarme Audível",
-                    outcome: {
-                      type: "playSound",
-                      details: {
-                        soundId: "sfx-handbell",
-                        durationSec: 10,
-                        rangeFt: 60,
-                      },
-                    },
-                  },
-                  {
-                    id: "trigger-mental-alarm",
-                    name: "Ativar Alarme Mental",
-                    outcome: {
-                      type: "notifyPlayer",
-                      details: {
-                        message: "Seu alarme foi ativado!",
-                        target: "caster",
-                        rangeFt: 5280,
-                      },
-                    },
-                  },
-                ],
-              },
+              details:
+                "Cria uma sentinela mágica e invisível na área designada. Na conjuração, o jogador designa criaturas que não disparam o alarme e escolhe um dos dois tipos de alerta: 1) Mental: um 'ping' de alerta é enviado ao conjurador se ele estiver a até 1 milha. 2) Audível: o som de um sino soa por 10 segundos, audível a até 60 pés.",
             },
           ],
         },
@@ -88,56 +60,312 @@ export const spellsLevel1 = [
     ],
   },
   {
-    name: "Animal Friendship",
+    id: "spell-amizade-animal",
+    name: ["Amizade Animal", "Animal Friendship"],
+    description:
+      "Você encanta uma criatura do tipo Besta. Ela deve passar em um teste de resistência de Sabedoria ou ficará com a condição 'Encantado' por você pela duração. O feitiço termina se você ou seus companheiros causarem dano ao alvo.",
     source: "LDJ2024",
     page: 239,
     level: 1,
     school: "enchantment",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a morsel of food",
+      types: ["verbal", "somatic", "material"],
+      material: {
+        description: "um bocado de comida",
+      },
     },
-    duration: [
+    duration: {
+      unit: "hour",
+      value: 24,
+    },
+    requirements: {
+      targetConditions: [
+        {
+          type: "isCreatureType",
+          creatureType: "beast",
+          details: "O alvo deve ser uma criatura do tipo Besta.",
+        },
+      ],
+    },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 24,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [
+          {
+            trigger: "onTakingDamage",
+            from: ["caster", "casterAllies"],
+          },
+        ],
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          range: {
+            normal: 30,
+            unit: "ft",
+          },
+          target: {
+            type: "creature",
+            quantity: 1,
+          },
+          save: {
+            ability: "wisdom",
+            dc: {
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "animal-friendship-charmed",
+              type: "applyCondition",
+              on: "fail",
+              condition: "charmed",
+              duration: {
+                unit: "hour",
+                value: 24,
+              },
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "Target a Beast that you can see within range. The target must succeed on a Wisdom saving throw or have the {@condition Charmed|XPHB} condition for the duration. If you or one of your allies deals damage to the target, the spells ends.",
-    ],
-    entriesHigherLevel: [
+  },
+  {
+    id: "spell-cure-wounds",
+    name: ["Curar Ferimentos", "Cure Wounds"],
+    description:
+      "Uma criatura que você toca recupera uma quantidade de pontos de vida igual a 2d8 + seu modificador de habilidade de conjuração.",
+    source: "LDJ2024",
+    page: 259,
+    level: 1,
+    school: "abjuration",
+    isRitual: false,
+    duration: {
+      unit: "instantaneous",
+    },
+    components: {
+      types: ["verbal", "somatic"],
+    },
+    effects: [
       {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can target one additional Beast for each spell slot level above 1.",
-        ],
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          range: {
+            normal: 5,
+            unit: "ft",
+          },
+          target: {
+            type: "creature",
+            quantity: 1,
+          },
+          outcomes: [
+            {
+              id: "cure-wounds-heal",
+              type: "modifyHP",
+              on: "success",
+              vitals: ["currentHp"],
+              operation: "add",
+              formula: {
+                roll: { count: 2, faces: 8 },
+                addSpellcastingModifier: true,
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "cure-wounds-heal",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    conditionInflict: ["charmed"],
-    savingThrow: ["wisdom"],
-    affectsCreatureType: ["beast"],
-    miscTags: ["SCT", "SGT"],
-    areaTags: ["ST"],
   },
+  {
+    id: "spell-healing-word",
+    name: ["Palavra Curativa", "Healing Word"],
+    description:
+      "Uma criatura à sua escolha que você pode ver dentro do alcance recupera pontos de vida iguais a 2d4 + seu modificador de habilidade de conjuração.",
+    source: "LDJ2024",
+    page: 284,
+    level: 1,
+    school: "abjuration",
+    isRitual: false,
+    duration: {
+      unit: "instantaneous",
+    },
+    components: {
+      types: ["verbal"],
+    },
+    effects: [
+      {
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "bonusAction",
+          },
+          range: {
+            normal: 60,
+            unit: "ft",
+          },
+          target: {
+            type: "creature",
+            quantity: 1,
+          },
+          outcomes: [
+            {
+              id: "healing-word-heal",
+              type: "modifyHP",
+              on: "success",
+              vitals: ["currentHp"],
+              operation: "add",
+              formula: {
+                roll: { count: 2, faces: 4 },
+                addSpellcastingModifier: true,
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "healing-word-heal",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "spell-arms-of-hadar",
+    name: ["Arms of Hadar"],
+    description:
+      "Invoking Hadar, you cause tendrils to erupt from yourself. Each creature in a 10-foot emanation originating from you makes a Strength saving throw. On a failed save, a target takes 2d6 Necrotic damage and can't take Reactions until the start of its next turn. On a successful save, a target takes half as much damage only.",
+    source: "LDJ2024",
+    page: 243,
+    level: 1,
+    school: "conjuration",
+    isRitual: false,
+   
+    components: {
+      types: ["verbal", "somatic"],
+    },
+    duration: {
+      unit: "instantaneous",
+    },
+    effects: [
+      {
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          range: {
+            normal: 0, // Emanation from self
+            unit: "ft",
+          },
+          target: {
+            type: "creature", // Targets creatures in the area
+          },
+          area: {
+            shape: "sphere", // Emanation is a sphere
+            size: 10, // 10-foot emanation
+          },
+          save: {
+            ability: "strength",
+            dc: {
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "arms-of-hadar-damage-fail",
+              type: "damage",
+              on: "fail",
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 6 },
+                damageTypeOptions: ["necrotic"],
+              },
+            },
+            {
+              id: "arms-of-hadar-no-reaction",
+              type: "applyEffect",
+              on: "fail",
+              effect: {
+                type: "preventsReaction",
+                duration: {
+                  unit: "turn",
+                  value: 1, // until the start of its next turn
+                },
+              },
+            },
+            {
+              id: "arms-of-hadar-damage-success",
+              type: "damage",
+              on: "success",
+              formula: {
+                roll: { count: 1, faces: 6 }, // Half damage
+                damageType: "necrotic",
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "arms-of-hadar-damage-fail",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "arms-of-hadar-damage-success",
+              propertyPath: "formula.roll.count",
+              increment: 0.5,
+            },
+          ],
+        },
+      },
+    ],
+  },
+] as const satisfies Spell[];
+
+export const toBoMoldedSpells = [
   {
     name: "Armor of Agathys",
     source: "LDJ2024",
@@ -184,50 +412,6 @@ export const spellsLevel1 = [
     ],
     damageInflict: ["cold"],
     miscTags: ["THP"],
-  },
-  {
-    name: "Arms of Hadar",
-    source: "LDJ2024",
-    page: 243,
-    level: 1,
-    school: "conjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "emanation",
-      distance: {
-        type: "feet",
-        amount: 10,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "Invoking Hadar, you cause tendrils to erupt from yourself. Each creature in a 10-foot {@variantrule Emanation [Area of Effect]|XPHB|Emanation} originating from you makes a Strength saving throw. On a failed save, a target takes {@damage 2d6} Necrotic damage and can't take Reactions until the start of its next turn. On a successful save, a target takes half as much damage only.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 2d6|1-9|1d6} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["necrotic"],
-    savingThrow: ["strength"],
-    areaTags: ["S"],
   },
   {
     name: "Bane",
@@ -740,48 +924,6 @@ export const spellsLevel1 = [
     ],
     miscTags: ["PRM"],
     areaTags: ["C"],
-  },
-  {
-    name: "Cure Wounds",
-    source: "LDJ2024",
-    page: 259,
-    level: 1,
-    school: "abjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "A creature you touch regains a number of {@variantrule Hit Points|XPHB} equal to {@dice 2d8} plus your spellcasting ability modifier.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The healing increases by {@scaledice 2d8|1-9|2d8} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    miscTags: ["HL"],
-    areaTags: ["ST"],
   },
   {
     name: "Detect Evil and Good",
@@ -1617,48 +1759,6 @@ export const spellsLevel1 = [
     damageInflict: ["piercing"],
     savingThrow: ["dexterity"],
     areaTags: ["S"],
-  },
-  {
-    name: "Healing Word",
-    source: "LDJ2024",
-    page: 284,
-    level: 1,
-    school: "abjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "A creature of your choice that you can see within range regains {@variantrule Hit Points|XPHB} equal to {@dice 2d4} plus your spellcasting ability modifier.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The healing increases by {@scaledice 2d4|1-9|2d4} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    miscTags: ["HL", "SGT"],
-    areaTags: ["ST"],
   },
   {
     name: "Hellish Rebuke",
@@ -2958,4 +3058,4 @@ export const spellsLevel1 = [
     savingThrow: ["wisdom"],
     miscTags: ["AAD"],
   },
-] as const satisfies Spell[];
+];

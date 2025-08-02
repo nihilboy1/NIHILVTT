@@ -1,3 +1,5 @@
+// src/shared/outcome-paths.ts
+
 import { z } from "zod";
 
 // ============================================================================
@@ -6,25 +8,118 @@ import { z } from "zod";
 
 export const SourceEnum = z.enum(["LDJ2024"]);
 
-export const ActionParameterPaths = z.enum([
-  // Caminhos para Activation
-  "activation.type",
+export const CreatureTypeEnum = z.enum([
+  "aberration",
+  "beast",
+  "celestial",
+  "construct",
+  "dragon",
+  "elemental",
+  "fey",
+  "fiend",
+  "giant",
+  "humanoid",
+  "monstrosity",
+  "ooze",
+  "plant",
+  "undead",
+]);
+
+export const RootParameterPaths = z.enum([
   "activation.cost.amount",
-  // Caminhos para Range
-  "range.normal",
-  "range.long",
-  // Caminhos para Area
-  "area.radius", // Para esferas
-  "area.size", // Para cubos
-  "area.length", // Para cones e linhas
-  "area.width", // Para linhas
-  // Caminhos para Target
-  "target.quantity",
-  // Caminhos para Save
-  "save.ability",
-  "save.dc", // Note: 'dc' pode ser um número ou um objeto. Modificar o objeto inteiro é mais simples.
-  // Caminhos para Charges
+  "activation.cost.resourceId",
+  "activation.cost.source",
+  "activation.type",
+  "area.radius",
+  "area.shape",
+  "area.size",
+  "attackType",
   "charges.max",
+  "overrideAbilityScore",
+  "range.normal",
+  "range.unit",
+  "save.ability",
+  "save.dc",
+  "save.dc.attributes",
+  "save.dc.base",
+  "target.details",
+  "target.quantity",
+  "target.type",
+]);
+
+export const OutcomeParameterPaths = z.enum([
+  "allowedSizes",
+  "attribute",
+  "condition",
+  "details",
+  "details.against",
+  "details.duration.unit",
+  "details.duration.value",
+  "details.on",
+  "direction",
+  "distance.unit",
+  "distance.value",
+  "duration.unit",
+  "duration.value",
+  "effect",
+  "effect.actionId",
+  "effect.count",
+  "effect.duration.isConcentration",
+  "effect.duration.unit",
+  "effect.duration.value",
+  "effect.modifier.appliesTo",
+  "effect.modifier.count",
+  "effect.modifier.dice.count",
+  "effect.modifier.dice.faces",
+  "effect.modifier.faces",
+  "effect.modifier.operation",
+  "effect.modifier.target",
+  "effect.on",
+  "effect.parameters.activation.type",
+  "effect.parameters.attackType",
+  "effect.parameters.outcomes",
+  "effect.parameters.overrideAbilityScore",
+  "effect.parameters.range.normal",
+  "effect.parameters.range.unit",
+  "effect.parameters.target.quantity",
+  "effect.parameters.target.type",
+  "effect.properties.bright",
+  "effect.properties.dim",
+  "effect.properties.duration.unit",
+  "effect.properties.duration.value",
+  "effect.requiresChoice",
+  "effect.scaling.rules",
+  "effect.scaling.type",
+  "effect.skill",
+  "effect.trigger",
+  "effect.type",
+  "formula.addSpellcastingModifier",
+  "formula.condition",
+  "formula.damageTypeOptions",
+  "formula.fixed",
+  "formula.ifFalse.damageTypeOptions",
+  "formula.ifFalse.roll.count",
+  "formula.ifFalse.roll.faces",
+  "formula.ifFalse.type",
+  "formula.ifTrue.damageTypeOptions",
+  "formula.ifTrue.roll.count",
+  "formula.ifTrue.roll.faces",
+  "formula.ifTrue.type",
+  "formula.roll.count",
+  "formula.roll.explodeLimit",
+  "formula.roll.explodesOn",
+  "formula.roll.faces",
+  "formula.type",
+  "id",
+  "mechanic",
+  "on",
+  "operation",
+  "token.effects",
+  "token.name",
+  "token.quantity",
+  "type",
+  "value",
+  "vitals",
 ]);
 
 export const RarityEnum = z.enum([
@@ -192,7 +287,6 @@ export const MagicSchoolEnum = z.enum([
   "transmutation",
 ]);
 
-// SUGESTÃO: Renomeado de SpellComponentSchema para consistência
 export const SpellComponentEnum = z.enum(["verbal", "somatic", "material"]);
 
 // ============================================================================
@@ -247,7 +341,6 @@ export const DurationUnitEnum = z.enum([
   "unlimited",
 ]);
 
-// SUGESTÃO: Removidos valores que não são unidades de medida para maior precisão.
 export const DistanceUnitEnum = z.enum(["ft", "mile"]);
 
 export const ScalablePropertyEnum = z.enum([
@@ -260,7 +353,6 @@ export const ScalablePropertyEnum = z.enum([
 
 export const WeightUnitEnum = z.enum(["lb"]);
 
-// SUGESTÃO: Corrigido erro de digitação de "Cooper" para "Copper"
 export const CostUnitEnum = z.enum(["copper", "silver", "gold", "platinum"]);
 
 export const SurfaceTypeEnum = z.enum([
