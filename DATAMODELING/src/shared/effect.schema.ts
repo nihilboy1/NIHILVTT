@@ -20,16 +20,15 @@ import {
   ArmorTypeEnum,
   DamageTypeEnum,
   ItemPropertyEnum,
-  OutcomeParameterPaths,
-  RootParameterPaths,
   SkillEnum,
   WeaponCategoryEnum,
   WeaponMasteryEnum,
   WeaponTypeEnum,
   WeightUnitEnum,
 } from "./primitives.js";
-import { actionOutcomesSchema } from "./outcome.schema.js";
+import { ActionOutcomesSchema } from "./outcome.schema.js";
 import { ActionParametersSchema } from "../domain/action/actions.schema.js";
+import { OutcomeParameterPaths, RootParameterPaths } from "./property-paths.schemas.js";
 
 // ============================================================================
 // SEÇÃO: CONDIÇÕES DE TÉRMINO E SCHEMA BASE
@@ -48,13 +47,17 @@ const EndOnCastingAgainConditionSchema = z.object({
   trigger: z.literal("onCastingSpellAgain"),
 });
 
+const EndOnDropItem = z.object({
+  trigger: z.literal("onDropItem"),
+});
+
 const EndOnLoseConcentration = z.object({
   trigger: z.literal("onLoseConcentration"),
 });
 
 // União de todas as possíveis condições de término.
 const EndConditionSchema = z.discriminatedUnion("trigger", [
-  EndOnTakingDamageConditionSchema,
+  EndOnTakingDamageConditionSchema,EndOnDropItem,
   EndOnCastingAgainConditionSchema,
   EndOnLoseConcentration,
 ]);
@@ -125,7 +128,7 @@ const OnWieldGrantWeaponAttackEffectSchema = BaseEffectSchema.extend({
     })
     .optional(),
   range: RangeSchema.optional(),
-  outcomes: z.array(z.lazy(() => actionOutcomesSchema)).optional(),
+  outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
   cost: z
     .object({
       amount: z.number(),

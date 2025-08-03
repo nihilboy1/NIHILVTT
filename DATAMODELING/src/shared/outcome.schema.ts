@@ -9,6 +9,7 @@ import {
   DamageFormulaSchema,
   DurationSchema,
   HPFormulaSchema,
+  SpellRequirementsSchema,
 } from "../shared/blocks.schema.js";
 import {
   effectSchema,
@@ -48,6 +49,7 @@ export const ModifyHPOutcomeSchema = z.object({
   operation: z.enum(["add", "subtract", "set"]), // <-- OPERAÇÃO EXPLÍCITA
   formula: HPFormulaSchema, // <-- FÓRMULA FLEXÍVEL
 });
+
 export const ApplyConditionOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("applyCondition"),
@@ -115,7 +117,6 @@ export const ModifyAttributeOutcomeSchema = z.object({
   value: z.number().int().positive("O valor da modificação deve ser positivo."),
   duration: DurationSchema,
 });
-type AnyEffect = Record<string, any>;
 
 type NoneOutcomeType = z.infer<typeof NoneOutcomeSchema>;
 type DamageOutcomeType = z.infer<typeof DamageOutcomeSchema>;
@@ -156,7 +157,7 @@ export type ActionOutcomeType =
   | MoveTargetOutcomeType
   | ApplyCustomEffectOutcomeType;
 
-export const actionOutcomesSchema: z.ZodType<ActionOutcomeType> =
+export const ActionOutcomesSchema: z.ZodType<ActionOutcomeType> =
   z.discriminatedUnion("type", [
     ...BaseActionOutcomesSchema.options,
     ApplyEffectOutcomeSchema,
@@ -165,5 +166,4 @@ export const actionOutcomesSchema: z.ZodType<ActionOutcomeType> =
     MoveTargetOutcomeSchema,
   ] as any);
 
-
-export type ActionOutcome = z.infer<typeof actionOutcomesSchema>;
+export type ActionOutcome = z.infer<typeof ActionOutcomesSchema>;

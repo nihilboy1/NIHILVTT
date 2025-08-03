@@ -25,103 +25,6 @@ export const CreatureTypeEnum = z.enum([
   "undead",
 ]);
 
-export const RootParameterPaths = z.enum([
-  "activation.cost.amount",
-  "activation.cost.resourceId",
-  "activation.cost.source",
-  "activation.type",
-  "area.radius",
-  "area.shape",
-  "area.size",
-  "attackType",
-  "charges.max",
-  "overrideAbilityScore",
-  "range.normal",
-  "range.unit",
-  "save.ability",
-  "save.dc",
-  "save.dc.attributes",
-  "save.dc.base",
-  "target.details",
-  "target.quantity",
-  "target.type",
-]);
-
-export const OutcomeParameterPaths = z.enum([
-  "allowedSizes",
-  "attribute",
-  "condition",
-  "details",
-  "details.against",
-  "details.duration.unit",
-  "details.duration.value",
-  "details.on",
-  "direction",
-  "distance.unit",
-  "distance.value",
-  "duration.unit",
-  "duration.value",
-  "effect",
-  "effect.actionId",
-  "effect.count",
-  "effect.duration.isConcentration",
-  "effect.duration.unit",
-  "effect.duration.value",
-  "effect.modifier.appliesTo",
-  "effect.modifier.count",
-  "effect.modifier.dice.count",
-  "effect.modifier.dice.faces",
-  "effect.modifier.faces",
-  "effect.modifier.operation",
-  "effect.modifier.target",
-  "effect.on",
-  "effect.parameters.activation.type",
-  "effect.parameters.attackType",
-  "effect.parameters.outcomes",
-  "effect.parameters.overrideAbilityScore",
-  "effect.parameters.range.normal",
-  "effect.parameters.range.unit",
-  "effect.parameters.target.quantity",
-  "effect.parameters.target.type",
-  "effect.properties.bright",
-  "effect.properties.dim",
-  "effect.properties.duration.unit",
-  "effect.properties.duration.value",
-  "effect.requiresChoice",
-  "effect.scaling.rules",
-  "effect.scaling.type",
-  "effect.skill",
-  "effect.trigger",
-  "effect.type",
-  "formula.addSpellcastingModifier",
-  "formula.condition",
-  "formula.damageTypeOptions",
-  "formula.fixed",
-  "formula.ifFalse.damageTypeOptions",
-  "formula.ifFalse.roll.count",
-  "formula.ifFalse.roll.faces",
-  "formula.ifFalse.type",
-  "formula.ifTrue.damageTypeOptions",
-  "formula.ifTrue.roll.count",
-  "formula.ifTrue.roll.faces",
-  "formula.ifTrue.type",
-  "formula.roll.count",
-  "formula.roll.explodeLimit",
-  "formula.roll.explodesOn",
-  "formula.roll.faces",
-  "formula.type",
-  "id",
-  "mechanic",
-  "on",
-  "operation",
-  "token.effects",
-  "token.name",
-  "token.quantity",
-  "type",
-  "value",
-  "vitals",
-]);
-
 export const RarityEnum = z.enum([
   "none",
   "common",
@@ -199,6 +102,12 @@ export type Condition = z.infer<typeof ConditionEnum>;
 // ============================================================================
 // PRIMITIVOS DE COMBATE E AÇÕES
 // ============================================================================
+
+export const CoverEnum = z.enum([
+  "half", // Half Cover
+  "threeQuarters", // Three-Quarters Cover
+  "total", // Total Cover
+]);
 
 export const ActionTypeEnum = z.enum([
   "action",
@@ -338,7 +247,7 @@ export const DurationUnitEnum = z.enum([
   "turn",
   "instantaneous",
   "special",
-  "unlimited",
+  "indefinite",
 ]);
 
 export const DistanceUnitEnum = z.enum(["ft", "mile"]);

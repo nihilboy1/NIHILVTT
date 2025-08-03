@@ -3,7 +3,7 @@
 
 import { z } from "zod";
 
-export const ParameterRootPaths = z.enum([
+export const RootParameterPaths = z.enum([
   "activation.cost.amount",
   "activation.cost.resourceId",
   "activation.cost.source",

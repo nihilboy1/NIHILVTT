@@ -117,7 +117,7 @@ function generateZodEnumString(
 ): string {
   const variableName =
     sourceType === 'parameters'
-      ? 'ParameterRootPaths'
+      ? 'RootParameterPaths'
       : 'OutcomeParameterPaths';
   const dataName =
     sourceType === 'parameters' ? 'Parameters (Raiz)' : 'Outcomes';
@@ -209,7 +209,7 @@ async function main() {
   // Define o caminho de saída e escreve o arquivo
   try {
     // CORREÇÃO: Constrói o caminho para 'src/shared/', que está no mesmo nível de 'domain'.
-    const outputPath = path.resolve(projectRoot, 'src', 'shared', 'object-paths.ts');
+    const outputPath = path.resolve(projectRoot, 'src', 'shared', 'property-paths.schemas.ts');
     const outputDir = path.dirname(outputPath);
 
     // Garante que o diretório de destino exista de forma síncrona antes de escrever

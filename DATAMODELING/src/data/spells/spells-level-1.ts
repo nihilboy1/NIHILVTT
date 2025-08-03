@@ -44,6 +44,7 @@ export const spellsLevel1 = [
           area: {
             shape: "cube",
             size: 20,
+            unit: "ft",
           },
           outcomes: [
             {
@@ -268,20 +269,15 @@ export const spellsLevel1 = [
   },
   {
     id: "spell-arms-of-hadar",
-    name: ["Arms of Hadar"],
+    name: ["Braços de Hadar","Arms of Hadar"],
     description:
-      "Invoking Hadar, you cause tendrils to erupt from yourself. Each creature in a 10-foot emanation originating from you makes a Strength saving throw. On a failed save, a target takes 2d6 Necrotic damage and can't take Reactions until the start of its next turn. On a successful save, a target takes half as much damage only.",
+      "**Braços de Hadar**\nVocê invoca os Braços de Hadar, fazendo com que tentáculos irrompam do seu corpo. Cada criatura em uma **área de 3 metros** centrada em você deve realizar um **teste de resistência de Força**.\n- **Falha:** O alvo sofre **2d6 de dano necrótico** e **não pode realizar Reações** até o início do próximo turno dele.\n- **Sucesso:** O alvo sofre **metade do dano**, sem efeitos adicionais.",
     source: "LDJ2024",
     page: 243,
     level: 1,
     school: "conjuration",
-    isRitual: false,
-   
     components: {
       types: ["verbal", "somatic"],
-    },
-    duration: {
-      unit: "instantaneous",
     },
     effects: [
       {
@@ -291,16 +287,13 @@ export const spellsLevel1 = [
           activation: {
             type: "action",
           },
-          range: {
-            normal: 0, // Emanation from self
-            unit: "ft",
-          },
           target: {
-            type: "creature", // Targets creatures in the area
+            type: "selfArea",
           },
           area: {
-            shape: "sphere", // Emanation is a sphere
-            size: 10, // 10-foot emanation
+            shape: "sphere",
+            radius: 10,
+            unit: "ft",
           },
           save: {
             ability: "strength",
@@ -328,7 +321,7 @@ export const spellsLevel1 = [
                 type: "preventsReaction",
                 duration: {
                   unit: "turn",
-                  value: 1, // until the start of its next turn
+                  value: 1, 
                 },
               },
             },
@@ -336,10 +329,7 @@ export const spellsLevel1 = [
               id: "arms-of-hadar-damage-success",
               type: "damage",
               on: "success",
-              formula: {
-                roll: { count: 1, faces: 6 }, // Half damage
-                damageType: "necrotic",
-              },
+              formula: {type: "half", of: "arms-of-hadar-damage-fail"},
             },
           ],
         },
@@ -351,12 +341,6 @@ export const spellsLevel1 = [
               outcomeId: "arms-of-hadar-damage-fail",
               propertyPath: "formula.roll.count",
               increment: 1,
-            },
-            {
-              type: "incrementOutcomeProperty",
-              outcomeId: "arms-of-hadar-damage-success",
-              propertyPath: "formula.roll.count",
-              increment: 0.5,
             },
           ],
         },

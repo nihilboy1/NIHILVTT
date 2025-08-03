@@ -21,10 +21,12 @@ export const itemsWeapon = [
         mastery: ["topple"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["slashing"],
           },
           versatile: {
+            type: "damage",
             roll: { count: 1, faces: 10 },
             damageTypeOptions: ["slashing"],
           },
@@ -52,6 +54,7 @@ export const itemsWeapon = [
         mastery: ["slow"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 4 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -79,6 +82,7 @@ export const itemsWeapon = [
         mastery: ["nick"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 4 },
             damageTypeOptions: ["piercing"],
           },
@@ -106,6 +110,7 @@ export const itemsWeapon = [
         mastery: ["vex"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 4 },
             damageTypeOptions: ["piercing"],
           },
@@ -134,6 +139,7 @@ export const itemsWeapon = [
         mastery: ["sap"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -161,6 +167,7 @@ export const itemsWeapon = [
         mastery: ["graze"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 10 },
             damageTypeOptions: ["slashing"],
           },
@@ -188,6 +195,7 @@ export const itemsWeapon = [
         mastery: ["cleave"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 12 },
             damageTypeOptions: ["slashing"],
           },
@@ -215,6 +223,7 @@ export const itemsWeapon = [
         mastery: ["push"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -242,6 +251,7 @@ export const itemsWeapon = [
         mastery: ["graze"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 2, faces: 6 },
             damageTypeOptions: ["slashing"],
           },
@@ -269,6 +279,7 @@ export const itemsWeapon = [
         mastery: ["cleave"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 10 },
             damageTypeOptions: ["slashing"],
           },
@@ -297,6 +308,7 @@ export const itemsWeapon = [
         range: { normal: 30, long: 120, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["piercing"],
           },
@@ -325,6 +337,7 @@ export const itemsWeapon = [
         range: { normal: 20, long: 60, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["slashing"],
           },
@@ -355,6 +368,7 @@ export const itemsWeapon = [
         range: { normal: 100, long: 400, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 10 },
             damageTypeOptions: ["piercing"],
           },
@@ -383,6 +397,7 @@ export const itemsWeapon = [
         range: { normal: 30, long: 120, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["piercing"],
           },
@@ -411,6 +426,7 @@ export const itemsWeapon = [
         range: { normal: 80, long: 320, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["piercing"],
           },
@@ -438,6 +454,7 @@ export const itemsWeapon = [
         range: { normal: 20, long: 60, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 4 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -466,6 +483,7 @@ export const itemsWeapon = [
         range: { normal: 150, long: 600, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["piercing"],
           },
@@ -493,10 +511,12 @@ export const itemsWeapon = [
         mastery: ["sap"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["slashing"],
           },
           versatile: {
+            type: "damage",
             roll: { count: 1, faces: 10 },
             damageTypeOptions: ["slashing"],
           },
@@ -524,6 +544,7 @@ export const itemsWeapon = [
         mastery: ["sap"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -551,6 +572,7 @@ export const itemsWeapon = [
         mastery: ["topple"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 2, faces: 6 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -578,6 +600,7 @@ export const itemsWeapon = [
         mastery: ["sap"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["piercing"],
           },
@@ -606,6 +629,7 @@ export const itemsWeapon = [
         range: { normal: 40, long: 120, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 12 },
             damageTypeOptions: ["piercing"],
           },
@@ -633,6 +657,7 @@ export const itemsWeapon = [
         mastery: ["push"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 10 },
             damageTypeOptions: ["piercing"],
           },
@@ -661,6 +686,7 @@ export const itemsWeapon = [
         range: { normal: 30, long: 90, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 10 },
             damageTypeOptions: ["piercing"],
           },
@@ -688,10 +714,12 @@ export const itemsWeapon = [
         mastery: ["topple"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["bludgeoning"],
           },
           versatile: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -719,6 +747,7 @@ export const itemsWeapon = [
         mastery: ["vex"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["piercing"],
           },
@@ -745,6 +774,7 @@ export const itemsWeapon = [
         mastery: ["nick"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["slashing"],
           },
@@ -773,6 +803,7 @@ export const itemsWeapon = [
         range: { normal: 80, long: 320, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["piercing"],
           },
@@ -800,6 +831,7 @@ export const itemsWeapon = [
         mastery: ["vex"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["piercing"],
           },
@@ -827,6 +859,7 @@ export const itemsWeapon = [
         mastery: ["nick"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 4 },
             damageTypeOptions: ["slashing"],
           },
@@ -855,6 +888,7 @@ export const itemsWeapon = [
         range: { normal: 30, long: 120, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 4 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -883,10 +917,12 @@ export const itemsWeapon = [
         range: { normal: 20, long: 60, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["piercing"],
           },
           versatile: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["piercing"],
           },
@@ -915,10 +951,12 @@ export const itemsWeapon = [
         range: { normal: 20, long: 60, unit: "ft" },
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 6 },
             damageTypeOptions: ["piercing"],
           },
           versatile: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["piercing"],
           },
@@ -946,6 +984,7 @@ export const itemsWeapon = [
         mastery: ["sap"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["piercing"],
           },
@@ -973,10 +1012,12 @@ export const itemsWeapon = [
         mastery: ["push"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 8 },
             damageTypeOptions: ["bludgeoning"],
           },
           versatile: {
+            type: "damage",
             roll: { count: 1, faces: 10 },
             damageTypeOptions: ["bludgeoning"],
           },
@@ -1004,6 +1045,7 @@ export const itemsWeapon = [
         mastery: ["slow"],
         damage: {
           primary: {
+            type: "damage",
             roll: { count: 1, faces: 4 },
             damageTypeOptions: ["slashing"],
           },
@@ -1012,17 +1054,12 @@ export const itemsWeapon = [
     ],
   },
 ] as const satisfies Item[];
-
 const allWeaponIds = itemsWeapon.map((weapon) => weapon.id);
-
 if (allWeaponIds.length === 0) {
   throw new Error(
     "Nenhuma arma encontrada em items-weapon.ts para criar o WeaponIdEnum."
   );
 }
-
 const [firstId, ...restIds] = allWeaponIds;
-
 export const WeaponIdEnum = z.enum([firstId, ...restIds]);
-
 export type WeaponId = z.infer<typeof WeaponIdEnum>;

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "validate:data": "npx tsx src/tooling/validate.ts",
-    "paths": "npx tsx src/tooling/extract_paths.ts"
+    "paths": "npx tsx src/tooling/generate-paths.ts",
+    "enums": "npx tsx src/tooling/generate-enums.ts"
   },
   "keywords": [],
   "author": "",

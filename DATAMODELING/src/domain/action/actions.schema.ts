@@ -3,6 +3,7 @@ import {
   AbilityScoreEnum,
   ActionTypeEnum,
   AttackTypeEnum,
+  CoverEnum,
   ReactionTriggerEnum,
   RechargeEventEnum,
   ResourceCostIdEnum,
@@ -15,7 +16,7 @@ import {
   TargetSchema,
 } from "../../shared/blocks.schema.js";
 import {
-  actionOutcomesSchema,
+  ActionOutcomesSchema,
   ActionOutcomeType,
 } from "../../shared/outcome.schema.js";
 
@@ -47,7 +48,13 @@ export const ActionParametersSchema = z.object({
 
   area: AreaSchema.optional(),
   target: TargetSchema.optional(),
-  save: z.object({ ability: AbilityScoreEnum, dc: DcSchema }).optional(),
+  save: z
+    .object({
+      ability: AbilityScoreEnum,
+      dc: DcSchema,
+      ignoreCovers: CoverEnum.array().optional(),
+    })
+    .optional(),
   charges: z
     .object({
       max: z.number().int(),
@@ -56,7 +63,7 @@ export const ActionParametersSchema = z.object({
         .optional(),
     })
     .optional(),
-  outcomes: z.array(z.lazy(() => actionOutcomesSchema)).optional(),
+  outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
 });
 
 export interface ActionParametersType {

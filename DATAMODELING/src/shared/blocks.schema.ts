@@ -66,9 +66,18 @@ const ConditionalDamageFormulaSchema = z.object({
   ifFalse: z.lazy(() => BaseDamageFormulaSchema),
 });
 
+const HalfDamageFormulaSchema = z.object({
+  type: z.literal("half"),
+  /** O ID do outcome de dano do qual este resultado deve derivar. */
+  of: z
+    .string()
+    .min(1, "É necessário especificar o ID do outcome de dano original."),
+});
+
 export const DamageFormulaSchema = z.union([
   BaseDamageFormulaSchema,
   ConditionalDamageFormulaSchema,
+  HalfDamageFormulaSchema,
 ]);
 
 export const AcSchema = z.discriminatedUnion("calculation", [
@@ -86,7 +95,7 @@ export const HPFormulaSchema = z
   .object({
     roll: DiceRollSchema.optional(),
     fixed: z.number().int().optional(),
-    addSpellcastingModifier: z.boolean()
+    addSpellcastingModifier: z.boolean(),
   })
   .refine((data) => data.roll || data.fixed !== undefined, {
     message:
@@ -107,6 +116,7 @@ export const RangeSchema = z.object({
 export const TargetSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("self") }),
   z.object({ type: z.literal("pointInSpace") }),
+  z.object({ type: z.literal("selfArea") }),
   z.object({
     type: z.literal("creature"),
     quantity: z.number().int().default(1),
@@ -189,10 +199,27 @@ export const WeaponPropertySchema = z.object({
 });
 
 export const AreaSchema = z.discriminatedUnion("shape", [
-  z.object({ shape: z.literal("sphere"), radius: z.number() }),
-  z.object({ shape: z.literal("cube"), size: z.number() }),
-  z.object({ shape: z.literal("cone"), length: z.number() }),
-  z.object({ shape: z.literal("line"), length: z.number(), width: z.number() }),
+  z.object({
+    shape: z.literal("sphere"),
+    radius: z.number(),
+    unit: DistanceUnitEnum.default("ft"),
+  }),
+  z.object({
+    shape: z.literal("cube"),
+    size: z.number(),
+    unit: DistanceUnitEnum.default("ft"),
+  }),
+  z.object({
+    shape: z.literal("cone"),
+    length: z.number(),
+    unit: DistanceUnitEnum.default("ft"),
+  }),
+  z.object({
+    shape: z.literal("line"),
+    length: z.number(),
+    width: z.number(),
+    unit: DistanceUnitEnum.default("ft"),
+  }),
 ]);
 
 export const DurationSchema = z.object({

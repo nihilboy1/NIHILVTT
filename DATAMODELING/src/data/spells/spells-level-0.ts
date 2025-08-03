@@ -30,6 +30,7 @@ export const spellsLevel0 = [
           area: {
             shape: "sphere",
             radius: 5,
+            unit: "ft",
           },
           save: {
             ability: "dexterity",
@@ -527,10 +528,9 @@ export const spellsLevel0 = [
             },
             {
               id: "flammable-object-burning",
-              type: "descriptive",
+              type: "applyCondition",
               on: "hit",
-              details:
-                "Um objeto inflamável atingido por esta magia começa a queimar se não estiver sendo vestido ou carregado.",
+              requirements :[{}]
             },
           ],
         },
@@ -1556,6 +1556,7 @@ export const spellsLevel0 = [
           target: { type: "creature", quantity: 1 },
           save: {
             ability: "dexterity",
+            ignoreCovers: ["half", "threeQuarters"],
             dc: {
               base: 8,
               attributes: ["proficiency", "spellcasting"],
@@ -1571,13 +1572,6 @@ export const spellsLevel0 = [
                 roll: { count: 1, faces: 8 },
                 damageTypeOptions: ["radiant"],
               },
-            },
-            {
-              id: "sacred-flame-cover-rule",
-              type: "descriptive",
-              on: "custom",
-              details:
-                "O alvo não ganha nenhum benefício de Meia Cobertura ou Cobertura de Três Quartos para este teste de resistência.",
             },
           ],
         },
@@ -1646,10 +1640,13 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ trigger: "onCastingSpellAgain" }],
+        endConditions: [
+          { trigger: "onCastingSpellAgain" },
+          { trigger: "onDropItem" },
+        ],
         parameters: {
           activation: { type: "bonusAction" },
-          target: { type: "self" },
+          target: { type: "object", quantity: 1 },
           outcomes: [
             {
               id: "shillelagh-apply-buff",
@@ -1712,13 +1709,6 @@ export const spellsLevel0 = [
                   ],
                 },
               },
-            },
-            {
-              id: "shillelagh-end-condition",
-              type: "descriptive",
-              on: "custom",
-              details:
-                "A magia termina se você a conjurar novamente ou se largar a arma.",
             },
           ],
         },
@@ -2106,7 +2096,7 @@ export const spellsLevel0 = [
         parameters: {
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
-          target: { type: "self" },
+          target: { type: "selfArea" },
           outcomes: [
             {
               id: "thaumaturgy-eyes",
@@ -2271,8 +2261,8 @@ export const spellsLevel0 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
-          target: { type: "self" },
-          area: { shape: "sphere", radius: 5 },
+          target: { type: "selfArea" },
+          area: { shape: "sphere", radius: 5, unit: "ft" },
           save: {
             ability: "constitution",
             dc: {
@@ -2290,6 +2280,11 @@ export const spellsLevel0 = [
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["thunder"],
               },
+            },
+            {
+              id: "thunderclap-damage",
+              type: "none",
+              on: "success",
             },
             {
               id: "thunderclap-sound",
@@ -2662,8 +2657,8 @@ export const spellsLevel0 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
-          target: { type: "self" },
-          area: { shape: "sphere", radius: 5 },
+          target: { type: "selfArea" },
+          area: { shape: "sphere", radius: 5, unit: "ft" },
           save: {
             ability: "constitution",
             dc: {
