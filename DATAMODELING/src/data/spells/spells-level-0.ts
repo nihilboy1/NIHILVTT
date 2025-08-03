@@ -35,6 +35,7 @@ export const spellsLevel0 = [
           save: {
             ability: "dexterity",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -42,8 +43,9 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "acid-splash-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "fail",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 1, faces: 6 },
@@ -108,17 +110,17 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ trigger: "onLoseConcentration" }],
+        endConditions: [{ on: "onUserLoseConcentration" }],
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
           outcomes: [
             {
               type: "applyEffect",
-              on: "success",
+              on: "any",
               effect: {
                 type: "triggeredModifier",
-                trigger: "onBeingAttacked",
+                triggers: [{ on: "onBeingAttacked" }],
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
@@ -155,12 +157,13 @@ export const spellsLevel0 = [
         parameters: {
           activation: { type: "action" },
           target: { type: "creature", quantity: 1 },
-          attackType: "meleeSpellAttack",
+          attackType: ["meleeSpellAttack"],
           outcomes: [
             {
               id: "chill-touch-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "hit",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 1, faces: 10 },
@@ -239,7 +242,7 @@ export const spellsLevel0 = [
         parameters: {
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
-          target: { type: "pointInSpace" },
+          target: { type: "point" },
           outcomes: [
             {
               type: "summonToken",
@@ -296,7 +299,7 @@ export const spellsLevel0 = [
             unit: "ft",
           },
           target: {
-            type: "pointInSpace",
+            type: "point",
           },
           outcomes: [
             {
@@ -367,12 +370,13 @@ export const spellsLevel0 = [
             type: "creature",
             quantity: 1,
           },
-          attackType: "rangedSpellAttack",
+          attackType: ["rangedSpellAttack"],
           outcomes: [
             {
               id: "eldritch-blast-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "hit",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 1, faces: 10 },
@@ -435,7 +439,7 @@ export const spellsLevel0 = [
             unit: "ft",
           },
           target: {
-            type: "pointInSpace",
+            type: "point",
           },
           outcomes: [
             {
@@ -514,11 +518,12 @@ export const spellsLevel0 = [
             type: "creature",
             quantity: 1,
           },
-          attackType: "rangedSpellAttack",
+          attackType: ["rangedSpellAttack"],
           outcomes: [
             {
               id: "fire-bolt-damage",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               on: "hit",
               formula: {
                 type: "damage",
@@ -530,7 +535,18 @@ export const spellsLevel0 = [
               id: "flammable-object-burning",
               type: "applyCondition",
               on: "hit",
-              requirements :[{}]
+              condition: "burning",
+              requirements: {
+                user: [
+                  {
+                    type: "isObject",
+                    isFlammable: true,
+                    isWorn: false,
+                    isCarried: false,
+                  },
+                ],
+              },
+              duration: { unit: "indefinite" },
             },
           ],
         },
@@ -587,19 +603,33 @@ export const spellsLevel0 = [
         description: "um pouco de maquiagem",
       },
     },
-    duration: {
-      unit: "minute",
-      value: 1,
-      isConcentration: true,
-    },
     effects: [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         endConditions: [
-          { trigger: "onLoseConcentration" },
-          { trigger: "onTakingDamage" },
+          { on: "onUserLoseConcentration" },
+          { on: "onTakingDamage" },
+          { on: "onUserActsHostile" },
         ],
+        requirements: {
+          target: [
+            {
+              type: "isCreatureType",
+              creatureType: "humanoid",
+            },
+            {
+              type: "hasStatus",
+              status: "hostile",
+              is: false,
+            },
+            {
+              type: "hasBeenAffectedBySpell",
+              spellId: "spell-friends",
+              withinLast: { value: 24, unit: "hour" },
+            },
+          ],
+        },
         parameters: {
           activation: {
             type: "action",
@@ -615,6 +645,7 @@ export const spellsLevel0 = [
           save: {
             ability: "wisdom",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -625,6 +656,17 @@ export const spellsLevel0 = [
               type: "applyCondition",
               on: "fail",
               condition: "charmed",
+              duration: {
+                unit: "minute",
+                value: 1,
+                isConcentration: true,
+              },
+            },
+            {
+              id: "friends-becomes-hostile",
+              type: "applyCondition",
+              on: "spellEnd",
+              condition: "hostile",
             },
             {
               type: "none",
@@ -632,13 +674,6 @@ export const spellsLevel0 = [
             },
           ],
         },
-        additionalRules: [
-          {
-            id: "friends-special-rules",
-            details:
-              "O alvo tem sucesso automaticamente se não for um Humanoide, se você estiver lutando com ele, ou se você já usou esta magia nele nas últimas 24 horas. A magia termina antes se o alvo sofrer dano ou se você atacar, causar dano ou forçar um teste de resistência em qualquer pessoa. Ao final da magia, o alvo sabe que foi encantado por você.",
-          },
-        ],
       },
     ],
   },
@@ -663,7 +698,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ trigger: "onLoseConcentration" }],
+        endConditions: [{ on: "onUserLoseConcentration" }],
         parameters: {
           activation: {
             type: "action",
@@ -713,7 +748,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ trigger: "onCastingSpellAgain" }],
+        endConditions: [{ on: "onUserCastSpellAgain" }],
         parameters: {
           activation: {
             type: "action",
@@ -771,7 +806,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ trigger: "onCastingSpellAgain" }],
+        endConditions: [{ on: "onUserCastSpellAgain" }],
         parameters: {
           activation: {
             type: "action",
@@ -781,7 +816,7 @@ export const spellsLevel0 = [
             unit: "ft",
           },
           target: {
-            type: "pointInSpace",
+            type: "point",
           },
           outcomes: [
             {
@@ -971,6 +1006,7 @@ export const spellsLevel0 = [
           save: {
             ability: "intelligence",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -978,8 +1014,9 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "mind-sliver-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "fail",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 1, faces: 6 },
@@ -992,12 +1029,12 @@ export const spellsLevel0 = [
               on: "fail",
               effect: {
                 type: "triggeredModifier",
-                trigger: "onSavingThrow",
+                triggers: [{ on: "onSavingThrow" }],
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
                   target: "saveRoll",
-                  appliesTo: "self",
+                  appliesTo: "target",
                 },
                 duration: {
                   unit: "turn",
@@ -1068,7 +1105,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ trigger: "onCastingSpellAgain" }],
+        endConditions: [{ on: "onUserCastSpellAgain" }],
         parameters: {
           activation: {
             type: "action",
@@ -1078,7 +1115,7 @@ export const spellsLevel0 = [
             unit: "ft",
           },
           target: {
-            type: "pointInSpace",
+            type: "point",
           },
           outcomes: [
             {
@@ -1142,7 +1179,7 @@ export const spellsLevel0 = [
             normal: 30,
             unit: "ft",
           },
-          attackType: "rangedSpellAttack",
+          attackType: ["rangedSpellAttack"],
           target: {
             type: "creature",
             quantity: 1,
@@ -1150,7 +1187,8 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "poison-spray-damage",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               on: "hit",
               formula: {
                 type: "damage",
@@ -1221,7 +1259,7 @@ export const spellsLevel0 = [
         parameters: {
           activation: { type: "action" },
           range: { normal: 10, unit: "ft" },
-          target: { type: "pointInSpace" },
+          target: { type: "point" },
           outcomes: [
             {
               id: "prestidigitation-sensory",
@@ -1298,7 +1336,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ trigger: "onCastingSpellAgain" }],
+        endConditions: [{ on: "onUserCastSpellAgain" }],
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "self" },
@@ -1328,12 +1366,13 @@ export const spellsLevel0 = [
                   activation: { type: "action" },
                   range: { normal: 60, unit: "ft" },
                   target: { type: "creature", quantity: 1 },
-                  attackType: "rangedSpellAttack",
+                  attackType: ["rangedSpellAttack"],
                   outcomes: [
                     {
                       id: "produce-flame-damage",
-                      type: "damage",
+                      type: "modifyTargetHP",
                       on: "hit",
+                      vitals: ["currentHp"],
                       formula: {
                         type: "damage",
                         roll: { count: 1, faces: 8 },
@@ -1417,7 +1456,7 @@ export const spellsLevel0 = [
             normal: 60,
             unit: "ft",
           },
-          attackType: "rangedSpellAttack",
+          attackType: ["rangedSpellAttack"],
           target: {
             type: "creature",
             quantity: 1,
@@ -1425,8 +1464,9 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "rof-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "hit",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 1, faces: 8 },
@@ -1500,7 +1540,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ trigger: "onLoseConcentration" }],
+        endConditions: [{ on: "onUserLoseConcentration" }],
         parameters: {
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
@@ -1512,7 +1552,7 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "triggeredModifier",
-                trigger: "onTakingDamage",
+                triggers: [{ on: "onTakingDamage" }],
                 requiresChoice: "damageType",
                 modifier: {
                   operation: "subtract",
@@ -1556,16 +1596,18 @@ export const spellsLevel0 = [
           target: { type: "creature", quantity: 1 },
           save: {
             ability: "dexterity",
-            ignoreCovers: ["half", "threeQuarters"],
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
+            ignoreCovers: ["half", "threeQuarters"],
           },
           outcomes: [
             {
               id: "sacred-flame-damage",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               on: "fail",
               formula: {
                 type: "damage",
@@ -1628,11 +1670,10 @@ export const spellsLevel0 = [
     },
     duration: { unit: "minute", value: 1 },
     requirements: {
-      casterConditions: [
+      user: [
         {
-          type: "equippedItem",
+          type: "isEquippingItem",
           itemIds: ["item-clava", "item-bordao"],
-          details: "É necessário estar empunhando um Porrete ou Bordão.",
         },
       ],
     },
@@ -1640,10 +1681,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [
-          { trigger: "onCastingSpellAgain" },
-          { trigger: "onDropItem" },
-        ],
+        endConditions: [{ on: "onUserCastSpellAgain" }, { on: "onDropItem" }],
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "object", quantity: 1 },
@@ -1658,13 +1696,14 @@ export const spellsLevel0 = [
                 duration: { unit: "minute", value: 1 },
                 parameters: {
                   activation: { type: "action" },
-                  attackType: "meleeWeaponAttack",
+                  attackType: ["meleeWeaponAttack"],
                   overrideAbilityScore: "spellcasting",
                   outcomes: [
                     {
                       id: "shillelagh-damage",
-                      type: "damage",
+                      type: "modifyTargetHP",
                       on: "hit",
+                      vitals: ["currentHp"],
                       formula: {
                         type: "damage",
                         roll: { count: 1, faces: 8 },
@@ -1734,12 +1773,13 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: "meleeSpellAttack",
+          attackType: ["meleeSpellAttack"],
           outcomes: [
             {
               id: "shocking-grasp-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "hit",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 1, faces: 8 },
@@ -1817,12 +1857,13 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: "rangedSpellAttack",
+          attackType: ["rangedSpellAttack"],
           outcomes: [
             {
               id: "sorcerous-burst-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "hit",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: {
@@ -1933,11 +1974,9 @@ export const spellsLevel0 = [
     components: { types: ["verbal", "somatic"] },
     duration: { unit: "instantaneous" },
     requirements: {
-      targetConditions: [
+      target: [
         {
           type: "hasZeroHP",
-          details:
-            "O alvo deve ter 0 de hp ou menos para poder ser estabilizado",
         },
       ],
     },
@@ -1952,11 +1991,14 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "spare-the-dying-heal",
-              type: "modifyHP",
+              type: "modifyTargetHP",
               on: "success",
-              operation: "set",
               vitals: ["currentHp"],
-              formula: { fixed: 1, addSpellcastingModifier: false },
+              formula: {
+                type: "healing",
+                fixed: 1,
+                addSpellcastingModifier: false,
+              },
             },
           ],
         },
@@ -2005,12 +2047,13 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: "rangedSpellAttack",
+          attackType: ["rangedSpellAttack"],
           outcomes: [
             {
               id: "starry-wisp-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "hit",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 1, faces: 8 },
@@ -2181,12 +2224,13 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: "meleeSpellAttack",
+          attackType: ["meleeSpellAttack"],
           outcomes: [
             {
               id: "thorn-whip-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "hit",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 1, faces: 6 },
@@ -2261,11 +2305,12 @@ export const spellsLevel0 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
-          target: { type: "selfArea" },
+          target: { type: "selfArea", selectionMode: "choice" },
           area: { shape: "sphere", radius: 5, unit: "ft" },
           save: {
             ability: "constitution",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -2273,7 +2318,8 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "thunderclap-damage",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               on: "fail",
               formula: {
                 type: "damage",
@@ -2355,6 +2401,7 @@ export const spellsLevel0 = [
           save: {
             ability: "wisdom",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -2362,19 +2409,19 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "toll-the-dead-damage",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               on: "fail",
               formula: {
+                type: "conditional",
                 condition: "targetIsWounded",
                 ifTrue: {
                   type: "damage",
-
                   roll: { count: 1, faces: 12 },
                   damageTypeOptions: ["necrotic"],
                 },
                 ifFalse: {
                   type: "damage",
-
                   roll: { count: 1, faces: 8 },
                   damageTypeOptions: ["necrotic"],
                 },
@@ -2397,6 +2444,7 @@ export const spellsLevel0 = [
               level: 5,
               outcomeId: "toll-the-dead-damage",
               newFormula: {
+                type: "conditional",
                 condition: "targetIsWounded",
                 ifTrue: {
                   type: "damage",
@@ -2405,7 +2453,6 @@ export const spellsLevel0 = [
                 },
                 ifFalse: {
                   type: "damage",
-
                   roll: { count: 2, faces: 8 },
                   damageTypeOptions: ["necrotic"],
                 },
@@ -2416,16 +2463,15 @@ export const spellsLevel0 = [
               level: 11,
               outcomeId: "toll-the-dead-damage",
               newFormula: {
+                type: "conditional",
                 condition: "targetIsWounded",
                 ifTrue: {
                   type: "damage",
-
                   roll: { count: 3, faces: 12 },
                   damageTypeOptions: ["necrotic"],
                 },
                 ifFalse: {
                   type: "damage",
-
                   roll: { count: 3, faces: 8 },
                   damageTypeOptions: ["necrotic"],
                 },
@@ -2436,16 +2482,15 @@ export const spellsLevel0 = [
               level: 17,
               outcomeId: "toll-the-dead-damage",
               newFormula: {
+                type: "conditional",
                 condition: "targetIsWounded",
                 ifTrue: {
                   type: "damage",
-
                   roll: { count: 4, faces: 12 },
                   damageTypeOptions: ["necrotic"],
                 },
                 ifFalse: {
                   type: "damage",
-
                   roll: { count: 4, faces: 8 },
                   damageTypeOptions: ["necrotic"],
                 },
@@ -2470,11 +2515,9 @@ export const spellsLevel0 = [
     },
     duration: { unit: "instantaneous" },
     requirements: {
-      casterConditions: [
+      user: [
         {
-          type: "beProficientWithEquippedWeapon",
-          details:
-            "O conjurador deve ser proficiente com a arma que está empunhando.",
+          type: "isProficientWithEquippedWeapon",
         },
       ],
     },
@@ -2485,21 +2528,20 @@ export const spellsLevel0 = [
         parameters: {
           activation: { type: "action" },
           target: { type: "creature", quantity: 1 },
-          attackType: "meleeWeaponAttack",
+          attackType: ["rangedWeaponAttack", "meleeWeaponAttack"],
           overrideAbilityScore: "spellcasting",
           outcomes: [
             {
               id: "true-strike-weapon-damage",
-              type: "customMechanic",
+              type: "dealWeaponDamage",
               on: "hit",
-              mechanic: "dealWeaponDamage",
-              details:
-                "Por padrão, o dano será o definido pela arma, mas você pode escolher que esse dano também seja Radiante se preferir.",
+              properties: { damageTypeOptions: ["weaponDefault", "radiant"] },
             },
             {
               id: "true-strike-extra-damage",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "hit",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 fixed: 0,
@@ -2568,6 +2610,7 @@ export const spellsLevel0 = [
           save: {
             ability: "wisdom",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -2575,7 +2618,8 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "vicious-mockery-damage",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               on: "fail",
               formula: {
                 type: "damage",
@@ -2662,6 +2706,7 @@ export const spellsLevel0 = [
           save: {
             ability: "constitution",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -2669,7 +2714,8 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "word-of-radiance-damage",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               on: "fail",
               formula: {
                 type: "damage",

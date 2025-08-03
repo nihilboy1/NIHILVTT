@@ -1,13 +1,5 @@
 import { z } from "zod";
-import {
-  AbilityScoreEnum,
-  ActionTypeEnum,
-  AttackTypeEnum,
-  CoverEnum,
-  ReactionTriggerEnum,
-  RechargeEventEnum,
-  ResourceCostIdEnum,
-} from "../../shared/primitives.js";
+
 import {
   AreaSchema,
   DcSchema,
@@ -19,28 +11,31 @@ import {
   ActionOutcomesSchema,
   ActionOutcomeType,
 } from "../../shared/outcome.schema.js";
-
-export const ActionSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-});
+import {
+  ActionTypeEnum,
+  AttackTypeEnum,
+  CoverEnum,
+  EventTriggerEnum,
+  RechargeEventEnum,
+  ResourceCostIdEnum,
+} from "../../shared/primitives/combat.primitives.js";
+import { AbilityScoreEnum } from "../../shared/primitives/character.primitives.js";
 
 export const ActionParametersSchema = z.object({
   activation: z
     .object({
       type: ActionTypeEnum,
-      cost: z
+      extraCost: z
         .object({
           amount: z.number().int(),
           source: z.enum(["item", "character"]),
           resourceId: ResourceCostIdEnum,
         })
         .optional(),
-      trigger: ReactionTriggerEnum.optional(),
+      trigger: EventTriggerEnum.optional(),
     })
     .optional(),
-  attackType: AttackTypeEnum.optional(),
+  attackType: AttackTypeEnum.array().optional(),
   range: RangeSchema.optional(),
   overrideAbilityScore: AbilityScoreEnum.or(
     z.literal("spellcasting")
@@ -74,7 +69,7 @@ export interface ActionParametersType {
       source: "item" | "character";
       resourceId: z.infer<typeof ResourceCostIdEnum>;
     };
-    trigger?: z.infer<typeof ReactionTriggerEnum>;
+    trigger?: z.infer<typeof EventTriggerEnum>;
   };
   attackType?: z.infer<typeof AttackTypeEnum>;
   overrideAbilityScore?: z.infer<typeof AbilityScoreEnum> | "spellcasting";

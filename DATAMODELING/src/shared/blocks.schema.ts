@@ -1,22 +1,31 @@
 import { z } from "zod";
+
+import { WeaponIdEnum } from "../shared/data-based-enums.schema.js";
 import {
-  AbilityScoreEnum,
-  CreatureTypeEnum,
-  DamageTypeEnum,
   DistanceUnitEnum,
   DurationUnitEnum,
-  WeaponPropertyEnum,
-} from "./primitives.js";
-import { WeaponIdEnum } from "../data/items/items-weapon.js";
+} from "./primitives/world.primitives.js";
+import {
+  AbilityScoreEnum,
+  ConditionStatusEnum,
+  CreatureTypeEnum,
+} from "./primitives/character.primitives.js";
+import { CoverEnum, DamageTypeEnum } from "./primitives/combat.primitives.js";
+import { WeaponPropertyEnum } from "./primitives/item.primitives.js";
 
 // ============================================================================
-// SEÇÃO: Fórmulas e Cálculos
-// Contém schemas para rolagens de dados, dano, cura e Classe de Armadura.
+// SEÇÃO 1: Fórmulas e Cálculos
 // ============================================================================
 
-export const DcSchema = z.union([
-  z.number().int(),
+/**
+ * ✅ REATORADO: Usando discriminatedUnion para ser mais explícito.
+ * Agora, um DC fixo é `{ type: 'fixed', value: 15 }` e um calculado
+ * é `{ type: 'calculated', ... }`, eliminando ambiguidades.
+ */
+export const DcSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("fixed"), value: z.number().int() }),
   z.object({
+    type: z.literal("calculated"),
     base: z.number().int(),
     attributes: z.array(
       AbilityScoreEnum.or(z.literal("proficiency")).or(
@@ -25,6 +34,17 @@ export const DcSchema = z.union([
     ),
   }),
 ]);
+
+/**
+ * ✅ CORRIGIDO: Schema específico para Testes de Resistência.
+ * Encapsula a Classe de Dificuldade (DC) e regras adicionais
+ * como ignorar cobertura, mantendo o DcSchema genérico e focado.
+ */
+export const SavingThrowSchema = z.object({
+  ability: AbilityScoreEnum,
+  dc: DcSchema,
+  ignoreCovers: z.array(CoverEnum).optional(),
+});
 
 export const DiceRollSchema = z.object({
   count: z.number().int().min(1, "A quantidade de dados deve ser no mínimo 1."),
@@ -39,46 +59,56 @@ export const DiceRollSchema = z.object({
     .optional(),
 });
 
-const BaseDamageFormulaSchema = z
-  .discriminatedUnion("type", [
-    z.object({
-      type: z.literal("damage"),
-      roll: DiceRollSchema.optional(),
-      fixed: z.number().int().optional(),
-      damageTypeOptions: z
-        .array(DamageTypeEnum)
-        .min(1, "É necessário especificar pelo menos um tipo de dano."),
-    }),
-    z.object({
-      type: z.literal("healing"),
-      roll: DiceRollSchema.optional(),
-      fixed: z.number().int().optional(),
-    }),
-  ])
-  .refine((data) => data.roll || data.fixed !== undefined, {
-    message:
-      "A fórmula precisa ter pelo menos uma rolagem (roll) ou um valor fixo (fixed).",
-  });
+export const HealingFormulaSchema = z.object({
+  type: z.literal("healing"),
+  roll: DiceRollSchema.optional(),
+  fixed: z.number().int().optional(),
+  addSpellcastingModifier: z.boolean().optional(),
+});
 
-const ConditionalDamageFormulaSchema = z.object({
+export const DamageFormulaSchema = z.object({
+  type: z.literal("damage"),
+  roll: DiceRollSchema.optional(),
+  fixed: z.number().int().optional(),
+  damageTypeOptions: z.array(DamageTypeEnum),
+});
+
+export const ConditionalHPFormulaSchema = z.object({
+  type: z.literal("conditional"),
   condition: z.literal("targetIsWounded"),
-  ifTrue: z.lazy(() => BaseDamageFormulaSchema),
-  ifFalse: z.lazy(() => BaseDamageFormulaSchema),
+  ifTrue: z.lazy(() => DamageFormulaSchema),
+  ifFalse: z.lazy(() => DamageFormulaSchema),
 });
 
 const HalfDamageFormulaSchema = z.object({
-  type: z.literal("half"),
-  /** O ID do outcome de dano do qual este resultado deve derivar. */
+  type: z.literal("halfDamage"),
   of: z
     .string()
     .min(1, "É necessário especificar o ID do outcome de dano original."),
 });
 
-export const DamageFormulaSchema = z.union([
-  BaseDamageFormulaSchema,
-  ConditionalDamageFormulaSchema,
-  HalfDamageFormulaSchema,
-]);
+/**
+ * ✅ REATORADO: Mudado para discriminatedUnion para melhor performance
+ * de validação e clareza de erros.
+ */
+export const HPFormulaSchema = z
+  .discriminatedUnion("type", [
+    HealingFormulaSchema,
+    DamageFormulaSchema,
+    ConditionalHPFormulaSchema,
+    HalfDamageFormulaSchema,
+  ])
+  .refine(
+    (data) => {
+      if (data.type === "conditional" || data.type === "halfDamage")
+        return true;
+      return data.roll || data.fixed !== undefined;
+    },
+    {
+      message:
+        "A fórmula precisa ter pelo menos uma rolagem (roll) ou um valor fixo (fixed).",
+    }
+  );
 
 export const AcSchema = z.discriminatedUnion("calculation", [
   z.object({ calculation: z.literal("base"), value: z.number() }),
@@ -91,20 +121,8 @@ export const AcSchema = z.discriminatedUnion("calculation", [
   }),
 ]);
 
-export const HPFormulaSchema = z
-  .object({
-    roll: DiceRollSchema.optional(),
-    fixed: z.number().int().optional(),
-    addSpellcastingModifier: z.boolean(),
-  })
-  .refine((data) => data.roll || data.fixed !== undefined, {
-    message:
-      "A fórmula de valor precisa ter pelo menos uma rolagem (roll) ou um valor fixo (fixed).",
-  });
-
 // ============================================================================
-// SEÇÃO: Estruturas de Ação
-// Contém schemas que definem os componentes de uma ação, como alcance e alvo.
+// SEÇÃO 2: Estruturas de Ação
 // ============================================================================
 
 export const RangeSchema = z.object({
@@ -113,18 +131,39 @@ export const RangeSchema = z.object({
   unit: DistanceUnitEnum.default("ft"),
 });
 
+/**
+ * ✏️ SUGESTÃO: O enum de seleção foi simplificado para ser mais claro.
+ * 'choice' significa que o conjurador escolhe os alvos dentro da área.
+ * 'all' significa que todos os alvos elegíveis na área são afetados.
+ */
+const SelectionModeEnum = z.enum(["choice", "all"]);
+
+/**
+ * ✅ REATORADO: O schema de alvo agora é mais explícito sobre sua função.
+ * Ele define o que é "mirado" para a conjuração da magia/ação.
+ * A área de efeito (o que é realmente afetado) é um conceito separado.
+ */
 export const TargetSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("self") }),
-  z.object({ type: z.literal("pointInSpace") }),
-  z.object({ type: z.literal("selfArea") }),
+  z.object({
+    type: z.literal("selfArea"),
+    selectionMode: SelectionModeEnum.default("all").optional(),
+  }),
+
   z.object({
     type: z.literal("creature"),
     quantity: z.number().int().default(1),
+    selectionMode: SelectionModeEnum.default("all").optional(),
   }),
   z.object({
     type: z.literal("object"),
     quantity: z.number().int().default(1),
+    selectionMode: SelectionModeEnum.default("all").optional(),
   }),
+  z.object({
+    type: z.literal("point"),
+    selectionMode: SelectionModeEnum.default("all").optional(),
+  }), // Usado para originar áreas de efeito
   z.object({
     type: z.literal("descriptive"),
     details: z.string(),
@@ -132,65 +171,62 @@ export const TargetSchema = z.discriminatedUnion("type", [
 ]);
 
 // ============================================================================
-// SEÇÃO: Requisitos
-// Contém schemas para definir pré-condições para usar itens ou magias.
+// SEÇÃO 3: Requisitos e Condições
 // ============================================================================
 
-// --- Requisitos de Itens (Legado) ---
-export const RequirementSchema = z.discriminatedUnion("type", [
+export const ConditionSchema = z.discriminatedUnion("type", [
+  // Requisitos de Atributo/Nível
   z.object({
-    type: z.literal("attribute"),
+    type: z.literal("hasAttribute"),
     attribute: AbilityScoreEnum,
     value: z.number().int(),
   }),
-  z.object({ type: z.literal("ancestry"), ancestry: z.string() }),
-  z.object({ type: z.literal("level"), value: z.number().int() }),
-  z.object({ type: z.literal("attunement") }),
+  z.object({ type: z.literal("isAncestry"), ancestry: z.string() }),
+  z.object({ type: z.literal("hasLevel"), value: z.number().int() }),
+  // Requisitos de Item/Equipamento
+  z.object({ type: z.literal("isAttuned") }),
+  z.object({
+    type: z.literal("isEquippingItem"),
+    itemIds: z.array(WeaponIdEnum),
+  }),
+  z.object({ type: z.literal("isProficientWithEquippedWeapon") }),
+  // Requisitos de Estado/Status
+  z.object({ type: z.literal("hasZeroHP") }),
+  z.object({
+    type: z.literal("hasStatus"),
+    status: ConditionStatusEnum,
+    is: z.boolean(),
+  }),
+  z.object({
+    type: z.literal("hasBeenAffectedBySpell"),
+    spellId: z.string(),
+    withinLast: z.object({
+      value: z.number(),
+      unit: z.enum(["hour", "day", "round"]),
+    }),
+  }),
+  // Requisitos de Tipo
+  z.object({
+    type: z.literal("isObject"),
+    isFlammable: z.boolean().optional(),
+    isWorn: z.boolean().optional(),
+    isCarried: z.boolean().optional(),
+  }),
+  z.object({
+    type: z.literal("isCreatureType"),
+    creatureType: CreatureTypeEnum,
+  }),
 ]);
 
-// --- Condições do Conjurador ---
-const CasterEquippedItemSchema = z.object({
-  type: z.literal("equippedItem"),
-  itemIds: z.array(WeaponIdEnum),
-  details: z.string().optional(),
-});
-
-const CasterProficientWithEquippedWeaponSchema = z.object({
-  type: z.literal("beProficientWithEquippedWeapon"),
-  details: z.string().optional(),
-});
-
-const CasterConditionSchema = z.discriminatedUnion("type", [
-  CasterEquippedItemSchema,
-  CasterProficientWithEquippedWeaponSchema,
-]);
-
-// --- Condições do Alvo ---
-const TargetHasZeroHPSchema = z.object({
-  type: z.literal("hasZeroHP"),
-  details: z.string().optional(),
-});
-
-const TargetIsCreatureType = z.object({
-  type: z.literal("isCreatureType"),
-  creatureType: CreatureTypeEnum,
-  details: z.string().optional(),
-});
-
-const TargetConditionSchema = z.discriminatedUnion("type", [
-  TargetHasZeroHPSchema,
-  TargetIsCreatureType,
-]);
-
-// --- Schema Principal de Requisitos de Magia ---
-export const SpellRequirementsSchema = z.object({
-  casterConditions: z.array(CasterConditionSchema).optional(),
-  targetConditions: z.array(TargetConditionSchema).optional(),
+export const RequirementSchema = z.object({
+  user: z.array(ConditionSchema).optional(),
+  target: z.array(ConditionSchema).optional(),
+  allTargetsInArea: z.array(ConditionSchema).optional(),
+  environment: z.array(z.any()).optional(),
 });
 
 // ============================================================================
-// SEÇÃO: Estruturas Geométricas e de Duração
-// Contém schemas para áreas de efeito, duração e propriedades de armas.
+// SEÇÃO 4: Estruturas Geométricas e de Duração
 // ============================================================================
 
 export const WeaponPropertySchema = z.object({
@@ -226,9 +262,4 @@ export const DurationSchema = z.object({
   unit: DurationUnitEnum,
   value: z.number().int().optional(),
   isConcentration: z.boolean().default(false).optional(),
-});
-
-export const AdditionalRulesSchema = z.object({
-  id: z.string(),
-  details: z.string(),
 });

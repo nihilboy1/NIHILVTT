@@ -1,15 +1,14 @@
 import { z } from "zod";
 
+import { RequirementSchema } from "../../shared/blocks.schema.js";
+import { EffectSchema } from "../../shared/effect.schema.js";
+import { SourceEnum } from "../../shared/primitives/world.primitives.js";
 import {
   CostUnitEnum,
-  WeightUnitEnum,
-  ArmorTypeEnum,
-  RarityEnum,
-  SourceEnum,
   ItemTypeEnum,
-} from "../../shared/primitives.js";
-import { RequirementSchema } from "../../shared/blocks.schema.js";
-import { effectSchema } from "../../shared/effect.schema.js";
+  RarityEnum,
+  WeightUnitEnum,
+} from "../../shared/primitives/item.primitives.js";
 
 // 1. O schema base continua o mesmo, definindo as propriedades comuns a todos os itens.
 const BaseItemSchema = z.object({
@@ -23,8 +22,8 @@ const BaseItemSchema = z.object({
   description: z.string().optional(),
   weight: z.object({ value: z.number(), unit: WeightUnitEnum }),
   price: z.object({ quantity: z.number(), unit: CostUnitEnum }).optional(),
-  requirements: z.array(RequirementSchema).optional(),
-  effects: z.array(effectSchema),
+  requirements: RequirementSchema.optional(),
+  effects: z.array(EffectSchema),
 });
 
 // 2. Schemas específicos que estendem o base, cada um com seu tipo literal.

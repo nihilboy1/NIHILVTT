@@ -1,7 +1,10 @@
 import { z } from "zod";
-import { ActionSchema } from "../../domain/action/actions.schema";
 
-export const FinalActionDataSchema = z.array(ActionSchema);
+export const ActionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+});
 
 export const ACTIONS = [
   {
@@ -61,12 +64,4 @@ export const ACTIONS = [
     name: "Conjurar Magia",
     description: "Conjura uma magia de nivel 0 a 9",
   },
-] as const;
-
-FinalActionDataSchema.parse(ACTIONS);
-
-const allActionIds = ACTIONS.map((action) => action.id);
-
-const [firstId, ...restIds] = allActionIds;
-
-export const ActionIdEnum = z.enum([firstId, ...restIds]);
+] as const satisfies z.infer<(typeof ActionSchema)[]>;

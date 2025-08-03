@@ -4,22 +4,22 @@ import {
   DcSchema,
   DurationSchema,
 } from "../../shared/blocks.schema";
-import {
-  AbilityScoreEnum,
-  SurfaceTriggerEnum,
-  SurfaceTypeEnum,
-} from "../../shared/primitives.js";
-import { actionOutcomesSchema } from "../../shared/outcome.schema.js";
+
+import { ActionOutcomesSchema } from "../../shared/outcome.schema.js";
+import { TriggerSchema } from "../../shared/effect.schema.js";
+import { EventTriggerEnum } from "../../shared/primitives/combat.primitives.js";
+import { AbilityScoreEnum } from "../../shared/primitives/character.primitives.js";
+import { SurfaceTypeEnum } from "../../shared/primitives/world.primitives.js";
 
 export const SurfaceRuleSchema = z.object({
-  trigger: SurfaceTriggerEnum,
+  trigger: EventTriggerEnum,
   save: z
     .object({
       ability: AbilityScoreEnum,
       dc: DcSchema,
     })
     .optional(),
-  outcomes: z.array(actionOutcomesSchema),
+  outcomes: z.array(ActionOutcomesSchema),
 });
 export const ActiveSurfaceSchema = z.object({
   id: z.string(),

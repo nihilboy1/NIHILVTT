@@ -1,79 +1,72 @@
-// ============================================================================
-// >> INÍCIO: src/shared/effect.schema.ts
-// Este é o coração do sistema. Define todos os Efeitos.
-// Os schemas Zod são a única fonte da verdade para a estrutura dos dados.
-// ============================================================================
-
 import { z } from "zod";
 import {
   AcSchema,
-  AdditionalRulesSchema, // Assumindo que este schema foi importado
-  DamageFormulaSchema,
+  DcSchema,
   DiceRollSchema,
   DurationSchema,
+  HPFormulaSchema,
   RangeSchema,
+  RequirementSchema,
   WeaponPropertySchema,
 } from "./blocks.schema.js";
-import { ActionIdEnum } from "../data/actions/actions.data.js";
+import { ActionIdEnum } from "../shared/data-based-enums.schema.js";
+
+import { ActionOutcomesSchema } from "./outcome.schema.js";
+import { ActionParametersSchema } from "../domain/action/actions.schema.js";
 import {
-  AbilityScoreEnum,
-  ArmorTypeEnum,
+  OutcomeParameterPaths,
+  RootParameterPaths,
+} from "../shared/data-based-enums.schema.js";
+import {
+  AttackTypeEnum,
   DamageTypeEnum,
+  EventTriggerEnum,
+} from "./primitives/combat.primitives.js";
+import {
+  ArmorTypeEnum,
   ItemPropertyEnum,
-  SkillEnum,
   WeaponCategoryEnum,
   WeaponMasteryEnum,
   WeaponTypeEnum,
   WeightUnitEnum,
-} from "./primitives.js";
-import { ActionOutcomesSchema } from "./outcome.schema.js";
-import { ActionParametersSchema } from "../domain/action/actions.schema.js";
-import { OutcomeParameterPaths, RootParameterPaths } from "./property-paths.schemas.js";
+} from "./primitives/item.primitives.js";
+import {
+  AbilityScoreEnum,
+  SkillEnum,
+} from "./primitives/character.primitives.js";
 
 // ============================================================================
-// SEÇÃO: CONDIÇÕES DE TÉRMINO E SCHEMA BASE
+// SEÇÃO: GATILHO UNIVERSAL E SCHEMA BASE
 // ============================================================================
 
-// 1. Schemas para Condições de Término (Automatizáveis)
-// Define gatilhos estruturados para que um VTT saiba quando remover um efeito.
+/**
+ * Define a estrutura universal para todos os gatilhos do sistema.
+ * Descreve "quando" um evento ocorre e, opcionalmente, "com qual condição".
+ */
+export const TriggerSchema = z.object({
+  on: EventTriggerEnum,
+  with: z
+    .object({
+      damageType: DamageTypeEnum.array().optional(),
+      fromAttackType: z.array(AttackTypeEnum).optional(),
 
-const EndOnTakingDamageConditionSchema = z.object({
-  trigger: z.literal("onTakingDamage"),
-  from: z.array(z.enum(["caster", "casterAllies", "any"])).optional(),
-  damageType: z.array(DamageTypeEnum).optional(),
+      from: z
+        .array(z.enum(["caster", "casterAllies", "target", "any"]))
+        .optional(),
+    })
+    .optional(),
 });
 
-const EndOnCastingAgainConditionSchema = z.object({
-  trigger: z.literal("onCastingSpellAgain"),
-});
-
-const EndOnDropItem = z.object({
-  trigger: z.literal("onDropItem"),
-});
-
-const EndOnLoseConcentration = z.object({
-  trigger: z.literal("onLoseConcentration"),
-});
-
-// União de todas as possíveis condições de término.
-const EndConditionSchema = z.discriminatedUnion("trigger", [
-  EndOnTakingDamageConditionSchema,EndOnDropItem,
-  EndOnCastingAgainConditionSchema,
-  EndOnLoseConcentration,
-]);
-
-// 2. O Schema Base
-// Define propriedades comuns a TODOS os efeitos, evitando repetição.
+/**
+ * Define propriedades comuns a TODOS os efeitos, como as condições de término.
+ * Utiliza o TriggerSchema universal para manter a consistência.
+ */
 const BaseEffectSchema = z.object({
-  // Para regras que podem ser automatizadas por um VTT.
-  endConditions: z.array(EndConditionSchema).optional(),
-  // Para regras puramente textuais que não podem ser automatizadas.
-  additionalRules: z.array(AdditionalRulesSchema).optional(),
+  endConditions: z.array(TriggerSchema).optional(),
 });
 
 // ============================================================================
 // SEÇÃO: SCHEMAS DE EFEITOS INDIVIDUAIS
-// Cada schema estende o BaseEffectSchema, herdando suas propriedades.
 // ============================================================================
 
 // --- Efeitos Ativáveis ---
@@ -91,6 +84,7 @@ const ActivatableCastSpellEffectSchema = BaseEffectSchema.extend({
   actionId: ActionIdEnum,
   parameters: z.lazy(() => ActionParametersSchema),
   scaling: z.lazy(() => SpellScalingSchema).optional(),
+  requirements: RequirementSchema.optional(),
 });
 
 // --- Efeitos de Equipar/Empunhar ---
@@ -121,10 +115,10 @@ const OnWieldGrantWeaponAttackEffectSchema = BaseEffectSchema.extend({
   weaponType: WeaponTypeEnum,
   properties: z.array(WeaponPropertySchema),
   mastery: z.array(WeaponMasteryEnum),
-  damage: z
+  damageFormulas: z
     .object({
-      primary: DamageFormulaSchema,
-      versatile: DamageFormulaSchema.optional(),
+      primary: HPFormulaSchema,
+      versatile: HPFormulaSchema.optional(),
     })
     .optional(),
   range: RangeSchema.optional(),
@@ -183,20 +177,22 @@ const GrantConditionalBonusEffectSchema = BaseEffectSchema.extend({
   duration: DurationSchema.optional(),
 });
 
+export const TriggeredEffectSchema = BaseEffectSchema.extend({
+  type: z.literal("triggeredEffect"),
+  triggers: z.array(TriggerSchema),
+  save: DcSchema.optional(),
+  outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
+  duration: DurationSchema.optional()
+});
+
 const TriggeredModifierEffectSchema = BaseEffectSchema.extend({
   type: z.literal("triggeredModifier"),
-  trigger: z.enum([
-    "onBeingAttacked",
-    "onAttackRoll",
-    "onDealingDamage",
-    "onTakingDamage",
-    "onSavingThrow",
-  ]),
+  triggers: z.array(TriggerSchema),
   modifier: z.object({
     operation: z.enum(["add", "subtract"]),
     dice: DiceRollSchema,
     target: z.enum(["attackRoll", "damageRoll", "saveRoll", "ac"]),
-    appliesTo: z.enum(["self", "attacker", "targetCreature"]),
+    appliesTo: z.enum(["self", "target", "attacker"]),
   }),
   duration: DurationSchema.optional(),
   requiresChoice: z.literal("damageType").optional(),
@@ -225,7 +221,7 @@ const ModifyOutcomeFormulaRuleSchema = z.object({
   type: z.literal("modifyOutcomeFormula"),
   level: z.number().int(),
   outcomeId: z.string(),
-  newFormula: DamageFormulaSchema,
+  newFormula: HPFormulaSchema,
 });
 
 const ModifyActionParameterRuleSchema = z.object({
@@ -243,6 +239,7 @@ const IncrementActionParameterRuleSchema = z.object({
 
 export const IncrementOutcomePropertyRuleSchema = z.object({
   type: z.literal("incrementOutcomeProperty"),
+  level: z.number().optional(),
   outcomeId: z.string().min(1, {
     message: "É necessário especificar o ID do outcome a ser modificado.",
   }),
@@ -256,6 +253,8 @@ const SpellScalingRuleSchema = z.discriminatedUnion("type", [
   IncrementActionParameterRuleSchema,
   IncrementOutcomePropertyRuleSchema,
 ]);
+
+export type SpellScalingRuleType = z.infer<typeof SpellScalingRuleSchema>;
 
 const SpellScalingSchema = z.discriminatedUnion("type", [
   z.object({
@@ -272,8 +271,7 @@ const SpellScalingSchema = z.discriminatedUnion("type", [
 // SEÇÃO: UNIÕES DE SCHEMAS E TIPOS FINAIS
 // ============================================================================
 
-// --- Schema para TODOS os efeitos possíveis ---
-export const effectSchema = z.discriminatedUnion("type", [
+export const EffectSchema = z.discriminatedUnion("type", [
   ActivatableActionEffectSchema,
   ActivatableCastSpellEffectSchema,
   OnEquipSetACEffectSchema,
@@ -289,10 +287,10 @@ export const effectSchema = z.discriminatedUnion("type", [
   PreventsHealingEffectSchema,
   ImposeDisadvantageEffectSchema,
   PreventsReactionEffectSchema,
+  TriggeredEffectSchema,
 ]);
 
-// --- Schema para efeitos que podem ser APLICADOS a um alvo (ex: um buff) ---
-export const applicableEffectSchema = z.discriminatedUnion("type", [
+export const ApplicableEffectSchema = z.discriminatedUnion("type", [
   ActivatableActionEffectSchema,
   GrantConditionalBonusEffectSchema,
   ImposeDisadvantageEffectSchema,
@@ -301,8 +299,8 @@ export const applicableEffectSchema = z.discriminatedUnion("type", [
   PreventsHealingEffectSchema,
   PreventsReactionEffectSchema,
   TriggeredModifierEffectSchema,
+  TriggeredEffectSchema,
 ]);
 
-// --- Tipos Finais (Inferidos) ---
-export type EffectType = z.infer<typeof effectSchema>;
-export type ApplicableEffectType = z.infer<typeof applicableEffectSchema>;
+export type EffectType = z.infer<typeof EffectSchema>;
+export type ApplicableEffectType = z.infer<typeof ApplicableEffectSchema>;

@@ -19,7 +19,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["versatile"] }],
         mastery: ["topple"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -52,7 +52,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["versatile"] }],
         mastery: ["slow"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 4 },
@@ -80,7 +80,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["light", "thrown"] }],
         mastery: ["nick"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 4 },
@@ -108,7 +108,7 @@ export const itemsWeapon = [
         weaponType: "ranged",
         properties: [{ property: ["finesse", "thrown"] }],
         mastery: ["vex"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 4 },
@@ -137,7 +137,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [],
         mastery: ["sap"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -165,7 +165,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["heavy", "reach", "twoHanded"] }],
         mastery: ["graze"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 10 },
@@ -193,7 +193,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["heavy", "twoHanded"] }],
         mastery: ["cleave"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 12 },
@@ -221,7 +221,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["twoHanded"] }],
         mastery: ["push"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -249,7 +249,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["heavy", "twoHanded"] }],
         mastery: ["graze"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 2, faces: 6 },
@@ -277,7 +277,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["heavy", "reach", "twoHanded"] }],
         mastery: ["cleave"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 10 },
@@ -306,7 +306,7 @@ export const itemsWeapon = [
         properties: [{ property: ["ammunition", "light", "loading"] }],
         mastery: ["vex"],
         range: { normal: 30, long: 120, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -335,7 +335,7 @@ export const itemsWeapon = [
         properties: [{ property: ["light", "thrown"] }],
         mastery: ["vex"],
         range: { normal: 20, long: 60, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -366,7 +366,7 @@ export const itemsWeapon = [
         ],
         mastery: ["push"],
         range: { normal: 100, long: 400, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 10 },
@@ -395,7 +395,7 @@ export const itemsWeapon = [
         properties: [{ property: ["thrown"] }],
         mastery: ["slow"],
         range: { normal: 30, long: 120, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -424,7 +424,7 @@ export const itemsWeapon = [
         properties: [{ property: ["ammunition", "loading", "twoHanded"] }],
         mastery: ["slow"],
         range: { normal: 80, long: 320, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -452,7 +452,7 @@ export const itemsWeapon = [
         properties: [{ property: ["light", "thrown"] }],
         mastery: ["nick"],
         range: { normal: 20, long: 60, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 4 },
@@ -481,7 +481,7 @@ export const itemsWeapon = [
         properties: [{ property: ["ammunition", "heavy", "twoHanded"] }],
         mastery: ["slow"],
         range: { normal: 150, long: 600, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -509,7 +509,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["versatile"] }],
         mastery: ["sap"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -542,7 +542,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [],
         mastery: ["sap"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -570,7 +570,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["heavy", "twoHanded"] }],
         mastery: ["topple"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 2, faces: 6 },
@@ -598,7 +598,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [],
         mastery: ["sap"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -627,7 +627,7 @@ export const itemsWeapon = [
         properties: [{ property: ["ammunition", "loading", "twoHanded"] }],
         mastery: ["slow"],
         range: { normal: 40, long: 120, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 12 },
@@ -655,7 +655,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["heavy", "reach", "twoHanded"] }],
         mastery: ["push"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 10 },
@@ -684,7 +684,7 @@ export const itemsWeapon = [
         properties: [{ property: ["ammunition", "loading"] }],
         mastery: ["vex"],
         range: { normal: 30, long: 90, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 10 },
@@ -712,7 +712,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["versatile"] }],
         mastery: ["topple"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -745,7 +745,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["finesse"] }],
         mastery: ["vex"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -772,7 +772,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["finesse", "light"] }],
         mastery: ["nick"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -801,7 +801,7 @@ export const itemsWeapon = [
         properties: [{ property: ["ammunition", "twoHanded"] }],
         mastery: ["vex"],
         range: { normal: 80, long: 320, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -829,7 +829,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["finesse", "light"] }],
         mastery: ["vex"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -857,7 +857,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["light"] }],
         mastery: ["nick"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 4 },
@@ -886,7 +886,7 @@ export const itemsWeapon = [
         properties: [{ property: ["ammunition"] }],
         mastery: ["slow"],
         range: { normal: 30, long: 120, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 4 },
@@ -915,7 +915,7 @@ export const itemsWeapon = [
         properties: [{ property: ["thrown", "versatile"] }],
         mastery: ["sap"],
         range: { normal: 20, long: 60, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -949,7 +949,7 @@ export const itemsWeapon = [
         properties: [{ property: ["thrown", "versatile"] }],
         mastery: ["topple"],
         range: { normal: 20, long: 60, unit: "ft" },
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 6 },
@@ -982,7 +982,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["versatile"] }],
         mastery: ["sap"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -1010,7 +1010,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["versatile"] }],
         mastery: ["push"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 8 },
@@ -1043,7 +1043,7 @@ export const itemsWeapon = [
         weaponType: "melee",
         properties: [{ property: ["finesse", "reach"] }],
         mastery: ["slow"],
-        damage: {
+        damageFormulas: {
           primary: {
             type: "damage",
             roll: { count: 1, faces: 4 },

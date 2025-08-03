@@ -36,7 +36,15 @@ export const itemsArmor: Item[] = [
     price: { quantity: 75, unit: "gold" },
     description:
       "Feita de anéis de metal interligados, a cota de malha oferece proteção substancial, mas seu peso e barulho impõem desvantagem em testes de Furtividade.",
-    requirements: [{ type: "attribute", attribute: "strength", value: 13 }],
+    requirements: {
+      user: [
+        {
+          type: "hasAttribute",
+          attribute: "strength",
+          value: 13,
+        },
+      ],
+    },
     effects: [
       {
         type: "onEquip_setAC",
@@ -194,7 +202,9 @@ export const itemsArmor: Item[] = [
     price: { quantity: 1500, unit: "gold" },
     description:
       "O auge da proteção pessoal, esta armadura consiste em placas de metal moldadas para cobrir todo o corpo. Requer força considerável para ser usada e impõe desvantagem em testes de Furtividade.",
-    requirements: [{ type: "attribute", attribute: "strength", value: 15 }],
+    requirements: {
+      user: [{ type: "hasAttribute", attribute: "strength", value: 15 }],
+    },
     effects: [
       {
         type: "onEquip_setAC",
@@ -294,7 +304,9 @@ export const itemsArmor: Item[] = [
     price: { quantity: 200, unit: "gold" },
     description:
       "Uma armadura pesada feita de tiras verticais de metal rebitadas a um suporte de couro. Requer força considerável e impõe desvantagem em testes de Furtividade.",
-    requirements: [{ type: "attribute", attribute: "strength", value: 15 }],
+    requirements: {
+      user: [{ type: "hasAttribute", attribute: "strength", value: 15 }],
+    },
     effects: [
       {
         type: "onEquip_setAC",

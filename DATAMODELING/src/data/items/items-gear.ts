@@ -18,12 +18,14 @@ export const itemsGear: Item[] = [
         actionId: "action-throw-item",
         parameters: {
           range: { normal: 20, unit: "ft" },
-          attackType: "rangedItemAttack",
+          attackType: ["rangedItemAttack"],
           outcomes: [
             {
               on: "hit",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               formula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["acid"],
               },
@@ -50,13 +52,14 @@ export const itemsGear: Item[] = [
         actionId: "action-throw-item",
         parameters: {
           range: { normal: 20, unit: "ft" },
-          save: { ability: "dexterity", dc: 10 },
+          save: { ability: "dexterity", dc: { type: "fixed", value: 10 } },
           outcomes: [
             {
               on: "fail",
-              type: "damage",
-
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 4 },
                 damageTypeOptions: ["fire"],
               },
@@ -84,11 +87,6 @@ export const itemsGear: Item[] = [
         parameters: {
           activation: {
             type: "action",
-            cost: {
-              amount: 1,
-              source: "character",
-              resourceId: "action", // Indica que consome a Ação principal do personagem
-            },
           },
           outcomes: [
             {
@@ -143,8 +141,8 @@ export const itemsGear: Item[] = [
         type: "activatableAction",
         actionId: "action-use-gear-area",
         parameters: {
-          area: { shape: "cube", size: 10 },
-          save: { ability: "dexterity", dc: 10 },
+          area: { shape: "cube", size: 10, unit: "ft" },
+          save: { ability: "dexterity", dc: { type: "fixed", value: 10 } },
           outcomes: [
             { on: "fail", type: "applyCondition", condition: "prone" },
           ],
@@ -170,23 +168,19 @@ export const itemsGear: Item[] = [
         parameters: {
           activation: {
             type: "action",
-            cost: {
-              amount: 1,
-              source: "character",
-              resourceId: "action",
-            },
           },
           target: {
             type: "descriptive",
             details: "one weapon or 3 pieces of ammunition",
           },
-          save: { ability: "constitution", dc: 10 },
+          save: { ability: "constitution", dc: { type: "fixed", value: 10 } },
           outcomes: [
             {
               on: "fail",
-              type: "damage",
-
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               formula: {
+                type: "damage",
                 roll: { count: 1, faces: 4 },
                 damageTypeOptions: ["poison"],
               },
@@ -212,13 +206,18 @@ export const itemsGear: Item[] = [
         type: "activatableAction",
         actionId: "action-use-gear-area",
         parameters: {
-          area: { shape: "cube", size: 5 },
-          save: { ability: "dexterity", dc: 15 },
+          area: { shape: "cube", size: 5, unit: "ft" },
+          save: {
+            ability: "dexterity",
+            dc: { type: "calculated", attributes: ["dexterity"], base: 15 },
+          },
           outcomes: [
             {
               on: "fail",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
               formula: {
+                type: "damage",
                 fixed: 1,
                 damageTypeOptions: ["piercing"],
               },
@@ -310,12 +309,12 @@ export const itemsGear: Item[] = [
         type: "activatableAction",
         actionId: "action-use-kit-charge",
         parameters: {
+          charges: { max: 10 },
           activation: {
             type: "action",
-            cost: { amount: 1, source: "item", resourceId: "itemCharge" },
+            extraCost: { amount: 1, source: "item", resourceId: "itemCharge" },
           },
 
-          charges: { max: 10 },
           outcomes: [
             {
               on: "success",
@@ -348,9 +347,11 @@ export const itemsGear: Item[] = [
           outcomes: [
             {
               on: "hit",
-              type: "damage",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
 
               formula: {
+                type: "damage",
                 roll: { count: 2, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },
@@ -406,26 +407,47 @@ export const itemsGear: Item[] = [
         type: "activatableAction",
         actionId: "action-set-trap",
         parameters: {
+          target: { type: "point" },
           activation: {
             type: "action",
-            cost: {
-              amount: 1,
-              source: "character",
-              resourceId: "action",
-            },
           },
-          save: { ability: "dexterity", dc: 13 },
           outcomes: [
             {
-              on: "fail",
-              type: "damage",
-              formula: {
-                roll: { count: 1, faces: 4 },
-                damageTypeOptions: ["piercing"],
+              type: "summonToken",
+              on: "any",
+              token: {
+                name: "Armadilha de Caça (Armada)",
+                quantity: 1,
+                effects: [
+                  {
+                    type: "triggeredEffect",
+                    triggers: [{ on: "onEnterArea" }],
+                    save: {
+                      type: "calculated",
+                      attributes: ["dexterity"],
+                      base: 13,
+                    },
+                    outcomes: [
+                      {
+                        on: "fail",
+                        type: "modifyTargetHP",
+                        vitals: ["currentHp"],
+                        formula: {
+                          type: "damage",
+                          roll: { count: 1, faces: 4 },
+                          damageTypeOptions: ["piercing"],
+                        },
+                      },
+                      {
+                        on: "fail",
+                        type: "applyCondition",
+                        condition: "restrained",
+                      },
+                    ],
+                  },
+                ],
               },
             },
-
-            { on: "fail", type: "applyCondition", condition: "restrained" },
           ],
         },
       },
@@ -487,9 +509,9 @@ export const itemsGear: Item[] = [
         actionId: "action-throw-item",
         parameters: {
           range: { normal: 20, unit: "ft" },
-          attackType: "rangedItemAttack",
+          attackType: ["rangedItemAttack"],
           outcomes: [
-            { on: "hit", type: "applyCondition", condition: "inflamable" },
+            { on: "hit", type: "applyCondition", condition: "flammable" },
           ],
         },
       },
@@ -547,11 +569,6 @@ export const itemsGear: Item[] = [
         parameters: {
           activation: {
             type: "action",
-            cost: {
-              amount: 1,
-              source: "character",
-              resourceId: "action",
-            },
           },
           target: {
             details: "torch or other exposed fuel",
@@ -587,8 +604,8 @@ export const itemsGear: Item[] = [
         weaponType: "melee",
         properties: [],
         mastery: [],
-        damage: {
-          primary: { fixed: 1, damageTypeOptions: ["fire"] }, // Dano 1
+        damageFormulas: {
+          primary: { type: "damage", fixed: 1, damageTypeOptions: ["fire"] }, // Dano 1}
         },
       },
     ],

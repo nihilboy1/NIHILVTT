@@ -19,7 +19,6 @@ export const spellsLevel1 = [
       types: ["verbal", "somatic", "material"],
       material: {
         description: "Um sininho e um fio de prata",
-        isConsumed: true,
       },
     },
     duration: {
@@ -39,7 +38,7 @@ export const spellsLevel1 = [
             unit: "ft",
           },
           target: {
-            type: "pointInSpace",
+            type: "point",
           },
           area: {
             shape: "cube",
@@ -49,9 +48,8 @@ export const spellsLevel1 = [
           outcomes: [
             {
               id: "alarm-create-ward",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "createAlarmWard",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria uma sentinela mágica e invisível na área designada. Na conjuração, o jogador designa criaturas que não disparam o alarme e escolhe um dos dois tipos de alerta: 1) Mental: um 'ping' de alerta é enviado ao conjurador se ele estiver a até 1 milha. 2) Audível: o som de um sino soa por 10 segundos, audível a até 60 pés.",
             },
@@ -80,11 +78,10 @@ export const spellsLevel1 = [
       value: 24,
     },
     requirements: {
-      targetConditions: [
+      target: [
         {
           type: "isCreatureType",
           creatureType: "beast",
-          details: "O alvo deve ser uma criatura do tipo Besta.",
         },
       ],
     },
@@ -94,8 +91,10 @@ export const spellsLevel1 = [
         actionId: "action-cast-spell",
         endConditions: [
           {
-            trigger: "onTakingDamage",
-            from: ["caster", "casterAllies"],
+            on: "onTakingDamage",
+            with: {
+              from: ["caster", "casterAllies"],
+            },
           },
         ],
         parameters: {
@@ -113,6 +112,7 @@ export const spellsLevel1 = [
           save: {
             ability: "wisdom",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -182,11 +182,11 @@ export const spellsLevel1 = [
           outcomes: [
             {
               id: "cure-wounds-heal",
-              type: "modifyHP",
+              type: "modifyTargetHP",
               on: "success",
               vitals: ["currentHp"],
-              operation: "add",
               formula: {
+                type: "healing",
                 roll: { count: 2, faces: 8 },
                 addSpellcastingModifier: true,
               },
@@ -242,11 +242,11 @@ export const spellsLevel1 = [
           outcomes: [
             {
               id: "healing-word-heal",
-              type: "modifyHP",
+              type: "modifyTargetHP",
               on: "success",
               vitals: ["currentHp"],
-              operation: "add",
               formula: {
+                type: "healing",
                 roll: { count: 2, faces: 4 },
                 addSpellcastingModifier: true,
               },
@@ -269,7 +269,7 @@ export const spellsLevel1 = [
   },
   {
     id: "spell-arms-of-hadar",
-    name: ["Braços de Hadar","Arms of Hadar"],
+    name: ["Braços de Hadar", "Arms of Hadar"],
     description:
       "**Braços de Hadar**\nVocê invoca os Braços de Hadar, fazendo com que tentáculos irrompam do seu corpo. Cada criatura em uma **área de 3 metros** centrada em você deve realizar um **teste de resistência de Força**.\n- **Falha:** O alvo sofre **2d6 de dano necrótico** e **não pode realizar Reações** até o início do próximo turno dele.\n- **Sucesso:** O alvo sofre **metade do dano**, sem efeitos adicionais.",
     source: "LDJ2024",
@@ -298,6 +298,7 @@ export const spellsLevel1 = [
           save: {
             ability: "strength",
             dc: {
+              type: "calculated",
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
@@ -305,8 +306,9 @@ export const spellsLevel1 = [
           outcomes: [
             {
               id: "arms-of-hadar-damage-fail",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "fail",
+              vitals: ["currentHp"],
               formula: {
                 type: "damage",
                 roll: { count: 2, faces: 6 },
@@ -321,15 +323,16 @@ export const spellsLevel1 = [
                 type: "preventsReaction",
                 duration: {
                   unit: "turn",
-                  value: 1, 
+                  value: 1,
                 },
               },
             },
             {
               id: "arms-of-hadar-damage-success",
-              type: "damage",
+              type: "modifyTargetHP",
               on: "success",
-              formula: {type: "half", of: "arms-of-hadar-damage-fail"},
+              vitals: ["currentHp"],
+              formula: { type: "halfDamage", of: "arms-of-hadar-damage-fail" },
             },
           ],
         },
@@ -347,204 +350,394 @@ export const spellsLevel1 = [
       },
     ],
   },
-] as const satisfies Spell[];
-
-export const toBoMoldedSpells = [
   {
-    name: "Armor of Agathys",
-    source: "LDJ2024",
-    page: 243,
-    level: 1,
-    school: "abjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-      m: "a shard of blue glass",
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
-        },
-      },
-    ],
-    entries: [
-      "Protective magical frost surrounds you. You gain 5 {@variantrule Temporary Hit Points|XPHB}. If a creature hits you with a melee attack roll before the spell ends, the creature takes 5 Cold damage. The spell ends early if you have no {@variantrule Temporary Hit Points|XPHB}.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The {@variantrule Temporary Hit Points|XPHB} and the Cold damage both increase by 5 for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["cold"],
-    miscTags: ["THP"],
-  },
-  {
-    name: "Bane",
-    source: "LDJ2024",
-    page: 245,
-    level: 1,
-    school: "enchantment",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-      m: "a drop of blood",
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
-        },
-        concentration: true,
-      },
-    ],
-    entries: [
-      "Up to three creatures of your choice that you can see within range must each make a Charisma saving throw. Whenever a target that fails this save makes an attack roll or a saving throw before the spell ends, the target must subtract {@dice 1d4} from the attack roll or save.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can target one additional creature for each spell slot level above 1.",
-        ],
-      },
-    ],
-    savingThrow: ["charisma"],
-    miscTags: ["SCT", "SGT"],
-    areaTags: ["MT"],
-  },
-  {
-    name: "Bless",
-    source: "LDJ2024",
-    page: 247,
-    level: 1,
-    school: "enchantment",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-      m: {
-        text: "a Holy Symbol worth 5+ GP",
-        cost: 500,
-      },
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
-        },
-        concentration: true,
-      },
-    ],
-    entries: [
-      "You bless up to three creatures within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target adds {@dice 1d4} to the attack roll or save.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can target one additional creature for each spell slot level above 1.",
-        ],
-      },
-    ],
-    miscTags: ["SCT"],
-    areaTags: ["MT"],
-  },
-  {
-    name: "Burning Hands",
+    id: "spell-burning-hands",
+    name: ["Mãos Flamejantes", "Burning Hands"],
+    description:
+      "Uma fina camada de chamas é expelida de suas mãos. Cada criatura em um cone de 4,5 metros (15 pés) deve fazer um teste de resistência de Destreza. Em caso de falha, sofre 3d6 de dano de fogo, ou metade do dano em caso de sucesso. Objetos inflamáveis na área que não estão sendo vestidos ou carregados pegam fogo.",
     source: "LDJ2024",
     page: 248,
     level: 1,
     school: "evocation",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "cone",
-      distance: {
-        type: "feet",
-        amount: 15,
-      },
-    },
     components: {
-      v: true,
-      s: true,
+      types: ["verbal", "somatic"],
     },
-    duration: [
+    duration: {
+      unit: "instantaneous",
+    },
+    effects: [
       {
-        type: "instant",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          target: {
+            type: "selfArea",
+          },
+          area: {
+            shape: "cone",
+            length: 15,
+            unit: "ft",
+          },
+          save: {
+            ability: "dexterity",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "burning-hands-damage-fail",
+              type: "modifyTargetHP",
+              on: "fail",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 3, faces: 6 },
+                damageTypeOptions: ["fire"],
+              },
+            },
+            {
+              id: "burning-hands-damage-success",
+              type: "modifyTargetHP",
+              on: "success",
+              vitals: ["currentHp"],
+              formula: {
+                type: "halfDamage",
+                of: "burning-hands-damage-fail",
+              },
+            },
+            {
+              id: "burning-hands-ignite-objects",
+              type: "applyCondition",
+              on: "any",
+              condition: "burning",
+              requirements: {
+                target: [
+                  {
+                    type: "isObject",
+                    isFlammable: true,
+                    isWorn: false,
+                    isCarried: false,
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "burning-hands-damage-fail",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    entries: [
-      "A thin sheet of flames shoots forth from you. Each creature in a 15-foot {@variantrule Cone [Area of Effect]|XPHB|Cone} makes a Dexterity saving throw, taking {@damage 3d6} Fire damage on a failed save or half as much damage on a successful one.",
-      "Flammable objects in the {@variantrule Cone [Area of Effect]|XPHB|Cone} that aren't being worn or carried start {@hazard burning|XPHB}.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 3d6|1-9|1d6} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["fire"],
-    savingThrow: ["dexterity"],
-    miscTags: ["OBJ"],
-    areaTags: ["N"],
   },
+  {
+    id: "spell-bless",
+    name: ["Benção", "Bless"],
+    description:
+      "Você abençoa até três criaturas à sua escolha dentro do alcance. Sempre que um alvo fizer uma rolagem de ataque ou um teste de resistência antes do fim da magia, o alvo pode adicionar 1d4 à rolagem.",
+    source: "LDJ2024",
+    page: 247,
+    level: 1,
+    school: "enchantment",
+    components: {
+      types: ["verbal", "somatic", "material"],
+      material: {
+        description: "um Símbolo Sagrado no valor de 5+ PO",
+      },
+    },
+    effects: [
+      {
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          range: {
+            normal: 30,
+            unit: "ft",
+          },
+          target: {
+            type: "creature",
+            quantity: 3,
+          },
+          outcomes: [
+            {
+              id: "bless-attack-buff",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "triggeredModifier",
+                triggers: [{ on: "onAttackRoll" }],
+                modifier: {
+                  operation: "add",
+                  dice: { count: 1, faces: 4 },
+                  target: "attackRoll",
+                  appliesTo: "self",
+                },
+                duration: {
+                  unit: "minute",
+                  value: 1,
+                  isConcentration: true,
+                },
+              },
+            },
+            {
+              id: "bless-save-buff",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "triggeredModifier",
+                triggers: [{ on: "onSavingThrow" }],
+                modifier: {
+                  operation: "add",
+                  dice: { count: 1, faces: 4 },
+                  target: "saveRoll",
+                  appliesTo: "self",
+                },
+                duration: {
+                  unit: "minute",
+                  value: 1,
+                  isConcentration: true,
+                },
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "spell-bane",
+    name: ["Perdição", "Bane"],
+    description:
+      "Até três criaturas à sua escolha dentro do alcance devem fazer um teste de resistência de Carisma. Sempre que um alvo que falhou neste teste fizer uma rolagem de ataque ou um teste de resistência antes do fim da magia, o alvo deve subtrair 1d4 da rolagem.",
+    source: "LDJ2024",
+    page: 245,
+    level: 1,
+    school: "enchantment",
+    components: {
+      types: ["verbal", "somatic", "material"],
+      material: {
+        description: "uma gota de sangue",
+      },
+    },
+    duration: {
+      unit: "minute",
+      value: 1,
+      isConcentration: true,
+    },
+    effects: [
+      {
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          range: {
+            normal: 30,
+            unit: "ft",
+          },
+          target: {
+            type: "creature",
+            quantity: 3,
+          },
+          save: {
+            ability: "charisma",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "bane-debuff-attack",
+              type: "applyEffect",
+              on: "fail",
+              effect: {
+                type: "triggeredModifier",
+                triggers: [{ on: "onAttackRoll" }],
+                modifier: {
+                  operation: "subtract",
+                  dice: { count: 1, faces: 4 },
+                  target: "attackRoll",
+                  appliesTo: "self",
+                },
+                duration: {
+                  unit: "minute",
+                  value: 1,
+                  isConcentration: true,
+                },
+              },
+            },
+            {
+              id: "bane-debuff-save",
+              type: "applyEffect",
+              on: "fail",
+              effect: {
+                type: "triggeredModifier",
+                triggers: [{ on: "onSavingThrow" }],
+                modifier: {
+                  operation: "subtract",
+                  dice: { count: 1, faces: 4 },
+                  target: "saveRoll",
+                  appliesTo: "self",
+                },
+                duration: {
+                  unit: "minute",
+                  value: 1,
+                  isConcentration: true,
+                },
+              },
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "spell-armor-of-agathys",
+    name: ["Armadura de Agathys", "Armor of Agathys"],
+    description:
+      "Uma geada mágica protetora te envolve. Você ganha 5 pontos de vida temporários. Se uma criatura te atingir com um ataque corpo a corpo antes do fim da magia, ela sofre 5 de dano de frio. A magia termina se você não tiver mais os pontos de vida temporários.",
+    source: "LDJ2024",
+    page: 243,
+    level: 1,
+    school: "abjuration",
+    components: {
+      types: ["verbal", "somatic", "material"],
+      material: {
+        description: "um caco de vidro azul",
+      },
+    },
+    duration: {
+      unit: "hour",
+      value: 1,
+    },
+    effects: [
+      {
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: "onTempHpDepleted" }],
+        parameters: {
+          activation: {
+            type: "bonusAction",
+          },
+          target: {
+            type: "self",
+          },
+          outcomes: [
+            {
+              id: "agathys-temp-hp",
+              type: "modifyTargetHP",
+              on: "any",
+              vitals: ["tempHp"],
+              formula: {
+                type: "healing",
+                fixed: 5,
+              },
+            },
+            {
+              id: "agathys-retaliation",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "triggeredEffect",
+                triggers: [
+                  {
+                    on: "onTakingDamage",
+                    with: {
+                      fromAttackType: [
+                        "meleeWeaponAttack",
+                        "meleeItemAttack",
+                        "meleeSpellAttack",
+                      ],
+                    },
+                  },
+                ],
+                outcomes: [
+                  {
+                    id: "agathys-retaliation-damage",
+                    type: "modifyTargetHP",
+                    on: "any",
+                    vitals: ["currentHp"],
+                    formula: {
+                      type: "damage",
+                      fixed: 5,
+                      damageTypeOptions: ["cold"],
+                    },
+                  },
+                ],
+                duration: {
+                  unit: "hour",
+                  value: 1,
+                },
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "agathys-temp-hp",
+              propertyPath: "formula.fixed",
+              increment: 5,
+            },
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "agathys-retaliation-damage",
+              propertyPath: "formula.fixed",
+              increment: 5,
+            },
+          ],
+        },
+      },
+    ],
+  },
+] as const satisfies Spell[];
+
+export const toBoMoldedSpells = [
   {
     name: "Charm Person",
     source: "LDJ2024",

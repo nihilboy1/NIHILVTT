@@ -1,67 +1,79 @@
-import { z } from "zod";
+import { object, z } from "zod";
+
 import {
-  ConditionEnum,
-  CreatureSizeEnum,
-  DistanceUnitEnum,
-  EffectOutcomeEnum,
-} from "../shared/primitives.js";
-import {
-  DamageFormulaSchema,
   DurationSchema,
   HPFormulaSchema,
-  SpellRequirementsSchema,
+  RequirementSchema,
 } from "../shared/blocks.schema.js";
 import {
-  effectSchema,
+  EffectSchema,
   ApplicableEffectType,
-  applicableEffectSchema,
+  ApplicableEffectSchema,
 } from "../shared/effect.schema.js";
+import { DistanceUnitEnum } from "./primitives/world.primitives.js";
+import {
+  DamageTypeEnum,
+  EffectOutcomeEnum,
+} from "./primitives/combat.primitives.js";
+import {
+  ConditionStatusEnum,
+  CreatureSizeEnum,
+} from "./primitives/character.primitives.js";
+
+// ============================================================================
+// SEÇÃO: SCHEMAS DE RESULTADOS (OUTCOMES) INDIVIDUAIS
+// Cada schema representa um resultado possível de uma ação.
+// ============================================================================
 
 export const NoneOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("none"),
   on: EffectOutcomeEnum,
 });
-export const DamageOutcomeSchema = z.object({
-  id: z.string().optional(),
-  type: z.literal("damage"),
-  on: EffectOutcomeEnum,
-  formula: DamageFormulaSchema,
-});
 
 export const MoveTargetOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("moveTarget"),
   on: EffectOutcomeEnum,
-  direction: z.enum(["towards", "away"]), // Para puxar ou empurrar
+  direction: z.enum(["towards", "away"]),
   distance: z.object({
     value: z.number().int().positive(),
-    unit: DistanceUnitEnum, // Reutilizando o enum de distância
+    unit: DistanceUnitEnum,
   }),
-  allowedSizes: z.array(CreatureSizeEnum).optional(), // <-- SUA SUGESTÃO APLICADA
+  allowedSizes: z.array(CreatureSizeEnum).optional(),
 });
 
-export const ModifyHPOutcomeSchema = z.object({
+export const ModifyTargetHPOutcomeSchema = z.object({
   id: z.string().optional(),
-  type: z.literal("modifyHP"),
+  type: z.literal("modifyTargetHP"),
   on: EffectOutcomeEnum,
-  vitals: z.array(z.enum(["maxHp", "currentHp", "tempHp"])),
-  operation: z.enum(["add", "subtract", "set"]), // <-- OPERAÇÃO EXPLÍCITA
-  formula: HPFormulaSchema, // <-- FÓRMULA FLEXÍVEL
+  formula: HPFormulaSchema,
+  vitals: z
+    .array(z.enum(["maxHp", "currentHp", "tempHp"]))
+    .default(["currentHp"]),
 });
 
 export const ApplyConditionOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("applyCondition"),
   on: EffectOutcomeEnum,
-  condition: ConditionEnum,
+  condition: ConditionStatusEnum,
+  requirements: RequirementSchema.optional(),
   duration: DurationSchema.optional(),
 });
+
 export const DescriptiveOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("descriptive"),
   on: EffectOutcomeEnum,
   details: z.string(),
+});
+
+export const DealWeaponDamageOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("dealWeaponDamage"),
+  on: EffectOutcomeEnum,
+  properties: z.object({ damageTypeOptions: DamageTypeEnum.array() }),
 });
 
 export const CustomMechanicOutcomeSchema = z.object({
@@ -80,34 +92,6 @@ export const ApplyCustomEffectOutcomeSchema = z.object({
   value: z.number().optional(),
 });
 
-export const BaseActionOutcomesSchema = z.discriminatedUnion("type", [
-  NoneOutcomeSchema,
-  DamageOutcomeSchema,
-  ModifyHPOutcomeSchema,
-  ApplyConditionOutcomeSchema,
-  DescriptiveOutcomeSchema,
-  CustomMechanicOutcomeSchema,
-  ApplyCustomEffectOutcomeSchema,
-]);
-
-const ApplyEffectOutcomeSchema = z.object({
-  id: z.string().optional(),
-  type: z.literal("applyEffect"),
-  on: EffectOutcomeEnum,
-  effect: z.lazy(() => applicableEffectSchema),
-});
-const SummonTokenOutcomeSchema = z.object({
-  id: z.string().optional(),
-  type: z.literal("summonToken"),
-  on: EffectOutcomeEnum,
-  token: z.object({
-    name: z.string(),
-    quantity: z.number().int().min(1),
-    effects: z.array(z.lazy(() => effectSchema)),
-  }),
-  duration: DurationSchema.optional(),
-});
-
 export const ModifyAttributeOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("modifyAttribute"),
@@ -118,17 +102,37 @@ export const ModifyAttributeOutcomeSchema = z.object({
   duration: DurationSchema,
 });
 
-type NoneOutcomeType = z.infer<typeof NoneOutcomeSchema>;
-type DamageOutcomeType = z.infer<typeof DamageOutcomeSchema>;
-type ModifyHPOutcomeType = z.infer<typeof ModifyHPOutcomeSchema>;
-type ApplyConditionOutcomeType = z.infer<typeof ApplyConditionOutcomeSchema>;
-type ModifyAttributeOutcomeType = z.infer<typeof ModifyAttributeOutcomeSchema>;
-type CustomMechanicOutcomeType = z.infer<typeof CustomMechanicOutcomeSchema>;
-type ApplyCustomEffectOutcomeType = z.infer<
-  typeof ApplyCustomEffectOutcomeSchema
->;
-type DescriptiveOutcomeType = z.infer<typeof DescriptiveOutcomeSchema>;
-type MoveTargetOutcomeType = z.infer<typeof MoveTargetOutcomeSchema>;
+// --- Schemas com Dependências Circulares ---
+// Estes schemas dependem do EffectSchema, que por sua vez depende dos outcomes.
+// O uso de z.lazy() é a solução correta para quebrar essa referência circular.
+
+const ApplyEffectOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("applyEffect"),
+  on: EffectOutcomeEnum,
+  effect: z.lazy(() => ApplicableEffectSchema),
+});
+
+const SummonTokenOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("summonToken"),
+  on: EffectOutcomeEnum,
+  token: z.object({
+    name: z.string(),
+    quantity: z.number().int().min(1),
+    effects: z.array(z.lazy(() => EffectSchema)),
+  }),
+  duration: DurationSchema.optional(),
+});
+
+// ============================================================================
+// SEÇÃO: TIPOS E UNIÃO FINAL DOS SCHEMAS
+// ============================================================================
+
+// --- Tipos Manuais para Schemas com z.lazy() ---
+// A inferência de tipo do Zod (z.infer) pode ter dificuldades com
+// discriminatedUnion contendo schemas lazy. Definir os tipos manualmente,
+// como feito aqui, é a abordagem mais robusta para garantir a segurança de tipos.
 
 export type ApplyEffectOutcomeType = {
   id?: string;
@@ -136,6 +140,7 @@ export type ApplyEffectOutcomeType = {
   on: z.infer<typeof EffectOutcomeEnum>;
   effect: ApplicableEffectType;
 };
+
 export type SummonTokenOutcomeType = {
   id?: string;
   type: "summonToken";
@@ -144,22 +149,34 @@ export type SummonTokenOutcomeType = {
   duration?: z.infer<typeof DurationSchema>;
 };
 
+// --- Tipo de União Final ---
+// Agrega todos os tipos de outcomes possíveis em um único tipo.
 export type ActionOutcomeType =
-  | NoneOutcomeType
-  | DamageOutcomeType
-  | ModifyHPOutcomeType
-  | ApplyConditionOutcomeType
-  | DescriptiveOutcomeType
-  | ApplyEffectOutcomeType
-  | SummonTokenOutcomeType
-  | CustomMechanicOutcomeType
-  | ModifyAttributeOutcomeType
-  | MoveTargetOutcomeType
-  | ApplyCustomEffectOutcomeType;
+  | z.infer<typeof NoneOutcomeSchema>
+  | z.infer<typeof ModifyTargetHPOutcomeSchema>
+  | z.infer<typeof ApplyConditionOutcomeSchema>
+  | z.infer<typeof DescriptiveOutcomeSchema>
+  | z.infer<typeof CustomMechanicOutcomeSchema>
+  | z.infer<typeof DealWeaponDamageOutcomeSchema>
+  | z.infer<typeof ApplyCustomEffectOutcomeSchema>
+  | z.infer<typeof ModifyAttributeOutcomeSchema>
+  | z.infer<typeof MoveTargetOutcomeSchema>
+  | ApplyEffectOutcomeType // Usando o tipo manual
+  | SummonTokenOutcomeType; // Usando o tipo manual
 
+// --- Schema de União Final ---
+// O schema Zod que valida qualquer um dos outcomes possíveis.
+// O cast `as any` é um artifício necessário para contornar as limitações
+// de inferência de tipo do Zod ao combinar schemas normais e lazy em uma união.
 export const ActionOutcomesSchema: z.ZodType<ActionOutcomeType> =
   z.discriminatedUnion("type", [
-    ...BaseActionOutcomesSchema.options,
+    NoneOutcomeSchema,
+    ModifyTargetHPOutcomeSchema,
+    ApplyConditionOutcomeSchema,
+    DescriptiveOutcomeSchema,
+    CustomMechanicOutcomeSchema,
+    DealWeaponDamageOutcomeSchema,
+    ApplyCustomEffectOutcomeSchema,
     ApplyEffectOutcomeSchema,
     SummonTokenOutcomeSchema,
     ModifyAttributeOutcomeSchema,

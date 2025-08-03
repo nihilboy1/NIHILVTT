@@ -1,16 +1,20 @@
 import { z } from "zod";
+
 import {
-  DurationUnitEnum,
+  RequirementSchema,
+  DurationSchema,
+} from "../../shared/blocks.schema.js";
+import {
+  EffectSchema,
+  EffectType,
+  SpellScalingRuleType,
+} from "../../shared/effect.schema.js";
+import { ActionOutcomeType } from "../../shared/outcome.schema.js";
+import {
   MagicSchoolEnum,
   SourceEnum,
   SpellComponentEnum,
-} from "../../shared/primitives.js";
-import {
-  SpellRequirementsSchema,
-  DurationSchema,
-} from "../../shared/blocks.schema.js";
-import { effectSchema, EffectType } from "../../shared/effect.schema.js";
-import { ActionOutcomeType } from "../../shared/outcome.schema.js";
+} from "../../shared/primitives/world.primitives.js";
 
 // 1. O schema base define a estrutura fundamental de uma magia.
 const baseSpellSchema = z.object({
@@ -21,7 +25,10 @@ const baseSpellSchema = z.object({
   page: z.number(),
   level: z.number().int().min(0).max(9),
   school: MagicSchoolEnum,
-  additionalRules: z.object({id: z.string(), details: z.string()}).array().optional(),
+  additionalRules: z
+    .object({ id: z.string(), details: z.string() })
+    .array()
+    .optional(),
   isRitual: z.boolean().default(false).optional(),
   components: z.object({
     types: z.array(SpellComponentEnum),
@@ -33,12 +40,12 @@ const baseSpellSchema = z.object({
       })
       .optional(),
   }),
-  requirements: SpellRequirementsSchema.optional(),
+  requirements: RequirementSchema.optional(),
   duration: DurationSchema.optional(),
   castingTime: DurationSchema.default({
     unit: "instantaneous",
   }).optional(),
-  effects: z.array(effectSchema),
+  effects: z.array(EffectSchema),
 });
 
 // 2. O schema final e exportado é a versão com o refinamento.
@@ -74,25 +81,27 @@ export const SpellSchema = baseSpellSchema.check((ctx) => {
       effect.type === "activatableCastSpell" &&
       effect.scaling?.type === "characterLevel"
     ) {
-      effect.scaling.rules.forEach((rule: any, index: number) => {
-        if (rule.type === "modifyOutcomeFormula") {
-          if (!definedOutcomeIds.has(rule.outcomeId)) {
-            ctx.issues.push({
-              input: ctx.value,
-              code: "custom",
-              message: `ID de outcome inválido: "${rule.outcomeId}". Não foi encontrado nenhum outcome com este ID na definição da magia.`,
-              path: [
-                "effects",
-                spell.effects.indexOf(effect),
-                "scaling",
-                "rules",
-                index,
-                "outcomeId",
-              ],
-            });
+      effect.scaling.rules.forEach(
+        (rule: SpellScalingRuleType, index: number) => {
+          if (rule.type === "modifyOutcomeFormula") {
+            if (!definedOutcomeIds.has(rule.outcomeId)) {
+              ctx.issues.push({
+                input: ctx.value,
+                code: "custom",
+                message: `ID de outcome inválido: "${rule.outcomeId}". Não foi encontrado nenhum outcome com este ID na definição da magia.`,
+                path: [
+                  "effects",
+                  spell.effects.indexOf(effect),
+                  "scaling",
+                  "rules",
+                  index,
+                  "outcomeId",
+                ],
+              });
+            }
           }
         }
-      });
+      );
     }
   });
 });
