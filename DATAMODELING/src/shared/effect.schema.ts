@@ -1,13 +1,13 @@
 import { z } from "zod";
 import {
   AcSchema,
+  AreaSchema,
   DcSchema,
   DiceRollSchema,
   DurationSchema,
   HPFormulaSchema,
   RangeSchema,
   RequirementSchema,
-  WeaponPropertySchema,
 } from "./blocks.schema.js";
 import { ActionIdEnum } from "../shared/data-based-enums.schema.js";
 
@@ -27,6 +27,7 @@ import {
   ItemPropertyEnum,
   WeaponCategoryEnum,
   WeaponMasteryEnum,
+  WeaponPropertyEnum,
   WeaponTypeEnum,
   WeightUnitEnum,
 } from "./primitives/item.primitives.js";
@@ -43,18 +44,37 @@ import {
  * Define a estrutura universal para todos os gatilhos do sistema.
  * Descreve "quando" um evento ocorre e, opcionalmente, "com qual condição".
  */
-export const TriggerSchema = z.object({
-  on: EventTriggerEnum,
-  with: z
+export const SystemEventsSchema = z.object({
+  on: EventTriggerEnum.array(),
+
+  specific: z
     .object({
       damageType: DamageTypeEnum.array().optional(),
-      fromAttackType: z.array(AttackTypeEnum).optional(),
-
+      attackType: z.array(AttackTypeEnum).optional(),
+      distance: RangeSchema.optional(),
+      outcomeId: z.string().optional(),
+      diceResultCondition: z.enum(["doubles", "triples", "any"]).optional(),
       from: z
         .array(z.enum(["caster", "casterAllies", "target", "any"]))
         .optional(),
+
+      savingThrow: z
+        .object({
+          ability: AbilityScoreEnum,
+          dc: DcSchema,
+          source: z.enum(["caster", "effect", "environment"]).optional(),
+        })
+        .optional(),
     })
     .optional(),
+});
+
+
+const ChainedEffectSchema = z.object({
+  triggers: SystemEventsSchema,
+  area: AreaSchema.optional(),
+  save: DcSchema.optional(),
+  outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
 });
 
 /**
@@ -62,7 +82,8 @@ export const TriggerSchema = z.object({
  * Utiliza o TriggerSchema universal para manter a consistência.
  */
 const BaseEffectSchema = z.object({
-  endConditions: z.array(TriggerSchema).optional(),
+  endConditions: z.array(SystemEventsSchema).optional(),
+  chainedEffects: z.array(ChainedEffectSchema).optional(),
 });
 
 // ============================================================================
@@ -113,7 +134,7 @@ const OnWieldGrantWeaponAttackEffectSchema = BaseEffectSchema.extend({
   type: z.literal("onWield_grantWeaponAttack"),
   weaponCategory: WeaponCategoryEnum,
   weaponType: WeaponTypeEnum,
-  properties: z.array(WeaponPropertySchema),
+  properties: WeaponPropertyEnum.array().optional(),
   mastery: z.array(WeaponMasteryEnum),
   damageFormulas: z
     .object({
@@ -140,6 +161,7 @@ const PassiveGrantAdvantageEffectSchema = BaseEffectSchema.extend({
   ability: AbilityScoreEnum.optional(),
   skill: SkillEnum.optional(),
   condition: z.string().optional(),
+  appliesToActions: ActionIdEnum.array().optional(),
   duration: DurationSchema.optional(),
 }).refine((data) => data.ability || data.skill || data.condition, {
   message: "Deve ter pelo menos ability, skill ou condition",
@@ -148,8 +170,8 @@ const PassiveGrantAdvantageEffectSchema = BaseEffectSchema.extend({
 const PassiveProvidesLightEffectSchema = BaseEffectSchema.extend({
   type: z.literal("passive_providesLight"),
   properties: z.object({
-    bright: z.number().int(),
-    dim: z.number().int(),
+    bright: z.number().int().optional(),
+    dim: z.number().int().optional(),
     duration: DurationSchema.optional(),
   }),
 });
@@ -162,9 +184,11 @@ const PassivePropertyEffectSchema = BaseEffectSchema.extend({
 
 const PassiveGrantBonusEffectSchema = BaseEffectSchema.extend({
   type: z.literal("passive_grantBonus"),
-  on: z.enum(["attackRoll", "damageRoll", "ac", "savingThrow"]),
-  value: z.number().int(),
+  on: z.enum(["attackRoll", "damageRoll", "ac", "savingThrow", "action"]),
+  appliesToActions: ActionIdEnum.array().optional(),
+  value: z.number().int().or(z.literal("proficiency")),
   condition: z.string().optional(),
+  duration: DurationSchema.optional(),
 });
 
 // --- Efeitos de Buff/Debuff e Modificadores ---
@@ -179,15 +203,15 @@ const GrantConditionalBonusEffectSchema = BaseEffectSchema.extend({
 
 export const TriggeredEffectSchema = BaseEffectSchema.extend({
   type: z.literal("triggeredEffect"),
-  triggers: z.array(TriggerSchema),
+  triggers: z.array(SystemEventsSchema),
   save: DcSchema.optional(),
   outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
-  duration: DurationSchema.optional()
+  duration: DurationSchema.optional(),
 });
 
 const TriggeredModifierEffectSchema = BaseEffectSchema.extend({
   type: z.literal("triggeredModifier"),
-  triggers: z.array(TriggerSchema),
+  triggers: z.array(SystemEventsSchema).optional(),
   modifier: z.object({
     operation: z.enum(["add", "subtract"]),
     dice: DiceRollSchema,
@@ -206,7 +230,7 @@ const PreventsHealingEffectSchema = BaseEffectSchema.extend({
 const ImposeDisadvantageEffectSchema = BaseEffectSchema.extend({
   type: z.literal("imposeDisadvantage"),
   on: z.enum(["attackRoll", "abilityCheck", "skillCheck", "savingThrow"]),
-  count: z.number().int().positive().default(1),
+  count: z.number().int().positive().default(1).optional(),
   duration: DurationSchema,
 });
 
@@ -231,6 +255,11 @@ const ModifyActionParameterRuleSchema = z.object({
   newValue: z.any(),
 });
 
+const DescriptiveRuleSchema = z.object({
+  type: z.literal("descriptive"),
+  details: z.string(),
+});
+
 const IncrementActionParameterRuleSchema = z.object({
   type: z.literal("incrementRootParameter"),
   propertyPath: RootParameterPaths,
@@ -247,11 +276,23 @@ export const IncrementOutcomePropertyRuleSchema = z.object({
   increment: z.number().int().default(1),
 });
 
+const IncrementChainedEffectPropertyRuleSchema = z.object({
+  type: z.literal("incrementChainedEffectProperty"),
+  chainedEffectIndex: z.number().int().default(0),
+  outcomeId: z.string().min(1, {
+    message: "É necessário especificar o ID do outcome a ser modificado.",
+  }),
+  propertyPath: OutcomeParameterPaths,
+  increment: z.number().int().default(1),
+});
+
 const SpellScalingRuleSchema = z.discriminatedUnion("type", [
   ModifyOutcomeFormulaRuleSchema,
   ModifyActionParameterRuleSchema,
   IncrementActionParameterRuleSchema,
   IncrementOutcomePropertyRuleSchema,
+  IncrementChainedEffectPropertyRuleSchema,
+  DescriptiveRuleSchema,
 ]);
 
 export type SpellScalingRuleType = z.infer<typeof SpellScalingRuleSchema>;
@@ -296,6 +337,7 @@ export const ApplicableEffectSchema = z.discriminatedUnion("type", [
   ImposeDisadvantageEffectSchema,
   PassiveGrantAdvantageEffectSchema,
   PassiveProvidesLightEffectSchema,
+  PassiveGrantBonusEffectSchema,
   PreventsHealingEffectSchema,
   PreventsReactionEffectSchema,
   TriggeredModifierEffectSchema,

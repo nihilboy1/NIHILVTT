@@ -675,17 +675,6 @@ Representa um resultado que é puramente descritivo, sem mecânica automatizáve
   - `on`: `EffectOutcomeEnum` - Quando este resultado ocorre.
   - `details`: `string` - A descrição textual do resultado.
 
-### `CustomMechanicOutcomeSchema`
-
-Representa um resultado com uma mecânica única que não se encaixa nas outras categorias.
-
-- **Tipo:** `Object`
-  - `id`: `string` (opcional) - Um identificador único para este resultado.
-  - `type`: `literal("customMechanic")` - O tipo de resultado.
-  - `on`: `EffectOutcomeEnum` - Quando este resultado ocorre.
-  - `mechanic`: `string` - O nome da mecânica (ex: "stabilizeCreature", "grantAdvantage").
-  - `details`: `any` (opcional) - Detalhes extras para a mecânica, um objeto onde as chaves são strings e os valores podem ser de qualquer tipo.
-
 ### `ApplyCustomEffectOutcomeSchema`
 
 Representa um resultado que aplica um efeito customizado ou temporário que não é uma condição padrão.
@@ -744,7 +733,6 @@ Uma união discriminada que representa os resultados básicos de uma ação.
   - `ModifyHPOutcomeSchema`
   - `ApplyConditionOutcomeSchema`
   - `DescriptiveOutcomeSchema`
-  - `CustomMechanicOutcomeSchema`
   - `ApplyCustomEffectOutcomeSchema`
 
 ### `ActionOutcomeSchema`
@@ -755,7 +743,6 @@ Uma união discriminada que representa qualquer tipo de resultado de ação.
   - `DamageOutcomeSchema`
   - `ApplyConditionOutcomeSchema`
   - `ApplyCustomEffectOutcomeSchema`
-  - `CustomMechanicOutcomeSchema`
   - `NoneOutcomeSchema`
   - `MoveTargetOutcomeSchema`
   - `ModifyHPOutcomeSchema`

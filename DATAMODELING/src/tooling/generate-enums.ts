@@ -197,6 +197,7 @@ async function main() {
   // Armazenadores para todos os dados extraídos
   const allWeaponIds = new Set<string>();
   const allActionIds = new Set<string>();
+  const allSpellIds = new Set<string>();
   let allDataForPaths: DataObject[] = [];
 
   for (const absolutePath of dataFiles) {
@@ -243,6 +244,24 @@ async function main() {
         );
       }
 
+      // Lógica de extração de ID de Magias
+      if (absolutePath.includes(path.join("data", "spells"))) {
+        for (const key in module) {
+          if (Array.isArray(module[key])) {
+            console.log(
+              chalk.cyan(
+                `  -> Encontrado '${key}' com ${module[key].length} magias para extração de ID.`
+              )
+            );
+            module[key].forEach((item: { id: string }) => {
+              if (item.id) {
+                allSpellIds.add(item.id);
+              }
+            });
+          }
+        }
+      }
+
       // Lógica de extração de dados para Paths (do script generate-paths.ts)
       for (const key in module) {
         const exportedItem = module[key];
@@ -285,6 +304,10 @@ async function main() {
     "ActionIdEnum",
     allActionIds
   );
+  const spellIdEnumString = generateZodEnumFromSet(
+    "SpellIdEnum",
+    allSpellIds
+  );
 
   // --- Geração dos Enums de Caminho ---
   const parameterPaths = extractParameterPaths(allDataForPaths);
@@ -305,6 +328,8 @@ import { z } from 'zod';
 ${weaponIdEnumString}
 
 ${actionIdEnumString}
+
+${spellIdEnumString}
 
 // --- Enums de Caminho de Propriedade ---
 ${parameterEnumString}

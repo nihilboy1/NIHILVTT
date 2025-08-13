@@ -1,27 +1,42 @@
 import { z } from "zod";
 
-import { WeaponIdEnum } from "../shared/data-based-enums.schema.js";
+import { SpellIdEnum, WeaponIdEnum } from "../shared/data-based-enums.schema.js";
 import {
   DistanceUnitEnum,
   DurationUnitEnum,
 } from "./primitives/world.primitives.js";
 import {
   AbilityScoreEnum,
+  AncestryIdEnum,
   ConditionStatusEnum,
   CreatureTypeEnum,
 } from "./primitives/character.primitives.js";
-import { CoverEnum, DamageTypeEnum } from "./primitives/combat.primitives.js";
+import {
+  CoverEnum,
+  DamageTypeEnum,
+  EventTriggerEnum,
+  RollModeEnum,
+} from "./primitives/combat.primitives.js";
 import { WeaponPropertyEnum } from "./primitives/item.primitives.js";
 
 // ============================================================================
 // SEÇÃO 1: Fórmulas e Cálculos
 // ============================================================================
+// Interface para a parte recursiva do nosso tipo
+interface ConditionalHPFormulaType {
+  type: "conditional";
+  conditionals: z.infer<typeof ConditionSchema>[];
+  ifTrue: HPFormulaType;
+  ifFalse?: HPFormulaType;
+}
 
-/**
- * ✅ REATORADO: Usando discriminatedUnion para ser mais explícito.
- * Agora, um DC fixo é `{ type: 'fixed', value: 15 }` e um calculado
- * é `{ type: 'calculated', ... }`, eliminando ambiguidades.
- */
+// O tipo de união final que será usado em todo o sistema
+type HPFormulaType =
+  | z.infer<typeof HealingFormulaSchema>
+  | z.infer<typeof DamageFormulaSchema>
+  | ConditionalHPFormulaType // Usando a interface manual limpa
+  | z.infer<typeof HalfDamageFormulaSchema>;
+
 export const DcSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("fixed"), value: z.number().int() }),
   z.object({
@@ -35,11 +50,23 @@ export const DcSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
-/**
- * ✅ CORRIGIDO: Schema específico para Testes de Resistência.
- * Encapsula a Classe de Dificuldade (DC) e regras adicionais
- * como ignorar cobertura, mantendo o DcSchema genérico e focado.
- */
+export const BaseRollModifierSchema = z.object({
+  type: z.literal("rollModifier"),
+  mode: RollModeEnum,
+});
+
+export const RollModifierSchema = z.lazy(() =>
+  z.discriminatedUnion("type", [
+    BaseRollModifierSchema,
+    z.object({
+      type: z.literal("conditionalRollModifier"),
+      triggers: EventTriggerEnum.array(),
+      ifTrue: BaseRollModifierSchema,
+      ifFalse: BaseRollModifierSchema,
+    }),
+  ])
+);
+
 export const SavingThrowSchema = z.object({
   ability: AbilityScoreEnum,
   dc: DcSchema,
@@ -73,12 +100,67 @@ export const DamageFormulaSchema = z.object({
   damageTypeOptions: z.array(DamageTypeEnum),
 });
 
-export const ConditionalHPFormulaSchema = z.object({
-  type: z.literal("conditional"),
-  condition: z.literal("targetIsWounded"),
-  ifTrue: z.lazy(() => DamageFormulaSchema),
-  ifFalse: z.lazy(() => DamageFormulaSchema),
-});
+export const ConditionSchema = z.discriminatedUnion("type", [
+  // ─── ATRIBUTOS E NÍVEL ──────────────────────────────
+  z.object({
+    type: z.literal("hasAttribute"),
+    attribute: AbilityScoreEnum,
+    value: z.number().int().min(0),
+  }),
+  z.object({
+    type: z.literal("isAncestry"),
+    ancestry: AncestryIdEnum, // evita string solta
+  }),
+  z.object({
+    type: z.literal("hasLevel"),
+    value: z.number().int().min(1),
+  }),
+
+  // ─── ITENS E EQUIPAMENTOS ────────────────────────────
+  z.object({
+    type: z.literal("isAttuned"),
+  }),
+  z.object({
+    type: z.literal("isEquippingItem"),
+    itemIds: WeaponIdEnum.array().nonempty(),
+  }),
+  z.object({
+    type: z.literal("isProficientWithEquippedWeapon"),
+  }),
+
+  // ─── STATUS / CONDIÇÕES ─────────────────────────────
+  z.object({
+    type: z.literal("hasZeroHP"),
+  }),
+  z.object({
+    type: z.literal("targetIsWounded"),
+  }),
+  z.object({
+    type: z.literal("hasStatus"),
+    status: ConditionStatusEnum,
+    is: z.boolean().default(true),
+  }),
+  z.object({
+    type: z.literal("hasBeenAffectedBySpell"),
+    spellId: SpellIdEnum,
+    withinLast: z.object({
+      value: z.number().positive(),
+      unit: z.enum(["hour", "day", "round"]),
+    }),
+  }),
+
+  // ─── TIPO / CATEGORIA DE ALVO ───────────────────────
+  z.object({
+    type: z.literal("isObject"),
+    isFlammable: z.boolean().optional(),
+    isWorn: z.boolean().optional(),
+    isCarried: z.boolean().optional(),
+  }),
+  z.object({
+    type: z.literal("isCreatureType"),
+    creatureTypes: CreatureTypeEnum.array().nonempty(),
+  }),
+]);
 
 const HalfDamageFormulaSchema = z.object({
   type: z.literal("halfDamage"),
@@ -87,11 +169,14 @@ const HalfDamageFormulaSchema = z.object({
     .min(1, "É necessário especificar o ID do outcome de dano original."),
 });
 
-/**
- * ✅ REATORADO: Mudado para discriminatedUnion para melhor performance
- * de validação e clareza de erros.
- */
-export const HPFormulaSchema = z
+export const ConditionalHPFormulaSchema = z.object({
+  type: z.literal("conditional"),
+  conditionals: z.array(z.lazy(() => ConditionSchema)),
+  ifTrue: z.lazy(() => HPFormulaSchema),
+  ifFalse: z.lazy(() => HPFormulaSchema).optional(),
+});
+
+export const HPFormulaSchema: z.ZodType<HPFormulaType> = z
   .discriminatedUnion("type", [
     HealingFormulaSchema,
     DamageFormulaSchema,
@@ -100,6 +185,7 @@ export const HPFormulaSchema = z
   ])
   .refine(
     (data) => {
+      // ✅ CORRIGIDO: A validação agora entende que 'conditional' não tem 'roll' ou 'fixed'
       if (data.type === "conditional" || data.type === "halfDamage")
         return true;
       return data.roll || data.fixed !== undefined;
@@ -131,39 +217,26 @@ export const RangeSchema = z.object({
   unit: DistanceUnitEnum.default("ft"),
 });
 
-/**
- * ✏️ SUGESTÃO: O enum de seleção foi simplificado para ser mais claro.
- * 'choice' significa que o conjurador escolhe os alvos dentro da área.
- * 'all' significa que todos os alvos elegíveis na área são afetados.
- */
 const SelectionModeEnum = z.enum(["choice", "all"]);
 
-/**
- * ✅ REATORADO: O schema de alvo agora é mais explícito sobre sua função.
- * Ele define o que é "mirado" para a conjuração da magia/ação.
- * A área de efeito (o que é realmente afetado) é um conceito separado.
- */
 export const TargetSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("self") }),
-  z.object({
-    type: z.literal("selfArea"),
-    selectionMode: SelectionModeEnum.default("all").optional(),
-  }),
-
+  z.object({ type: z.literal("selfArea") }),
   z.object({
     type: z.literal("creature"),
     quantity: z.number().int().default(1),
-    selectionMode: SelectionModeEnum.default("all").optional(),
+    creatureTypes: z.array(CreatureTypeEnum).optional(),
   }),
   z.object({
     type: z.literal("object"),
     quantity: z.number().int().default(1),
-    selectionMode: SelectionModeEnum.default("all").optional(),
   }),
   z.object({
-    type: z.literal("point"),
-    selectionMode: SelectionModeEnum.default("all").optional(),
-  }), // Usado para originar áreas de efeito
+    type: z.literal("weapon"),
+    quantity: z.number().int().default(1),
+    properties: z.array(DamageTypeEnum).optional(),
+  }),
+  z.object({ type: z.literal("point") }),
   z.object({
     type: z.literal("descriptive"),
     details: z.string(),
@@ -173,50 +246,6 @@ export const TargetSchema = z.discriminatedUnion("type", [
 // ============================================================================
 // SEÇÃO 3: Requisitos e Condições
 // ============================================================================
-
-export const ConditionSchema = z.discriminatedUnion("type", [
-  // Requisitos de Atributo/Nível
-  z.object({
-    type: z.literal("hasAttribute"),
-    attribute: AbilityScoreEnum,
-    value: z.number().int(),
-  }),
-  z.object({ type: z.literal("isAncestry"), ancestry: z.string() }),
-  z.object({ type: z.literal("hasLevel"), value: z.number().int() }),
-  // Requisitos de Item/Equipamento
-  z.object({ type: z.literal("isAttuned") }),
-  z.object({
-    type: z.literal("isEquippingItem"),
-    itemIds: z.array(WeaponIdEnum),
-  }),
-  z.object({ type: z.literal("isProficientWithEquippedWeapon") }),
-  // Requisitos de Estado/Status
-  z.object({ type: z.literal("hasZeroHP") }),
-  z.object({
-    type: z.literal("hasStatus"),
-    status: ConditionStatusEnum,
-    is: z.boolean(),
-  }),
-  z.object({
-    type: z.literal("hasBeenAffectedBySpell"),
-    spellId: z.string(),
-    withinLast: z.object({
-      value: z.number(),
-      unit: z.enum(["hour", "day", "round"]),
-    }),
-  }),
-  // Requisitos de Tipo
-  z.object({
-    type: z.literal("isObject"),
-    isFlammable: z.boolean().optional(),
-    isWorn: z.boolean().optional(),
-    isCarried: z.boolean().optional(),
-  }),
-  z.object({
-    type: z.literal("isCreatureType"),
-    creatureType: CreatureTypeEnum,
-  }),
-]);
 
 export const RequirementSchema = z.object({
   user: z.array(ConditionSchema).optional(),
@@ -229,32 +258,32 @@ export const RequirementSchema = z.object({
 // SEÇÃO 4: Estruturas Geométricas e de Duração
 // ============================================================================
 
-export const WeaponPropertySchema = z.object({
-  property: WeaponPropertyEnum.array(),
-  condition: z.string().optional(),
-});
 
 export const AreaSchema = z.discriminatedUnion("shape", [
   z.object({
     shape: z.literal("sphere"),
     radius: z.number(),
     unit: DistanceUnitEnum.default("ft"),
+    selectionMode: SelectionModeEnum.default("all").optional(),
   }),
   z.object({
     shape: z.literal("cube"),
     size: z.number(),
     unit: DistanceUnitEnum.default("ft"),
+    selectionMode: SelectionModeEnum.default("all").optional(),
   }),
   z.object({
     shape: z.literal("cone"),
     length: z.number(),
     unit: DistanceUnitEnum.default("ft"),
+    selectionMode: SelectionModeEnum.default("all").optional(),
   }),
   z.object({
     shape: z.literal("line"),
     length: z.number(),
     width: z.number(),
     unit: DistanceUnitEnum.default("ft"),
+    selectionMode: SelectionModeEnum.default("all").optional(),
   }),
 ]);
 

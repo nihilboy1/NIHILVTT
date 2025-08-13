@@ -3,6 +3,8 @@
 // Proposta: Mover para 'world.primitives.ts'
 // ============================================================================
 
+export const TemplateType = z.enum(["areaOfEffect", "Token"]);
+
 import z from "zod";
 
 export const DurationUnitEnum = z.enum([
@@ -25,7 +27,10 @@ export const SurfaceTypeEnum = z.enum([
   "grease",
   "water",
   "web",
-  "darkness",
+  "fog",
+  "oil",
+  "ballBearings",
+  "caltrops",
 ]);
 
 export const SourceEnum = z.enum(["LDJ2024"]);

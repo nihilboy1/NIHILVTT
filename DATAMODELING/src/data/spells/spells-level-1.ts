@@ -1,5 +1,4 @@
 import type { Spell } from "../../domain/spell/spell.schema.js";
-
 export const spellsLevel1 = [
   {
     id: "spell-alarme",
@@ -81,7 +80,7 @@ export const spellsLevel1 = [
       target: [
         {
           type: "isCreatureType",
-          creatureType: "beast",
+          creatureTypes: ["beast"],
         },
       ],
     },
@@ -91,10 +90,8 @@ export const spellsLevel1 = [
         actionId: "action-cast-spell",
         endConditions: [
           {
-            on: "onTakingDamage",
-            with: {
-              from: ["caster", "casterAllies"],
-            },
+            on: ["onTakingDamage"],
+            specific: { from: ["caster", "casterAllies"] },
           },
         ],
         parameters: {
@@ -481,7 +478,7 @@ export const spellsLevel1 = [
               on: "any",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: "onAttackRoll" }],
+                triggers: [{ on: ["onAttackRoll"] }],
                 modifier: {
                   operation: "add",
                   dice: { count: 1, faces: 4 },
@@ -501,7 +498,7 @@ export const spellsLevel1 = [
               on: "any",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: "onSavingThrow" }],
+                triggers: [{ on: ["onSavingThrow"] }],
                 modifier: {
                   operation: "add",
                   dice: { count: 1, faces: 4 },
@@ -581,7 +578,7 @@ export const spellsLevel1 = [
               on: "fail",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: "onAttackRoll" }],
+                triggers: [{ on: ["onAttackRoll"] }],
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
@@ -601,7 +598,7 @@ export const spellsLevel1 = [
               on: "fail",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: "onSavingThrow" }],
+                triggers: [{ on: ["onSavingThrow"] }],
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
@@ -657,7 +654,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onTempHpDepleted" }],
+        endConditions: [{ on: ["onTempHpDepleted"] }],
         parameters: {
           activation: {
             type: "bonusAction",
@@ -684,9 +681,9 @@ export const spellsLevel1 = [
                 type: "triggeredEffect",
                 triggers: [
                   {
-                    on: "onTakingDamage",
-                    with: {
-                      fromAttackType: [
+                    on: ["onTakingDamage"],
+                    specific: {
+                      attackType: [
                         "meleeWeaponAttack",
                         "meleeItemAttack",
                         "meleeSpellAttack",
@@ -735,2504 +732,3058 @@ export const spellsLevel1 = [
       },
     ],
   },
-] as const satisfies Spell[];
-
-export const toBoMoldedSpells = [
   {
-    name: "Charm Person",
+    id: "spell-charm-person",
+    name: ["Enfeitiçar Pessoa", "Charm Person"],
+    description:
+      "Um humanoide que você possa ver dentro do alcance deve fazer um teste de resistência de Sabedoria. Ele o faz com vantagem se você ou seus aliados estiverem lutando com ele. Em uma falha, o alvo fica encantado por você até o fim da magia ou até que você ou seus companheiros o danifiquem. Quando a magia termina, o alvo sabe que foi encantado por você.",
     source: "LDJ2024",
     page: 249,
     level: 1,
     school: "enchantment",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
     components: {
-      v: true,
-      s: true,
+      types: ["verbal", "somatic"],
     },
-    duration: [
+    duration: {
+      unit: "hour",
+      value: 1,
+    },
+    requirements: {
+      target: [
+        {
+          type: "isCreatureType",
+          creatureTypes: ["humanoid"],
+        },
+      ],
+    },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [
+          {
+            on: ["onTakingDamage"],
+            specific: {
+              from: ["caster", "casterAllies"],
+            },
+          },
+        ],
+        parameters: {
+          activation: {
+            type: "action",
+          },
+          range: {
+            normal: 30,
+            unit: "ft",
+          },
+          target: {
+            type: "creature",
+            quantity: 1,
+          },
+          save: {
+            ability: "wisdom",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+            rollModifier: {
+              type: "conditionalRollModifier",
+              triggers: ["onUserOrAlliesActsHostile"],
+              ifTrue: { type: "rollModifier", mode: "advantage" },
+              ifFalse: { type: "rollModifier", mode: "normal" },
+            },
+          },
+          outcomes: [
+            {
+              id: "charm-person-charmed",
+              type: "applyCondition",
+              on: "fail",
+              condition: "charmed",
+              duration: {
+                unit: "hour",
+                value: 1,
+              },
+            },
+            {
+              id: "charm-person-awareness-rule",
+              type: "descriptive",
+              on: "spellEnd",
+              details:
+                "Quando a magia termina, o alvo sabe que foi encantado por você.",
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "One Humanoid you can see within range makes a Wisdom saving throw. It does so with {@variantrule Advantage|XPHB} if you or your allies are fighting it. On a failed save, the target has the {@condition Charmed|XPHB} condition until the spell ends or until you or your allies damage it. The {@condition Charmed|XPHB} creature is {@variantrule Friendly [Attitude]|XPHB|Friendly} to you. When the spell ends, the target knows it was {@condition Charmed|XPHB} by you.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can target one additional creature for each spell slot level above 1.",
-        ],
-      },
-    ],
-    conditionInflict: ["charmed"],
-    savingThrow: ["wisdom"],
-    affectsCreatureType: ["humanoid"],
-    miscTags: ["SCT", "SGT"],
-    areaTags: ["ST"],
   },
+] as const satisfies Spell[];
+export const X1 = [
   {
-    name: "Chromatic Orb",
+    id: "spell-chromatic-orb",
+    name: ["Orbe Cromática", "Chromatic Orb"],
+    description:
+      "Você arremessa um orbe de energia. Escolha Ácido, Frio, Fogo, Relâmpago, Veneno ou Trovão e faça um ataque de magia à distância. Em um acerto, o alvo sofre 3d8 de dano do tipo escolhido. Se rolar o mesmo número em dois ou mais d8s, o orbe salta para outro alvo.",
     source: "LDJ2024",
     page: 249,
     level: 1,
     school: "evocation",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 90,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: {
-        text: "a diamond worth 50+ GP",
-        cost: 5000,
-      },
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um diamante no valor de 50+ PO", costGp: 50 },
     },
-    duration: [
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "You hurl an orb of energy at a target within range. Choose Acid, Cold, Fire, Lightning, Poison, or Thunder for the type of orb you create, and then make a ranged spell attack against the target. On a hit, the target takes {@damage 3d8} damage of the chosen type.",
-      "If you roll the same number on two or more of the d8s, the orb leaps to a different target of your choice within 30 feet of the target. Make an attack roll against the new target, and make a new damage roll. The orb can't leap again unless you cast the spell with a level 2+ spell slot.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 3d8|1-9|1d8} for each spell slot level above 1. The orb can leap a maximum number of times equal to the level of the slot expended, and a creature can be targeted only once by each casting of this spell.",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 90, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          attackType: ["rangedSpellAttack"],
+          choices: {
+            on: "any",
+            type: "chooseEffect",
+            options: [
+              {
+                id: "damage-acid",
+                name: "Ácido",
+                outcome: {
+                  id: "chromatic-orb-damage",
+                  type: "modifyTargetHP",
+                  on: "hit",
+                  vitals: ["currentHp"],
+                  formula: {
+                    type: "damage",
+                    roll: { count: 3, faces: 8 },
+                    damageTypeOptions: ["acid"],
+                  },
+                },
+              },
+              {
+                id: "damage-cold",
+                name: "Frio",
+                outcome: {
+                  id: "chromatic-orb-damage",
+                  type: "modifyTargetHP",
+                  on: "hit",
+                  vitals: ["currentHp"],
+                  formula: {
+                    type: "damage",
+                    roll: { count: 3, faces: 8 },
+                    damageTypeOptions: ["cold"],
+                  },
+                },
+              },
+              {
+                id: "damage-fire",
+                name: "Fogo",
+                outcome: {
+                  id: "chromatic-orb-damage",
+                  type: "modifyTargetHP",
+                  on: "hit",
+                  vitals: ["currentHp"],
+                  formula: {
+                    type: "damage",
+                    roll: { count: 3, faces: 8 },
+                    damageTypeOptions: ["fire"],
+                  },
+                },
+              },
+              {
+                id: "damage-lightning",
+                name: "Relâmpago",
+                outcome: {
+                  id: "chromatic-orb-damage",
+                  type: "modifyTargetHP",
+                  on: "hit",
+                  vitals: ["currentHp"],
+                  formula: {
+                    type: "damage",
+                    roll: { count: 3, faces: 8 },
+                    damageTypeOptions: ["lightning"],
+                  },
+                },
+              },
+              {
+                id: "damage-poison",
+                name: "Veneno",
+                outcome: {
+                  id: "chromatic-orb-damage",
+                  type: "modifyTargetHP",
+                  on: "hit",
+                  vitals: ["currentHp"],
+                  formula: {
+                    type: "damage",
+                    roll: { count: 3, faces: 8 },
+                    damageTypeOptions: ["poison"],
+                  },
+                },
+              },
+              {
+                id: "damage-thunder",
+                name: "Trovão",
+                outcome: {
+                  id: "chromatic-orb-damage",
+                  type: "modifyTargetHP",
+                  on: "hit",
+                  vitals: ["currentHp"],
+                  formula: {
+                    type: "damage",
+                    roll: { count: 3, faces: 8 },
+                    damageTypeOptions: ["thunder"],
+                  },
+                },
+              },
+            ],
+          },
+          outcomes: [],
+        },
+        chainedEffects: [
+          {
+            triggers: {
+              on: ["onDiceRollResult"],
+              specific: {
+                outcomeId: "chromatic-orb-damage",
+                diceResultCondition: "doubles",
+              },
+            },
+            outcomes: [
+              {
+                type: "descriptive",
+                on: "any",
+                details:
+                  "O orbe salta para um alvo diferente à sua escolha a até 30 pés. Faça uma nova jogada de ataque e uma nova jogada de dano.",
+              },
+            ],
+          },
         ],
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "chromatic-orb-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    damageInflict: ["acid", "cold", "fire", "lightning", "poison", "thunder"],
-    spellAttack: ["R"],
-    miscTags: ["SGT"],
-    areaTags: ["ST"],
   },
   {
-    name: "Color Spray",
+    id: "spell-color-spray",
+    name: ["Leque Cromático", "Color Spray"],
+    description:
+      "Você lança um leque de luzes coloridas. Cada criatura em um cone de 15 pés deve ter sucesso em um teste de resistência de Constituição ou ficará Cega até o final do seu próximo turno.",
     source: "LDJ2024",
     page: 251,
     level: 1,
     school: "illusion",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "cone",
-      distance: {
-        type: "feet",
-        amount: 15,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a pinch of colorful sand",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma pitada de areia colorida" },
     },
-    duration: [
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        type: "instant",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "selfArea" },
+          area: { shape: "cone", length: 15, unit: "ft" },
+          save: {
+            ability: "constitution",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "color-spray-blinded",
+              type: "applyCondition",
+              on: "fail",
+              condition: "blinded",
+              duration: { unit: "turn", value: 1 },
+            },
+            {
+              id: "color-spray-success",
+              type: "none",
+              on: "success",
+            },
+          ],
+        },
       },
     ],
-    entries: [
-      "You launch a dazzling array of flashing, colorful light. Each creature in a 15-foot {@variantrule Cone [Area of Effect]|XPHB|Cone} originating from you must succeed on a Constitution saving throw or have the {@condition Blinded|XPHB} condition until the end of your next turn.",
-    ],
-    conditionInflict: ["blinded"],
-    savingThrow: ["constitution"],
-    areaTags: ["N"],
   },
   {
-    name: "Command",
+    id: "spell-command",
+    name: ["Comando", "Command"],
+    description:
+      "Você fala um comando de uma palavra para uma criatura. Ela deve passar em um teste de resistência de Sabedoria ou seguir o comando em seu próximo turno.",
     source: "LDJ2024",
     page: 251,
     level: 1,
     school: "enchantment",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "action",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          save: {
+            ability: "wisdom",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "command-fail",
+              type: "descriptive",
+              on: "fail",
+              details:
+                "O alvo segue um comando de uma palavra no próximo turno. Opções: **Aproxime-se**, **Largue**, **Fuja**, **Ajoelhe-se**, **Pare.**",
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "You speak a one-word command to a creature you can see within range. The target must succeed on a Wisdom saving throw or follow the command on its next turn. Choose the command from these options:",
-      {
-        type: "list",
-        style: "list-hang-notitle",
-        items: [
-          {
-            type: "item",
-            name: "Approach",
-            entries: [
-              "The target moves toward you by the shortest and most direct route, ending its turn if it moves within 5 feet of you.",
-            ],
-          },
-          {
-            type: "item",
-            name: "Drop",
-            entries: [
-              "The target drops whatever it is holding and then ends its turn.",
-            ],
-          },
-          {
-            type: "item",
-            name: "Flee",
-            entries: [
-              "The target spends its turn moving away from you by the fastest available means.",
-            ],
-          },
-          {
-            type: "item",
-            name: "Grovel",
-            entries: [
-              "The target has the {@condition Prone|XPHB} condition and then ends its turn.",
-            ],
-          },
-          {
-            type: "item",
-            name: "Halt",
-            entries: [
-              "On its turn, the target doesn't move and takes no action or {@variantrule Bonus Action|XPHB}.",
-            ],
-          },
-        ],
-      },
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can affect one additional creature for each spell slot level above 1.",
-        ],
-      },
-    ],
-    conditionInflict: ["prone"],
-    savingThrow: ["wisdom"],
-    miscTags: ["SCT", "SGT"],
-    areaTags: ["ST"],
   },
   {
-    name: "Compelled Duel",
+    id: "spell-compelled-duel",
+    name: ["Duelo Compelido", "Compelled Duel"],
+    description:
+      "Você tenta compelir uma criatura para um duelo. Em uma falha em um teste de resistência de Sabedoria, o alvo tem Desvantagem em ataques contra outros que não você e não pode se mover voluntariamente para mais de 30 pés de distância de você.",
     source: "LDJ2024",
     page: 252,
     level: 1,
     school: "enchantment",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "minute", value: 1, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [
+          { on: ["onUserLoseConcentration", "onUserActsHostile"] },
+        ],
+        parameters: {
+          activation: { type: "bonusAction" },
+          range: { normal: 30, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          save: {
+            ability: "wisdom",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "compelled-duel-disadvantage",
+              type: "applyEffect",
+              on: "fail",
+              effect: {
+                type: "imposeDisadvantage",
+                on: "attackRoll",
+                duration: { unit: "minute", value: 1, isConcentration: true },
+              },
+            },
+            {
+              id: "compelled-duel-movement-restriction",
+              type: "descriptive",
+              on: "fail",
+              details:
+                "O alvo não pode se mover voluntariamente para um espaço a mais de 30 pés de você.",
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "You try to compel a creature into a duel. One creature that you can see within range makes a Wisdom saving throw. On a failed save, the target has {@variantrule Disadvantage|XPHB} on attack rolls against creatures other than you, and it can't willingly move to a space that is more than 30 feet away from you.",
-      "The spell ends if you make an attack roll against a creature other than the target, if you cast a spell on an enemy other than the target, if an ally of yours damages the target, or if you end your turn more than 30 feet away from the target.",
-    ],
-    savingThrow: ["wisdom"],
-    miscTags: ["SGT"],
-    areaTags: ["ST"],
   },
   {
-    name: "Comprehend Languages",
+    id: "spell-comprehend-languages",
+    name: ["Compreender Idiomas", "Comprehend Languages"],
+    description:
+      "Pela duração, você entende o significado literal de qualquer idioma que ouve ou vê, incluindo texto escrito que você toca.",
     source: "LDJ2024",
     page: 252,
     level: 1,
     school: "divination",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
+    isRitual: true,
     components: {
-      v: true,
-      s: true,
-      m: "a pinch of soot and salt",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma pitada de fuligem e sal" },
     },
-    duration: [
+    duration: { unit: "hour", value: 1 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "self" },
+          outcomes: [
+            {
+              id: "comprehend-languages-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Você entende todos os idiomas falados e escritos. Não decodifica mensagens secretas.",
+            },
+          ],
         },
       },
     ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "For the duration, you understand the literal meaning of any language that you hear or see signed. You also understand any written language that you see, but you must be touching the surface on which the words are written. It takes about 1 minute to read one page of text. This spell doesn't decode symbols or secret messages.",
-    ],
   },
   {
-    name: "Create or Destroy Water",
+    id: "spell-create-or-destroy-water",
+    name: ["Criar ou Destruir Água", "Create or Destroy Water"],
+    description:
+      "Você cria ou destrói água. Crie até 10 galões de água limpa, ou destrua até 10 galões de água ou um nevoeiro em um cubo de 30 pés.",
     source: "LDJ2024",
     page: 258,
     level: 1,
     school: "transmutation",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a mix of water and sand",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma mistura de água e areia" },
     },
-    duration: [
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "You do one of the following:",
-      {
-        type: "list",
-        style: "list-hang-notitle",
-        items: [
-          {
-            type: "item",
-            name: "Create Water",
-            entries: [
-              "You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30-foot {@variantrule Cube [Area of Effect]|XPHB|Cube} within range, extinguishing exposed flames there.",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 30, unit: "ft" },
+          target: { type: "point" },
+          choices: {
+            on: "any",
+            type: "chooseEffect",
+            options: [
+              {
+                id: "create-water",
+                name: "Criar Água",
+                outcome: {
+                  type: "descriptive",
+                  on: "any",
+                  details:
+                    "Cria 10 galões de água em um recipiente ou como chuva em um cubo de 30 pés.",
+                },
+              },
+              {
+                id: "destroy-water",
+                name: "Destruir Água",
+                outcome: {
+                  type: "descriptive",
+                  on: "any",
+                  details:
+                    "Destrói 10 galões de água em um recipiente ou nevoeiro em um cubo de 30 pés.",
+                },
+              },
             ],
           },
-          {
-            type: "item",
-            name: "Destroy Water",
-            entries: [
-              "You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30-foot {@variantrule Cube [Area of Effect]|XPHB|Cube} within range.",
-            ],
-          },
-        ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "descriptive",
+              details: "Aumenta 10 galões ou 5 pés no cubo por nível de slot.",
+            },
+          ],
+        },
       },
     ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You create or destroy 10 additional gallons of water, or the size of the {@variantrule Cube [Area of Effect]|XPHB|Cube} increases by 5 feet, for each spell slot level above 1.",
-        ],
-      },
-    ],
-    miscTags: ["PRM"],
-    areaTags: ["C"],
   },
   {
-    name: "Detect Evil and Good",
+    id: "spell-detect-evil-and-good",
+    name: ["Detectar o Bem e o Mal", "Detect Evil and Good"],
+    description:
+      "Pela duração, você sente a localização de qualquer Aberração, Celestial, Elemental, Feérico, Infernal ou Morto-vivo a até 30 pés de você. A magia é bloqueada por cobertura.",
     source: "LDJ2024",
     page: 261,
     level: 1,
     school: "divination",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "minute", value: 10, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "sphere",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "selfArea" },
+          area: { shape: "sphere", radius: 30, unit: "ft" },
+          outcomes: [
+            {
+              id: "detect-evil-good-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Sente a localização dos tipos de criatura especificados e a presença da magia Santificar.",
+            },
+          ],
         },
-        concentration: true,
       },
-    ],
-    entries: [
-      "For the duration, you sense the location of any Aberration, Celestial, Elemental, Fey, Fiend, or Undead within 30 feet of yourself. You also sense whether the {@spell Hallow|XPHB} spell is active there and, if so, where.",
-      "The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin sheet of lead.",
-    ],
-    affectsCreatureType: [
-      "aberration",
-      "celestial",
-      "elemental",
-      "fey",
-      "fiend",
-      "undead",
     ],
   },
   {
-    name: "Detect Magic",
+    id: "spell-detect-magic",
+    name: ["Detectar Magia", "Detect Magic"],
+    description:
+      "Pela duração, você sente a presença de efeitos mágicos a 30 pés. Com a ação Magia, você pode ver uma aura fraca ao redor de qualquer criatura ou objeto visível que tenha magia e aprender sua escola de magia.",
     source: "LDJ2024",
     page: 262,
     level: 1,
     school: "divination",
-    castingTime: [
+    isRitual: true,
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "minute", value: 10, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "sphere",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "selfArea" },
+          area: { shape: "sphere", radius: 30, unit: "ft" },
+          outcomes: [
+            {
+              id: "detect-magic-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Sente a presença de magia. Uma ação de Magia revela auras e a escola de magia.",
+            },
+          ],
         },
-        concentration: true,
       },
-    ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "For the duration, you sense the presence of magical effects within 30 feet of yourself. If you sense such effects, you can take the {@action Magic|XPHB} action to see a faint aura around any visible creature or object in the area that bears the magic, and if an effect was created by a spell, you learn the spell's {@book school of magic|XPHB|7|Schools of Magic}.",
-      "The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin sheet of lead.",
     ],
   },
   {
-    name: "Detect Poison and Disease",
+    id: "spell-detect-poison-and-disease",
+    name: ["Detectar Veneno e Doença", "Detect Poison and Disease"],
+    description:
+      "Pela duração, você sente a localização de venenos, criaturas venenosas e contágios mágicos a até 30 pés de você.",
     source: "LDJ2024",
     page: 262,
     level: 1,
     school: "divination",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "sphere",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
+    isRitual: true,
     components: {
-      v: true,
-      s: true,
-      m: "a yew leaf",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma folha de teixo" },
     },
-    duration: [
+    duration: { unit: "minute", value: 10, isConcentration: true },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "selfArea" },
+          area: { shape: "sphere", radius: 30, unit: "ft" },
+          outcomes: [
+            {
+              id: "detect-poison-disease-effect",
+              type: "descriptive",
+              on: "any",
+              details: "Sente a localização e o tipo de venenos e doenças.",
+            },
+          ],
         },
-        concentration: true,
       },
-    ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "For the duration, you sense the location of poisons, poisonous or venomous creatures, and magical contagions within 30 feet of yourself. You sense the kind of poison, creature, or contagion in each case.",
-      "The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin sheet of lead.",
     ],
   },
   {
-    name: "Disguise Self",
+    id: "spell-disguise-self",
+    name: ["Disfarçar-se", "Disguise Self"],
+    description:
+      "Você faz a si mesmo, incluindo suas roupas e pertences, parecer diferente. A ilusão falha na inspeção física. Uma criatura pode usar uma ação de Estudo para fazer um teste de Investigação contra a CD da sua magia para perceber o disfarce.",
     source: "LDJ2024",
     page: 262,
     level: 1,
     school: "illusion",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "hour", value: 1 },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "self" },
+          outcomes: [
+            {
+              id: "disguise-self-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Altera a aparência visual. Pode parecer até 1 pé mais alto ou mais baixo. A inspeção física revela a ilusão. Um teste de Investigação (CD da magia) também revela a verdade.",
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "You make yourself—including your clothing, armor, weapons, and other belongings on your person—look different until the spell ends. You can seem 1 foot shorter or taller and can appear heavier or lighter. You must adopt a form that has the same basic arrangement of limbs as you have. Otherwise, the extent of the illusion is up to you.",
-      "The changes wrought by this spell fail to hold up to physical inspection. For example, if you use this spell to add a hat to your outfit, objects pass through the hat, and anyone who touches it would feel nothing.",
-      "To discern that you are disguised, a creature must take the {@action Study|XPHB} action to inspect your appearance and succeed on an Intelligence ({@skill Investigation|XPHB}) check against your spell save DC.",
-    ],
-    abilityCheck: ["intelligence"],
-    miscTags: ["SGT"],
   },
   {
-    name: "Dissonant Whispers",
+    id: "spell-dissonant-whispers",
+    name: ["Sussurros Dissonantes", "Dissonant Whispers"],
+    description:
+      "Uma criatura deve fazer um teste de resistência de Sabedoria. Em uma falha, sofre 3d6 de dano psíquico e deve usar sua reação para se mover o mais longe possível de você. Em um sucesso, sofre metade do dano.",
     source: "LDJ2024",
     page: 264,
     level: 1,
     school: "enchantment",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "action",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          save: {
+            ability: "wisdom",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "dissonant-whispers-damage-fail",
+              type: "modifyTargetHP",
+              on: "fail",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 3, faces: 6 },
+                damageTypeOptions: ["psychic"],
+              },
+            },
+            {
+              id: "dissonant-whispers-move",
+              type: "moveTarget",
+              on: "fail",
+              direction: "away",
+              distance: {
+                value: "max",
+                unit: "ft",
+              },
+              usesReaction: true,
+            },
+            {
+              id: "dissonant-whispers-damage-success",
+              type: "modifyTargetHP",
+              on: "success",
+              vitals: ["currentHp"],
+              formula: {
+                type: "halfDamage",
+                of: "dissonant-whispers-damage-fail",
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "dissonant-whispers-damage-fail",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "One creature of your choice that you can see within range hears a discordant melody in its mind. The target makes a Wisdom saving throw. On a failed save, it takes {@damage 3d6} Psychic damage and must immediately use its {@variantrule Reaction|XPHB}, if available, to move as far away from you as it can, using the safest route. On a successful save, the target takes half as much damage only.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 3d6|1-9|1d6} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["psychic"],
-    savingThrow: ["wisdom"],
-    miscTags: ["SGT"],
-    areaTags: ["ST"],
   },
   {
-    name: "Divine Favor",
+    id: "spell-divine-favor",
+    name: ["Favor Divino", "Divine Favor"],
+    description:
+      "Até o fim da magia, seus ataques com armas causam um dano radiante extra de 1d4 em um acerto.",
     source: "LDJ2024",
     page: 265,
     level: 1,
     school: "transmutation",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "minute", value: 1 },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "bonusAction" },
+          target: { type: "self" },
+          outcomes: [
+            {
+              id: "divine-favor-apply-buff",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "triggeredEffect",
+                triggers: [
+                  {
+                    on: ["onDealingDamage"],
+                    specific: {
+                      attackType: ["meleeWeaponAttack", "rangedWeaponAttack"],
+                    },
+                  },
+                ],
+                outcomes: [
+                  {
+                    id: "divine-favor-extra-damage",
+                    type: "modifyTargetHP",
+                    on: "any",
+                    vitals: ["currentHp"],
+                    formula: {
+                      type: "damage",
+                      roll: { count: 1, faces: 4 },
+                      damageTypeOptions: ["radiant"],
+                    },
+                  },
+                ],
+                duration: { unit: "minute", value: 1 },
+              },
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "Until the spell ends, your attacks with weapons deal an extra {@damage 1d4} Radiant damage on a hit.",
-    ],
-    damageInflict: ["radiant"],
-    miscTags: ["AAD"],
   },
   {
-    name: "Divine Smite",
+    id: "spell-divine-smite",
+    name: ["Golpe Divino", "Divine Smite"],
+    description:
+      "Imediatamente após atingir um alvo com um ataque corpo a corpo, o alvo sofre um dano radiante extra de 2d8. O dano aumenta em 1d8 se o alvo for um Infernal ou Morto-vivo.",
     source: "LDJ2024",
     page: 265,
     level: 1,
     school: "evocation",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-        condition:
-          "which you take immediately after hitting a target with a Melee weapon or an {@variantrule Unarmed Strike|XPHB}",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "bonusAction",
+          },
+          target: {
+            type: "descriptive",
+            details:
+              "Alvo recém-atingido por um ataque corpo a corpo com arma.",
+          },
+          outcomes: [
+            {
+              id: "divine-smite-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 8 },
+                damageTypeOptions: ["radiant"],
+              },
+            },
+            {
+              id: "divine-smite-bonus-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8 },
+                damageTypeOptions: ["radiant"],
+              },
+              requirements: {
+                target: [
+                  {
+                    type: "isCreatureType",
+                    creatureTypes: ["fiend", "undead"],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "divine-smite-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "The target takes an extra {@damage 2d8} Radiant damage from the attack. The damage increases by {@damage 1d8} if the target is a Fiend or an Undead.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 2d8|1-9|1d8} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["radiant"],
-    miscTags: ["AAD"],
   },
   {
-    name: "Ensnaring Strike",
+    id: "spell-ensnaring-strike",
+    name: ["Golpe Aprisionador", "Ensnaring Strike"],
+    description:
+      "Após atingir uma criatura com uma arma, vinhas surgem. Ela deve fazer um teste de resistência de Força (com Vantagem se for Grande ou maior) ou ficará Contida. Enquanto contida, sofre 1d6 de dano perfurante no início de cada um de seus turnos. A criatura pode usar uma ação para tentar se libertar com um teste de Atletismo.",
     source: "LDJ2024",
     page: 268,
     level: 1,
     school: "conjuration",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "minute", value: 1, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-        condition:
-          "which you take immediately after hitting a creature with a weapon",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: {
+            type: "bonusAction",
+          },
+          target: {
+            type: "creature",
+            quantity: 1,
+          },
+          save: {
+            ability: "strength",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "ensnaring-strike-restrained",
+              type: "applyCondition",
+              on: "fail",
+              condition: "restrained",
+              duration: { unit: "minute", value: 1, isConcentration: true },
+            },
+            {
+              id: "ensnaring-strike-dot-effect",
+              type: "applyEffect",
+              on: "fail",
+              effect: {
+                type: "triggeredEffect",
+                triggers: [{ on: ["onTurnStart"] }],
+                outcomes: [
+                  {
+                    id: "ensnaring-strike-damage",
+                    type: "modifyTargetHP",
+                    on: "any",
+                    vitals: ["currentHp"],
+                    formula: {
+                      type: "damage",
+                      roll: { count: 1, faces: 6 },
+                      damageTypeOptions: ["piercing"],
+                    },
+                  },
+                ],
+                duration: { unit: "minute", value: 1, isConcentration: true },
+              },
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+          ],
         },
-        concentration: true,
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "ensnaring-strike-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    entries: [
-      "As you hit the target, grasping vines appear on it, and it makes a Strength saving throw. A Large or larger creature has {@variantrule Advantage|XPHB} on this save. On a failed save, the target has the {@condition Restrained|XPHB} condition until the spell ends. On a successful save, the vines shrivel away, and the spell ends.",
-      "While {@condition Restrained|XPHB}, the target takes {@damage 1d6} Piercing damage at the start of each of its turns. The target or a creature within reach of it can take an action to make a Strength ({@skill Athletics|XPHB}) check against your spell save DC. On a success, the spell ends.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 1d6|1-9|1d6} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["piercing"],
-    conditionInflict: ["restrained"],
-    savingThrow: ["strength"],
-    abilityCheck: ["strength"],
   },
   {
-    name: "Entangle",
+    id: "spell-entangle",
+    name: ["Emaranhar", "Entangle"],
+    description:
+      "Plantas brotam em um quadrado de 20 pés, tornando a área terreno difícil. Cada criatura na área deve passar em um teste de resistência de Força ou ficará Contida. Uma criatura contida pode usar sua ação para fazer um teste de Atletismo para se libertar.",
     source: "LDJ2024",
     page: 268,
     level: 1,
     school: "conjuration",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "minute", value: 1, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 90,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 90, unit: "ft" },
+          area: { shape: "cube", size: 20, unit: "ft" },
+          save: {
+            ability: "strength",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "entangle-difficult-terrain",
+              type: "descriptive",
+              on: "any",
+              details: "A área se torna terreno difícil pela duração.",
+            },
+            {
+              id: "entangle-restrained",
+              type: "applyCondition",
+              on: "fail",
+              condition: "restrained",
+              duration: { unit: "minute", value: 1, isConcentration: true },
+            },
+            {
+              id: "entangle-escape",
+              type: "descriptive",
+              on: "fail",
+              details:
+                "Uma criatura contida pode usar sua ação para fazer um teste de Força (Atletismo) contra a CD da magia para se libertar.",
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "Grasping plants sprout from the ground in a 20-foot square within range. For the duration, these plants turn the ground in the area into {@variantrule Difficult Terrain|XPHB}. They disappear when the spell ends.",
-      "Each creature (other than you) in the area when you cast the spell must succeed on a Strength saving throw or have the {@condition Restrained|XPHB} condition until the spell ends. A {@condition Restrained|XPHB} creature can take an action to make a Strength ({@skill Athletics|XPHB}) check against your spell save DC. On a success, it frees itself from the grasping plants and is no longer {@condition Restrained|XPHB} by them.",
-    ],
-    conditionInflict: ["restrained"],
-    savingThrow: ["strength"],
-    abilityCheck: ["strength"],
-    miscTags: ["DFT"],
-    areaTags: ["Q"],
   },
   {
-    name: "Expeditious Retreat",
+    id: "spell-expeditious-retreat",
+    name: ["Recuo Acelerado", "Expeditious Retreat"],
+    description:
+      "Você realiza a ação Disparada, e até o fim da magia, pode realizar essa ação novamente como uma ação bônus.",
     source: "LDJ2024",
     page: 270,
     level: 1,
     school: "transmutation",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "minute", value: 10, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "bonusAction" },
+          target: { type: "self" },
+          outcomes: [
+            {
+              id: "expeditious-retreat-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Você imediatamente realiza a ação Disparada. Pela duração, você pode usar uma ação bônus para realizar a ação Disparada.",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "You take the {@action Dash|XPHB} action, and until the spell ends, you can take that action again as a {@variantrule Bonus Action|XPHB}.",
-    ],
-    miscTags: ["UBA"],
   },
   {
-    name: "Faerie Fire",
+    id: "spell-faerie-fire",
+    name: ["Fogo das Fadas", "Faerie Fire"],
+    description:
+      "Objetos e criaturas em um cubo de 20 pés são delineados por luz. Criaturas na área devem passar em um teste de resistência de Destreza. Pela duração, alvos afetados emitem penumbra e não podem se beneficiar da condição Invisível. Jogadas de ataque contra eles têm vantagem.",
     source: "LDJ2024",
     page: 271,
     level: 1,
     school: "evocation",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "minute", value: 1, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          area: { shape: "cube", size: 20, unit: "ft" },
+          save: {
+            ability: "dexterity",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "faerie-fire-apply-effect",
+              type: "applyEffect",
+              on: "fail",
+              effect: {
+                type: "passive_providesLight",
+                properties: {
+                  bright: 0,
+                  dim: 10,
+                  duration: { unit: "minute", value: 1, isConcentration: true },
+                },
+              },
+            },
+            {
+              id: "faerie-fire-advantage",
+              type: "descriptive",
+              on: "fail",
+              details:
+                "Jogadas de ataque contra a criatura afetada têm vantagem se o atacante puder vê-la, e a criatura não pode se beneficiar de invisibilidade.",
+            },
+            {
+              type: "none",
+              on: "success",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "Objects in a 20-foot {@variantrule Cube [Area of Effect]|XPHB|Cube} within range are outlined in blue, green, or violet light (your choice). Each creature in the {@variantrule Cube [Area of Effect]|XPHB|Cube} is also outlined if it fails a Dexterity saving throw. For the duration, objects and affected creatures shed {@variantrule Dim Light|XPHB} in a 10-foot radius and can't benefit from the {@condition Invisible|XPHB} condition.",
-      "{@action Attack|XPHB} rolls against an affected creature or object have {@variantrule Advantage|XPHB} if the attacker can see it.",
-    ],
-    savingThrow: ["dexterity"],
-    miscTags: ["ADV", "LGT"],
-    areaTags: ["C"],
   },
   {
-    name: "False Life",
+    id: "spell-false-life",
+    name: ["Vida Falsa", "False Life"],
+    description: "Você ganha 2d4 + 4 pontos de vida temporários.",
     source: "LDJ2024",
     page: 271,
     level: 1,
     school: "necromancy",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a drop of alcohol",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma gota de álcool" },
     },
-    duration: [
+    duration: { unit: "instantaneous" }, // Os PVs duram, mas a magia não. A nova regra diz 'instantâneo'.
+    effects: [
       {
-        type: "instant",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "self" },
+          outcomes: [
+            {
+              id: "false-life-temp-hp",
+              type: "modifyTargetHP",
+              on: "any",
+              vitals: ["tempHp"],
+              formula: {
+                type: "healing",
+                roll: { count: 2, faces: 4, bonus: 4 },
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "false-life-temp-hp",
+              propertyPath: "formula.fixed", // O escalonamento é um valor fixo, não mais dados.
+              increment: 5,
+            },
+          ],
+        },
       },
     ],
-    entries: [
-      "You gain {@dice 2d4 + 4} {@variantrule Temporary Hit Points|XPHB}.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You gain 5 additional {@variantrule Temporary Hit Points|XPHB} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    miscTags: ["THP"],
   },
   {
-    name: "Feather Fall",
+    id: "spell-feather-fall",
+    name: ["Queda Suave", "Feather Fall"],
+    description:
+      "Até cinco criaturas em queda diminuem sua taxa de descida para 60 pés por rodada. Se aterrissarem antes do fim da magia, não sofrem dano de queda.",
     source: "LDJ2024",
     page: 271,
     level: 1,
     school: "transmutation",
-    castingTime: [
-      {
-        number: 1,
-        unit: "reaction",
-        condition:
-          "which you take when you or a creature you can see within 60 feet of you falls",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
     components: {
-      v: true,
-      m: "a small feather or piece of down",
+      types: ["verbal", "material"],
+      material: { description: "uma pena pequena" },
     },
-    duration: [
+    duration: { unit: "minute", value: 1 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "reaction",
+            details: "Quando você ou uma criatura a até 60 pés cai.",
+          },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "creature", quantity: 5 },
+          outcomes: [
+            {
+              id: "feather-fall-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "A taxa de queda do alvo torna-se 60 pés por rodada. O alvo não sofre dano de queda ao aterrissar.",
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "Choose up to five falling creatures within range. A falling creature's rate of descent slows to 60 feet per round until the spell ends. If a creature lands before the spell ends, the creature takes no damage from the fall, and the spell ends for that creature.",
-    ],
-    areaTags: ["MT"],
   },
   {
-    name: "Find Familiar",
+    id: "spell-find-familiar",
+    name: ["Encontrar Familiar", "Find Familiar"],
+    description:
+      "Você ganha o serviço de um familiar, um espírito que assume a forma de um animal. Ele age de forma independente, mas obedece aos seus comandos.",
     source: "LDJ2024",
     page: 272,
     level: 1,
     school: "conjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "hour",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 10,
-      },
-    },
+    isRitual: true,
+    castingTime: { unit: "hour", value: 1 },
     components: {
-      v: true,
-      s: true,
-      m: {
-        text: "burning incense worth 10+ GP, which the spell consumes",
-        cost: 1000,
-        consume: true,
+      types: ["verbal", "somatic", "material"],
+      material: {
+        description: "incenso no valor de 10+ PO, que a magia consome",
+        costGp: 10,
+        isConsumed: true,
       },
     },
-    duration: [
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        type: "instant",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "special" },
+          range: { normal: 10, unit: "ft" },
+          target: { type: "point" },
+          outcomes: [
+            {
+              id: "find-familiar-summon",
+              type: "summonToken",
+              on: "any",
+              tokenId: "token-find-familiar",
+              quantity: 1,
+            },
+            {
+              id: "find-familiar-rules",
+              type: "descriptive",
+              on: "any",
+              details:
+                "O familiar é Celestial, Feérico ou Infernal. Ele obedece a seus comandos, age em sua própria iniciativa e não pode atacar. Você pode se comunicar telepaticamente, ver através de seus olhos e entregar magias de toque através dele.",
+            },
+          ],
+        },
       },
     ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "You gain the service of a familiar, a spirit that takes an animal form you choose: {@creature Bat|XMM}, {@creature Cat|XMM}, {@creature Frog|XMM}, {@creature Hawk|XMM}, {@creature Lizard|XMM}, {@creature Octopus|XMM}, {@creature Owl|XMM}, {@creature Rat|XMM}, {@creature Raven|XMM}, {@creature Spider|XMM}, {@creature Weasel|XMM}, or another Beast that has a {@filter Challenge Rating of 0|bestiary|challenge rating=[&0]|type=beast|miscellaneous=!swarm}. Appearing in an unoccupied space within range, the familiar has the statistics of the chosen form, though it is a Celestial, Fey, or Fiend (your choice) instead of a Beast. Your familiar acts independently of you, but it obeys your commands.",
-      {
-        type: "entries",
-        name: "Telepathic Connection",
-        entries: [
-          "While your familiar is within 100 feet of you, you can communicate with it telepathically. Additionally, as a {@variantrule Bonus Action|XPHB}, you can see through the familiar's eyes and hear what it hears until the start of your next turn, gaining the benefits of any special senses it has.",
-          "Finally, when you cast a spell with a range of touch, your familiar can deliver the touch. Your familiar must be within 100 feet of you, and it must take a {@variantrule Reaction|XPHB} to deliver the touch when you cast the spell.",
-        ],
-      },
-      {
-        type: "entries",
-        name: "Combat",
-        entries: [
-          "The familiar is an ally to you and your allies. It rolls its own {@variantrule Initiative|XPHB} and acts on its own turn. A familiar can't attack, but it can take other actions as normal.",
-        ],
-      },
-      {
-        type: "entries",
-        name: "Disappearance of the Familiar",
-        entries: [
-          "When the familiar drops to 0 {@variantrule Hit Points|XPHB}, it disappears. It reappears after you cast this spell again. As a {@action Magic|XPHB} action, you can temporarily dismiss the familiar to a pocket dimension. Alternatively, you can dismiss it forever. As a {@action Magic|XPHB} action while it is temporarily dismissed, you can cause it to reappear in an unoccupied space within 30 feet of you. Whenever the familiar drops to 0 {@variantrule Hit Points|XPHB} or disappears into the pocket dimension, it leaves behind in its space anything it was wearing or carrying.",
-        ],
-      },
-      {
-        type: "entries",
-        name: "One Familiar Only",
-        entries: [
-          "You can't have more than one familiar at a time. If you cast this spell while you have a familiar, you instead cause it to adopt a new eligible form.",
-        ],
-      },
-    ],
-    miscTags: ["PRM", "SMN"],
   },
   {
-    name: "Fog Cloud",
+    id: "spell-fog-cloud",
+    name: ["Nuvem de Neblina", "Fog Cloud"],
+    description:
+      "Você cria uma esfera de neblina de 20 pés de raio, que é densamente obscurecida. Ela dura pela duração ou até ser dispersada por um vento forte.",
     source: "LDJ2024",
     page: 276,
     level: 1,
     school: "conjuration",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "hour", value: 1, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 120,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
-        },
-        concentration: true,
-      },
-    ],
-    entries: [
-      "You create a 20-foot-radius {@variantrule Sphere [Area of Effect]|XPHB|Sphere} of fog centered on a point within range. The {@variantrule Sphere [Area of Effect]|XPHB|Sphere} is {@variantrule Heavily Obscured|XPHB}. It lasts for the duration or until a strong wind (such as one created by {@spell Gust of Wind|XPHB}) disperses it.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The fog's radius increases by 20 feet for each spell slot level above 1.",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [
+          { on: ["onUserLoseConcentration", "onHitByStrongWind"] },
         ],
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 120, unit: "ft" },
+          target: { type: "point" },
+          area: { shape: "sphere", radius: 20, unit: "ft" },
+          outcomes: [
+            {
+              id: "fog-cloud-create-area",
+              type: "createAreaEffect",
+              on: "any",
+              surfaceType: "fog",
+              status: "heavilyObscured",
+              duration: { unit: "hour", value: 1, isConcentration: true },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "area.radius",
+              increment: 20,
+            },
+          ],
+        },
       },
     ],
-    miscTags: ["OBS"],
-    areaTags: ["S"],
   },
   {
-    name: "Goodberry",
+    id: "spell-goodberry",
+    name: ["Boa Baga", "Goodberry"],
+    description:
+      "Dez bagas aparecem em sua mão. Uma criatura pode usar uma ação bônus para comer uma, recuperando 1 PV. Uma baga fornece nutrição para um dia.",
     source: "LDJ2024",
     page: 280,
     level: 1,
     school: "conjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a sprig of mistletoe",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um ramo de visco" },
     },
-    duration: [
+    // A duração da magia se refere à existência das bagas
+    duration: { unit: "hour", value: 24 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 24,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { unit: "ft", normal: 5 },
+          target: { type: "self" },
+          outcomes: [
+            {
+              id: "goodberry-create-berries",
+              type: "createItem",
+              on: "any",
+              itemId: "item-goodberry",
+              quantity: 10,
+              duration: { unit: "hour", value: 24 },
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "Ten berries appear in your hand and are infused with magic for the duration. A creature can take a {@variantrule Bonus Action|XPHB} to eat one berry. Eating a berry restores 1 {@variantrule Hit Points|XPHB|Hit Point}, and the berry provides enough nourishment to sustain a creature for one day.",
-      "Uneaten berries disappear when the spell ends.",
-    ],
-    miscTags: ["HL"],
   },
   {
-    name: "Grease",
+    id: "spell-grease",
+    name: ["Graxa", "Grease"],
+    description:
+      "Graxa não inflamável cobre o chão em um quadrado de 10 pés, tornando-o terreno difícil. Cada criatura na área deve passar em um teste de resistência de Destreza ou cairá no chão (prone).",
     source: "LDJ2024",
     page: 280,
     level: 1,
     school: "conjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a bit of pork rind or butter",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um pouco de casca de porco ou manteiga" },
     },
-    duration: [
+    duration: { unit: "minute", value: 1 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "point" },
+          area: { shape: "cube", size: 10, unit: "ft" },
+          // Este 'save' é para as criaturas pegas na conjuração inicial
+          save: {
+            ability: "dexterity",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            // Outcome 1: Aplica a condição "prone" na conjuração inicial
+            {
+              id: "grease-initial-prone",
+              type: "applyCondition",
+              on: "fail",
+              condition: "prone",
+            },
+            // Outcome 2: Cria a área de efeito persistente
+            {
+              id: "grease-create-area",
+              type: "createAreaEffect",
+              on: "any", // A área é criada independentemente do save
+              surfaceType: "grease",
+              isDifficultTerrain: true,
+              duration: { unit: "minute", value: 1 },
+              rules: [
+                {
+                  // Esta regra afeta quem entra ou termina o turno na área
+                  trigger: { on: ["onEnterArea", "onEndTurnInArea"] },
+                  save: {
+                    ability: "dexterity",
+                    dc: {
+                      type: "calculated",
+                      base: 8,
+                      attributes: ["proficiency", "spellcasting"],
+                    },
+                  },
+                  outcomes: [
+                    {
+                      id: "grease-ongoing-prone",
+                      type: "applyCondition",
+                      on: "fail",
+                      condition: "prone",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "Nonflammable grease covers the ground in a 10-foot square centered on a point within range and turns it into {@variantrule Difficult Terrain|XPHB} for the duration.",
-      "When the grease appears, each creature standing in its area must succeed on a Dexterity saving throw or have the {@condition Prone|XPHB} condition. A creature that enters the area or ends its turn there must also succeed on that save or fall {@condition Prone|XPHB}.",
-    ],
-    conditionInflict: ["prone"],
-    savingThrow: ["dexterity"],
-    miscTags: ["DFT"],
-    areaTags: ["Q"],
   },
   {
-    name: "Guiding Bolt",
+    id: "spell-guiding-bolt",
+    name: ["Raio Guiador", "Guiding Bolt"],
+    description:
+      "Você lança um raio de luz. Faça um ataque de magia à distância. Em um acerto, causa 4d6 de dano radiante, e a próxima jogada de ataque contra o alvo tem vantagem.",
     source: "LDJ2024",
     page: 282,
     level: 1,
     school: "evocation",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "round", value: 1 },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 120,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "round",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 120, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          attackType: ["rangedSpellAttack"],
+          outcomes: [
+            {
+              id: "guiding-bolt-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 4, faces: 6 },
+                damageTypeOptions: ["radiant"],
+              },
+            },
+            {
+              id: "guiding-bolt-advantage-debuff",
+              type: "descriptive",
+              on: "hit",
+              details:
+                "A próxima jogada de ataque feita contra o alvo antes do final do seu próximo turno tem vantagem.",
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "guiding-bolt-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "You hurl a bolt of light toward a creature within range. Make a ranged spell attack against the target. On a hit, it takes {@damage 4d6} Radiant damage, and the next attack roll made against it before the end of your next turn has {@variantrule Advantage|XPHB}.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 4d6|1-9|1d6} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["radiant"],
-    spellAttack: ["R"],
-    miscTags: ["ADV"],
-    areaTags: ["ST"],
   },
   {
-    name: "Hail of Thorns",
+    id: "spell-hail-of-thorns",
+    name: ["Chuva de Espinhos", "Hail of Thorns"],
+    description:
+      "Após acertar com uma arma de longo alcance, espinhos explodem. O alvo e cada criatura a 5 pés dele devem fazer um teste de resistência de Destreza, sofrendo 1d10 de dano perfurante em falha, ou metade em sucesso.",
     source: "LDJ2024",
     page: 283,
     level: 1,
     school: "conjuration",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-        condition:
-          "which you take immediately after hitting a creature with a Ranged weapon",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "bonusAction",
+            details:
+              "Imediatamente após acertar com uma arma de longo alcance.",
+          },
+          target: {
+            type: "descriptive",
+            details: "O alvo do ataque e criaturas a 5 pés dele.",
+          },
+          area: { shape: "sphere", radius: 5, unit: "ft" },
+          save: {
+            ability: "dexterity",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "hail-of-thorns-damage-fail",
+              type: "modifyTargetHP",
+              on: "fail",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 10 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+            {
+              id: "hail-of-thorns-damage-success",
+              type: "modifyTargetHP",
+              on: "success",
+              vitals: ["currentHp"],
+              formula: {
+                type: "halfDamage",
+                of: "hail-of-thorns-damage-fail",
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "hail-of-thorns-damage-fail",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "As you hit the creature, this spell creates a rain of thorns that sprouts from your Ranged weapon or ammunition. The target of the attack and each creature within 5 feet of it make a Dexterity saving throw, taking {@damage 1d10} Piercing damage on a failed save or half as much damage on a successful one.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 1d10|1-9|1d10} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["piercing"],
-    savingThrow: ["dexterity"],
-    areaTags: ["S"],
   },
   {
-    name: "Hellish Rebuke",
+    id: "spell-hellish-rebuke",
+    name: ["Repreensão Infernal", "Hellish Rebuke"],
+    description:
+      "Como reação a sofrer dano, a criatura que o danificou é cercada por chamas. Ela deve fazer um teste de resistência de Destreza, sofrendo 2d10 de dano de fogo em falha, ou metade em sucesso.",
     source: "LDJ2024",
     page: 284,
     level: 1,
     school: "evocation",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "reaction",
-        condition:
-          "which you take in response to taking damage from a creature that you can see within 60 feet of yourself",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "reaction",
+            details:
+              "Em resposta a sofrer dano de uma criatura visível a até 60 pés.",
+          },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          save: {
+            ability: "dexterity",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "hellish-rebuke-damage-fail",
+              type: "modifyTargetHP",
+              on: "fail",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 10 },
+                damageTypeOptions: ["fire"],
+              },
+            },
+            {
+              id: "hellish-rebuke-damage-success",
+              type: "modifyTargetHP",
+              on: "success",
+              vitals: ["currentHp"],
+              formula: {
+                type: "halfDamage",
+                of: "hellish-rebuke-damage-fail",
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "hellish-rebuke-damage-fail",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "The creature that damaged you is momentarily surrounded by green flames. It makes a Dexterity saving throw, taking {@damage 2d10} Fire damage on a failed save or half as much damage on a successful one.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 2d10|1-9|1d10} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["fire"],
-    savingThrow: ["dexterity"],
-    miscTags: ["SGT"],
-    areaTags: ["ST"],
   },
   {
-    name: "Heroism",
+    id: "spell-heroism",
+    name: ["Heroísmo", "Heroism"],
+    description:
+      "Uma criatura voluntária que você toca fica imune à condição Assustado e ganha PVs temporários iguais ao seu modificador de habilidade de conjuração no início de cada um de seus turnos.",
     source: "LDJ2024",
     page: 285,
     level: 1,
     school: "enchantment",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "minute", value: 1, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          range: { unit: "ft", normal: 5 },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "heroism-apply-effect",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "triggeredEffect",
+                triggers: [{ on: ["onTurnStart"] }],
+                outcomes: [
+                  {
+                    id: "heroism-temp-hp",
+                    type: "modifyTargetHP",
+                    on: "any",
+                    vitals: ["tempHp"],
+                    formula: { type: "healing", addSpellcastingModifier: true },
+                  },
+                ],
+                duration: { unit: "minute", value: 1, isConcentration: true },
+              },
+            },
+            {
+              id: "heroism-frightened-immunity",
+              type: "descriptive",
+              on: "any",
+              details: "O alvo é imune à condição Assustado.",
+            },
+          ],
         },
-        concentration: true,
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    entries: [
-      "A willing creature you touch is imbued with bravery. Until the spell ends, the creature is immune to the {@condition Frightened|XPHB} condition and gains {@variantrule Temporary Hit Points|XPHB} equal to your spellcasting ability modifier at the start of each of its turns.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can target one additional creature for each spell slot level above 1.",
-        ],
-      },
-    ],
-    conditionImmune: ["frightened"],
-    miscTags: ["SCT", "THP"],
-    areaTags: ["ST"],
   },
   {
-    name: "Hex",
+    id: "spell-hex",
+    name: ["Rogar Praga", "Hex"],
+    description:
+      "Você amaldiçoa uma criatura. Até a magia acabar, você causa 1d6 de dano necrótico extra a ela com seus ataques e ela tem desvantagem em testes de uma habilidade à sua escolha. Se o alvo morrer, você pode mover a praga.",
     source: "LDJ2024",
     page: 285,
     level: 1,
     school: "enchantment",
-    castingTime: [
-      {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 90,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "the petrified eye of a newt",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "o olho petrificado de um tritão" },
     },
-    duration: [
+    duration: { unit: "hour", value: 1, isConcentration: true },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "bonusAction" },
+          range: { normal: 90, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "hex-apply-curse",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "triggeredEffect",
+                triggers: [
+                  {
+                    on: ["onDealingDamage"],
+                    specific: { from: ["caster"] },
+                  },
+                ],
+                outcomes: [
+                  {
+                    id: "hex-extra-damage",
+                    type: "modifyTargetHP",
+                    on: "any",
+                    vitals: ["currentHp"],
+                    formula: {
+                      type: "damage",
+                      roll: { count: 1, faces: 6 },
+                      damageTypeOptions: ["necrotic"],
+                    },
+                  },
+                ],
+                duration: { unit: "hour", value: 1, isConcentration: true },
+              },
+            },
+            {
+              id: "hex-disadvantage-rule",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Escolha uma habilidade. O alvo tem desvantagem em testes com essa habilidade.",
+            },
+            {
+              id: "hex-move-rule",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Se o alvo morrer, você pode usar uma ação bônus para mover a praga para uma nova criatura.",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "You place a curse on a creature that you can see within range. Until the spell ends, you deal an extra {@damage 1d6} Necrotic damage to the target whenever you hit it with an attack roll. Also, choose one ability when you cast the spell. The target has {@variantrule Disadvantage|XPHB} on ability checks made with the chosen ability.",
-      "If the target drops to 0 {@variantrule Hit Points|XPHB} before this spell ends, you can take a {@variantrule Bonus Action|XPHB} on a later turn to curse a new creature.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "Your {@status Concentration|XPHB} can last longer with a spell slot of level 2 (up to 4 hours), 3-4 (up to 8 hours), or 5+ (24 hours).",
-        ],
-      },
-    ],
-    damageInflict: ["necrotic"],
-    miscTags: ["AAD", "SGT", "UBA"],
-    areaTags: ["ST"],
   },
   {
-    name: "Hunter's Mark",
+    id: "spell-hunters-mark",
+    name: ["Marca do Caçador", "Hunter's Mark"],
+    description:
+      "Você marca uma criatura como sua presa. Até a magia acabar, você causa 1d6 de dano de força extra a ela com seus ataques e tem vantagem em testes de Percepção e Sobrevivência para encontrá-la.",
     source: "LDJ2024",
     page: 287,
     level: 1,
     school: "divination",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "hour", value: 1, isConcentration: true },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 90,
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "bonusAction" },
+          range: { normal: 90, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "hunters-mark-apply-effect",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "triggeredEffect",
+                triggers: [
+                  {
+                    on: ["onDealingDamage"],
+                    specific: {
+                      attackType: ["meleeWeaponAttack", "rangedWeaponAttack"],
+                    },
+                  },
+                ],
+                outcomes: [
+                  {
+                    id: "hunters-mark-damage",
+                    type: "modifyTargetHP",
+                    on: "any",
+                    vitals: ["currentHp"],
+                    formula: {
+                      type: "damage",
+                      roll: { count: 1, faces: 6 },
+                      damageTypeOptions: ["force"],
+                    },
+                  },
+                ],
+                duration: { unit: "hour", value: 1, isConcentration: true },
+              },
+            },
+            {
+              id: "hunters-mark-advantage-rule",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Você tem vantagem em testes de Sabedoria (Percepção ou Sobrevivência) para encontrar o alvo.",
+            },
+            {
+              id: "hunters-mark-move-rule",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Se o alvo morrer, você pode usar uma ação bônus para mover a marca.",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "You magically mark one creature you can see within range as your quarry. Until the spell ends, you deal an extra {@damage 1d6} Force damage to the target whenever you hit it with an attack roll. You also have {@variantrule Advantage|XPHB} on any Wisdom ({@skill Perception|XPHB} or {@skill Survival|XPHB}) check you make to find it.",
-      "If the target drops to 0 {@variantrule Hit Points|XPHB} before this spell ends, you can take a {@variantrule Bonus Action|XPHB} to move the mark to a new creature you can see within range.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "Your {@status Concentration|XPHB} can last longer with a spell slot of level 3-4 (up to 8 hours) or 5+ (up to 24 hours).",
-        ],
-      },
-    ],
-    damageInflict: ["force"],
-    miscTags: ["AAD", "ADV", "SGT", "UBA"],
-    areaTags: ["ST"],
   },
   {
-    name: "Ice Knife",
+    id: "spell-ice-knife",
+    name: ["Faca de Gelo", "Ice Knife"],
+    description:
+      "Você lança um caco de gelo. Faça um ataque de magia à distância. Em um acerto, causa 1d10 de dano perfurante. Acerte ou erre, o caco explode. O alvo e cada criatura a 5 pés dele devem passar em um teste de Destreza ou sofrerão 2d6 de dano de frio.",
     source: "LDJ2024",
     page: 287,
     level: 1,
     school: "conjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
     components: {
-      s: true,
-      m: "a drop of water or a piece of ice",
+      types: ["somatic", "material"],
+      material: { description: "uma gota de água ou um pedaço de gelo" },
     },
-    duration: [
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "You create a shard of ice and fling it at one creature within range. Make a ranged spell attack against the target. On a hit, the target takes {@damage 1d10} Piercing damage. Hit or miss, the shard then explodes. The target and each creature within 5 feet of it must succeed on a Dexterity saving throw or take {@damage 2d6} Cold damage.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The Cold damage increases by {@scaledamage 2d6|1-9|1d6} for each spell slot level above 1.",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          // --- PARTE 1: O ataque à distância inicial ---
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          attackType: ["rangedSpellAttack"],
+
+          // --- PARTE 2: Os resultados diretos do ataque ---
+          outcomes: [
+            {
+              id: "ice-knife-piercing-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 10 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+        chainedEffects: [
+          {
+            triggers: { on: ["onHit", "onMiss"] },
+            area: { shape: "sphere", radius: 5, unit: "ft" },
+            save: {
+              type: "calculated",
+              attributes: ["dexterity", "spellcasting"],
+
+              base: 8,
+            },
+            outcomes: [
+              {
+                id: "ice-knife-explosion-damage",
+                type: "modifyTargetHP",
+                on: "fail",
+                vitals: ["currentHp"],
+                formula: {
+                  type: "damage",
+                  roll: { count: 2, faces: 6 },
+                  damageTypeOptions: ["cold"],
+                },
+              },
+              {
+                id: "ice-knife-explosion-no-damage",
+                type: "none",
+                on: "success",
+              },
+            ],
+          },
         ],
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementChainedEffectProperty",
+              chainedEffectIndex: 0,
+              outcomeId: "ice-knife-explosion-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    damageInflict: ["cold", "piercing"],
-    spellAttack: ["R"],
-    savingThrow: ["dexterity"],
-    areaTags: ["ST"],
   },
   {
-    name: "Identify",
+    id: "spell-identify",
+    name: ["Identificar", "Identify"],
+    description:
+      "Você toca um objeto. Se for um item mágico, você aprende suas propriedades, como usá-lo, se requer sintonização e suas cargas. Se tocar uma criatura, você aprende quais magias a afetam.",
     source: "LDJ2024",
     page: 287,
     level: 1,
     school: "divination",
-    castingTime: [
-      {
-        number: 1,
-        unit: "minute",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
+    isRitual: true,
+    castingTime: { unit: "minute", value: 1 },
     components: {
-      v: true,
-      s: true,
-      m: {
-        text: "a pearl worth 100+ GP",
-        cost: 10000,
-      },
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma pérola no valor de 100+ PO", costGp: 100 },
     },
-    duration: [
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        type: "instant",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "special" },
+          range: { unit: "ft", normal: 5 },
+          target: {
+            type: "descriptive",
+            details: "Um objeto ou criatura tocado durante toda a conjuração.",
+          },
+          outcomes: [
+            {
+              id: "identify-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Aprende todas as propriedades de um item mágico ou as magias que afetam uma criatura.",
+            },
+          ],
+        },
       },
     ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "You touch an object throughout the spell's casting. If the object is a magic item or some other magical object, you learn its properties and how to use them, whether it requires {@variantrule Attunement|XPHB}, and how many charges it has, if any. You learn whether any ongoing spells are affecting the item and what they are. If the item was created by a spell, you learn that spell's name.",
-      "If you instead touch a creature throughout the casting, you learn which ongoing spells, if any, are currently affecting it.",
-    ],
-    miscTags: ["OBJ"],
-    areaTags: ["ST"],
   },
   {
-    name: "Illusory Script",
+    id: "spell-illusory-script",
+    name: ["Escrita Ilusória", "Illusory Script"],
+    description:
+      "Você escreve em um material e o imbui com uma ilusão. Para você e criaturas designadas, o texto parece normal. Para todos os outros, parece um script desconhecido. A ilusão pode ser desfeita, e Truesight a ignora.",
     source: "LDJ2024",
     page: 288,
     level: 1,
     school: "illusion",
-    castingTime: [
-      {
-        number: 1,
-        unit: "minute",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
+    isRitual: true,
+    castingTime: { unit: "minute", value: 1 },
     components: {
-      s: true,
-      m: {
-        text: "ink worth 10+ GP, which the spell consumes",
-        cost: 1000,
-        consume: true,
+      types: ["somatic", "material"],
+      material: {
+        description: "tinta no valor de 10+ PO, que a magia consome",
+        costGp: 10,
+        isConsumed: true,
       },
     },
-    duration: [
+    duration: { unit: "day", value: 10 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "day",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "special" },
+          range: { unit: "ft", normal: 5 },
+          target: { type: "object", quantity: 1 },
+          outcomes: [
+            {
+              id: "illusory-script-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "O texto escrito só é legível para criaturas que você designa. Para outros, é ininteligível.",
+            },
+          ],
         },
       },
     ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "You write on parchment, paper, or another suitable material and imbue it with an illusion that lasts for the duration. To you and any creatures you designate when you cast the spell, the writing appears normal, seems to be written in your hand, and conveys whatever meaning you intended when you wrote the text. To all others, the writing appears as if it were written in an unknown or magical script that is unintelligible. Alternatively, the illusion can alter the meaning, handwriting, and language of the text, though the language must be one you know.",
-      "If the spell is dispelled, the original script and the illusion both disappear.",
-      "A creature that has {@sense Truesight|XPHB} can read the hidden message.",
-    ],
   },
   {
-    name: "Inflict Wounds",
+    id: "spell-inflict-wounds",
+    name: ["Infligir Ferimentos", "Inflict Wounds"],
+    description:
+      "Uma criatura que você toca deve fazer um teste de resistência de Constituição, sofrendo 2d10 de dano necrótico em uma falha, ou metade em um sucesso.",
     source: "LDJ2024",
     page: 288,
     level: 1,
     school: "necromancy",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "action",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { unit: "ft", normal: 5 },
+          target: { type: "creature", quantity: 1 },
+          save: {
+            ability: "constitution",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "inflict-wounds-damage-fail",
+              type: "modifyTargetHP",
+              on: "fail",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 10 },
+                damageTypeOptions: ["necrotic"],
+              },
+            },
+            {
+              id: "inflict-wounds-damage-success",
+              type: "modifyTargetHP",
+              on: "success",
+              vitals: ["currentHp"],
+              formula: {
+                type: "halfDamage",
+                of: "inflict-wounds-damage-fail",
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "inflict-wounds-damage-fail",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "A creature you touch makes a Constitution saving throw, taking {@damage 2d10} Necrotic damage on a failed save or half as much damage on a successful one.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 2d10|1-9|1d10} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["necrotic"],
-    savingThrow: ["constitution"],
-    areaTags: ["ST"],
   },
   {
-    name: "Jump",
+    id: "spell-jump",
+    name: ["Salto", "Jump"],
+    description:
+      "Você toca uma criatura voluntária. Uma vez em cada um de seus turnos, até o fim da magia, essa criatura pode saltar até 30 pés gastando 10 pés de movimento.",
     source: "LDJ2024",
     page: 290,
     level: 1,
     school: "transmutation",
-    castingTime: [
-      {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a grasshopper's hind leg",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "a perna traseira de um gafanhoto" },
     },
-    duration: [
+    duration: { unit: "minute", value: 1 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "bonusAction" },
+          range: { unit: "ft", normal: 5 },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "jump-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Uma vez por turno, o alvo pode saltar até 30 pés gastando 10 pés de movimento.",
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "You touch a willing creature. Once on each of its turns until the spell ends, that creature can jump up to 30 feet by spending 10 feet of movement.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can target one additional creature for each spell slot level above 1.",
-        ],
-      },
-    ],
-    miscTags: ["SCT"],
-    areaTags: ["ST"],
   },
   {
-    name: "Longstrider",
+    id: "spell-longstrider",
+    name: ["Passos Longos", "Longstrider"],
+    description:
+      "Você toca uma criatura. A velocidade do alvo aumenta em 10 pés até o fim da magia.",
     source: "LDJ2024",
     page: 293,
     level: 1,
     school: "transmutation",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a pinch of dirt",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma pitada de terra" },
     },
-    duration: [
+    duration: { unit: "hour", value: 1 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { unit: "ft", normal: 5 },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "longstrider-buff",
+              type: "modifyAttribute",
+              on: "any",
+              attribute: "speed",
+              operation: "add",
+              value: 10,
+              stacking: "none",
+              duration: { unit: "hour", value: 1 },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "You touch a creature. The target's {@variantrule Speed|XPHB} increases by 10 feet until the spell ends.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can target one additional creature for each spell slot level above 1.",
-        ],
-      },
-    ],
-    miscTags: ["SCT"],
-    areaTags: ["ST"],
   },
   {
-    name: "Mage Armor",
+    id: "spell-mage-armor",
+    name: ["Armadura Arcana", "Mage Armor"],
+    description:
+      "Você toca uma criatura voluntária que não está vestindo armadura. A CA base do alvo torna-se 13 + seu modificador de Destreza. A magia termina se o alvo vestir armadura.",
     source: "LDJ2024",
     page: 293,
     level: 1,
     school: "abjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a piece of cured leather",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um pedaço de couro curado" },
     },
-    duration: [
+    duration: { unit: "hour", value: 8 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 8,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { unit: "ft", normal: 5 },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "mage-armor-set-ac",
+              type: "setAC",
+              on: "any",
+              calculation: {
+                calculation: "formula",
+                base: 13,
+                attribute: "dexterity",
+              },
+              duration: { unit: "hour", value: 8 },
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "You touch a willing creature who isn't wearing armor. Until the spell ends, the target's base AC becomes 13 plus its Dexterity modifier. The spell ends early if the target dons armor.",
-    ],
-    miscTags: ["MAC"],
-    areaTags: ["ST"],
   },
   {
-    name: "Magic Missile",
+    id: "spell-magic-missile",
+    name: ["Míssil Mágico", "Magic Missile"],
+    description:
+      "Você cria três dardos de força mágica. Cada dardo atinge uma criatura de sua escolha, causando 1d4 + 1 de dano de força.",
     source: "LDJ2024",
     page: 295,
     level: 1,
     school: "evocation",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "action",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 120, unit: "ft" },
+          target: { type: "creature", quantity: 3 }, // Representa os 3 dardos
+          outcomes: [
+            {
+              id: "magic-missile-damage",
+              type: "modifyTargetHP",
+              on: "any", // Míssil Mágico não erra
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4, bonus: 1 },
+                damageTypeOptions: ["force"],
+              },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 120,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "You create three glowing darts of magical force. Each dart strikes a creature of your choice that you can see within range. A dart deals {@damage 1d4 + 1} Force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The spell creates one more dart for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["force"],
-    miscTags: ["SGT"],
-    areaTags: ["MT", "ST"],
   },
   {
-    name: "Protection from Evil and Good",
+    id: "spell-protection-from-evil-and-good",
+    name: ["Proteção contra o Bem e o Mal", "Protection from Evil and Good"],
+    description:
+      "Uma criatura voluntária que você toca é protegida contra Aberrações, Celestiais, etc. Tais criaturas têm desvantagem em ataques contra o alvo, e o alvo não pode ser possuído, encantado ou amedrontado por elas.",
     source: "LDJ2024",
     page: 309,
     level: 1,
     school: "abjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "touch",
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: {
-        text: "a flask of Holy Water worth 25+ GP, which the spell consumes",
-        cost: 2500,
-        consume: true,
+      types: ["verbal", "somatic", "material"],
+      material: {
+        description: "água benta ou pó de prata e ferro, que a magia consome",
       },
     },
-    duration: [
+    duration: { unit: "minute", value: 10, isConcentration: true },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          range: { unit: "ft", normal: 5 },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "protection-from-evil-good-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Criaturas especificadas têm desvantagem para atacar o alvo. O alvo não pode ser encantado, amedrontado ou possuído por elas e tem vantagem em novos testes de resistência contra esses efeitos existentes.",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "Until the spell ends, one willing creature you touch is protected against creatures that are Aberrations, Celestials, Elementals, Fey, Fiends, or Undead. The protection grants several benefits. Creatures of those types have {@variantrule Disadvantage|XPHB} on attack rolls against the target. The target also can't be possessed by or gain the {@condition Charmed|XPHB} or {@condition Frightened|XPHB} conditions from them. If the target is already possessed, {@condition Charmed|XPHB}, or {@condition Frightened|XPHB} by such a creature, the target has {@variantrule Advantage|XPHB} on any new saving throw against the relevant effect.",
-    ],
-    affectsCreatureType: [
-      "aberration",
-      "celestial",
-      "elemental",
-      "fey",
-      "fiend",
-      "undead",
-    ],
-    miscTags: ["ADV"],
-    areaTags: ["ST"],
   },
   {
-    name: "Purify Food and Drink",
+    id: "spell-purify-food-and-drink",
+    name: ["Purificar Comida e Bebida", "Purify Food and Drink"],
+    description:
+      "Você remove veneno e podridão de comida e bebida não mágicas em uma esfera de 5 pés de raio.",
     source: "LDJ2024",
     page: 310,
     level: 1,
     school: "transmutation",
-    castingTime: [
+    isRitual: true,
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "action",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 10, unit: "ft" },
+          area: { shape: "sphere", radius: 5, unit: "ft" },
+          outcomes: [
+            {
+              id: "purify-food-drink-effect",
+              type: "descriptive",
+              on: "any",
+              details: "purifica agua ou alimentos",
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 10,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "You remove poison and rot from nonmagical food and drink in a 5-foot-radius {@variantrule Sphere [Area of Effect]|XPHB|Sphere} centered on a point within range.",
-    ],
-    areaTags: ["S"],
   },
   {
-    name: "Ray of Sickness",
+    id: "spell-ray-of-sickness",
+    name: ["Raio da Doença", "Ray of Sickness"],
+    description:
+      "Você dispara um raio esverdeado. Faça um ataque de magia à distância. Em um acerto, o alvo sofre 2d8 de dano de veneno e fica envenenado até o final do seu próximo turno.",
     source: "LDJ2024",
     page: 311,
     level: 1,
     school: "necromancy",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "action",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          attackType: ["rangedSpellAttack"],
+          outcomes: [
+            {
+              id: "ray-of-sickness-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 8 },
+                damageTypeOptions: ["poison"],
+              },
+            },
+            {
+              id: "ray-of-sickness-poison",
+              type: "applyCondition",
+              on: "hit",
+              condition: "poisoned",
+              duration: { unit: "turn", value: 1 },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "ray-of-sickness-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "You shoot a greenish ray at a creature within range. Make a ranged spell attack against the target. On a hit, the target takes {@damage 2d8} Poison damage and has the {@condition Poisoned|XPHB} condition until the end of your next turn.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 2d8|1-9|1d8} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["poison"],
-    conditionInflict: ["poisoned"],
-    spellAttack: ["R"],
-    areaTags: ["ST"],
   },
   {
-    name: "Sanctuary",
+    id: "spell-sanctuary",
+    name: ["Santuário", "Sanctuary"],
+    description:
+      "Você protege uma criatura. Qualquer criatura que a visar com um ataque ou magia prejudicial deve primeiro fazer um teste de Sabedoria. Em uma falha, deve escolher um novo alvo ou perder o ataque/magia. A magia termina se a criatura protegida atacar, conjurar uma magia ou causar dano.",
     source: "LDJ2024",
     page: 313,
     level: 1,
     school: "abjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a shard of glass from a mirror",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um caco de vidro de um espelho" },
     },
-    duration: [
+    duration: { unit: "minute", value: 1 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserActsHostile"] }],
+        parameters: {
+          activation: { type: "bonusAction" },
+          range: { normal: 30, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "sanctuary-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Qualquer criatura que tente atacar ou prejudicar o alvo deve primeiro passar em um teste de resistência de Sabedoria (CD da magia).",
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "You ward a creature within range. Until the spell ends, any creature who targets the warded creature with an attack roll or a damaging spell must succeed on a Wisdom saving throw or either choose a new target or lose the attack or spell. This spell doesn't protect the warded creature from areas of effect.",
-      "The spell ends if the warded creature makes an attack roll, casts a spell, or deals damage.",
-    ],
-    savingThrow: ["wisdom"],
-    areaTags: ["ST"],
   },
   {
-    name: "Searing Smite",
+    id: "spell-searing-smite",
+    name: ["Golpe Fervente", "Searing Smite"],
+    description:
+      "Ao acertar com um ataque corpo a corpo, você causa 1d6 extra de dano de fogo. No início de cada um de seus turnos, o alvo sofre 1d6 de dano de fogo e faz um teste de Constituição para encerrar o efeito.",
     source: "LDJ2024",
     page: 314,
     level: 1,
     school: "evocation",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "minute", value: 1 },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-        condition:
-          "which you take immediately after hitting a target with a Melee weapon or an {@variantrule Unarmed Strike|XPHB}",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "bonusAction",
+            details: "Imediatamente após atingir com um ataque corpo a corpo.",
+          },
+          target: { type: "descriptive", details: "Alvo do ataque." },
+          outcomes: [
+            {
+              id: "searing-smite-initial-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6 },
+                damageTypeOptions: ["fire"],
+              },
+            },
+            {
+              id: "searing-smite-burning-effect",
+              type: "applyCondition",
+              on: "hit",
+              condition: "burning",
+              duration: { unit: "minute", value: 1 },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "searing-smite-initial-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "As you hit the target, it takes an extra {@damage 1d6} Fire damage from the attack. At the start of each of its turns until the spell ends, the target takes {@damage 1d6} Fire damage and then makes a Constitution saving throw. On a failed save, the spell continues. On a successful save, the spell ends.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "All the damage increases by {@scaledamage 1d6|1-9|1d6} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["fire"],
-    savingThrow: ["constitution"],
-    miscTags: ["AAD"],
   },
   {
-    name: "Shield",
+    id: "spell-shield",
+    name: ["Escudo Arcano", "Shield"],
+    description:
+      "Como reação ao ser atingido por um ataque ou alvo do Míssil Mágico, você ganha +5 de CA até o início do seu próximo turno e não sofre dano do Míssil Mágico.",
     source: "LDJ2024",
     page: 316,
     level: 1,
     school: "abjuration",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "round", value: 1 },
+    effects: [
       {
-        number: 1,
-        unit: "reaction",
-        condition:
-          "which you take when you are hit by an attack roll or targeted by the Magic Missile spell",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "round",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "reaction",
+            details:
+              "Quando você é atingido por um ataque ou alvo do Míssil Mágico.",
+          },
+          target: { type: "self" },
+          outcomes: [
+            {
+              id: "shield-ac-bonus",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "passive_grantBonus",
+                on: "ac",
+                value: 5,
+                duration: { unit: "round", value: 1 },
+              },
+            },
+            {
+              id: "shield-magic-missile-immunity",
+              type: "descriptive",
+              on: "any",
+              details: "Você não sofre dano de Míssil Mágico.",
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "An imperceptible barrier of magical force protects you. Until the start of your next turn, you have a +5 bonus to AC, including against the triggering attack, and you take no damage from {@spell Magic Missile|XPHB}.",
-    ],
-    miscTags: ["MAC"],
   },
   {
-    name: "Shield of Faith",
+    id: "spell-shield-of-faith",
+    name: ["Escudo da Fé", "Shield of Faith"],
+    description:
+      "Um campo cintilante envolve uma criatura, concedendo-lhe um bônus de +2 na CA pela duração.",
     source: "LDJ2024",
     page: 316,
     level: 1,
     school: "abjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "bonus",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a prayer scroll",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um pergaminho de oração" },
     },
-    duration: [
+    duration: { unit: "minute", value: 10, isConcentration: true },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "bonusAction" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          outcomes: [
+            {
+              id: "shield-of-faith-apply-buff",
+              type: "applyEffect",
+              on: "any",
+              effect: {
+                type: "passive_grantBonus",
+                on: "ac",
+                value: 2,
+                duration: { unit: "minute", value: 10, isConcentration: true },
+              },
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "A shimmering field surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.",
-    ],
-    miscTags: ["MAC"],
-    areaTags: ["ST"],
   },
   {
-    name: "Silent Image",
+    id: "spell-silent-image",
+    name: ["Imagem Silenciosa", "Silent Image"],
+    description:
+      "Você cria a imagem de um objeto, criatura ou fenômeno de até 15 pés cúbicos. A imagem é puramente visual. A interação física a revela como uma ilusão.",
     source: "LDJ2024",
     page: 317,
     level: 1,
     school: "illusion",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a bit of fleece",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um pouco de lã" },
     },
-    duration: [
+    duration: { unit: "minute", value: 10, isConcentration: true },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "point" },
+          outcomes: [
+            {
+              id: "silent-image-summon",
+              type: "summonToken",
+              on: "any",
+              tokenId: "token-silent-image",
+              quantity: 1,
+              duration: { unit: "minute", value: 10, isConcentration: true },
+            },
+            {
+              id: "silent-image-rules",
+              type: "descriptive",
+              on: "any",
+              details:
+                "A imagem não tem som ou outros efeitos sensoriais. Você pode movê-la com uma ação. Interação física ou um teste de Investigação bem-sucedido revelam a ilusão.",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot {@variantrule Cube [Area of Effect]|XPHB|Cube}. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects.",
-      "As a {@action Magic|XPHB} action, you can cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. For example, if you create an image of a creature and move it, you can alter the image so that it appears to be walking.",
-      "Physical interaction with the image reveals it to be an illusion, since things can pass through it. A creature that takes a {@action Study|XPHB} action to examine the image can determine that it is an illusion with a successful Intelligence ({@skill Investigation|XPHB}) check against your spell save DC. If a creature discerns the illusion for what it is, the creature can see through the image.",
-    ],
-    abilityCheck: ["intelligence"],
   },
   {
-    name: "Sleep",
+    id: "spell-sleep",
+    name: ["Sono", "Sleep"],
+    description:
+      "Criaturas à sua escolha em uma esfera de 5 pés de raio devem passar em um teste de Sabedoria ou ficam Incapacitadas. Se falharem no próximo teste, ficam Inconscientes. Criaturas que não dormem são imunes.",
     source: "LDJ2024",
     page: 317,
     level: 1,
     school: "enchantment",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a pinch of sand or rose petals",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma pitada de areia ou pétalas de rosa" },
     },
-    duration: [
+    duration: { unit: "minute", value: 1, isConcentration: true },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          area: {
+            shape: "sphere",
+            radius: 5,
+            unit: "ft",
+            selectionMode: "choice",
+          },
+          save: {
+            ability: "wisdom",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "sleep-incapacitated",
+              type: "applyCondition",
+              on: "fail",
+              condition: "incapacitated",
+              duration: { unit: "turn", value: 1 },
+            },
+            {
+              id: "sleep-unconscious-rule",
+              type: "descriptive",
+              on: "fail",
+              details:
+                "No final de seu próximo turno, o alvo repete o teste de resistência. Em uma falha, fica Inconsciente pela duração.",
+            },
+          ],
         },
-        concentration: true,
       },
     ],
-    entries: [
-      "Each creature of your choice in a 5-foot-radius {@variantrule Sphere [Area of Effect]|XPHB|Sphere} centered on a point within range must succeed on a Wisdom saving throw or have the {@condition Incapacitated|XPHB} condition until the end of its next turn, at which point it must repeat the save. If the target fails the second save, the target has the {@condition Unconscious|XPHB} condition for the duration. The spell ends on a target if it takes damage or someone within 5 feet of it takes an action to shake it out of the spell's effect.",
-      "Creatures that don't sleep, such as elves, or that have {@variantrule Immunity|XPHB} to the {@condition Exhaustion|XPHB} condition automatically succeed on saves against this spell.",
-    ],
-    conditionInflict: ["incapacitated", "unconscious"],
-    savingThrow: ["wisdom"],
-    areaTags: ["S"],
   },
   {
-    name: "Speak with Animals",
+    id: "spell-speak-with-animals",
+    name: ["Falar com Animais", "Speak with Animals"],
+    description:
+      "Pela duração, você pode compreender e se comunicar verbalmente com Bestas.",
     source: "LDJ2024",
     page: 318,
     level: 1,
     school: "divination",
-    castingTime: [
+    isRitual: true,
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "minute", value: 10 },
+    effects: [
       {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 10,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "self" },
+          outcomes: [
+            {
+              id: "speak-with-animals-effect",
+              type: "descriptive",
+              on: "any",
+              details:
+                "Você pode compreender e comunicar-se verbalmente com criaturas do tipo Besta pela duração.",
+            },
+          ],
         },
       },
     ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "For the duration, you can comprehend and verbally communicate with Beasts, and you can use any of the {@action Influence|XPHB} action's skill options with them.",
-      "Most Beasts have little to say about topics that don't pertain to survival or companionship, but at minimum, a Beast can give you information about nearby locations and monsters, including whatever it has perceived within the past day.",
-    ],
-    affectsCreatureType: ["beast"],
   },
   {
-    name: "Tasha's Hideous Laughter",
+    id: "spell-tashas-hideous-laughter",
+    name: ["Riso Histérico de Tasha", "Tasha's Hideous Laughter"],
+    description:
+      "Uma criatura deve passar em um teste de Sabedoria ou cairá no chão (prone) e ficará Incapacitada, rindo incontrolavelmente. A cada dano sofrido ou no final de seus turnos, pode tentar um novo teste.",
     source: "LDJ2024",
     page: 331,
-    srd52: "Hideous Laughter",
     level: 1,
     school: "enchantment",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a tart and a feather",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma torta e uma pena" },
     },
-    duration: [
+    duration: { unit: "minute", value: 1, isConcentration: true },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 30, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          save: {
+            ability: "wisdom",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "tashas-laughter-prone",
+              type: "applyCondition",
+              on: "fail",
+              condition: "prone",
+              duration: { unit: "minute", value: 1, isConcentration: true },
+            },
+            {
+              id: "tashas-laughter-incapacitated",
+              type: "applyCondition",
+              on: "fail",
+              condition: "incapacitated",
+              duration: { unit: "minute", value: 1, isConcentration: true },
+            },
+            {
+              id: "tashas-laughter-repeat-save",
+              type: "descriptive",
+              on: "fail",
+              details:
+                "No final de cada um de seus turnos e cada vez que sofre dano, o alvo pode fazer outro teste de Sabedoria (com vantagem se for por dano) para encerrar o efeito.",
+            },
+          ],
         },
-        concentration: true,
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementRootParameter",
+              propertyPath: "target.quantity",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    entries: [
-      "One creature of your choice that you can see within range makes a Wisdom saving throw. On a failed save, it has the {@condition Prone|XPHB} and {@condition Incapacitated|XPHB} conditions for the duration. During that time, it laughs uncontrollably if it's capable of laughter, and it can't end the {@condition Prone|XPHB} condition on itself.",
-      "At the end of each of its turns and each time it takes damage, it makes another Wisdom saving throw. The target has {@variantrule Advantage|XPHB} on the save if the save is triggered by damage. On a successful save, the spell ends.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "You can target one additional creature for each spell slot level above 1.",
-        ],
-      },
-    ],
-    conditionInflict: ["incapacitated", "prone"],
-    savingThrow: ["wisdom"],
-    miscTags: ["SCT", "SGT"],
-    areaTags: ["ST"],
   },
   {
-    name: "Tenser's Floating Disk",
+    id: "spell-tensers-floating-disk",
+    name: ["Disco Flutuante de Tenser", "Tenser's Floating Disk"],
+    description:
+      "Cria um disco de força horizontal que pode carregar até 500 libras. Ele te segue, permanecendo a 20 pés de você.",
     source: "LDJ2024",
     page: 332,
-    srd52: "Floating Disk",
     level: 1,
     school: "conjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 30,
-      },
-    },
+    isRitual: true,
     components: {
-      v: true,
-      s: true,
-      m: "a drop of mercury",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "uma gota de mercúrio" },
     },
-    duration: [
+    duration: { unit: "hour", value: 1 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 30, unit: "ft" },
+          target: { type: "point" },
+          outcomes: [
+            {
+              id: "tensers-disk-summon",
+              type: "summonToken",
+              on: "any",
+              tokenId: "token-tensers-floating-disk",
+              quantity: 1,
+              duration: { unit: "hour", value: 1 },
+            },
+            {
+              id: "tensers-disk-rules",
+              type: "descriptive",
+              on: "any",
+              details:
+                "O disco tem 3 pés de diâmetro, flutua a 3 pés do chão e carrega até 500 libras. Ele o segue a uma distância de 20 pés. A magia termina se você se afastar mais de 100 pés.",
+            },
+          ],
         },
       },
     ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "This spell creates a circular, horizontal plane of force, 3 feet in diameter and 1 inch thick, that floats 3 feet above the ground in an unoccupied space of your choice that you can see within range. The disk remains for the duration and can hold up to 500 pounds. If more weight is placed on it, the spell ends, and everything on the disk falls to the ground.",
-      "The disk is immobile while you are within 20 feet of it. If you move more than 20 feet away from it, the disk follows you so that it remains within 20 feet of you. It can move across uneven terrain, up or down stairs, slopes and the like, but it can't cross an elevation change of 10 feet or more. For example, the disk can't move across a 10-foot-deep pit, nor could it leave such a pit if it was created at the bottom.",
-      "If you move more than 100 feet from the disk (typically because it can't move around an obstacle to follow you), the spell ends.",
-    ],
-    miscTags: ["SGT"],
   },
   {
-    name: "Thunderous Smite",
+    id: "spell-thunderous-smite",
+    name: ["Golpe Trovejante", "Thunderous Smite"],
+    description:
+      "Ao acertar com um ataque corpo a corpo, você causa 2d6 extra de dano de trovão. A criatura deve passar em um teste de Força ou será empurrada 10 pés e cairá no chão (prone).",
     source: "LDJ2024",
     page: 334,
     level: 1,
     school: "evocation",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-        condition:
-          "which you take immediately after hitting a target with a Melee weapon or an {@variantrule Unarmed Strike|XPHB}",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "bonusAction",
+            details: "Imediatamente após atingir com um ataque corpo a corpo.",
+          },
+          target: { type: "descriptive", details: "Alvo do ataque." },
+          save: {
+            ability: "strength",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "thunderous-smite-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 6 },
+                damageTypeOptions: ["thunder"],
+              },
+            },
+            {
+              id: "thunderous-smite-push",
+              type: "moveTarget",
+              on: "fail",
+              direction: "away",
+              distance: { value: 10, unit: "ft" },
+            },
+            {
+              id: "thunderous-smite-prone",
+              type: "applyCondition",
+              on: "fail",
+              condition: "prone",
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "thunderous-smite-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "Your strike rings with thunder that is audible within 300 feet of you, and the target takes an extra {@damage 2d6} Thunder damage from the attack. Additionally, if the target is a creature, it must succeed on a Strength saving throw or be pushed 10 feet away from you and have the {@condition Prone|XPHB} condition.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 2d6|1-9|1d6} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["thunder"],
-    conditionInflict: ["prone"],
-    savingThrow: ["strength"],
-    miscTags: ["AAD", "FMV"],
   },
   {
-    name: "Thunderwave",
+    id: "spell-thunderwave",
+    name: ["Onda de Trovão", "Thunderwave"],
+    description:
+      "Uma onda de energia trovejante explode de você. Cada criatura em um cubo de 15 pés deve fazer um teste de Constituição. Em falha, sofre 2d8 de dano de trovão e é empurrada 10 pés. Em sucesso, sofre metade do dano.",
     source: "LDJ2024",
     page: 334,
     level: 1,
     school: "evocation",
-    castingTime: [
+    components: { types: ["verbal", "somatic"] },
+    duration: { unit: "instantaneous" },
+    effects: [
       {
-        number: 1,
-        unit: "action",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          target: { type: "selfArea" },
+          area: { shape: "cube", size: 15, unit: "ft" },
+          save: {
+            ability: "constitution",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "thunderwave-damage-fail",
+              type: "modifyTargetHP",
+              on: "fail",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 8 },
+                damageTypeOptions: ["thunder"],
+              },
+            },
+            {
+              id: "thunderwave-push",
+              type: "moveTarget",
+              on: "fail",
+              direction: "away",
+              distance: { value: 10, unit: "ft" },
+            },
+            {
+              id: "thunderwave-damage-success",
+              type: "modifyTargetHP",
+              on: "success",
+              vitals: ["currentHp"],
+              formula: { type: "halfDamage", of: "thunderwave-damage-fail" },
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "thunderwave-damage-fail",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    range: {
-      type: "cube",
-      distance: {
-        type: "feet",
-        amount: 15,
-      },
-    },
-    components: {
-      v: true,
-      s: true,
-    },
-    duration: [
-      {
-        type: "instant",
-      },
-    ],
-    entries: [
-      "You unleash a wave of thunderous energy. Each creature in a 15-foot {@variantrule Cube [Area of Effect]|XPHB|Cube} originating from you makes a Constitution saving throw. On a failed save, a creature takes {@damage 2d8} Thunder damage and is pushed 10 feet away from you. On a successful save, a creature takes half as much damage only.",
-      "In addition, unsecured objects that are entirely within the {@variantrule Cube [Area of Effect]|XPHB|Cube} are pushed 10 feet away from you, and a thunderous boom is audible within 300 feet.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 2d8|1-9|1d8} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["thunder"],
-    savingThrow: ["constitution"],
-    miscTags: ["FMV", "OBJ"],
-    areaTags: ["C"],
   },
   {
-    name: "Unseen Servant",
+    id: "spell-unseen-servant",
+    name: ["Servo Invisível", "Unseen Servant"],
+    description:
+      "Cria uma força invisível, sem mente e sem forma que realiza tarefas simples ao seu comando.",
     source: "LDJ2024",
     page: 336,
     level: 1,
     school: "conjuration",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
+    isRitual: true,
     components: {
-      v: true,
-      s: true,
-      m: "a bit of string and of wood",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um pedaço de corda e de madeira" },
     },
-    duration: [
+    duration: { unit: "hour", value: 1 },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "hour",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "point" },
+          outcomes: [
+            {
+              id: "unseen-servant-summon",
+              type: "summonToken",
+              on: "any",
+              tokenId: "token-unseen-servant",
+              quantity: 1,
+              duration: { unit: "hour", value: 1 },
+            },
+            {
+              id: "unseen-servant-rules",
+              type: "descriptive",
+              on: "any",
+              details:
+                "O servo é Médio, tem CA 10, 1 PV, Força 2 e não pode atacar. Você pode comandá-lo com uma ação bônus para se mover e interagir com objetos.",
+            },
+          ],
         },
       },
     ],
-    meta: {
-      ritual: true,
-    },
-    entries: [
-      "This spell creates an {@condition Invisible|XPHB}, mindless, shapeless, Medium force that performs simple tasks at your command until the spell ends. The servant springs into existence in an unoccupied space on the ground within range. It has AC 10, 1 {@variantrule Hit Points|XPHB|Hit Point}, and a Strength of 2, and it can't attack. If it drops to 0 {@variantrule Hit Points|XPHB}, the spell ends.",
-      "Once on each of your turns as a {@variantrule Bonus Action|XPHB}, you can mentally command the servant to move up to 15 feet and interact with an object. The servant can perform simple tasks that a human could do, such as fetching things, cleaning, mending, folding clothes, lighting fires, serving food, and pouring drinks. Once you give the command, the servant performs the task to the best of its ability until it completes the task, then waits for your next command.",
-      "If you command the servant to perform a task that would move it more than 60 feet away from you, the spell ends.",
-    ],
-    miscTags: ["SMN", "UBA"],
   },
   {
-    name: "Witch Bolt",
+    id: "spell-witch-bolt",
+    name: ["Raio Enfeitiçante", "Witch Bolt"],
+    description:
+      "Um raio de energia crepitante atinge uma criatura. Faça um ataque de magia à distância. Em um acerto, causa 2d12 de dano de relâmpago. Em turnos subsequentes, você pode usar uma ação bônus para causar 1d12 de dano de relâmpago automaticamente.",
     source: "LDJ2024",
     page: 343,
     level: 1,
     school: "evocation",
-    castingTime: [
-      {
-        number: 1,
-        unit: "action",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "feet",
-        amount: 60,
-      },
-    },
     components: {
-      v: true,
-      s: true,
-      m: "a twig struck by lightning",
+      types: ["verbal", "somatic", "material"],
+      material: { description: "um galho atingido por um raio" },
     },
-    duration: [
+    duration: { unit: "minute", value: 1, isConcentration: true },
+    effects: [
       {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 60, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
+          attackType: ["rangedSpellAttack"],
+          outcomes: [
+            {
+              id: "witch-bolt-initial-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 12 },
+                damageTypeOptions: ["lightning"],
+              },
+            },
+            {
+              id: "witch-bolt-grant-action",
+              type: "applyEffect",
+              on: "hit",
+              effect: {
+                type: "activatableAction",
+                actionId: "action-witch-bolt-channel",
+                duration: { unit: "minute", value: 1, isConcentration: true },
+                parameters: {
+                  activation: { type: "bonusAction" },
+                  outcomes: [
+                    {
+                      id: "witch-bolt-recurring-damage",
+                      type: "modifyTargetHP",
+                      on: "any",
+                      vitals: ["currentHp"],
+                      formula: {
+                        type: "damage",
+                        roll: { count: 1, faces: 12 },
+                        damageTypeOptions: ["lightning"],
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
         },
-        concentration: true,
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "witch-bolt-initial-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
+        },
       },
     ],
-    entries: [
-      "A beam of crackling energy lances toward a creature within range, forming a sustained arc of lightning between you and the target. Make a ranged spell attack against it. On a hit, the target takes {@damage 2d12} Lightning damage.",
-      "On each of your subsequent turns, you can take a {@variantrule Bonus Action|XPHB} to deal {@damage 1d12} Lightning damage to the target automatically, even if the first attack missed.",
-      "The spell ends if the target is ever outside the spell's range or if it has Total {@variantrule Cover|XPHB} from you.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The initial damage increases by {@scaledamage 2d12|1-9|1d12} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["lightning"],
-    spellAttack: ["R"],
-    miscTags: ["UBA"],
-    areaTags: ["ST"],
   },
   {
-    name: "Wrathful Smite",
+    id: "spell-wrathful-smite",
+    name: ["Golpe Colérico", "Wrathful Smite"],
+    description:
+      "Ao acertar com um ataque corpo a corpo, causa 1d6 extra de dano necrótico e o alvo deve passar em um teste de Sabedoria ou ficará Assustado. No final de cada um de seus turnos, pode repetir o teste para encerrar o efeito.",
     source: "LDJ2024",
     page: 343,
     level: 1,
     school: "necromancy",
-    castingTime: [
+    components: { types: ["verbal"] },
+    duration: { unit: "minute", value: 1 },
+    effects: [
       {
-        number: 1,
-        unit: "bonus",
-        condition:
-          "which you take immediately after hitting a creature with a Melee weapon or an {@variantrule Unarmed Strike|XPHB}",
-      },
-    ],
-    range: {
-      type: "point",
-      distance: {
-        type: "self",
-      },
-    },
-    components: {
-      v: true,
-    },
-    duration: [
-      {
-        type: "timed",
-        duration: {
-          type: "minute",
-          amount: 1,
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        parameters: {
+          activation: {
+            type: "bonusAction",
+            details: "Imediatamente após atingir com um ataque corpo a corpo.",
+          },
+          target: { type: "descriptive", details: "Alvo do ataque." },
+          save: {
+            ability: "wisdom",
+            dc: {
+              type: "calculated",
+              base: 8,
+              attributes: ["proficiency", "spellcasting"],
+            },
+          },
+          outcomes: [
+            {
+              id: "wrathful-smite-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6 },
+                damageTypeOptions: ["necrotic"],
+              },
+            },
+            {
+              id: "wrathful-smite-frightened",
+              type: "applyCondition",
+              on: "fail",
+              condition: "frightened",
+              duration: { unit: "minute", value: 1 },
+            },
+            {
+              id: "wrathful-smite-repeat-save",
+              type: "descriptive",
+              on: "fail",
+              details:
+                "No final de cada um de seus turnos, o alvo repete o teste de resistência para encerrar o efeito.",
+            },
+          ],
+        },
+        scaling: {
+          type: "spellSlot",
+          rules: [
+            {
+              type: "incrementOutcomeProperty",
+              outcomeId: "wrathful-smite-damage",
+              propertyPath: "formula.roll.count",
+              increment: 1,
+            },
+          ],
         },
       },
     ],
-    entries: [
-      "The target takes an extra {@damage 1d6} Necrotic damage from the attack, and it must succeed on a Wisdom saving throw or have the {@condition Frightened|XPHB} condition until the spell ends. At the end of each of its turns, the {@condition Frightened|XPHB} target repeats the save, ending the spell on itself on a success.",
-    ],
-    entriesHigherLevel: [
-      {
-        type: "entries",
-        name: "Using a Higher-Level Spell Slot",
-        entries: [
-          "The damage increases by {@scaledamage 1d6|1-9|1d6} for each spell slot level above 1.",
-        ],
-      },
-    ],
-    damageInflict: ["necrotic"],
-    conditionInflict: ["frightened"],
-    savingThrow: ["wisdom"],
-    miscTags: ["AAD"],
   },
-];
+] as const satisfies Spell[];

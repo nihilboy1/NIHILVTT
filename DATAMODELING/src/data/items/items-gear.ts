@@ -34,7 +34,7 @@ export const itemsGear: Item[] = [
         },
       },
     ],
-  },
+  }, // ok
   {
     id: "item-fogo-alquimico",
     name: ["Fogo Alquímico", "Alchemist's Fire"],
@@ -51,18 +51,27 @@ export const itemsGear: Item[] = [
         type: "activatableAction",
         actionId: "action-throw-item",
         parameters: {
+          attackType: ["rangedItemAttack"],
           range: { normal: 20, unit: "ft" },
           save: { ability: "dexterity", dc: { type: "fixed", value: 10 } },
           outcomes: [
             {
+              type: "damageOverTime",
               on: "fail",
-              type: "modifyTargetHP",
-              vitals: ["currentHp"],
-              formula: {
-                type: "damage",
-                roll: { count: 1, faces: 4 },
-                damageTypeOptions: ["fire"],
+              trigger: { on: ["onTurnStart"] },
+              damage: {
+                formula: {
+                  type: "damage",
+                  damageTypeOptions: ["fire"],
+                  roll: { count: 1, faces: 4 },
+                },
               },
+              save: {
+                ability: "dexterity",
+                dc: { type: "fixed", value: 10 },
+                endsOnSuccess: true,
+              },
+              duration: { unit: "indefinite" },
             },
           ],
         },
@@ -79,24 +88,25 @@ export const itemsGear: Item[] = [
     weight: { value: 0, unit: "lb" },
     price: { quantity: 50, unit: "gold" },
     description:
-      "Como uma ação, você pode beber este frasco para ganhar vantagem em testes de resistência contra veneno por 1 hora.",
+      "Como uma Ação Bônus, você pode beber um frasco de Antitoxina para ganhar Vantagem em testes de resistência para evitar ou encerrar a condição Envenenado por 1 hora.",
     effects: [
       {
         type: "activatableAction",
         actionId: "action-consume-item",
         parameters: {
           activation: {
-            type: "action",
+            type: "bonusAction",
           },
           outcomes: [
             {
-              on: "success",
-              type: "customMechanic",
-              mechanic: "grantAdvantage",
-              details: {
-                on: "savingThrow",
-                against: ["poison"],
-                duration: { value: 1, unit: "hour" },
+              on: "any",
+              type: "grantAdvantageDisadvantage",
+              target: { type: "self" },
+              duration: { unit: "hour", value: 1 },
+              mode: "advantage",
+              targetRoll: "savingThrow",
+              appliesTo: {
+                status: ["poisoned"],
               },
             },
           ],
@@ -135,16 +145,37 @@ export const itemsGear: Item[] = [
     weight: { value: 2, unit: "lb" },
     price: { quantity: 1, unit: "gold" },
     description:
-      "Como uma ação, você pode espalhar estas esferas para cobrir uma área de 10 pés quadrados. Uma criatura que se mova pela área deve ser bem-sucedida em um teste de resistência de Destreza (CD 10) ou ficará caída.",
+      "Como uma ação, você pode espalhar estas esferas para cobrir uma área de 10 pés quadrados. Uma criatura que se mova pela área deve ser bem-sucedida em um teste de resistência de Destreza (CD 10) ou ficará caída. A área é considerada terreno difícil.",
     effects: [
       {
         type: "activatableAction",
         actionId: "action-use-gear-area",
         parameters: {
+          range: { normal: 5, unit: "ft" },
           area: { shape: "cube", size: 10, unit: "ft" },
-          save: { ability: "dexterity", dc: { type: "fixed", value: 10 } },
           outcomes: [
-            { on: "fail", type: "applyCondition", condition: "prone" },
+            {
+              on: "any",
+              type: "createAreaEffect",
+              surfaceType: "ballBearings",
+              isDifficultTerrain: true,
+              duration: { unit: "indefinite" },
+
+              rules: [
+                {
+                  trigger: {
+                    on: ["onEnterArea", "onMovesInArea"],
+                  },
+                  save: {
+                    ability: "dexterity",
+                    dc: { type: "fixed", value: 10 },
+                  },
+                  outcomes: [
+                    { on: "fail", type: "applyCondition", condition: "prone" },
+                  ],
+                },
+              ],
+            },
           ],
         },
       },
@@ -157,10 +188,16 @@ export const itemsGear: Item[] = [
     page: 227,
     type: "gear",
     rarity: "common",
-    weight: { value: 0, unit: "lb" },
-    price: { quantity: 100, unit: "gold" },
+    weight: {
+      value: 0,
+      unit: "lb",
+    },
+    price: {
+      quantity: 100,
+      unit: "gold",
+    },
     description:
-      "Você pode usar uma ação para aplicar este veneno em uma arma. Uma criatura atingida deve fazer um teste de resistência de Constituição (CD 10) ou sofrerá 1d4 de dano de veneno.",
+      "Você pode usar uma ação para aplicar este veneno em uma arma cortante ou perfurante, ou em até três peças de munição. A arma ou munição permanece venenosa por 1 minuto ou até acertar um ataque. Uma criatura atingida por essa arma deve fazer um teste de resistência de Constituição (CD 10) ou sofrerá 1d4 de dano de veneno.",
     effects: [
       {
         type: "activatableAction",
@@ -170,19 +207,43 @@ export const itemsGear: Item[] = [
             type: "action",
           },
           target: {
-            type: "descriptive",
-            details: "one weapon or 3 pieces of ammunition",
+            type: "weapon",
+            quantity: 1,
+            properties: ["slashing", "piercing"],
           },
-          save: { ability: "constitution", dc: { type: "fixed", value: 10 } },
           outcomes: [
             {
-              on: "fail",
-              type: "modifyTargetHP",
-              vitals: ["currentHp"],
-              formula: {
-                type: "damage",
-                roll: { count: 1, faces: 4 },
-                damageTypeOptions: ["poison"],
+              on: "any",
+              type: "modifyWeaponProperties",
+              duration: {
+                unit: "minute",
+                value: 1,
+              },
+              charges: 1,
+              addedEffect: {
+                trigger: "onHit",
+                save: {
+                  ability: "constitution",
+                  dc: {
+                    type: "fixed",
+                    value: 10,
+                  },
+                },
+                outcomes: [
+                  {
+                    on: "fail",
+                    type: "modifyTargetHP",
+                    vitals: ["currentHp"],
+                    formula: {
+                      type: "damage",
+                      damageTypeOptions: ["poison"],
+                      roll: {
+                        count: 1,
+                        faces: 4,
+                      },
+                    },
+                  },
+                ],
               },
             },
           ],
@@ -191,43 +252,87 @@ export const itemsGear: Item[] = [
     ],
   },
   {
-    id: "item-abrolhos",
-    name: ["Abrolhos", "Caltrops"],
+    id: "item-estrepes",
+    name: ["Estrepes", "Caltrops"],
     source: "LDJ2024",
     page: 224,
     type: "gear",
     rarity: "common",
-    weight: { value: 2, unit: "lb" },
-    price: { quantity: 1, unit: "gold" },
+    weight: {
+      value: 2,
+      unit: "lb",
+    },
+    price: {
+      quantity: 1,
+      unit: "gold",
+    },
     description:
-      "Como uma ação, você pode espalhar abrolhos para cobrir uma área de 5 pés quadrados. Uma criatura que entrar na área deve ter sucesso em um teste de Destreza (CD 15) ou para de se mover e sofre 1 de dano perfurante. Até recuperar 1 PV, seu deslocamento é reduzido em 10 pés.",
+      "Como uma ação, você pode espalhar um saco de estrepes para cobrir uma área de 5 pés quadrados. Qualquer criatura que entrar na área deve ter sucesso em um teste de resistência de Destreza (CD 15) ou para de se mover e sofre 1 de dano perfurante. Até que a criatura recupere pelo menos 1 ponto de vida, seu deslocamento é reduzido em 10 pés. Uma criatura que se mova pela área com metade do seu deslocamento não precisa fazer o teste.",
     effects: [
       {
         type: "activatableAction",
         actionId: "action-use-gear-area",
         parameters: {
-          area: { shape: "cube", size: 5, unit: "ft" },
-          save: {
-            ability: "dexterity",
-            dc: { type: "calculated", attributes: ["dexterity"], base: 15 },
+          area: {
+            shape: "cube",
+            size: 5,
+            unit: "ft",
           },
+          range: { normal: 5, unit: "ft" },
           outcomes: [
             {
-              on: "fail",
-              type: "modifyTargetHP",
-              vitals: ["currentHp"],
-              formula: {
-                type: "damage",
-                fixed: 1,
-                damageTypeOptions: ["piercing"],
+              on: "any",
+              type: "createAreaEffect",
+              surfaceType: "caltrops",
+              isDifficultTerrain: true,
+              duration: {
+                unit: "indefinite",
               },
-            },
+              rules: [
+                {
+                  trigger: {
+                    on: ["onEnterArea"],
+                  },
+                  save: {
+                    ability: "dexterity",
+                    dc: {
+                      type: "fixed",
+                      value: 15,
+                    },
+                  },
+                  outcomes: [
+                    {
+                      on: "fail",
+                      type: "modifyTargetHP",
 
-            {
-              on: "fail",
-              type: "applyCustomEffect",
-              effect: "movementReduced",
-              value: 10,
+                      vitals: ["currentHp"],
+                      formula: {
+                        type: "damage",
+                        fixed: 1,
+                        damageTypeOptions: ["piercing"],
+                      },
+                    },
+                    {
+                      on: "fail",
+                      type: "modifyAttribute",
+                      attribute: "speed",
+                      operation: "subtract",
+                      value: "all",
+                      stacking: "none",
+                      duration: {
+                        unit: "turn",
+                        value: 1,
+                      },
+                      endConditions: [{ on: ["onHealed"] }],
+                    },
+                    {
+                      on: "fail",
+                      type: "applyCondition",
+                      condition: "movementStopped",
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
@@ -271,7 +376,13 @@ export const itemsGear: Item[] = [
     price: { quantity: 5, unit: "gold" },
     description:
       "Uma corrente de 10 pés de comprimento. Pode ser arrebentada com um teste de Força (CD 20).",
-    effects: [],
+    effects: [
+      {
+        type: "passive_property",
+        property: "burstDC",
+        value: 20,
+      },
+    ],
   },
   {
     id: "item-pe-de-cabra",
@@ -289,7 +400,7 @@ export const itemsGear: Item[] = [
         type: "passive_grantAdvantage",
         on: "abilityCheck",
         ability: "strength",
-        condition: "where leverage can be applied",
+        appliesToActions: ["action-force-open"],
       },
     ],
   },
@@ -300,26 +411,48 @@ export const itemsGear: Item[] = [
     page: 225,
     type: "gear",
     rarity: "common",
-    weight: { value: 3, unit: "lb" },
-    price: { quantity: 5, unit: "gold" },
+    weight: {
+      value: 3,
+      unit: "lb",
+    },
+    price: {
+      quantity: 5,
+      unit: "gold",
+    },
     description:
-      "Este kit tem 10 usos. Como uma ação, você pode gastar um uso para estabilizar uma criatura com 0 PV, sem precisar de um teste de Medicina.",
+      "Este kit tem 10 usos. Como uma ação, você pode gastar um uso para estabilizar uma criatura com 0 Pontos de Vida, fazendo-a retornar a 1 Ponto de Vida.",
     effects: [
       {
         type: "activatableAction",
         actionId: "action-use-kit-charge",
         parameters: {
-          charges: { max: 10 },
+          charges: {
+            max: 10,
+          },
           activation: {
             type: "action",
-            extraCost: { amount: 1, source: "item", resourceId: "itemCharge" },
+            extraCost: {
+              amount: 1,
+              source: "item",
+              resourceId: "itemCharge",
+            },
           },
-
+          target: {
+            type: "creature",
+            quantity: 1,
+          },
+          requirements: {
+            target: [{ type: "hasZeroHP" }],
+          },
           outcomes: [
             {
-              on: "success",
-              type: "customMechanic",
-              mechanic: "stabilizeCreature",
+              on: "any",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "healing",
+                fixed: 1,
+              },
             },
           ],
         },
@@ -342,18 +475,30 @@ export const itemsGear: Item[] = [
         type: "activatableAction",
         actionId: "action-throw-item",
         parameters: {
+          attackType: ["rangedItemAttack"],
           range: { normal: 20, unit: "ft" },
-          target: { type: "descriptive", details: "fiend or undead" },
+          target: {
+            type: "creature",
+            quantity: 1,
+          },
           outcomes: [
             {
               on: "hit",
               type: "modifyTargetHP",
               vitals: ["currentHp"],
-
               formula: {
-                type: "damage",
-                roll: { count: 2, faces: 6 },
-                damageTypeOptions: ["radiant"],
+                type: "conditional",
+                conditionals: [
+                  {
+                    creatureTypes: ["fiend", "undead"],
+                    type: "isCreatureType",
+                  },
+                ],
+                ifTrue: {
+                  type: "damage",
+                  roll: { count: 2, faces: 6 },
+                  damageTypeOptions: ["radiant"],
+                },
               },
             },
           ],
@@ -408,45 +553,16 @@ export const itemsGear: Item[] = [
         actionId: "action-set-trap",
         parameters: {
           target: { type: "point" },
+          range: { normal: 5, unit: "ft" },
           activation: {
             type: "action",
           },
           outcomes: [
             {
               type: "summonToken",
+              tokenId: "template-hunting-trap-armed",
               on: "any",
-              token: {
-                name: "Armadilha de Caça (Armada)",
-                quantity: 1,
-                effects: [
-                  {
-                    type: "triggeredEffect",
-                    triggers: [{ on: "onEnterArea" }],
-                    save: {
-                      type: "calculated",
-                      attributes: ["dexterity"],
-                      base: 13,
-                    },
-                    outcomes: [
-                      {
-                        on: "fail",
-                        type: "modifyTargetHP",
-                        vitals: ["currentHp"],
-                        formula: {
-                          type: "damage",
-                          roll: { count: 1, faces: 4 },
-                          damageTypeOptions: ["piercing"],
-                        },
-                      },
-                      {
-                        on: "fail",
-                        type: "applyCondition",
-                        condition: "restrained",
-                      },
-                    ],
-                  },
-                ],
-              },
+              quantity: 1,
             },
           ],
         },
@@ -502,16 +618,67 @@ export const itemsGear: Item[] = [
     weight: { value: 1, unit: "lb" },
     price: { quantity: 1, unit: "silver" },
     description:
-      "Como uma ação, você pode espalhar o óleo deste frasco em uma criatura a até 5 pés ou arremessá-lo a até 20 pés, quebrando-o com o impacto. Em ambos os casos, faça um ataque à distância. Se acertar, o alvo fica coberto de óleo. Se o alvo sofrer qualquer dano de fogo antes que o óleo seque (após 1 minuto), ele sofre 5 de dano de fogo adicional. Você também pode derramar o óleo no chão para cobrir uma área de 5 pés quadrados, criando uma superfície escorregadia. Quando a área coberta de óleo é exposta ao fogo, ela queima por 2 rodadas e causa 5 de dano de fogo a qualquer criatura que entrar na área ou terminar seu turno nela.",
+      "Como uma ação, você pode derramar o óleo no chão para cobrir uma área de 5 pés quadrados, criando uma superfície escorregadia. Quando a área coberta de óleo é exposta ao fogo, ela queima por 2 rodadas e causa 5 de dano de fogo a qualquer criatura que entrar na área ou terminar seu turno nela.",
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-throw-item",
+        actionId: "action-use-gear-area",
         parameters: {
-          range: { normal: 20, unit: "ft" },
-          attackType: ["rangedItemAttack"],
+          activation: { type: "action" },
+          range: { normal: 5, unit: "ft" },
+          area: { shape: "cube", size: 5, unit: "ft" },
           outcomes: [
-            { on: "hit", type: "applyCondition", condition: "flammable" },
+            {
+              on: "any",
+              type: "createAreaEffect",
+              surfaceType: "oil",
+              isDifficultTerrain: true,
+              duration: { unit: "indefinite" },
+              rules: [
+                {
+                  trigger: { on: ["onEnterArea"] },
+                  save: {
+                    ability: "dexterity",
+                    dc: { type: "fixed", value: 10 },
+                  },
+                  outcomes: [
+                    { on: "fail", type: "applyCondition", condition: "prone" },
+                  ],
+                },
+              ],
+
+              transformRules: [
+                {
+                  trigger: {
+                    on: ["onTakingDamage"],
+                    specific: { damageType: ["fire"] },
+                  },
+                  newSurface: {
+                    on: "any",
+                    type: "createAreaEffect",
+                    surfaceType: "fire",
+                    duration: { unit: "round", value: 2 },
+                    rules: [
+                      {
+                        trigger: { on: ["onEnterArea", "onEndTurnInArea"] },
+                        outcomes: [
+                          {
+                            on: "any",
+                            type: "modifyTargetHP",
+                            vitals: ["currentHp"],
+                            formula: {
+                              type: "damage",
+                              fixed: 5,
+                              damageTypeOptions: ["fire"],
+                            },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
           ],
         },
       },
@@ -602,10 +769,10 @@ export const itemsGear: Item[] = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [],
         mastery: [],
+        properties: ["light"],
         damageFormulas: {
-          primary: { type: "damage", fixed: 1, damageTypeOptions: ["fire"] }, // Dano 1}
+          primary: { type: "damage", fixed: 1, damageTypeOptions: ["fire"] },
         },
       },
     ],

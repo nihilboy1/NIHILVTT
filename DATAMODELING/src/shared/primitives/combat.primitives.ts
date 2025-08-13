@@ -1,33 +1,62 @@
-
 // ============================================================================
 // PRIMITIVOS DE COMBATE E AÇÃO
 // Proposta: Mover para 'combat.primitives.ts'
 // ============================================================================
 
 import z from "zod";
+export const RollModeEnum = z.enum(["normal", "advantage", "disadvantage"]);
 
 export const EventTriggerEnum = z.enum([
-  "onBeingAttacked",
+  // --- Combate direto ---
   "onAttackRoll",
+  "onHit", "onMiss",
+  "onBeingAttacked",
   "onDealingDamage",
   "onTakingDamage",
-  "onTempHpDepleted",
-  "onSavingThrow",
+  "onAllyDamagesTarget",
+  "onAllyIsHit",
+
+  // --- Ciclos de turno ---
   "onTurnStart",
   "onTurnEnd",
-  "onCharacterDeath",
-  "onEnterArea",
-  "onLeaveArea",
   "onStartTurnInArea",
   "onEndTurnInArea",
+
+  // --- Movimento e alcance ---
+  "onEnterArea",
+  "onLeaveArea",
+  "onMovesInArea",
   "onTargetEntersReach",
+  "onBeingFarFromCaster",
   "onTargetLeavesReach",
-  "onAllyIsHit",
-  "onUserCastSpellAgain",
-  "onUserActsHostile",
+  "onUserFarFromTarget", // param: distance
+
+  // --- Status e condições ---
+  "onConditionGained", // param: condition
+  "onConditionLost", // param: condition
+  "onTempHpDepleted",
+  "onHitByStrongWind",
+  "onHealed", // param: amount
+  "onHpBelowThreshold", // param: threshold
+  "onSavingThrow", // param opcional: type (STR, DEX, etc.)
+
+  // --- Interações do usuário ---
   "onDropItem",
+  "onUserCastSpellAgain",
+  "onUserCastsOnNonTargetEnemy",
+  "onUserAttacksOther",
+  "onUserActsHostile",
+  "onUserOrAlliesActsHostile",
   "onUserLoseConcentration",
+
+  // --- Eventos críticos ---
+  "onCharacterDeath",
+  "onTargetIsWounded", // param: hpThreshold
+  "onDiceRollResult",
 ]);
+
+
+// Para validar arrays de endConditions:
 
 export const CoverEnum = z.enum(["half", "threeQuarters", "total"]);
 

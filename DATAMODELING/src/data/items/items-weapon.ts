@@ -17,7 +17,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["versatile"] }],
+        properties: ["versatile"],
         mastery: ["topple"],
         damageFormulas: {
           primary: {
@@ -44,13 +44,13 @@ export const itemsWeapon = [
     weight: { value: 2, unit: "lb" },
     price: { quantity: 1, unit: "silver" },
     description:
-      "Um pedaço de madeira pesado, simples mas eficaz como arma de concussão.",
+      "Um pedaço de madeira leve, simples mas eficaz como arma de concussão.",
     effects: [
       {
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["versatile"] }],
+        properties: ["light"],
         mastery: ["slow"],
         damageFormulas: {
           primary: {
@@ -78,7 +78,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["light", "thrown"] }],
+        properties: ["light", "thrown"],
         mastery: ["nick"],
         damageFormulas: {
           primary: {
@@ -106,7 +106,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "ranged",
-        properties: [{ property: ["finesse", "thrown"] }],
+        properties: ["finesse", "thrown"],
         mastery: ["vex"],
         damageFormulas: {
           primary: {
@@ -135,7 +135,6 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [],
         mastery: ["sap"],
         damageFormulas: {
           primary: {
@@ -163,7 +162,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["heavy", "reach", "twoHanded"] }],
+        properties: ["heavy", "reach", "twoHanded"],
         mastery: ["graze"],
         damageFormulas: {
           primary: {
@@ -191,7 +190,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["heavy", "twoHanded"] }],
+        properties: ["heavy", "twoHanded"],
         mastery: ["cleave"],
         damageFormulas: {
           primary: {
@@ -219,7 +218,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["twoHanded"] }],
+        properties: ["twoHanded"],
         mastery: ["push"],
         damageFormulas: {
           primary: {
@@ -247,7 +246,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["heavy", "twoHanded"] }],
+        properties: ["heavy", "twoHanded"],
         mastery: ["graze"],
         damageFormulas: {
           primary: {
@@ -275,7 +274,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["heavy", "reach", "twoHanded"] }],
+        properties: ["heavy", "reach", "twoHanded"],
         mastery: ["cleave"],
         damageFormulas: {
           primary: {
@@ -303,7 +302,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "ranged",
-        properties: [{ property: ["ammunition", "light", "loading"] }],
+        properties: ["ammunition", "light", "loading"],
         mastery: ["vex"],
         range: { normal: 30, long: 120, unit: "ft" },
         damageFormulas: {
@@ -332,7 +331,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["light", "thrown"] }],
+        properties: ["light", "thrown"],
         mastery: ["vex"],
         range: { normal: 20, long: 60, unit: "ft" },
         damageFormulas: {
@@ -361,9 +360,8 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "ranged",
-        properties: [
-          { property: ["ammunition", "heavy", "loading", "twoHanded"] },
-        ],
+        properties: ["ammunition", "heavy", "loading", "twoHanded"],
+
         mastery: ["push"],
         range: { normal: 100, long: 400, unit: "ft" },
         damageFormulas: {
@@ -392,7 +390,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["thrown"] }],
+        properties: ["thrown"],
         mastery: ["slow"],
         range: { normal: 30, long: 120, unit: "ft" },
         damageFormulas: {
@@ -421,7 +419,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "ranged",
-        properties: [{ property: ["ammunition", "loading", "twoHanded"] }],
+        properties: ["ammunition", "loading", "twoHanded"],
         mastery: ["slow"],
         range: { normal: 80, long: 320, unit: "ft" },
         damageFormulas: {
@@ -449,7 +447,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["light", "thrown"] }],
+        properties: ["light", "thrown"],
         mastery: ["nick"],
         range: { normal: 20, long: 60, unit: "ft" },
         damageFormulas: {
@@ -478,7 +476,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "ranged",
-        properties: [{ property: ["ammunition", "heavy", "twoHanded"] }],
+        properties: ["ammunition", "heavy", "twoHanded"],
         mastery: ["slow"],
         range: { normal: 150, long: 600, unit: "ft" },
         damageFormulas: {
@@ -507,7 +505,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["versatile"] }],
+        properties: ["versatile"],
         mastery: ["sap"],
         damageFormulas: {
           primary: {
@@ -540,7 +538,6 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [],
         mastery: ["sap"],
         damageFormulas: {
           primary: {
@@ -568,7 +565,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["heavy", "twoHanded"] }],
+        properties: ["heavy", "twoHanded"],
         mastery: ["topple"],
         damageFormulas: {
           primary: {
@@ -596,7 +593,6 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [],
         mastery: ["sap"],
         damageFormulas: {
           primary: {
@@ -624,7 +620,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "ranged",
-        properties: [{ property: ["ammunition", "loading", "twoHanded"] }],
+        properties: ["ammunition", "loading", "twoHanded"],
         mastery: ["slow"],
         range: { normal: 40, long: 120, unit: "ft" },
         damageFormulas: {
@@ -653,7 +649,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["heavy", "reach", "twoHanded"] }],
+        properties: ["heavy", "reach", "twoHanded"],
         mastery: ["push"],
         damageFormulas: {
           primary: {
@@ -681,7 +677,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "ranged",
-        properties: [{ property: ["ammunition", "loading"] }],
+        properties: ["ammunition", "loading"],
         mastery: ["vex"],
         range: { normal: 30, long: 90, unit: "ft" },
         damageFormulas: {
@@ -710,7 +706,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["versatile"] }],
+        properties: ["versatile"],
         mastery: ["topple"],
         damageFormulas: {
           primary: {
@@ -743,7 +739,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["finesse"] }],
+        properties: ["finesse"],
         mastery: ["vex"],
         damageFormulas: {
           primary: {
@@ -770,7 +766,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["finesse", "light"] }],
+        properties: ["finesse", "light"],
         mastery: ["nick"],
         damageFormulas: {
           primary: {
@@ -798,7 +794,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "ranged",
-        properties: [{ property: ["ammunition", "twoHanded"] }],
+        properties: ["ammunition", "twoHanded"],
         mastery: ["vex"],
         range: { normal: 80, long: 320, unit: "ft" },
         damageFormulas: {
@@ -827,7 +823,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["finesse", "light"] }],
+        properties: ["finesse", "light"],
         mastery: ["vex"],
         damageFormulas: {
           primary: {
@@ -855,7 +851,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["light"] }],
+        properties: ["light"],
         mastery: ["nick"],
         damageFormulas: {
           primary: {
@@ -883,7 +879,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "ranged",
-        properties: [{ property: ["ammunition"] }],
+        properties: ["ammunition"],
         mastery: ["slow"],
         range: { normal: 30, long: 120, unit: "ft" },
         damageFormulas: {
@@ -912,7 +908,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "simple",
         weaponType: "melee",
-        properties: [{ property: ["thrown", "versatile"] }],
+        properties: ["thrown", "versatile"],
         mastery: ["sap"],
         range: { normal: 20, long: 60, unit: "ft" },
         damageFormulas: {
@@ -946,7 +942,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["thrown", "versatile"] }],
+        properties: ["thrown", "versatile"],
         mastery: ["topple"],
         range: { normal: 20, long: 60, unit: "ft" },
         damageFormulas: {
@@ -980,7 +976,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["versatile"] }],
+        properties: ["versatile"],
         mastery: ["sap"],
         damageFormulas: {
           primary: {
@@ -1008,7 +1004,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["versatile"] }],
+        properties: ["versatile"],
         mastery: ["push"],
         damageFormulas: {
           primary: {
@@ -1041,7 +1037,7 @@ export const itemsWeapon = [
         type: "onWield_grantWeaponAttack",
         weaponCategory: "martial",
         weaponType: "melee",
-        properties: [{ property: ["finesse", "reach"] }],
+        properties: ["finesse", "reach"],
         mastery: ["slow"],
         damageFormulas: {
           primary: {

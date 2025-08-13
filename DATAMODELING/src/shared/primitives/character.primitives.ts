@@ -5,6 +5,19 @@
 
 import z from "zod";
 
+export const AncestryIdEnum = z.enum([
+  "human",
+  "elf",
+  "dwarf",
+  "halfling",
+  "gnome",
+  "dragonborn",
+  "tiefling",
+  "aasimar",
+  "goliath",
+  "orc",
+]);
+
 export const CreatureTypeEnum = z.enum([
   "aberration",
   "beast",
@@ -81,9 +94,13 @@ export const BaseConditionEnum = z.enum([
 export const SystemStatusEnum = z.enum([
   "flammable",
   "wet",
+  "hasZeroHp",
   "frozen",
   "burning",
   "hostile",
+  "movementStopped",
+  "lightlyObscured", // Adicionado
+  "heavilyObscured", // Adicionado
 ]);
 
 // União de condições e status do sistema.

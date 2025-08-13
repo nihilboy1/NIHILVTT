@@ -5,11 +5,14 @@ import {
   DcSchema,
   DiceRollSchema,
   RangeSchema,
+  RequirementSchema,
+  RollModifierSchema,
   TargetSchema,
 } from "../../shared/blocks.schema.js";
 import {
   ActionOutcomesSchema,
   ActionOutcomeType,
+  ChooseEffectOutcomeSchema,
 } from "../../shared/outcome.schema.js";
 import {
   ActionTypeEnum,
@@ -33,6 +36,7 @@ export const ActionParametersSchema = z.object({
         })
         .optional(),
       trigger: EventTriggerEnum.optional(),
+      details: z.string().optional(),
     })
     .optional(),
   attackType: AttackTypeEnum.array().optional(),
@@ -40,6 +44,7 @@ export const ActionParametersSchema = z.object({
   overrideAbilityScore: AbilityScoreEnum.or(
     z.literal("spellcasting")
   ).optional(),
+  requirements: RequirementSchema.optional(),
 
   area: AreaSchema.optional(),
   target: TargetSchema.optional(),
@@ -48,6 +53,7 @@ export const ActionParametersSchema = z.object({
       ability: AbilityScoreEnum,
       dc: DcSchema,
       ignoreCovers: CoverEnum.array().optional(),
+      rollModifier: RollModifierSchema.optional(), // <-- aqui
     })
     .optional(),
   charges: z
@@ -59,6 +65,7 @@ export const ActionParametersSchema = z.object({
     })
     .optional(),
   outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
+  choices: ChooseEffectOutcomeSchema.optional(),
 });
 
 export interface ActionParametersType {

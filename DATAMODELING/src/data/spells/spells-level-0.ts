@@ -1,3 +1,4 @@
+import { on } from "events";
 import type { Spell } from "../../domain/spell/spell.schema.js";
 export const spellsLevel0 = [
   {
@@ -110,7 +111,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onUserLoseConcentration" }],
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
@@ -120,7 +121,7 @@ export const spellsLevel0 = [
               on: "any",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: "onBeingAttacked" }],
+                triggers: [{ on: ["onBeingAttacked"] }],
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
@@ -247,16 +248,8 @@ export const spellsLevel0 = [
             {
               type: "summonToken",
               on: "success",
-              token: {
-                name: "Dancing Light",
-                quantity: 4,
-                effects: [
-                  {
-                    type: "passive_providesLight",
-                    properties: { bright: 0, dim: 10 },
-                  },
-                ],
-              },
+              tokenId: "token-dancing-lights",
+              quantity: 4,
             },
             {
               type: "applyEffect",
@@ -304,33 +297,29 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "druidcraft-weather-sensor",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "druidcraft_weatherSensor",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria um efeito sensorial que prevê o tempo por 24h (o efeito em si dura 1 rodada).",
             },
             {
               id: "druidcraft-bloom",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "druidcraft_bloom",
+              type: "descriptive",
+              on: "any",
               details:
                 "Faz uma flor desabrochar, uma vagem se abrir ou um botão de folha brotar instantaneamente.",
             },
             {
               id: "druidcraft-sensory-effect",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "druidcraft_sensoryEffect",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria um efeito sensorial inofensivo (folhas, brisa, som, etc.) em um cubo de 5 pés.",
             },
             {
               id: "druidcraft-fire-play",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "druidcraft_firePlay",
+              type: "descriptive",
+              on: "any",
               details:
                 "Acende ou apaga uma chama pequena não mágica (vela, tocha, fogueira).",
             },
@@ -444,41 +433,36 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "elementalism-conjure-air",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "elementalism_conjureAir",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria uma brisa em um cubo de 5 pés que pode farfalhar folhas e fechar portas destrancadas.",
             },
             {
               id: "elementalism-conjure-earth",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "elementalism_conjureEarth",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria uma fina camada de poeira em uma área de 5 pés quadrados ou escreve uma palavra na terra.",
             },
             {
               id: "elementalism-conjure-fire",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "elementalism_conjureFire",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria uma nuvem inofensiva de brasas e fumaça colorida em um cubo de 5 pés, que pode acender pequenas chamas.",
             },
             {
               id: "elementalism-conjure-water",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "elementalism_conjureWater",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria um spray de névoa fria em um cubo de 5 pés ou 1 xícara de água limpa.",
             },
             {
               id: "elementalism-sculpt-element",
-              type: "customMechanic",
-              on: "custom",
-              mechanic: "elementalism_sculptElement",
+              type: "descriptive",
+              on: "any",
               details:
                 "Moldar terra, areia, fogo, fumaça, névoa ou água que caiba em um cubo de 1 pé em uma forma rudimentar por 1 hora.",
             },
@@ -608,15 +592,19 @@ export const spellsLevel0 = [
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         endConditions: [
-          { on: "onUserLoseConcentration" },
-          { on: "onTakingDamage" },
-          { on: "onUserActsHostile" },
+          {
+            on: [
+              "onUserLoseConcentration",
+              "onTakingDamage",
+              "onUserActsHostile",
+            ],
+          },
         ],
         requirements: {
           target: [
             {
               type: "isCreatureType",
-              creatureType: "humanoid",
+              creatureTypes: ["humanoid"],
             },
             {
               type: "hasStatus",
@@ -698,7 +686,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onUserLoseConcentration" }],
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
         parameters: {
           activation: {
             type: "action",
@@ -748,7 +736,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onUserCastSpellAgain" }],
+        endConditions: [{ on: ["onUserCastSpellAgain"] }],
         parameters: {
           activation: {
             type: "action",
@@ -777,7 +765,7 @@ export const spellsLevel0 = [
             {
               id: "light-special-rules",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details:
                 "Cobrir o objeto com algo opaco bloqueia a luz. A magia termina se você a conjurar novamente.",
             },
@@ -806,7 +794,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onUserCastSpellAgain" }],
+        endConditions: [{ on: ["onUserCastSpellAgain"] }],
         parameters: {
           activation: {
             type: "action",
@@ -823,11 +811,8 @@ export const spellsLevel0 = [
               id: "mage-hand-summon",
               type: "summonToken",
               on: "success",
-              token: {
-                name: "Mão Mágica",
-                quantity: 1,
-                effects: [],
-              },
+              tokenId: "token-magic-hand",
+              quantity: 1,
               duration: {
                 unit: "minute",
                 value: 1,
@@ -851,7 +836,7 @@ export const spellsLevel0 = [
                   outcomes: [
                     {
                       type: "descriptive",
-                      on: "custom",
+                      on: "any",
                       details:
                         "Você pode mover a mão até 30 pés e usá-la para manipular um objeto, abrir uma porta ou recipiente destrancado, guardar ou pegar um item de um recipiente aberto, ou derramar o conteúdo de um frasco.",
                     },
@@ -862,7 +847,7 @@ export const spellsLevel0 = [
             {
               id: "mage-hand-rules",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details:
                 "A mão desaparece se ficar a mais de 30 pés de você ou se você conjurar esta magia novamente. A mão não pode atacar, ativar itens mágicos ou carregar mais de 10 libras.",
             },
@@ -912,9 +897,8 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "mending-repair-object",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "mending_repairObject",
+              type: "descriptive",
+              on: "any",
               details:
                 "Repara uma única quebra ou rasgo (não maior que 1 pé) em um objeto tocado. Pode reparar fisicamente um item mágico, mas não restaura sua magia.",
             },
@@ -961,9 +945,8 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "message-communication",
-              type: "customMechanic",
+              type: "descriptive",
               on: "success",
-              mechanic: "message_sendAndReceive",
               details:
                 "O alvo ouve a mensagem e pode responder em um sussurro que apenas você ouve. O feitiço é bloqueado por 1 pé de pedra/metal/madeira, uma fina folha de chumbo ou silêncio mágico.",
             },
@@ -1029,7 +1012,7 @@ export const spellsLevel0 = [
               on: "fail",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: "onSavingThrow" }],
+                triggers: [{ on: ["onSavingThrow"] }],
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
@@ -1105,7 +1088,23 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onUserCastSpellAgain" }],
+        endConditions: [
+          { on: ["onUserCastSpellAgain"] },
+          {
+            on: ["onSavingThrow"],
+            specific: {
+              savingThrow: {
+                ability: "intelligence",
+                source: "effect",
+                dc: {
+                  type: "calculated",
+                  attributes: ["spellcasting"],
+                  base: 8,
+                },
+              },
+            },
+          },
+        ],
         parameters: {
           activation: {
             type: "action",
@@ -1119,33 +1118,36 @@ export const spellsLevel0 = [
           },
           outcomes: [
             {
-              id: "minor-illusion-image",
-              type: "summonToken",
-              on: "success",
-              token: {
-                name: "Ilusão Menor (Imagem)",
-                quantity: 1,
-                effects: [],
-              },
-              duration: {
-                unit: "minute",
-                value: 1,
-              },
-            },
-            {
-              id: "minor-illusion-sound",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "minorIllusion_createSound",
-              details:
-                "Cria um som, de um sussurro a um grito. Pode ser contínuo ou sons discretos.",
-            },
-            {
-              id: "minor-illusion-investigation-rule",
-              type: "descriptive",
-              on: "custom",
-              details:
-                "Uma criatura pode usar sua ação para fazer um teste de Inteligência (Investigação) contra a CD de suas magias para discernir a ilusão. Interação física com a imagem também a revela.",
+              type: "chooseEffect",
+              on: "any",
+              options: [
+                {
+                  id: "create-minor-ilusion-token",
+                  name: "Criar Ilusão Menor",
+                  outcome: {
+                    id: "minor-illusion-image",
+                    type: "summonToken",
+                    on: "success",
+                    tokenId: "token-minor-illusion",
+                    quantity: 1,
+                    duration: {
+                      unit: "minute",
+                      value: 1,
+                    },
+                  },
+                },
+                {
+                  id: "emmit-minor-ilusion-sound",
+                  name: "Emitir Som da Ilusão menor",
+                  outcome: {
+                    id: "minor-illusion-sound",
+                    type: "descriptive",
+                    on: "any",
+                    details:
+                      "Cria um som, de um sussurro a um grito. Pode ser contínuo ou sons discretos.",
+                  },
+                },
+              ],
             },
           ],
         },
@@ -1263,56 +1265,50 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "prestidigitation-sensory",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "prestidigitation_sensoryEffect",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria um efeito sensorial inofensivo e instantâneo, como uma chuva de faíscas, uma lufada de vento, notas musicais fracas ou um odor estranho.",
             },
             {
               id: "prestidigitation-fire",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "prestidigitation_firePlay",
+              type: "descriptive",
+              on: "any",
               details:
                 "Instantaneamente acende ou apaga uma vela, uma tocha ou uma pequena fogueira.",
             },
             {
               id: "prestidigitation-clean",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "prestidigitation_cleanOrSoil",
+              type: "descriptive",
+              on: "any",
               details:
                 "Instantaneamente limpa ou suja um objeto não maior que 1 pé cúbico.",
             },
             {
               id: "prestidigitation-sensation",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "prestidigitation_minorSensation",
+              type: "descriptive",
+              on: "any",
               details:
                 "Esfria, aquece ou dá sabor a até 1 pé cúbico de material não-vivo por 1 hora.",
             },
             {
               id: "prestidigitation-mark",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "prestidigitation_magicMark",
+              type: "descriptive",
+              on: "any",
               details:
                 "Faz uma cor, uma pequena marca ou um símbolo aparecer em um objeto ou superfície por 1 hora.",
             },
             {
               id: "prestidigitation-creation",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "prestidigitation_minorCreation",
+              type: "descriptive",
+              on: "any",
               details:
                 "Cria uma bugiganga não mágica ou uma imagem ilusória que cabe na sua mão e dura até o final do seu próximo turno.",
             },
             {
               id: "prestidigitation-rules",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details:
                 "Se conjurar esta magia múltiplas vezes, você pode ter até três de seus efeitos não-instantâneos ativos por vez.",
             },
@@ -1336,7 +1332,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onUserCastSpellAgain" }],
+        endConditions: [{ on: ["onUserCastSpellAgain"] }],
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "self" },
@@ -1421,7 +1417,7 @@ export const spellsLevel0 = [
             {
               id: "produce-flame-rules",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details: "A magia termina se você a conjurar novamente.",
             },
           ],
@@ -1480,6 +1476,7 @@ export const spellsLevel0 = [
               attribute: "speed",
               operation: "subtract",
               value: 10,
+              stacking: "none",
               duration: {
                 unit: "turn",
                 value: 1,
@@ -1540,7 +1537,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onUserLoseConcentration" }],
+        endConditions: [{ on: ["onUserLoseConcentration"] }],
         parameters: {
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
@@ -1552,7 +1549,7 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: "onTakingDamage" }],
+                triggers: [{ on: ["onTakingDamage"] }],
                 requiresChoice: "damageType",
                 modifier: {
                   operation: "subtract",
@@ -1566,7 +1563,7 @@ export const spellsLevel0 = [
             {
               id: "resistance-rules",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details:
                 "Uma criatura só pode se beneficiar desta magia uma vez por turno.",
             },
@@ -1681,7 +1678,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: "onUserCastSpellAgain" }, { on: "onDropItem" }],
+        endConditions: [{ on: ["onUserCastSpellAgain", "onDropItem"] }],
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "object", quantity: 1 },
@@ -1974,12 +1971,9 @@ export const spellsLevel0 = [
     components: { types: ["verbal", "somatic"] },
     duration: { unit: "instantaneous" },
     requirements: {
-      target: [
-        {
-          type: "hasZeroHP",
-        },
-      ],
+      target: [{ type: "hasStatus", status: "hasZeroHp", is: true }],
     },
+
     effects: [
       {
         type: "activatableCastSpell",
@@ -2075,9 +2069,8 @@ export const spellsLevel0 = [
             },
             {
               id: "starry-wisp-invisible-debuff",
-              type: "customMechanic",
+              type: "descriptive",
               on: "hit",
-              mechanic: "preventsInvisibilityBenefit",
               details:
                 "O alvo não pode se beneficiar da condição Invisível até o final do seu próximo turno.",
             },
@@ -2143,9 +2136,8 @@ export const spellsLevel0 = [
           outcomes: [
             {
               id: "thaumaturgy-eyes",
-              type: "customMechanic",
-              on: "success",
-              mechanic: "alterEyes",
+              type: "descriptive",
+              on: "any",
               details: "Você altera a aparência dos seus olhos por 1 minuto.",
             },
             {
@@ -2161,39 +2153,35 @@ export const spellsLevel0 = [
             },
             {
               id: "thaumaturgy-fire-play",
-              type: "customMechanic",
+              type: "descriptive",
               on: "success",
-              mechanic: "controlFlames",
               details:
                 "Você faz chamas piscarem, brilharem, escurecerem ou mudarem de cor por 1 minuto.",
             },
             {
               id: "thaumaturgy-door",
-              type: "customMechanic",
+              type: "descriptive",
               on: "success",
-              mechanic: "slamDoorOrWindow",
               details:
                 "Você instantaneamente faz uma porta ou janela destrancada se abrir ou bater com força.",
             },
             {
               id: "thaumaturgy-sound",
-              type: "customMechanic",
+              type: "descriptive",
               on: "success",
-              mechanic: "phantomSound",
               details:
                 "Você cria um som instantâneo que se origina de um ponto à sua escolha dentro do alcance.",
             },
             {
               id: "thaumaturgy-tremors",
-              type: "customMechanic",
+              type: "descriptive",
               on: "success",
-              mechanic: "groundTremors",
               details: "Você causa tremores inofensivos no chão por 1 minuto.",
             },
             {
               id: "thaumaturgy-rules",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details:
                 "Se conjurar esta magia múltiplas vezes, você pode ter até três de seus efeitos de 1 minuto ativos por vez.",
             },
@@ -2305,8 +2293,13 @@ export const spellsLevel0 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
-          target: { type: "selfArea", selectionMode: "choice" },
-          area: { shape: "sphere", radius: 5, unit: "ft" },
+          target: { type: "selfArea" },
+          area: {
+            shape: "sphere",
+            radius: 5,
+            unit: "ft",
+            selectionMode: "choice",
+          },
           save: {
             ability: "constitution",
             dc: {
@@ -2335,7 +2328,7 @@ export const spellsLevel0 = [
             {
               id: "thunderclap-sound",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details:
                 "O som trovejante da magia pode ser ouvido a até 100 pés de distância.",
             },
@@ -2414,7 +2407,7 @@ export const spellsLevel0 = [
               on: "fail",
               formula: {
                 type: "conditional",
-                condition: "targetIsWounded",
+                conditionals: [{ type: "targetIsWounded" }],
                 ifTrue: {
                   type: "damage",
                   roll: { count: 1, faces: 12 },
@@ -2430,7 +2423,7 @@ export const spellsLevel0 = [
             {
               id: "toll-the-dead-sound",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details:
                 "O som de um sino fúnebre é audível a até 10 pés do alvo.",
             },
@@ -2445,7 +2438,7 @@ export const spellsLevel0 = [
               outcomeId: "toll-the-dead-damage",
               newFormula: {
                 type: "conditional",
-                condition: "targetIsWounded",
+                conditionals: [{ type: "targetIsWounded" }],
                 ifTrue: {
                   type: "damage",
                   roll: { count: 2, faces: 12 },
@@ -2464,7 +2457,7 @@ export const spellsLevel0 = [
               outcomeId: "toll-the-dead-damage",
               newFormula: {
                 type: "conditional",
-                condition: "targetIsWounded",
+                conditionals: [{ type: "targetIsWounded" }],
                 ifTrue: {
                   type: "damage",
                   roll: { count: 3, faces: 12 },
@@ -2483,7 +2476,7 @@ export const spellsLevel0 = [
               outcomeId: "toll-the-dead-damage",
               newFormula: {
                 type: "conditional",
-                condition: "targetIsWounded",
+                conditionals: [{ type: "targetIsWounded" }],
                 ifTrue: {
                   type: "damage",
                   roll: { count: 4, faces: 12 },
@@ -2726,7 +2719,7 @@ export const spellsLevel0 = [
             {
               id: "word-of-radiance-targeting-rule",
               type: "descriptive",
-              on: "custom",
+              on: "any",
               details:
                 "Você pode escolher quais criaturas dentro da área de 5 pés são afetadas pela magia.",
             },

@@ -55,13 +55,34 @@ export const ACTIONS = [
     description: "Prepara uma armadilha mecânica no chão.",
   },
   {
+    id: "action-disarm-trap",
+    name: "Desarmar Armadilha",
+    description: "Tenta desarmar uma armadilha",
+  },
+  {
+    id: "action-pick-lock",
+    name: "Abrir fechadura",
+    description: "Tenta abrir uma fechadura com ferramentas de ladrão",
+  },
+  {
     id: "action-use-kit-charge",
     name: "Usar Carga de Kit",
     description: "Gasta um uso de um kit para um efeito específico.",
   },
   {
+    id: "action-witch-bolt-channel",
+    name: "Canalizar Raio de Bruxa",
+    description:
+      "Canaliza a energia do Raio de Bruxa para causar dano contínuo.",
+  },
+  {
     id: "action-cast-spell",
     name: "Conjurar Magia",
     description: "Conjura uma magia de nivel 0 a 9",
+  },
+  {
+    id: "action-force-open",
+    name: "Abrir à força",
+    description: "Tenta abrir alguma coisa à força",
   },
 ] as const satisfies z.infer<(typeof ActionSchema)[]>;
