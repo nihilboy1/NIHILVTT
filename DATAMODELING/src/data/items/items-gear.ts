@@ -1,5 +1,6 @@
 import { Item } from "../../domain/item/items.schema";
 import z from "zod";
+
 export const itemsGear = [
   {
     id: "item-acido",
@@ -859,12 +860,16 @@ export const itemsGear = [
     ],
   },
 ] as const satisfies Item[];
+
 const allGearIds = itemsGear.map((gear) => gear.id);
+
 if (allGearIds.length === 0) {
   throw new Error(
     "Nenhum equipamento encontrado em items-gear.ts para criar o GearIdEnum.",
   );
 }
+
 const [firstGearId, ...restGearIds] = allGearIds;
+
 export const GearIdEnum = z.enum([firstGearId, ...restGearIds]);
 export type GearId = z.infer<typeof GearIdEnum>;

@@ -5,19 +5,23 @@ import {
   EnvironmentEnum,
   LanguageEnum,
   SkillEnum,
-  VisionTypeEnum,
 } from "../../shared/primitives/character.primitives";
 import { DamageTypeEnum } from "../../shared/primitives/combat.primitives";
 import { DiceRollSchema } from "../../shared/blocks.schema";
 import { EffectSchema } from "../../shared/effect.schema";
-import {
-  DistanceUnitEnum,
-} from "../../shared/primitives/world.primitives";
+import { DistanceUnitEnum } from "../../shared/primitives/world.primitives";
 import { ArmorIdEnum } from "../../data/items/items-armor";
 import { GearIdEnum } from "../../data/items/items-gear";
 import { ToolIdEnum } from "../../data/items/items-tool";
 import { WeaponIdEnum } from "../../data/items/items-weapon";
-import { ChallengeRatingEnum, ConditionStatusEnum, CreatureSizeEnum, CreatureTypeEnum, SourceEnum } from "../../shared/primitives/system.primitives";
+import {
+  ChallengeRatingEnum,
+  ConditionStatusEnum,
+  CreatureSizeEnum,
+  CreatureTypeEnum,
+  SourceEnum,
+} from "../../shared/primitives/system.primitives";
+
 const ItemIdEnum = z.union([WeaponIdEnum, ArmorIdEnum, GearIdEnum, ToolIdEnum]);
 const AbilityScoresSchema = z.object({
   strength: z.number().int(),

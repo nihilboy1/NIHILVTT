@@ -1,5 +1,6 @@
 import { Item } from "../../domain/item/items.schema";
 import z from "zod";
+
 export const itemsTool = [
   {
     id: "item-ferramentas-de-ladrao",
@@ -23,12 +24,16 @@ export const itemsTool = [
     ],
   },
 ] as const satisfies Item[];
+
 const allToolIds = itemsTool.map((tool) => tool.id);
+
 if (allToolIds.length === 0) {
   throw new Error(
     "Nenhuma ferramenta encontrada em items-tool.ts para criar o ToolIdEnum.",
   );
 }
+
 const [firstToolId, ...restToolIds] = allToolIds;
+
 export const ToolIdEnum = z.enum([firstToolId, ...restToolIds]);
 export type ToolId = z.infer<typeof ToolIdEnum>;

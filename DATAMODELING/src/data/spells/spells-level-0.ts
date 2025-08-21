@@ -1,4 +1,3 @@
-import { on } from "events";
 import type { Spell } from "../../domain/spell/spell.schema.js";
 
 export const spellsLevel0 = [

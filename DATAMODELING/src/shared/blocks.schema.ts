@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { SpellIdEnum, WeaponIdEnum } from "../shared/data-based-enums.js";
 import {
   DistanceUnitEnum,
   DurationUnitEnum,
@@ -126,10 +125,7 @@ export const DamageFormulaSchema = z.object({
   damageTypeOptions: z.array(DamageTypeEnum),
 });
 
-const SimpleDistanceSchema = z.object({
-  value: z.number().int().min(1),
-  unit: DistanceUnitEnum.default("ft"),
-});
+
 
 export const RangeSchema = z.object({
   normal: z.number().int().optional(),

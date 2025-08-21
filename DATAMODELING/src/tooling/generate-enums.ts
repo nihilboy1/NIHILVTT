@@ -9,12 +9,12 @@ import { glob } from "glob";
 interface Outcome {
   id?: string;
   type: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface Parameters {
   outcomes?: Outcome[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface Effect {
@@ -26,7 +26,7 @@ interface DataObject {
   id: string;
   effects?: Effect[];
   // Permite outras propriedades para ser compatível com itemsWeapon, etc.
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // --- Tratamento de Erros Globais ---
@@ -46,7 +46,7 @@ process.on("unhandledRejection", (reason) => {
  * Função recursiva para extrair todos os caminhos de propriedades de um objeto.
  */
 function getPaths(
-  obj: Record<string, any>,
+  obj: Record<string, unknown>,
   options: { ignoreKeys?: string[] } = {},
   currentPath = "",
   paths = new Set<string>(),
@@ -60,7 +60,7 @@ function getPaths(
     const newPath = currentPath ? `${currentPath}.${key}` : key;
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      getPaths(value, options, newPath, paths);
+      getPaths(value as Record<string, unknown>, options, newPath, paths);
     } else {
       paths.add(newPath);
     }
@@ -73,6 +73,7 @@ function getPaths(
  */
 function extractParameterPaths(data: DataObject[]): Set<string> {
   const allPaths = new Set<string>();
+
   data.forEach((item) => {
     item.effects?.forEach((effect) => {
       if (effect.parameters) {
@@ -88,6 +89,7 @@ function extractParameterPaths(data: DataObject[]): Set<string> {
  */
 function extractOutcomePaths(data: DataObject[]): Set<string> {
   const allPaths = new Set<string>();
+
   data.forEach((item) => {
     item.effects?.forEach((effect) => {
       if (Array.isArray(effect.parameters?.outcomes)) {
@@ -115,8 +117,10 @@ function generateZodEnumFromSet(name: string, values: Set<string>): string {
     );
     return `export const ${name} = z.enum([]);`;
   }
+
   const sortedValues = Array.from(values).sort();
   const enumValues = sortedValues.map((val) => `  '${val}'`).join(",\n");
+
   return `export const ${name} = z.enum([\n${enumValues}\n]);`;
 }
 
@@ -210,6 +214,7 @@ async function main() {
 
     try {
       const module = await import(finalImportPath);
+
       console.log(
         chalk.gray(
           `- Processando ${path.relative(projectRoot, absolutePath)}...`,
@@ -265,6 +270,7 @@ async function main() {
       // Lógica de extração de dados para Paths (do script generate-paths.ts)
       for (const key in module) {
         const exportedItem = module[key];
+
         if (Array.isArray(exportedItem) && exportedItem.length > 0) {
           // Adiciona qualquer array exportado que contenha objetos com 'id' e 'effects'
           if (

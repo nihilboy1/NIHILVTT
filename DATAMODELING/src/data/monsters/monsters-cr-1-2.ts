@@ -1,5 +1,4 @@
-import { on } from "events";
-import { Monster } from "../../domain/creature/creature.schema";
+import { Monster } from "../../domain/monster/monster.schema";
 
 export const monsters_cr_1_2_modeled: Monster[] = [
   {

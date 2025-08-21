@@ -1,21 +1,27 @@
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
+import globals from "globals";
 
 export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    languageOptions: {
+      globals: {
+        ...globals.node, // agora sim: process, __dirname, Buffer etc.
+      },
+    },
     rules: {
-      "@typescript-eslint/padding-line-between-statements": [
+      "padding-line-between-statements": [
         "error",
         {
           blankLine: "always",
           prev: "*",
-          next: ["const", "let", "var", "export", "type", "interface"],
+          next: ["const", "let", "var", "export"],
         },
         {
           blankLine: "always",
-          prev: ["const", "let", "var", "export", "type", "interface"],
+          prev: ["const", "let", "var", "export"],
           next: "*",
         },
         {
@@ -24,11 +30,6 @@ export default tseslint.config(
           next: ["const", "let", "var"],
         },
         { blankLine: "any", prev: "export", next: "export" },
-        {
-          blankLine: "any",
-          prev: ["type", "interface"],
-          next: ["type", "interface"],
-        },
       ],
     },
   },

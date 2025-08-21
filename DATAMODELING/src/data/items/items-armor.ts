@@ -1,5 +1,6 @@
 import { Item } from "../../domain/item/items.schema";
 import z from "zod";
+
 export const itemsArmor = [
   {
     id: "item-peitoral-de-aco",
@@ -377,12 +378,16 @@ export const itemsArmor = [
     ],
   },
 ] as const satisfies Item[];
+
 const allArmorIds = itemsArmor.map((armor) => armor.id);
+
 if (allArmorIds.length === 0) {
   throw new Error(
     "Nenhuma armadura encontrada em items-armor.ts para criar o ArmorIdEnum.",
   );
 }
+
 const [firstArmorId, ...restArmorIds] = allArmorIds;
+
 export const ArmorIdEnum = z.enum([firstArmorId, ...restArmorIds]);
 export type ArmorId = z.infer<typeof ArmorIdEnum>;

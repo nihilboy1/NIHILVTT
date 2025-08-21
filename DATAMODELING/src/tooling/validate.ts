@@ -15,7 +15,7 @@ process.on("unhandledRejection", (reason) => {
   process.exit(1);
 });
 
-function validateData(data: any[], schema: z.ZodSchema<any>, dataName: string) {
+function validateData(data: unknown[], schema: z.ZodSchema<unknown>, dataName: string) {
   console.log(
     chalk.cyan(
       `\n🔍 Iniciando a validação dos dados de: ${chalk.bold.underline(
@@ -53,8 +53,9 @@ function validateData(data: any[], schema: z.ZodSchema<any>, dataName: string) {
       const fieldPath = fieldPathParts.join(".");
 
       const itemWithError = data[index as number];
-      const itemId =
-        itemWithError?.id || `Índice ${String(index)} (ID não encontrado)`;
+      const itemWithErrorTyped = itemWithError as { id?: string };
+      const itemId = itemWithErrorTyped?.id || `Índice ${String(index)} (ID não encontrado)`;
+
 
       const readableField = fieldPath || "(campo não identificado)";
       const message = `${chalk.yellow("- Campo")} '${chalk.cyan(
@@ -110,13 +111,17 @@ async function main() {
 
   if (choice === "1" || choice === "3") {
     console.log(chalk.blue("Carregando dados de magias..."));
+
     const { PHB2024SPELLS } = await import("../data/spells/spells-union.js");
+
     validateData(PHB2024SPELLS, FinalSpellDataSchema, "Magias");
   }
 
   if (choice === "2" || choice === "3") {
     console.log(chalk.blue("Carregando dados de itens..."));
+
     const { PHB2024ITEMS } = await import("../data/items/items-union.js");
+
     validateData(PHB2024ITEMS, FinalItemDataSchema, "Itens");
   }
 
