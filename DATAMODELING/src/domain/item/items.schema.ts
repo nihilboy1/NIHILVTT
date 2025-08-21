@@ -1,22 +1,20 @@
 import { z } from "zod";
-
 import { RequirementSchema } from "../../shared/blocks.schema.js";
 import { EffectSchema } from "../../shared/effect.schema.js";
-import { SourceEnum } from "../../shared/primitives/world.primitives.js";
 import {
   CostUnitEnum,
   ItemTypeEnum,
   RarityEnum,
   WeightUnitEnum,
 } from "../../shared/primitives/item.primitives.js";
+import { SourceEnum } from "../../shared/primitives/system.primitives.js";
 
-// 1. O schema base continua o mesmo, definindo as propriedades comuns a todos os itens.
 const BaseItemSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).array(),
   source: SourceEnum,
   page: z.number(),
-  type: ItemTypeEnum, // O tipo genérico que será especializado abaixo
+  type: ItemTypeEnum,
   rarity: RarityEnum,
   requiresAttunement: z.boolean().default(false).optional(),
   description: z.string().optional(),
@@ -26,8 +24,8 @@ const BaseItemSchema = z.object({
   effects: z.array(EffectSchema),
 });
 
-// 2. Schemas específicos que estendem o base, cada um com seu tipo literal.
 const GearItemSchema = BaseItemSchema.extend({ type: z.literal("gear") });
+
 const ToolItemSchema = BaseItemSchema.extend({ type: z.literal("tool") });
 
 const ArmorItemSchema = BaseItemSchema.extend({
@@ -44,10 +42,9 @@ const WeaponItemSchema = BaseItemSchema.extend({
   {
     message:
       "Itens do tipo 'weapon' devem ter pelo menos um efeito 'onWield_grantWeaponAttack'.",
-  }
+  },
 );
 
-// 3. Schema final: a união discriminada. O Zod infere a união de tipos automaticamente.
 export const ItemSchema = z.discriminatedUnion("type", [
   GearItemSchema,
   ToolItemSchema,
@@ -55,6 +52,6 @@ export const ItemSchema = z.discriminatedUnion("type", [
   ArmorItemSchema,
 ]);
 
-// 4. Tipos finais: inferidos diretamente do schema final, sem passos intermediários.
 export type Item = z.infer<typeof ItemSchema>;
+
 export const FinalItemDataSchema = z.array(ItemSchema);

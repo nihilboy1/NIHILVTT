@@ -32,7 +32,7 @@ export const monsters_cr_1_8 = [
     cha: 10,
     passive: 10,
     languages: ["Common", "Thieves' cant"],
-    cr: "1/8",
+    cr: 0.125,
     gear: ["leather armor|xphb", "light crossbow|xphb", "scimitar|xphb"],
     action: [
       {
@@ -84,7 +84,7 @@ export const monsters_cr_1_8 = [
       perception: "+6",
     },
     passive: 16,
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Pack Tactics",
@@ -152,7 +152,7 @@ export const monsters_cr_1_8 = [
     },
     senses: ["darkvision 60 ft."],
     passive: 10,
-    cr: "1/8",
+    cr: 0.125,
     action: [
       {
         name: "Bite",
@@ -205,7 +205,7 @@ export const monsters_cr_1_8 = [
     },
     passive: 10,
     languages: ["Common"],
-    cr: "1/8",
+    cr: 0.125,
     gear: ["leather armor|xphb", "sickle|xphb"],
     action: [
       {
@@ -260,7 +260,7 @@ export const monsters_cr_1_8 = [
     passive: 12,
     vulnerable: ["psychic"],
     languages: ["understands Undercommon but can't speak; telepathy 60 ft."],
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Advanced Telepathy",
@@ -334,7 +334,7 @@ export const monsters_cr_1_8 = [
     cha: 5,
     senses: ["blindsight 10 ft."],
     passive: 11,
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Flyby",
@@ -394,7 +394,7 @@ export const monsters_cr_1_8 = [
     },
     senses: ["blindsight 30 ft."],
     passive: 9,
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Amphibious",
@@ -450,7 +450,7 @@ export const monsters_cr_1_8 = [
     },
     senses: ["darkvision 60 ft."],
     passive: 12,
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Pack Tactics",
@@ -512,7 +512,7 @@ export const monsters_cr_1_8 = [
     },
     senses: ["darkvision 60 ft."],
     passive: 13,
-    cr: "1/8",
+    cr: 0.125,
     action: [
       {
         name: "Bite",
@@ -561,7 +561,7 @@ export const monsters_cr_1_8 = [
     senses: ["darkvision 60 ft."],
     passive: 9,
     languages: ["Common", "Goblin"],
-    cr: "1/8",
+    cr: 0.125,
     gear: [
       {
         item: "dagger|xphb",
@@ -627,7 +627,7 @@ export const monsters_cr_1_8 = [
     },
     passive: 12,
     languages: ["Common"],
-    cr: "1/8",
+    cr: 0.125,
     gear: ["chain shirt|xphb", "shield|xphb", "spear|xphb"],
     action: [
       {
@@ -671,7 +671,7 @@ export const monsters_cr_1_8 = [
     senses: ["darkvision 60 ft."],
     passive: 8,
     languages: ["Common", "Draconic"],
-    cr: "1/8",
+    cr: 0.125,
     gear: [
       {
         item: "dagger|xphb",
@@ -749,7 +749,7 @@ export const monsters_cr_1_8 = [
     immune: ["poison"],
     conditionImmune: ["charmed", "frightened", "poisoned"],
     languages: ["understands Abyssal but can't speak"],
-    cr: "1/8",
+    cr: 0.125,
     action: [
       {
         name: "Claw",
@@ -803,7 +803,7 @@ export const monsters_cr_1_8 = [
     },
     senses: ["darkvision 60 ft."],
     passive: 15,
-    cr: "1/8",
+    cr: 0.125,
     action: [
       {
         name: "Bite",
@@ -846,7 +846,7 @@ export const monsters_cr_1_8 = [
     cha: 12,
     passive: 12,
     languages: ["Common", "Primordial (Aquan)"],
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Amphibious",
@@ -894,7 +894,7 @@ export const monsters_cr_1_8 = [
     passive: 10,
     conditionImmune: ["charmed"],
     languages: ["Modron"],
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Disintegration",
@@ -957,7 +957,7 @@ export const monsters_cr_1_8 = [
       str: "+4",
     },
     passive: 10,
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Beast of Burden",
@@ -1016,7 +1016,7 @@ export const monsters_cr_1_8 = [
     },
     passive: 12,
     languages: ["Common plus two other languages"],
-    cr: "1/8",
+    cr: 0.125,
     gear: ["breastplate|xphb", "rapier|xphb"],
     action: [
       {
@@ -1076,7 +1076,7 @@ export const monsters_cr_1_8 = [
       str: "+4",
     },
     passive: 10,
-    cr: "1/8",
+    cr: 0.125,
     action: [
       {
         name: "Hooves",
@@ -1128,7 +1128,7 @@ export const monsters_cr_1_8 = [
     passive: 7,
     resist: ["acid", "cold", "fire", "lightning", "thunder"],
     languages: ["understands Slaad but can't speak"],
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Magic Resistance",
@@ -1181,7 +1181,7 @@ export const monsters_cr_1_8 = [
     cha: 6,
     senses: ["darkvision 60 ft."],
     passive: 9,
-    cr: "1/8",
+    cr: 0.125,
     action: [
       {
         name: "Proboscis",
@@ -1243,7 +1243,7 @@ export const monsters_cr_1_8 = [
     vulnerable: ["fire"],
     conditionImmune: ["deafened"],
     languages: ["understands Common but can't speak"],
-    cr: "1/8",
+    cr: 0.125,
     trait: [
       {
         name: "Pack Tactics",
@@ -1304,7 +1304,7 @@ export const monsters_cr_1_8 = [
     cha: 3,
     senses: ["blindsight 10 ft."],
     passive: 10,
-    cr: "1/8",
+    cr: 0.125,
     action: [
       {
         name: "Bite",
@@ -1341,7 +1341,7 @@ export const monsters_cr_1_8 = [
     cha: 8,
     passive: 10,
     languages: ["Common"],
-    cr: "1/8",
+    cr: 0.125,
     gear: ["chain shirt|xphb", "spear|xphb"],
     trait: [
       {

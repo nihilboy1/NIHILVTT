@@ -1,10 +1,9 @@
 import type { Spell } from "../../domain/spell/spell.schema.js";
+
 export const spellsLevel1 = [
   {
     id: "spell-alarme",
     name: ["Alarme", "Alarm"],
-    description:
-      "Você prepara um alarme contra invasões. Escolha uma porta, uma janela ou uma área dentro do alcance que não seja maior que um cubo de 6 metros (20 pés). Até o fim da magia, um alarme alerta você sempre que uma criatura designada tocar ou entrar na área protegida. Ao conjurar a magia, você pode designar criaturas que não ativarão o alarme. Você também escolhe se o alarme será audível ou mental.",
     source: "LDJ2024",
     page: 239,
     level: 1,
@@ -24,38 +23,9 @@ export const spellsLevel1 = [
       unit: "hour",
       value: 8,
     },
-    effects: [
-      {
-        type: "activatableCastSpell",
-        actionId: "action-cast-spell",
-        parameters: {
-          activation: {
-            type: "special",
-          },
-          range: {
-            normal: 30,
-            unit: "ft",
-          },
-          target: {
-            type: "point",
-          },
-          area: {
-            shape: "cube",
-            size: 20,
-            unit: "ft",
-          },
-          outcomes: [
-            {
-              id: "alarm-create-ward",
-              type: "descriptive",
-              on: "any",
-              details:
-                "Cria uma sentinela mágica e invisível na área designada. Na conjuração, o jogador designa criaturas que não disparam o alarme e escolhe um dos dois tipos de alerta: 1) Mental: um 'ping' de alerta é enviado ao conjurador se ele estiver a até 1 milha. 2) Audível: o som de um sino soa por 10 segundos, audível a até 60 pés.",
-            },
-          ],
-        },
-      },
-    ],
+    description:
+      "Você prepara um alarme contra invasões. Escolha uma porta, uma janela ou uma área dentro do alcance que não seja maior que um cubo de 6 metros (20 pés). Até o fim da magia, um alarme alerta você sempre que uma criatura designada tocar ou entrar na área protegida.\n\nAo conjurar a magia, você pode designar criaturas que não ativarão o alarme. Você também escolhe se o alarme será audível ou mental:\n\n• **Mental**: um sinal telepático desperta você enquanto estiver a até 1 milha da área protegida.\n• **Audível**: o som de um sino toca por 10 segundos, audível a até 60 pés.\n\nA sentinela mágica é invisível e dura até o fim da magia.",
+    effects: [],
   },
   {
     id: "spell-amizade-animal",
@@ -77,23 +47,21 @@ export const spellsLevel1 = [
       value: 24,
     },
     requirements: {
-      target: [
-        {
-          type: "isCreatureType",
-          creatureTypes: ["beast"],
-        },
-      ],
+      target: {
+        events: [
+          {
+            type: "isCreatureOfType",
+            creatureTypes: ["beast"],
+          },
+        ],
+      },
     },
     effects: [
       {
+        name: "Conjurar Amizade Animal",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [
-          {
-            on: ["onTakingDamage"],
-            specific: { from: ["caster", "casterAllies"] },
-          },
-        ],
+        endConditions: {},
         parameters: {
           activation: {
             type: "action",
@@ -162,6 +130,7 @@ export const spellsLevel1 = [
     },
     effects: [
       {
+        name: "Conjurar Curar Ferimentos",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -222,6 +191,7 @@ export const spellsLevel1 = [
     },
     effects: [
       {
+        name: "Conjurar Palavra Curativa",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -278,6 +248,7 @@ export const spellsLevel1 = [
     },
     effects: [
       {
+        name: "Conjurar Braços de Hadar",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -317,6 +288,7 @@ export const spellsLevel1 = [
               type: "applyEffect",
               on: "fail",
               effect: {
+                name: "Impedir Reações",
                 type: "preventsReaction",
                 duration: {
                   unit: "turn",
@@ -364,6 +336,7 @@ export const spellsLevel1 = [
     },
     effects: [
       {
+        name: "Conjurar Mãos Flamejantes",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -414,14 +387,16 @@ export const spellsLevel1 = [
               on: "any",
               condition: "burning",
               requirements: {
-                target: [
-                  {
-                    type: "isObject",
-                    isFlammable: true,
-                    isWorn: false,
-                    isCarried: false,
-                  },
-                ],
+                target: {
+                  events: [
+                    {
+                      type: "isObject",
+                      isCarried: false,
+                      isFlammable: true,
+                      isWorn: false,
+                    },
+                  ],
+                },
               },
             },
           ],
@@ -457,6 +432,7 @@ export const spellsLevel1 = [
     },
     effects: [
       {
+        name: "Conjurar Benção",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -473,36 +449,22 @@ export const spellsLevel1 = [
           },
           outcomes: [
             {
-              id: "bless-attack-buff",
+              id: "bless-buff",
               type: "applyEffect",
               on: "any",
               effect: {
+                name: "Bênção - Modificador",
                 type: "triggeredModifier",
-                triggers: [{ on: ["onAttackRoll"] }],
+                triggers: {
+                  events: [
+                    { type: "madeSavingThrow" },
+                    { type: "madeAttackRoll" },
+                  ],
+                },
                 modifier: {
                   operation: "add",
                   dice: { count: 1, faces: 4 },
-                  target: "attackRoll",
-                  appliesTo: "self",
-                },
-                duration: {
-                  unit: "minute",
-                  value: 1,
-                  isConcentration: true,
-                },
-              },
-            },
-            {
-              id: "bless-save-buff",
-              type: "applyEffect",
-              on: "any",
-              effect: {
-                type: "triggeredModifier",
-                triggers: [{ on: ["onSavingThrow"] }],
-                modifier: {
-                  operation: "add",
-                  dice: { count: 1, faces: 4 },
-                  target: "saveRoll",
+                  target: ["saveRoll", "attackRoll"],
                   appliesTo: "self",
                 },
                 duration: {
@@ -549,6 +511,7 @@ export const spellsLevel1 = [
     },
     effects: [
       {
+        name: "Conjurar Perdição",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -573,36 +536,22 @@ export const spellsLevel1 = [
           },
           outcomes: [
             {
-              id: "bane-debuff-attack",
+              id: "bane-debuff",
               type: "applyEffect",
-              on: "fail",
+              on: "any",
               effect: {
+                name: "Perdição - Penalidade",
                 type: "triggeredModifier",
-                triggers: [{ on: ["onAttackRoll"] }],
+                triggers: {
+                  events: [
+                    { type: "madeSavingThrow" },
+                    { type: "madeAttackRoll" },
+                  ],
+                },
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
-                  target: "attackRoll",
-                  appliesTo: "self",
-                },
-                duration: {
-                  unit: "minute",
-                  value: 1,
-                  isConcentration: true,
-                },
-              },
-            },
-            {
-              id: "bane-debuff-save",
-              type: "applyEffect",
-              on: "fail",
-              effect: {
-                type: "triggeredModifier",
-                triggers: [{ on: ["onSavingThrow"] }],
-                modifier: {
-                  operation: "subtract",
-                  dice: { count: 1, faces: 4 },
-                  target: "saveRoll",
+                  target: ["saveRoll", "attackRoll"],
                   appliesTo: "self",
                 },
                 duration: {
@@ -652,9 +601,10 @@ export const spellsLevel1 = [
     },
     effects: [
       {
+        name: "Conjurar Armadura de Agathys",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onTempHpDepleted"] }],
+        endConditions: { events: [{ type: "tempHPDepleted" }] },
         parameters: {
           activation: {
             type: "bonusAction",
@@ -678,19 +628,11 @@ export const spellsLevel1 = [
               type: "applyEffect",
               on: "any",
               effect: {
+                name: "Retaliação de Agathys",
                 type: "triggeredEffect",
-                triggers: [
-                  {
-                    on: ["onTakingDamage"],
-                    specific: {
-                      attackType: [
-                        "meleeWeaponAttack",
-                        "meleeItemAttack",
-                        "meleeSpellAttack",
-                      ],
-                    },
-                  },
-                ],
+                triggers: {
+                  events: [{ type: "tookDamage", attackType: ["meleeAttack"] }],
+                },
                 outcomes: [
                   {
                     id: "agathys-retaliation-damage",
@@ -736,7 +678,7 @@ export const spellsLevel1 = [
     id: "spell-charm-person",
     name: ["Enfeitiçar Pessoa", "Charm Person"],
     description:
-      "Um humanoide que você possa ver dentro do alcance deve fazer um teste de resistência de Sabedoria. Ele o faz com vantagem se você ou seus aliados estiverem lutando com ele. Em uma falha, o alvo fica encantado por você até o fim da magia ou até que você ou seus companheiros o danifiquem. Quando a magia termina, o alvo sabe que foi encantado por você.",
+      "Um humanoide à sua escolha, que você possa ver dentro do alcance, deve realizar um teste de resistência de Sabedoria. O alvo faz esse teste com vantagem se você ou seus aliados estiverem em combate contra ele. Em caso de falha, o alvo fica encantado por você até o fim da duração da magia ou até que você ou seus companheiros o prejudiquem. Quando a magia termina, o alvo sabe que foi enfeitiçado por você. Você tem desvantagem ao Conjurar esta magia contra uma criatura que você ou seus companheiros tenham tratado de forma hostil.",
     source: "LDJ2024",
     page: 249,
     level: 1,
@@ -749,25 +691,24 @@ export const spellsLevel1 = [
       value: 1,
     },
     requirements: {
-      target: [
-        {
-          type: "isCreatureType",
-          creatureTypes: ["humanoid"],
-        },
-      ],
+      target: {
+        events: [{ type: "isCreatureOfType", creatureTypes: ["humanoid"] }],
+      },
     },
     effects: [
       {
+        name: "Conjurar Enfeitiçar Pessoa",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [
-          {
-            on: ["onTakingDamage"],
-            specific: {
+        endConditions: {
+          events: [
+            {
+              type: "tookDamage",
               from: ["caster", "casterAllies"],
+              attackType: ["any"],
             },
-          },
-        ],
+          ],
+        },
         parameters: {
           activation: {
             type: "action",
@@ -787,12 +728,6 @@ export const spellsLevel1 = [
               base: 8,
               attributes: ["proficiency", "spellcasting"],
             },
-            rollModifier: {
-              type: "conditionalRollModifier",
-              triggers: ["onUserOrAlliesActsHostile"],
-              ifTrue: { type: "rollModifier", mode: "advantage" },
-              ifFalse: { type: "rollModifier", mode: "normal" },
-            },
           },
           outcomes: [
             {
@@ -804,13 +739,6 @@ export const spellsLevel1 = [
                 unit: "hour",
                 value: 1,
               },
-            },
-            {
-              id: "charm-person-awareness-rule",
-              type: "descriptive",
-              on: "spellEnd",
-              details:
-                "Quando a magia termina, o alvo sabe que foi encantado por você.",
             },
             {
               type: "none",
@@ -831,8 +759,6 @@ export const spellsLevel1 = [
       },
     ],
   },
-] as const satisfies Spell[];
-export const X1 = [
   {
     id: "spell-chromatic-orb",
     name: ["Orbe Cromática", "Chromatic Orb"],
@@ -849,6 +775,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Orbe Cromática",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -856,119 +783,45 @@ export const X1 = [
           range: { normal: 90, unit: "ft" },
           target: { type: "creature", quantity: 1 },
           attackType: ["rangedSpellAttack"],
-          choices: {
-            on: "any",
-            type: "chooseEffect",
-            options: [
-              {
-                id: "damage-acid",
-                name: "Ácido",
-                outcome: {
-                  id: "chromatic-orb-damage",
-                  type: "modifyTargetHP",
-                  on: "hit",
-                  vitals: ["currentHp"],
-                  formula: {
-                    type: "damage",
-                    roll: { count: 3, faces: 8 },
-                    damageTypeOptions: ["acid"],
-                  },
-                },
+          outcomes: [
+            {
+              id: "chromatic-orb-damage",
+              type: "modifyTargetHP",
+              on: "hit",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 3, faces: 8 },
+                damageTypeOptions: [
+                  "acid",
+                  "cold",
+                  "fire",
+                  "lightning",
+                  "poison",
+                  "thunder",
+                ],
               },
-              {
-                id: "damage-cold",
-                name: "Frio",
-                outcome: {
-                  id: "chromatic-orb-damage",
-                  type: "modifyTargetHP",
-                  on: "hit",
-                  vitals: ["currentHp"],
-                  formula: {
-                    type: "damage",
-                    roll: { count: 3, faces: 8 },
-                    damageTypeOptions: ["cold"],
-                  },
-                },
-              },
-              {
-                id: "damage-fire",
-                name: "Fogo",
-                outcome: {
-                  id: "chromatic-orb-damage",
-                  type: "modifyTargetHP",
-                  on: "hit",
-                  vitals: ["currentHp"],
-                  formula: {
-                    type: "damage",
-                    roll: { count: 3, faces: 8 },
-                    damageTypeOptions: ["fire"],
-                  },
-                },
-              },
-              {
-                id: "damage-lightning",
-                name: "Relâmpago",
-                outcome: {
-                  id: "chromatic-orb-damage",
-                  type: "modifyTargetHP",
-                  on: "hit",
-                  vitals: ["currentHp"],
-                  formula: {
-                    type: "damage",
-                    roll: { count: 3, faces: 8 },
-                    damageTypeOptions: ["lightning"],
-                  },
-                },
-              },
-              {
-                id: "damage-poison",
-                name: "Veneno",
-                outcome: {
-                  id: "chromatic-orb-damage",
-                  type: "modifyTargetHP",
-                  on: "hit",
-                  vitals: ["currentHp"],
-                  formula: {
-                    type: "damage",
-                    roll: { count: 3, faces: 8 },
-                    damageTypeOptions: ["poison"],
-                  },
-                },
-              },
-              {
-                id: "damage-thunder",
-                name: "Trovão",
-                outcome: {
-                  id: "chromatic-orb-damage",
-                  type: "modifyTargetHP",
-                  on: "hit",
-                  vitals: ["currentHp"],
-                  formula: {
-                    type: "damage",
-                    roll: { count: 3, faces: 8 },
-                    damageTypeOptions: ["thunder"],
-                  },
-                },
-              },
-            ],
-          },
-          outcomes: [],
+            },
+          ],
         },
         chainedEffects: [
           {
             triggers: {
-              on: ["onDiceRollResult"],
-              specific: {
-                outcomeId: "chromatic-orb-damage",
-                diceResultCondition: "doubles",
-              },
+              events: [
+                {
+                  type: "dicePatternRolled",
+                  condition: "anyDoubles",
+                  diceType: 8,
+                  rollCount: 3,
+                },
+              ],
             },
             outcomes: [
               {
                 type: "descriptive",
                 on: "any",
                 details:
-                  "O orbe salta para um alvo diferente à sua escolha a até 30 pés. Faça uma nova jogada de ataque e uma nova jogada de dano.",
+                  "O orbe salta para um alvo diferente à sua escolha a até 30 pés. Conjure a magia novamente. Faça uma nova jogada de ataque e uma nova jogada de dano.",
               },
             ],
           },
@@ -1003,6 +856,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Leque Cromático",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1048,6 +902,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Comando",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1102,11 +957,16 @@ export const X1 = [
     duration: { unit: "minute", value: 1, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Duelo Forçado",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [
-          { on: ["onUserLoseConcentration", "onUserActsHostile"] },
-        ],
+        endConditions: {
+          events: [
+            { type: "lostConcentration" },
+            { type: "hostile", who: ["user"], is: true },
+          ],
+        },
+
         parameters: {
           activation: { type: "bonusAction" },
           range: { normal: 30, unit: "ft" },
@@ -1125,6 +985,7 @@ export const X1 = [
               type: "applyEffect",
               on: "fail",
               effect: {
+                name: "Desvantagem em Ataques",
                 type: "imposeDisadvantage",
                 on: "attackRoll",
                 duration: { unit: "minute", value: 1, isConcentration: true },
@@ -1163,6 +1024,7 @@ export const X1 = [
     duration: { unit: "hour", value: 1 },
     effects: [
       {
+        name: "Conjurar Compreender Idiomas",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1197,6 +1059,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Criar ou Destruir Água",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1255,9 +1118,12 @@ export const X1 = [
     duration: { unit: "minute", value: 10, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Detectar o Bem e o Mal",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           target: { type: "selfArea" },
@@ -1289,9 +1155,12 @@ export const X1 = [
     duration: { unit: "minute", value: 10, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Detectar Magia",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           target: { type: "selfArea" },
@@ -1326,9 +1195,12 @@ export const X1 = [
     duration: { unit: "minute", value: 10, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Detectar Veneno e Doença",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           target: { type: "selfArea" },
@@ -1358,6 +1230,7 @@ export const X1 = [
     duration: { unit: "hour", value: 1 },
     effects: [
       {
+        name: "Conjurar Disfarçar-se",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1389,6 +1262,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Sussurros Dissonantes",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1465,6 +1339,7 @@ export const X1 = [
     duration: { unit: "minute", value: 1 },
     effects: [
       {
+        name: "Conjurar Favor Divino",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1476,15 +1351,9 @@ export const X1 = [
               type: "applyEffect",
               on: "any",
               effect: {
+                name: "Dano Extra Divino",
                 type: "triggeredEffect",
-                triggers: [
-                  {
-                    on: ["onDealingDamage"],
-                    specific: {
-                      attackType: ["meleeWeaponAttack", "rangedWeaponAttack"],
-                    },
-                  },
-                ],
+                triggers: { events: [{ type: "dealtDamage" }] },
                 outcomes: [
                   {
                     id: "divine-favor-extra-damage",
@@ -1519,6 +1388,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Golpe Divino",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1553,12 +1423,14 @@ export const X1 = [
                 damageTypeOptions: ["radiant"],
               },
               requirements: {
-                target: [
-                  {
-                    type: "isCreatureType",
-                    creatureTypes: ["fiend", "undead"],
-                  },
-                ],
+                target: {
+                  events: [
+                    {
+                      type: "isCreatureOfType",
+                      creatureTypes: ["fiend", "undead"],
+                    },
+                  ],
+                },
               },
             },
           ],
@@ -1590,9 +1462,12 @@ export const X1 = [
     duration: { unit: "minute", value: 1, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Golpe Aprisionador",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: {
             type: "bonusAction",
@@ -1622,8 +1497,9 @@ export const X1 = [
               type: "applyEffect",
               on: "fail",
               effect: {
+                name: "Dano Contínuo Aprisionador",
                 type: "triggeredEffect",
-                triggers: [{ on: ["onTurnStart"] }],
+                triggers: { events: [{ type: "onTurnStart" }] },
                 outcomes: [
                   {
                     id: "ensnaring-strike-damage",
@@ -1673,9 +1549,12 @@ export const X1 = [
     duration: { unit: "minute", value: 1, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Emaranhar",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           range: { normal: 90, unit: "ft" },
@@ -1731,9 +1610,12 @@ export const X1 = [
     duration: { unit: "minute", value: 10, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Recuo Acelerado",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "self" },
@@ -1763,9 +1645,12 @@ export const X1 = [
     duration: { unit: "minute", value: 1, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Fogo das Fadas",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -1784,6 +1669,7 @@ export const X1 = [
               type: "applyEffect",
               on: "fail",
               effect: {
+                name: "Luz de Fada",
                 type: "passive_providesLight",
                 properties: {
                   bright: 0,
@@ -1823,6 +1709,7 @@ export const X1 = [
     duration: { unit: "instantaneous" }, // Os PVs duram, mas a magia não. A nova regra diz 'instantâneo'.
     effects: [
       {
+        name: "Conjurar Vida Falsa",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1847,7 +1734,7 @@ export const X1 = [
             {
               type: "incrementOutcomeProperty",
               outcomeId: "false-life-temp-hp",
-              propertyPath: "formula.fixed", // O escalonamento é um valor fixo, não mais dados.
+              propertyPath: "formula.fixed",
               increment: 5,
             },
           ],
@@ -1859,7 +1746,7 @@ export const X1 = [
     id: "spell-feather-fall",
     name: ["Queda Suave", "Feather Fall"],
     description:
-      "Até cinco criaturas em queda diminuem sua taxa de descida para 60 pés por rodada. Se aterrissarem antes do fim da magia, não sofrem dano de queda.",
+      "Quando você ou até cinco criaturas dentro do alcance caírem, você pode conjurar esta magia como uma reação. Cada criatura escolhida tem sua taxa de queda reduzida para 60 pés por rodada. Se aterrissarem antes do fim da magia, não sofrem dano de queda. A magia dura até 1 minuto.",
     source: "LDJ2024",
     page: 271,
     level: 1,
@@ -1869,35 +1756,13 @@ export const X1 = [
       material: { description: "uma pena pequena" },
     },
     duration: { unit: "minute", value: 1 },
-    effects: [
-      {
-        type: "activatableCastSpell",
-        actionId: "action-cast-spell",
-        parameters: {
-          activation: {
-            type: "reaction",
-            details: "Quando você ou uma criatura a até 60 pés cai.",
-          },
-          range: { normal: 60, unit: "ft" },
-          target: { type: "creature", quantity: 5 },
-          outcomes: [
-            {
-              id: "feather-fall-effect",
-              type: "descriptive",
-              on: "any",
-              details:
-                "A taxa de queda do alvo torna-se 60 pés por rodada. O alvo não sofre dano de queda ao aterrissar.",
-            },
-          ],
-        },
-      },
-    ],
+    effects: [],
   },
   {
     id: "spell-find-familiar",
     name: ["Encontrar Familiar", "Find Familiar"],
     description:
-      "Você ganha o serviço de um familiar, um espírito que assume a forma de um animal. Ele age de forma independente, mas obedece aos seus comandos.",
+      "Você ganha o serviço de um familiar, um espírito que assume a forma de um animal. Ele age de forma independente, mas obedece aos seus comandos. O familiar é Celestial, Feérico ou Infernal. Ele obedece a seus comandos, age em sua própria iniciativa e não pode atacar. Você pode se comunicar telepaticamente, ver através de seus olhos e entregar magias de toque através dele.",
     source: "LDJ2024",
     page: 272,
     level: 1,
@@ -1915,6 +1780,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Encontrar Familiar",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -1928,13 +1794,6 @@ export const X1 = [
               on: "any",
               tokenId: "token-find-familiar",
               quantity: 1,
-            },
-            {
-              id: "find-familiar-rules",
-              type: "descriptive",
-              on: "any",
-              details:
-                "O familiar é Celestial, Feérico ou Infernal. Ele obedece a seus comandos, age em sua própria iniciativa e não pode atacar. Você pode se comunicar telepaticamente, ver através de seus olhos e entregar magias de toque através dele.",
             },
           ],
         },
@@ -1954,11 +1813,16 @@ export const X1 = [
     duration: { unit: "hour", value: 1, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Nuvem de Neblina",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [
-          { on: ["onUserLoseConcentration", "onHitByStrongWind"] },
-        ],
+        endConditions: {
+          events: [
+            { type: "lostConcentration" },
+            { type: "wasHitByStrongWind" },
+          ],
+        },
+
         parameters: {
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
@@ -2005,6 +1869,7 @@ export const X1 = [
     duration: { unit: "hour", value: 24 },
     effects: [
       {
+        name: "Conjurar Boa Baga",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2041,6 +1906,7 @@ export const X1 = [
     duration: { unit: "minute", value: 1 },
     effects: [
       {
+        name: "Conjurar Graxa",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2048,7 +1914,6 @@ export const X1 = [
           range: { normal: 60, unit: "ft" },
           target: { type: "point" },
           area: { shape: "cube", size: 10, unit: "ft" },
-          // Este 'save' é para as criaturas pegas na conjuração inicial
           save: {
             ability: "dexterity",
             dc: {
@@ -2058,25 +1923,27 @@ export const X1 = [
             },
           },
           outcomes: [
-            // Outcome 1: Aplica a condição "prone" na conjuração inicial
             {
               id: "grease-initial-prone",
               type: "applyCondition",
               on: "fail",
               condition: "prone",
             },
-            // Outcome 2: Cria a área de efeito persistente
             {
               id: "grease-create-area",
               type: "createAreaEffect",
-              on: "any", // A área é criada independentemente do save
+              on: "any",
               surfaceType: "grease",
               isDifficultTerrain: true,
               duration: { unit: "minute", value: 1 },
               rules: [
                 {
-                  // Esta regra afeta quem entra ou termina o turno na área
-                  trigger: { on: ["onEnterArea", "onEndTurnInArea"] },
+                  trigger: {
+                    events: [
+                      { type: "enteredArea" },
+                      { type: "endedTurnInArea" },
+                    ],
+                  },
                   save: {
                     ability: "dexterity",
                     dc: {
@@ -2114,6 +1981,7 @@ export const X1 = [
     duration: { unit: "round", value: 1 },
     effects: [
       {
+        name: "Conjurar Raio Guiador",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2134,11 +2002,13 @@ export const X1 = [
               },
             },
             {
-              id: "guiding-bolt-advantage-debuff",
-              type: "descriptive",
+              type: "grantAdvantageDisadvantage",
               on: "hit",
-              details:
-                "A próxima jogada de ataque feita contra o alvo antes do final do seu próximo turno tem vantagem.",
+              target: { type: "creature", quantity: 1 },
+              mode: "advantage",
+              targetRoll: "attackRoll",
+              appliesTo: "nextAttacker",
+              duration: { unit: "turn", value: 1 },
             },
           ],
         },
@@ -2169,13 +2039,17 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Chuva de Espinhos",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
             type: "bonusAction",
-            details:
-              "Imediatamente após acertar com uma arma de longo alcance.",
+            triggers: {
+              events: [
+                { type: "madeAttackRoll", attackType: "rangedWeaponAttack" },
+              ],
+            },
           },
           target: {
             type: "descriptive",
@@ -2241,13 +2115,21 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Repreensão Infernal",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
             type: "reaction",
-            details:
-              "Em resposta a sofrer dano de uma criatura visível a até 60 pés.",
+            triggers: {
+              events: [
+                {
+                  type: "wasAttacked",
+                  byVisibleCreature: true,
+                  maxDistance: { unit: "ft", normal: 60 },
+                },
+              ],
+            },
           },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
@@ -2310,9 +2192,12 @@ export const X1 = [
     duration: { unit: "minute", value: 1, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Heroísmo",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           range: { unit: "ft", normal: 5 },
@@ -2323,8 +2208,9 @@ export const X1 = [
               type: "applyEffect",
               on: "any",
               effect: {
+                name: "Força Heroica",
                 type: "triggeredEffect",
-                triggers: [{ on: ["onTurnStart"] }],
+                triggers: { events: [{ type: "onTurnStart" }] },
                 outcomes: [
                   {
                     id: "heroism-temp-hp",
@@ -2374,9 +2260,12 @@ export const X1 = [
     duration: { unit: "hour", value: 1, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Rogar Praga",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "bonusAction" },
           range: { normal: 90, unit: "ft" },
@@ -2387,13 +2276,12 @@ export const X1 = [
               type: "applyEffect",
               on: "any",
               effect: {
+                name: "Dano Extra da Maldição",
                 type: "triggeredEffect",
-                triggers: [
-                  {
-                    on: ["onDealingDamage"],
-                    specific: { from: ["caster"] },
-                  },
-                ],
+                triggers: {
+                  events: [{ type: "dealtDamage" }],
+                },
+
                 outcomes: [
                   {
                     id: "hex-extra-damage",
@@ -2433,7 +2321,7 @@ export const X1 = [
     id: "spell-hunters-mark",
     name: ["Marca do Caçador", "Hunter's Mark"],
     description:
-      "Você marca uma criatura como sua presa. Até a magia acabar, você causa 1d6 de dano de força extra a ela com seus ataques e tem vantagem em testes de Percepção e Sobrevivência para encontrá-la.",
+      "Você marca uma criatura como sua presa. Enquanto a magia durar, você causa 1d6 de dano de força extra a ela sempre que acertar um ataque com arma. Além disso, você tem vantagem em testes de Sabedoria (Percepção ou Sobrevivência) para encontrá-la. Se o alvo morrer antes da magia acabar, você pode usar uma ação bônus em um turno posterior para marcar uma nova criatura.",
     source: "LDJ2024",
     page: 287,
     level: 1,
@@ -2442,9 +2330,12 @@ export const X1 = [
     duration: { unit: "hour", value: 1, isConcentration: true },
     effects: [
       {
+        name: "Conjurar Marca do Caçador",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "bonusAction" },
           range: { normal: 90, unit: "ft" },
@@ -2456,14 +2347,17 @@ export const X1 = [
               on: "any",
               effect: {
                 type: "triggeredEffect",
-                triggers: [
-                  {
-                    on: ["onDealingDamage"],
-                    specific: {
+                name: "Hunters Mark",
+                triggers: {
+                  events: [
+                    {
+                      type: "tookDamage",
+                      from: ["caster"],
                       attackType: ["meleeWeaponAttack", "rangedWeaponAttack"],
                     },
-                  },
-                ],
+                  ],
+                },
+
                 outcomes: [
                   {
                     id: "hunters-mark-damage",
@@ -2479,20 +2373,6 @@ export const X1 = [
                 ],
                 duration: { unit: "hour", value: 1, isConcentration: true },
               },
-            },
-            {
-              id: "hunters-mark-advantage-rule",
-              type: "descriptive",
-              on: "any",
-              details:
-                "Você tem vantagem em testes de Sabedoria (Percepção ou Sobrevivência) para encontrar o alvo.",
-            },
-            {
-              id: "hunters-mark-move-rule",
-              type: "descriptive",
-              on: "any",
-              details:
-                "Se o alvo morrer, você pode usar uma ação bônus para mover a marca.",
             },
           ],
         },
@@ -2515,6 +2395,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Faca de Gelo",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2541,7 +2422,9 @@ export const X1 = [
         },
         chainedEffects: [
           {
-            triggers: { on: ["onHit", "onMiss"] },
+            triggers: {
+              events: [{ type: "attackHit" }, { type: "attackMissed" }],
+            },
             area: { shape: "sphere", radius: 5, unit: "ft" },
             save: {
               type: "calculated",
@@ -2602,6 +2485,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Identificar",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2646,6 +2530,7 @@ export const X1 = [
     duration: { unit: "day", value: 10 },
     effects: [
       {
+        name: "Conjurar Escrita Ilusória",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2678,6 +2563,7 @@ export const X1 = [
     duration: { unit: "instantaneous" },
     effects: [
       {
+        name: "Conjurar Infligir Ferimentos",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2746,6 +2632,7 @@ export const X1 = [
     duration: { unit: "minute", value: 1 },
     effects: [
       {
+        name: "Conjurar Salto",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2791,6 +2678,7 @@ export const X1 = [
     duration: { unit: "hour", value: 1 },
     effects: [
       {
+        name: "Conjurar Passos Longos",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2839,6 +2727,7 @@ export const X1 = [
     duration: { unit: "hour", value: 8 },
     effects: [
       {
+        name: "Conjurar Armadura Arcana",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
@@ -2876,6 +2765,7 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Míssil Mágico",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2927,8 +2817,11 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Proteção contra o Bem e o Mal",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           range: { unit: "ft", normal: 5 },
@@ -2961,6 +2854,7 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Purificar Comida e Bebida",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2992,6 +2886,7 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Raio da Doença",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -3050,8 +2945,12 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Santuário",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserActsHostile"] }],
+        endConditions: {
+          events: [{ type: "hostile", who: ["user"], is: true }],
+        },
+
         parameters: {
           activation: { type: "bonusAction" },
           range: { normal: 30, unit: "ft" },
@@ -3083,11 +2982,16 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Golpe Fervente",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
             type: "bonusAction",
-            details: "Imediatamente após atingir com um ataque corpo a corpo.",
+            triggers: {
+              events: [
+                { type: "madeAttackRoll", attackType: "meleeWeaponAttack" },
+              ],
+            },
           },
           target: { type: "descriptive", details: "Alvo do ataque." },
           outcomes: [
@@ -3139,12 +3043,25 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Escudo Arcano",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
             type: "reaction",
-            details:
-              "Quando você é atingido por um ataque ou alvo do Míssil Mágico.",
+            triggers: {
+              events: [
+                {
+                  type: "wasAffectedBySpell",
+                  spellId: "spell-magic-missile",
+                },
+                {
+                  type: "wasAttacked",
+                  byVisibleCreature: true,
+                  maxDistance: { unit: "ft", normal: 60 },
+                },
+              ],
+              conditionMode: "any",
+            },
           },
           target: { type: "self" },
           outcomes: [
@@ -3153,6 +3070,7 @@ export const X1 = [
               type: "applyEffect",
               on: "any",
               effect: {
+                name: "Bônus de CA do Escudo",
                 type: "passive_grantBonus",
                 on: "ac",
                 value: 5,
@@ -3188,7 +3106,10 @@ export const X1 = [
       {
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        name: "Conjurar Escudo Arcano",
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "bonusAction" },
           range: { normal: 60, unit: "ft" },
@@ -3199,6 +3120,7 @@ export const X1 = [
               type: "applyEffect",
               on: "any",
               effect: {
+                name: "Bônus de CA da Fé",
                 type: "passive_grantBonus",
                 on: "ac",
                 value: 2,
@@ -3227,8 +3149,11 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Imagem Silenciosa",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -3271,8 +3196,11 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Sono",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -3325,6 +3253,7 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Falar com Animais",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -3359,8 +3288,11 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Riso Histérico de Tasha",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
@@ -3428,6 +3360,7 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Disco Flutuante de Tenser",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -3468,11 +3401,16 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Golpe Trovejante",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
             type: "bonusAction",
-            details: "Imediatamente após atingir com um ataque corpo a corpo.",
+            triggers: {
+              events: [
+                { type: "madeAttackRoll", attackType: "meleeWeaponAttack" },
+              ],
+            },
           },
           target: { type: "descriptive", details: "Alvo do ataque." },
           save: {
@@ -3526,7 +3464,7 @@ export const X1 = [
   },
   {
     id: "spell-thunderwave",
-    name: ["Onda de Trovão", "Thunderwave"],
+    name: ["Onda Trovejante", "Thunderwave"],
     description:
       "Uma onda de energia trovejante explode de você. Cada criatura em um cubo de 15 pés deve fazer um teste de Constituição. Em falha, sofre 2d8 de dano de trovão e é empurrada 10 pés. Em sucesso, sofre metade do dano.",
     source: "LDJ2024",
@@ -3538,6 +3476,7 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Onda Trovejante",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -3611,6 +3550,7 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Servo Invisível",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -3654,8 +3594,11 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Raio Enfeitiçante",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+        },
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -3678,6 +3621,7 @@ export const X1 = [
               type: "applyEffect",
               on: "hit",
               effect: {
+                name: "Canalização do Witch Bolt",
                 type: "activatableAction",
                 actionId: "action-witch-bolt-channel",
                 duration: { unit: "minute", value: 1, isConcentration: true },
@@ -3729,11 +3673,16 @@ export const X1 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Raio Enfeitiçante",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
             type: "bonusAction",
-            details: "Imediatamente após atingir com um ataque corpo a corpo.",
+            triggers: {
+              events: [
+                { type: "madeAttackRoll", attackType: "meleeWeaponAttack" },
+              ],
+            },
           },
           target: { type: "descriptive", details: "Alvo do ataque." },
           save: {

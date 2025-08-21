@@ -1,6 +1,6 @@
 import { Item } from "../../domain/item/items.schema";
-
-export const itemsGear: Item[] = [
+import z from "zod";
+export const itemsGear = [
   {
     id: "item-acido",
     name: ["Ácido", "Acid"],
@@ -15,6 +15,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Arremessar Ácido",
         actionId: "action-throw-item",
         parameters: {
           range: { normal: 20, unit: "ft" },
@@ -34,7 +35,7 @@ export const itemsGear: Item[] = [
         },
       },
     ],
-  }, // ok
+  },
   {
     id: "item-fogo-alquimico",
     name: ["Fogo Alquímico", "Alchemist's Fire"],
@@ -49,6 +50,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Arremessar Fogo Alquímico",
         actionId: "action-throw-item",
         parameters: {
           attackType: ["rangedItemAttack"],
@@ -58,7 +60,7 @@ export const itemsGear: Item[] = [
             {
               type: "damageOverTime",
               on: "fail",
-              trigger: { on: ["onTurnStart"] },
+              triggers: { events: [{ type: "onTurnStart" }] },
               damage: {
                 formula: {
                   type: "damage",
@@ -92,6 +94,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Consumir Antídoto",
         actionId: "action-consume-item",
         parameters: {
           activation: {
@@ -105,9 +108,10 @@ export const itemsGear: Item[] = [
               duration: { unit: "hour", value: 1 },
               mode: "advantage",
               targetRoll: "savingThrow",
-              appliesTo: {
+              appliesToFilter: {
                 status: ["poisoned"],
               },
+              appliesTo: "self",
             },
           ],
         },
@@ -128,6 +132,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "onEquip_providesContainer",
+        name: "Compartimento de Armazenamento",
         properties: {
           capacity: { value: 30, unit: "lb" },
           volume: { value: 1, unit: "cubic_foot" },
@@ -149,6 +154,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Espalhar Esferas",
         actionId: "action-use-gear-area",
         parameters: {
           range: { normal: 5, unit: "ft" },
@@ -160,11 +166,10 @@ export const itemsGear: Item[] = [
               surfaceType: "ballBearings",
               isDifficultTerrain: true,
               duration: { unit: "indefinite" },
-
               rules: [
                 {
                   trigger: {
-                    on: ["onEnterArea", "onMovesInArea"],
+                    events: [{ type: "enteredArea" }, { type: "movedInArea" }],
                   },
                   save: {
                     ability: "dexterity",
@@ -201,6 +206,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Aplicar Veneno em Arma",
         actionId: "action-apply-poison",
         parameters: {
           activation: {
@@ -271,6 +277,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Espalhar Estrepes",
         actionId: "action-use-gear-area",
         parameters: {
           area: {
@@ -291,7 +298,7 @@ export const itemsGear: Item[] = [
               rules: [
                 {
                   trigger: {
-                    on: ["onEnterArea"],
+                    events: [{ type: "enteredArea" }],
                   },
                   save: {
                     ability: "dexterity",
@@ -304,7 +311,6 @@ export const itemsGear: Item[] = [
                     {
                       on: "fail",
                       type: "modifyTargetHP",
-
                       vitals: ["currentHp"],
                       formula: {
                         type: "damage",
@@ -323,12 +329,12 @@ export const itemsGear: Item[] = [
                         unit: "turn",
                         value: 1,
                       },
-                      endConditions: [{ on: ["onHealed"] }],
+                      endConditions: [{ events: [{ type: "wasHealed" }] }],
                     },
                     {
                       on: "fail",
                       type: "applyCondition",
-                      condition: "movementStopped",
+                      condition: "restrained",
                     },
                   ],
                 },
@@ -353,6 +359,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "passive_providesLight",
+        name: "Iluminação de Vela",
         properties: {
           bright: 5,
           dim: 5,
@@ -361,6 +368,7 @@ export const itemsGear: Item[] = [
       },
       {
         type: "activatableAction",
+        name: "Acender Vela",
         actionId: "action-light-item",
       },
     ],
@@ -379,6 +387,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "passive_property",
+        name: "CD para Arrebentar",
         property: "burstDC",
         value: 20,
       },
@@ -398,6 +407,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "passive_grantAdvantage",
+        name: "Vantagem em Força",
         on: "abilityCheck",
         ability: "strength",
         appliesToActions: ["action-force-open"],
@@ -425,10 +435,9 @@ export const itemsGear: Item[] = [
       {
         type: "activatableAction",
         actionId: "action-use-kit-charge",
+        name: "Usar Kit de Curandeiro",
         parameters: {
-          charges: {
-            max: 10,
-          },
+          charges: { type: "static", amount: 10, max: 10 },
           activation: {
             type: "action",
             extraCost: {
@@ -442,7 +451,7 @@ export const itemsGear: Item[] = [
             quantity: 1,
           },
           requirements: {
-            target: [{ type: "hasZeroHP" }],
+            target: { events: [{ type: "hasZeroHP" }] },
           },
           outcomes: [
             {
@@ -473,6 +482,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Arremessar Água Benta",
         actionId: "action-throw-item",
         parameters: {
           attackType: ["rangedItemAttack"],
@@ -488,12 +498,14 @@ export const itemsGear: Item[] = [
               vitals: ["currentHp"],
               formula: {
                 type: "conditional",
-                conditionals: [
-                  {
-                    creatureTypes: ["fiend", "undead"],
-                    type: "isCreatureType",
-                  },
-                ],
+                variables: {
+                  events: [
+                    {
+                      type: "isCreatureOfType",
+                      creatureTypes: ["fiend", "undead"],
+                    },
+                  ],
+                },
                 ifTrue: {
                   type: "damage",
                   roll: { count: 2, faces: 6 },
@@ -520,6 +532,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "passive_providesLight",
+        name: "Iluminação de Lanterna",
         properties: {
           bright: 30,
           dim: 30,
@@ -528,10 +541,12 @@ export const itemsGear: Item[] = [
       },
       {
         type: "activatableAction",
+        name: "Acender Lanterna",
         actionId: "action-light-item",
       },
       {
         type: "activatableAction",
+        name: "Cobrir Lanterna",
         actionId: "action-cover-lantern",
       },
     ],
@@ -550,6 +565,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Armar Armadilha",
         actionId: "action-set-trap",
         parameters: {
           target: { type: "point" },
@@ -583,6 +599,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "passive_providesLight",
+        name: "Iluminação de Lampião",
         properties: {
           bright: 15,
           dim: 30,
@@ -591,6 +608,7 @@ export const itemsGear: Item[] = [
       },
       {
         type: "activatableAction",
+        name: "Acender Lampião",
         actionId: "action-light-item",
       },
     ],
@@ -606,7 +624,14 @@ export const itemsGear: Item[] = [
     price: { quantity: 10, unit: "gold" },
     description:
       "Um cadeado vem com uma chave. Sem a chave, uma criatura proficiente com ferramentas de ladrão pode abrir a fechadura com um teste de Destreza (CD 15) bem-sucedido.",
-    effects: [{ type: "passive_property", property: "pickLockDC", value: 15 }],
+    effects: [
+      {
+        type: "passive_property",
+        name: "CD para Abrir Fechadura",
+        property: "pickLockDC",
+        value: 15,
+      },
+    ],
   },
   {
     id: "item-oleo",
@@ -622,6 +647,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Derramar Óleo",
         actionId: "action-use-gear-area",
         parameters: {
           activation: { type: "action" },
@@ -636,7 +662,7 @@ export const itemsGear: Item[] = [
               duration: { unit: "indefinite" },
               rules: [
                 {
-                  trigger: { on: ["onEnterArea"] },
+                  trigger: { events: [{ type: "enteredArea" }] },
                   save: {
                     ability: "dexterity",
                     dc: { type: "fixed", value: 10 },
@@ -646,12 +672,10 @@ export const itemsGear: Item[] = [
                   ],
                 },
               ],
-
               transformRules: [
                 {
                   trigger: {
-                    on: ["onTakingDamage"],
-                    specific: { damageType: ["fire"] },
+                    events: [{ type: "tookDamage", damageTypes: ["fire"] }],
                   },
                   newSurface: {
                     on: "any",
@@ -660,7 +684,12 @@ export const itemsGear: Item[] = [
                     duration: { unit: "round", value: 2 },
                     rules: [
                       {
-                        trigger: { on: ["onEnterArea", "onEndTurnInArea"] },
+                        trigger: {
+                          events: [
+                            { type: "enteredArea" },
+                            { type: "endedTurnInArea" },
+                          ],
+                        },
                         outcomes: [
                           {
                             on: "any",
@@ -698,6 +727,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "onEquip_providesContainer",
+        name: "Compartimento de Armazenamento",
         properties: {
           capacity: { value: 6, unit: "lb" },
           volume: { value: 0.2, unit: "cubic_foot" },
@@ -716,7 +746,14 @@ export const itemsGear: Item[] = [
     price: { quantity: 1, unit: "gold" },
     description:
       "Uma corda de cânhamo com 50 pés de comprimento. Pode ser arrebentada com um teste de Força (CD 17).",
-    effects: [{ type: "passive_property", property: "burstDC", value: 17 }],
+    effects: [
+      {
+        type: "passive_property",
+        name: "CD para Arrebentar",
+        property: "burstDC",
+        value: 17,
+      },
+    ],
   },
   {
     id: "item-pederneira",
@@ -732,6 +769,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "activatableAction",
+        name: "Acender Fogo",
         actionId: "action-light-item",
         parameters: {
           activation: {
@@ -759,6 +797,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "passive_providesLight",
+        name: "Iluminação de Tocha",
         properties: {
           bright: 20,
           dim: 20,
@@ -767,6 +806,7 @@ export const itemsGear: Item[] = [
       },
       {
         type: "onWield_grantWeaponAttack",
+        name: "Ataque com Tocha",
         weaponCategory: "simple",
         weaponType: "melee",
         mastery: [],
@@ -791,6 +831,7 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "onEquip_providesContainer",
+        name: "Compartimento do Frasco",
         properties: {
           capacity: { value: 0.25, unit: "lb" }, // 4 onças
         },
@@ -810,10 +851,20 @@ export const itemsGear: Item[] = [
     effects: [
       {
         type: "onEquip_providesContainer",
+        name: "Compartimento do Odre",
         properties: {
           capacity: { value: 4, unit: "lb" }, // 4 pintos ~ 4 libras
         },
       },
     ],
   },
-];
+] as const satisfies Item[];
+const allGearIds = itemsGear.map((gear) => gear.id);
+if (allGearIds.length === 0) {
+  throw new Error(
+    "Nenhum equipamento encontrado em items-gear.ts para criar o GearIdEnum.",
+  );
+}
+const [firstGearId, ...restGearIds] = allGearIds;
+export const GearIdEnum = z.enum([firstGearId, ...restGearIds]);
+export type GearId = z.infer<typeof GearIdEnum>;

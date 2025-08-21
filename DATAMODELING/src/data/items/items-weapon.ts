@@ -1,5 +1,6 @@
 import z from "zod";
 import { Item } from "../../domain/item/items.schema";
+
 export const itemsWeapon = [
   {
     id: "item-machado-de-batalha",
@@ -15,6 +16,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Machado de Batalha",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["versatile"],
@@ -48,6 +50,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Clava",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["light"],
@@ -76,6 +79,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Adaga",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["light", "thrown"],
@@ -104,6 +108,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Dardo",
         weaponCategory: "simple",
         weaponType: "ranged",
         properties: ["finesse", "thrown"],
@@ -133,6 +138,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Mangual",
         weaponCategory: "martial",
         weaponType: "melee",
         mastery: ["sap"],
@@ -160,6 +166,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Glaive",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["heavy", "reach", "twoHanded"],
@@ -188,6 +195,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Machado Grande",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["heavy", "twoHanded"],
@@ -216,6 +224,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Clava Grande",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["twoHanded"],
@@ -244,6 +253,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Espada Grande",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["heavy", "twoHanded"],
@@ -272,6 +282,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Alabarda",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["heavy", "reach", "twoHanded"],
@@ -300,6 +311,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Besta de Mão",
         weaponCategory: "martial",
         weaponType: "ranged",
         properties: ["ammunition", "light", "loading"],
@@ -329,6 +341,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Machadinha",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["light", "thrown"],
@@ -358,10 +371,10 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Besta Pesada",
         weaponCategory: "martial",
         weaponType: "ranged",
         properties: ["ammunition", "heavy", "loading", "twoHanded"],
-
         mastery: ["push"],
         range: { normal: 100, long: 400, unit: "ft" },
         damageFormulas: {
@@ -388,6 +401,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Azagaia",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["thrown"],
@@ -417,6 +431,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Besta Leve",
         weaponCategory: "simple",
         weaponType: "ranged",
         properties: ["ammunition", "loading", "twoHanded"],
@@ -445,6 +460,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Martelo Leve",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["light", "thrown"],
@@ -474,6 +490,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Arco Longo",
         weaponCategory: "martial",
         weaponType: "ranged",
         properties: ["ammunition", "heavy", "twoHanded"],
@@ -503,6 +520,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Espada Longa",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["versatile"],
@@ -536,6 +554,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Maça",
         weaponCategory: "simple",
         weaponType: "melee",
         mastery: ["sap"],
@@ -563,6 +582,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Malho",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["heavy", "twoHanded"],
@@ -591,6 +611,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Estrela-d'alva",
         weaponCategory: "martial",
         weaponType: "melee",
         mastery: ["sap"],
@@ -618,6 +639,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Mosquete",
         weaponCategory: "martial",
         weaponType: "ranged",
         properties: ["ammunition", "loading", "twoHanded"],
@@ -647,6 +669,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Pique",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["heavy", "reach", "twoHanded"],
@@ -675,6 +698,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Pistola",
         weaponCategory: "martial",
         weaponType: "ranged",
         properties: ["ammunition", "loading"],
@@ -704,6 +728,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Bordão",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["versatile"],
@@ -737,6 +762,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Rapieira",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["finesse"],
@@ -764,6 +790,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Cimitarra",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["finesse", "light"],
@@ -792,6 +819,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Arco Curto",
         weaponCategory: "simple",
         weaponType: "ranged",
         properties: ["ammunition", "twoHanded"],
@@ -821,6 +849,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Espada Curta",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["finesse", "light"],
@@ -849,6 +878,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Foice Curta",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["light"],
@@ -877,6 +907,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Funda",
         weaponCategory: "simple",
         weaponType: "ranged",
         properties: ["ammunition"],
@@ -906,6 +937,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Lança",
         weaponCategory: "simple",
         weaponType: "melee",
         properties: ["thrown", "versatile"],
@@ -940,6 +972,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Tridente",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["thrown", "versatile"],
@@ -974,6 +1007,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Picareta de Guerra",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["versatile"],
@@ -1002,6 +1036,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Martelo de Guerra",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["versatile"],
@@ -1035,6 +1070,7 @@ export const itemsWeapon = [
     effects: [
       {
         type: "onWield_grantWeaponAttack",
+        name: "Chicote",
         weaponCategory: "martial",
         weaponType: "melee",
         properties: ["finesse", "reach"],
@@ -1050,12 +1086,15 @@ export const itemsWeapon = [
     ],
   },
 ] as const satisfies Item[];
+
 const allWeaponIds = itemsWeapon.map((weapon) => weapon.id);
 if (allWeaponIds.length === 0) {
   throw new Error(
-    "Nenhuma arma encontrada em items-weapon.ts para criar o WeaponIdEnum."
+    "Nenhuma arma encontrada em items-weapon.ts para criar o WeaponIdEnum.",
   );
 }
 const [firstId, ...restIds] = allWeaponIds;
+
 export const WeaponIdEnum = z.enum([firstId, ...restIds]);
+
 export type WeaponId = z.infer<typeof WeaponIdEnum>;

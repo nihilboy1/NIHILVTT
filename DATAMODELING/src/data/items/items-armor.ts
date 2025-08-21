@@ -1,6 +1,6 @@
 import { Item } from "../../domain/item/items.schema";
-
-export const itemsArmor: Item[] = [
+import z from "zod";
+export const itemsArmor = [
   {
     id: "item-peitoral-de-aco",
     name: ["Peitoral de Aço", "Breastplate"],
@@ -15,6 +15,7 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Peitoral de Aço",
         armorType: "medium",
         calculation: {
           calculation: "formula",
@@ -37,23 +38,27 @@ export const itemsArmor: Item[] = [
     description:
       "Feita de anéis de metal interligados, a cota de malha oferece proteção substancial, mas seu peso e barulho impõem desvantagem em testes de Furtividade.",
     requirements: {
-      user: [
-        {
-          type: "hasAttribute",
-          attribute: "strength",
-          value: 13,
-        },
-      ],
+      user: {
+        events: [
+          {
+            type: "hasAttribute",
+            comparison: "greaterOrEqual",
+            attribute: "strength",
+            value: 13,
+          },
+        ],
+      },
     },
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Cota de Malha",
         armorType: "heavy",
-
         calculation: { calculation: "base", value: 16 },
       },
       {
         type: "onEquip_imposeDisadvantage",
+        name: "Cota de Malha",
         on: "skillCheck",
         skill: "stealth",
       },
@@ -73,8 +78,8 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Camisão de Malha",
         armorType: "medium",
-
         calculation: {
           calculation: "formula",
           base: 13,
@@ -98,6 +103,7 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Meia Armadura de Placas",
         armorType: "medium",
         calculation: {
           calculation: "formula",
@@ -108,6 +114,7 @@ export const itemsArmor: Item[] = [
       },
       {
         type: "onEquip_imposeDisadvantage",
+        name: "Meia Armadura de Placas",
         on: "skillCheck",
         skill: "stealth",
       },
@@ -127,8 +134,8 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Armadura de Peles",
         armorType: "medium",
-
         calculation: {
           calculation: "formula",
           base: 12,
@@ -152,8 +159,8 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Armadura de Couro",
         armorType: "light",
-
         calculation: {
           calculation: "formula",
           base: 11,
@@ -176,8 +183,8 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Armadura Acolchoada",
         armorType: "light",
-
         calculation: {
           calculation: "formula",
           base: 11,
@@ -187,6 +194,7 @@ export const itemsArmor: Item[] = [
       {
         type: "onEquip_imposeDisadvantage",
         on: "skillCheck",
+        name: "Armadura Acolchoada",
         skill: "stealth",
       },
     ],
@@ -203,17 +211,27 @@ export const itemsArmor: Item[] = [
     description:
       "O auge da proteção pessoal, esta armadura consiste em placas de metal moldadas para cobrir todo o corpo. Requer força considerável para ser usada e impõe desvantagem em testes de Furtividade.",
     requirements: {
-      user: [{ type: "hasAttribute", attribute: "strength", value: 15 }],
+      user: {
+        events: [
+          {
+            type: "hasAttribute",
+            comparison: "greaterOrEqual",
+            attribute: "strength",
+            value: 15,
+          },
+        ],
+      },
     },
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Armadura de Placas",
         armorType: "heavy",
-
         calculation: { calculation: "base", value: 18 },
       },
       {
         type: "onEquip_imposeDisadvantage",
+        name: "Armadura de Placas",
         on: "skillCheck",
         skill: "stealth",
       },
@@ -233,12 +251,13 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Armadura de Anéis",
         armorType: "heavy",
-
         calculation: { calculation: "base", value: 14 },
       },
       {
         type: "onEquip_imposeDisadvantage",
+        name: "Armadura de Anéis",
         on: "skillCheck",
         skill: "stealth",
       },
@@ -258,8 +277,8 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Armadura de Escamas",
         armorType: "medium",
-
         calculation: {
           calculation: "formula",
           base: 14,
@@ -269,6 +288,7 @@ export const itemsArmor: Item[] = [
       },
       {
         type: "onEquip_imposeDisadvantage",
+        name: "Armadura de Escamas",
         on: "skillCheck",
         skill: "stealth",
       },
@@ -288,6 +308,7 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Escudo",
         armorType: "shield",
         calculation: { calculation: "bonus", value: 2 },
       },
@@ -305,16 +326,27 @@ export const itemsArmor: Item[] = [
     description:
       "Uma armadura pesada feita de tiras verticais de metal rebitadas a um suporte de couro. Requer força considerável e impõe desvantagem em testes de Furtividade.",
     requirements: {
-      user: [{ type: "hasAttribute", attribute: "strength", value: 15 }],
+      user: {
+        events: [
+          {
+            type: "hasAttribute",
+            comparison: "greaterOrEqual",
+            attribute: "strength",
+            value: 15,
+          },
+        ],
+      },
     },
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Armadura de Talas",
         armorType: "heavy",
         calculation: { calculation: "base", value: 17 },
       },
       {
         type: "onEquip_imposeDisadvantage",
+        name: "Armadura de Talas",
         on: "skillCheck",
         skill: "stealth",
       },
@@ -334,8 +366,8 @@ export const itemsArmor: Item[] = [
     effects: [
       {
         type: "onEquip_setAC",
+        name: "Armadura de Couro Batido",
         armorType: "light",
-
         calculation: {
           calculation: "formula",
           base: 12,
@@ -344,4 +376,13 @@ export const itemsArmor: Item[] = [
       },
     ],
   },
-];
+] as const satisfies Item[];
+const allArmorIds = itemsArmor.map((armor) => armor.id);
+if (allArmorIds.length === 0) {
+  throw new Error(
+    "Nenhuma armadura encontrada em items-armor.ts para criar o ArmorIdEnum.",
+  );
+}
+const [firstArmorId, ...restArmorIds] = allArmorIds;
+export const ArmorIdEnum = z.enum([firstArmorId, ...restArmorIds]);
+export type ArmorId = z.infer<typeof ArmorIdEnum>;

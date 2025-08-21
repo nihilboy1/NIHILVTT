@@ -1,4 +1,4 @@
-import { SummonedTokenType } from "../../domain/templates/templates";
+import { SummonedTokenType } from "../../domain/token/token.schema";
 
 export const SummonedTokensData: SummonedTokenType[] = [
   {
@@ -8,7 +8,8 @@ export const SummonedTokensData: SummonedTokenType[] = [
     effects: [
       {
         type: "triggeredEffect",
-        triggers: [{ on: ["onEnterArea"] }],
+        name: "Armadilha de Caça (Armada)",
+        triggers: { events: [{ type: "enteredArea" }] },
         save: {
           type: "calculated",
           attributes: ["dexterity"],
@@ -46,16 +47,16 @@ export const SummonedTokensData: SummonedTokenType[] = [
     effects: [
       {
         type: "passive_providesLight",
+        name: "Luzes Dançantes",
         properties: {
           dim: 10,
           duration: { isConcentration: true, unit: "minute", value: 1 },
         },
-        endConditions: [
-          {
-            on: ["onBeingFarFromCaster"],
-            specific: { distance: { unit: "ft", normal: 120 } },
-          },
-        ],
+        endConditions: {
+          events: [
+            { type: "isFarFromCaster", distance: { unit: "ft", normal: 120 } },
+          ],
+        },
       },
     ],
     capabilities: {

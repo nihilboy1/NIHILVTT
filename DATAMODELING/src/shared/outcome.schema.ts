@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import {
   AcSchema,
   DcSchema,
@@ -11,7 +10,6 @@ import {
 import {
   ApplicableEffectSchema,
   ApplicableEffectType,
-  SystemEventsSchema,
 } from "../shared/effect.schema.js";
 import {
   DistanceUnitEnum,
@@ -22,18 +20,13 @@ import {
   EffectOutcomeEnum,
   RollModeEnum,
 } from "./primitives/combat.primitives.js";
+import { AbilityScoreEnum } from "./primitives/character.primitives.js";
 import {
-  AbilityScoreEnum,
   ConditionStatusEnum,
   CreatureSizeEnum,
   SystemStatusEnum,
-} from "./primitives/character.primitives.js";
-
-// ============================================================================
-// SEÇÃO: SCHEMAS DE RESULTADOS (OUTCOMES) INDIVIDUAIS
-// ============================================================================
-
-// --- Schemas Base (Sem dependências complexas) ---
+} from "./primitives/system.primitives.js";
+import { GameEventSchema } from "./game-events.schema.js";
 
 export const NoneOutcomeSchema = z.object({
   id: z.string().optional(),
@@ -101,7 +94,7 @@ export const DamageOverTimeOutcomeSchema = z.object({
   type: z.literal("damageOverTime"),
   on: EffectOutcomeEnum,
   duration: DurationSchema,
-  trigger: z.lazy(() => SystemEventsSchema),
+  triggers: z.lazy(() => GameEventSchema),
   damage: z.object({
     formula: HPFormulaSchema,
   }),
@@ -124,6 +117,9 @@ export const GrantAdvantageDisadvantageOutcomeSchema = z.object({
   targetRoll: z.enum(["abilityCheck", "attackRoll", "savingThrow"]),
   duration: DurationSchema,
   appliesTo: z
+    .enum(["nextAttacker", "anyAttacker", "target", "self"])
+    .default("nextAttacker"),
+  appliesToFilter: z
     .object({
       abilities: z.array(AbilityScoreEnum).optional(),
       status: z.array(ConditionStatusEnum).optional(),
@@ -144,20 +140,20 @@ export const ModifyAttributeOutcomeSchema = z.object({
     z.literal("all"),
   ]),
   duration: DurationSchema,
-  endConditions: z.array(z.lazy(() => SystemEventsSchema)).optional(),
-});
-
-const ChoiceOptionSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  outcome: z.lazy(() => ActionOutcomesSchema),
+  endConditions: z.array(z.lazy(() => GameEventSchema)).optional(),
 });
 
 export const ChooseEffectOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("chooseEffect"),
   on: EffectOutcomeEnum,
-  options: z.array(ChoiceOptionSchema),
+  options: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      outcome: z.lazy(() => ActionOutcomesSchema),
+    }),
+  ),
 });
 
 export const CreateItemOutcomeSchema = z.object({
@@ -169,10 +165,8 @@ export const CreateItemOutcomeSchema = z.object({
   duration: DurationSchema.optional(),
 });
 
-// --- Schemas com Dependências Circulares ---
-
 export const SurfaceRuleSchema = z.object({
-  trigger: z.lazy(() => SystemEventsSchema),
+  trigger: z.lazy(() => GameEventSchema),
   save: z
     .object({
       ability: AbilityScoreEnum,
@@ -183,7 +177,7 @@ export const SurfaceRuleSchema = z.object({
 });
 
 export const TransformRuleSchema = z.object({
-  trigger: z.lazy(() => SystemEventsSchema),
+  triggers: z.lazy(() => GameEventSchema),
   newSurface: z.lazy(() => CreateAreaEffectOutcomeSchema),
 });
 
@@ -206,9 +200,6 @@ const ApplyEffectOutcomeSchema = z.object({
   effect: z.lazy(() => ApplicableEffectSchema),
 });
 
-// ✅ ATUALIZADO: Schema para invocar um token a partir de um template.
-// A lógica agora se baseia em referenciar um template predefinido,
-// em vez de descrever o token diretamente no outcome.
 const SummonTokenOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("summonToken"),
@@ -238,11 +229,6 @@ export const ModifyWeaponPropertiesOutcomeSchema = z.object({
   addedEffect: AddedWeaponEffectSchema,
 });
 
-// ============================================================================
-// SEÇÃO: TIPOS E UNIÃO FINAL DOS SCHEMAS
-// ============================================================================
-
-// --- Tipos Manuais para Schemas com z.lazy() ---
 export interface ChoiceOptionType {
   id: string;
   name: string;
@@ -257,12 +243,12 @@ export type ChooseEffectOutcomeType = {
 };
 
 export interface TransformRuleType {
-  trigger: z.infer<typeof SystemEventsSchema>;
+  trigger: z.infer<typeof GameEventSchema>;
   newSurface: CreateAreaEffectOutcomeType;
 }
 
 export interface SurfaceRuleType {
-  trigger: z.infer<typeof SystemEventsSchema>;
+  trigger: z.infer<typeof GameEventSchema>;
   save?: {
     ability: z.infer<typeof AbilityScoreEnum>;
     dc: z.infer<typeof DcSchema>;
@@ -289,8 +275,6 @@ export type ApplyEffectOutcomeType = {
   effect: ApplicableEffectType;
 };
 
-// ✅ ATUALIZADO: O tipo para SummonToken agora é inferido diretamente do novo schema,
-// garantindo consistência e uma única fonte de verdade.
 export type SummonTokenOutcomeType = z.infer<typeof SummonTokenOutcomeSchema>;
 
 export type ModifyWeaponPropertiesOutcomeType = {
@@ -309,7 +293,6 @@ export type ModifyWeaponPropertiesOutcomeType = {
   };
 };
 
-// --- União Final de Tipos ---
 export type ActionOutcomeType =
   | z.infer<typeof NoneOutcomeSchema>
   | z.infer<typeof SetAcOutcomeSchema>
@@ -324,11 +307,10 @@ export type ActionOutcomeType =
   | z.infer<typeof CreateItemOutcomeSchema>
   | CreateAreaEffectOutcomeType
   | ApplyEffectOutcomeType
-  | SummonTokenOutcomeType // ✅ Corretamente incluído na união
+  | SummonTokenOutcomeType
   | ChooseEffectOutcomeType
   | ModifyWeaponPropertiesOutcomeType;
 
-// --- União Final de Schemas ---
 export const ActionOutcomesSchema: z.ZodType<ActionOutcomeType> =
   z.discriminatedUnion("type", [
     NoneOutcomeSchema,
@@ -341,7 +323,7 @@ export const ActionOutcomesSchema: z.ZodType<ActionOutcomeType> =
     DealWeaponDamageOutcomeSchema,
     CreateItemOutcomeSchema,
     ApplyEffectOutcomeSchema,
-    SummonTokenOutcomeSchema, // ✅ Schema atualizado na união
+    SummonTokenOutcomeSchema,
     ModifyAttributeOutcomeSchema,
     MoveTargetOutcomeSchema,
     DamageOverTimeOutcomeSchema,

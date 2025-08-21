@@ -1,6 +1,6 @@
 import { Item } from "../../domain/item/items.schema";
-
-export const itemsTool: Item[] = [
+import z from "zod";
+export const itemsTool = [
   {
     id: "item-ferramentas-de-ladrao",
     name: ["Ferramentas de Ladrão", "Thieves' Tools"],
@@ -15,10 +15,20 @@ export const itemsTool: Item[] = [
     effects: [
       {
         type: "passive_grantBonus",
+        name: "Ferramentas de Ladrão",
         on: "action",
         appliesToActions: ["action-disarm-trap", "action-pick-lock"],
         value: "proficiency",
       },
     ],
   },
-];
+] as const satisfies Item[];
+const allToolIds = itemsTool.map((tool) => tool.id);
+if (allToolIds.length === 0) {
+  throw new Error(
+    "Nenhuma ferramenta encontrada em items-tool.ts para criar o ToolIdEnum.",
+  );
+}
+const [firstToolId, ...restToolIds] = allToolIds;
+export const ToolIdEnum = z.enum([firstToolId, ...restToolIds]);
+export type ToolId = z.infer<typeof ToolIdEnum>;

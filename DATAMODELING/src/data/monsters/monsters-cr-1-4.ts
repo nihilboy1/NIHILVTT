@@ -28,7 +28,7 @@ export const monsters_cr_1_4 = [
     },
     passive: 15,
     languages: ["Aarakocra", "Primordial (Auran)"],
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Talons",
@@ -90,7 +90,7 @@ export const monsters_cr_1_4 = [
       "petrified",
       "poisoned",
     ],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Flyby",
@@ -157,7 +157,7 @@ export const monsters_cr_1_4 = [
       "petrified",
       "poisoned",
     ],
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Slash",
@@ -193,7 +193,7 @@ export const monsters_cr_1_4 = [
     wis: 10,
     cha: 5,
     passive: 10,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Beak",
@@ -243,7 +243,7 @@ export const monsters_cr_1_4 = [
     senses: ["darkvision 60 ft."],
     passive: 15,
     languages: ["understands Elvish and Sylvan but can't speak them"],
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Bite",
@@ -299,7 +299,7 @@ export const monsters_cr_1_4 = [
     wis: 9,
     cha: 5,
     passive: 9,
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Bloodied Fury",
@@ -357,7 +357,7 @@ export const monsters_cr_1_4 = [
     },
     passive: 10,
     languages: ["Bullywug", "Common"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Amphibious",
@@ -433,7 +433,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["blindsight 10 ft."],
     passive: 12,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Bite",
@@ -487,7 +487,7 @@ export const monsters_cr_1_4 = [
     wis: 11,
     cha: 7,
     passive: 10,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Hooves",
@@ -537,7 +537,7 @@ export const monsters_cr_1_4 = [
     languages: [
       "Abyssal; telepathy 60 ft. (works only with creatures that understand Abyssal)",
     ],
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Rend",
@@ -596,7 +596,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["darkvision 60 ft."],
     passive: 12,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Ram",
@@ -649,7 +649,7 @@ export const monsters_cr_1_4 = [
     senses: ["darkvision 60 ft."],
     passive: 13,
     resist: ["poison"],
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Bite",
@@ -691,7 +691,7 @@ export const monsters_cr_1_4 = [
     cha: 6,
     senses: ["blindsight 120 ft."],
     passive: 11,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Bite",
@@ -741,7 +741,7 @@ export const monsters_cr_1_4 = [
     cha: 3,
     senses: ["blindsight 30 ft."],
     passive: 8,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Bite",
@@ -788,7 +788,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["darkvision 30 ft."],
     passive: 12,
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Amphibious",
@@ -855,7 +855,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["darkvision 60 ft."],
     passive: 10,
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Spider Climb",
@@ -919,7 +919,7 @@ export const monsters_cr_1_4 = [
       "Elvish",
       "and Sylvan but can't speak them",
     ],
-    cr: "1/4",
+    cr: 0.25,
     spellcasting: [
       {
         name: "Spellcasting",
@@ -998,7 +998,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["blindsight 10 ft."],
     passive: 12,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Bite",
@@ -1040,7 +1040,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["blindsight 10 ft.", "darkvision 60 ft."],
     passive: 13,
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Spider Climb",
@@ -1106,7 +1106,7 @@ export const monsters_cr_1_4 = [
     senses: ["darkvision 60 ft."],
     passive: 9,
     languages: ["Common", "Goblin"],
-    cr: "1/4",
+    cr: 0.25,
     gear: [
       "leather armor|xphb",
       "scimitar|xphb",
@@ -1176,7 +1176,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["blindsight 30 ft."],
     passive: 13,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Bone Cudgel",
@@ -1223,7 +1223,7 @@ export const monsters_cr_1_4 = [
     senses: ["darkvision 60 ft."],
     passive: 12,
     languages: ["Common", "Primordial (Auran)"],
-    cr: "1/4",
+    cr: 0.25,
     spellcasting: [
       {
         name: "Eldritch Lantern {@recharge 4}",
@@ -1297,7 +1297,7 @@ export const monsters_cr_1_4 = [
     senses: ["darkvision 120 ft.", "truesight 30 ft."],
     passive: 14,
     languages: ["Undercommon"],
-    cr: "1/4",
+    cr: 0.25,
     gear: ["spear|xphb"],
     trait: [
       {
@@ -1377,7 +1377,7 @@ export const monsters_cr_1_4 = [
     passive: 10,
     conditionImmune: ["charmed"],
     languages: ["Modron"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Disintegration",
@@ -1441,7 +1441,7 @@ export const monsters_cr_1_4 = [
     immune: ["poison"],
     conditionImmune: ["exhaustion", "poisoned"],
     languages: ["Primordial (Aquan, Terran)"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Death Burst",
@@ -1503,7 +1503,7 @@ export const monsters_cr_1_4 = [
     passive: 9,
     conditionImmune: ["deafened"],
     languages: ["understands Common but can't speak"],
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Claw",
@@ -1562,7 +1562,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["darkvision 60 ft."],
     passive: 14,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Rend",
@@ -1614,7 +1614,7 @@ export const monsters_cr_1_4 = [
     },
     passive: 14,
     languages: ["Sylvan"],
-    cr: "1/4",
+    cr: 0.25,
     spellcasting: [
       {
         name: "Spellcasting",
@@ -1703,7 +1703,7 @@ export const monsters_cr_1_4 = [
     },
     passive: 12,
     languages: ["Common"],
-    cr: "1/4",
+    cr: 0.25,
     gear: ["chain shirt|xphb", "holy symbol|xphb", "mace|xphb"],
     spellcasting: [
       {
@@ -1791,7 +1791,7 @@ export const monsters_cr_1_4 = [
     senses: ["blindsight 10 ft.", "darkvision 60 ft."],
     passive: 15,
     languages: ["understands Common and Draconic but can't speak"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Magic Resistance",
@@ -1863,7 +1863,7 @@ export const monsters_cr_1_4 = [
       perception: "+1",
     },
     passive: 11,
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Flyby",
@@ -1917,7 +1917,7 @@ export const monsters_cr_1_4 = [
     wis: 11,
     cha: 7,
     passive: 10,
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Hooves",
@@ -1973,7 +1973,7 @@ export const monsters_cr_1_4 = [
     vulnerable: ["bludgeoning"],
     conditionImmune: ["exhaustion", "poisoned"],
     languages: ["understands Common plus one other language but can't speak"],
-    cr: "1/4",
+    cr: 0.25,
     gear: ["shortbow|xphb", "shortsword|xphb"],
     action: [
       {
@@ -2035,7 +2035,7 @@ export const monsters_cr_1_4 = [
     immune: ["fire", "poison"],
     conditionImmune: ["exhaustion", "poisoned"],
     languages: ["Primordial (Auran, Ignan)"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Death Burst",
@@ -2106,7 +2106,7 @@ export const monsters_cr_1_4 = [
     },
     passive: 13,
     languages: ["Common", "Elvish", "Sylvan"],
-    cr: "1/4",
+    cr: 0.25,
     spellcasting: [
       {
         name: "Invisibility",
@@ -2184,7 +2184,7 @@ export const monsters_cr_1_4 = [
     immune: ["fire", "poison"],
     conditionImmune: ["exhaustion", "poisoned"],
     languages: ["Primordial (Aquan, Ignan)"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Blurred Form",
@@ -2270,7 +2270,7 @@ export const monsters_cr_1_4 = [
       "restrained",
       "stunned",
     ],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Swarm",
@@ -2334,7 +2334,7 @@ export const monsters_cr_1_4 = [
       "restrained",
       "stunned",
     ],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Swarm",
@@ -2400,7 +2400,7 @@ export const monsters_cr_1_4 = [
       "restrained",
       "stunned",
     ],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Swarm",
@@ -2461,7 +2461,7 @@ export const monsters_cr_1_4 = [
     senses: ["darkvision 60 ft."],
     passive: 10,
     languages: ["Troglodyte"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Stench",
@@ -2522,7 +2522,7 @@ export const monsters_cr_1_4 = [
     senses: ["blindsight 30 ft."],
     passive: 6,
     conditionImmune: ["blinded", "charmed", "deafened", "frightened"],
-    cr: "1/4",
+    cr: 0.25,
     action: [
       {
         name: "Multiattack",
@@ -2575,7 +2575,7 @@ export const monsters_cr_1_4 = [
     senses: ["darkvision 60 ft."],
     passive: 8,
     languages: ["Common", "Draconic"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Pack Tactics",
@@ -2659,7 +2659,7 @@ export const monsters_cr_1_4 = [
     },
     senses: ["darkvision 60 ft."],
     passive: 15,
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Pack Tactics",
@@ -2728,7 +2728,7 @@ export const monsters_cr_1_4 = [
     immune: ["poison"],
     conditionImmune: ["exhaustion", "poisoned"],
     languages: ["understands Common plus one other language but can't speak"],
-    cr: "1/4",
+    cr: 0.25,
     trait: [
       {
         name: "Undead Fortitude",

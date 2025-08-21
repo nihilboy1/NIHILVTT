@@ -1,1886 +1,2550 @@
-// Este arquivo é gerado automaticamente. Não edite manualmente.
+import { on } from "events";
+import { Monster } from "../../domain/creature/creature.schema";
 
-export const monsters_cr_1_2 = [
+export const monsters_cr_1_2_modeled: Monster[] = [
   {
-    name: "Ape",
-    source: "XMM",
-    page: 348,
-    otherSources: [
-      {
-        source: "XPHB",
-        page: 346,
-      },
-    ],
-    size: ["M"],
+    id: "monster-ape",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Macaco", "Ape"],
+    description:
+      "O Macaco é um primata inteligente e ágil, conhecido por sua força e habilidade de escalar árvores com facilidade.",
+    source: "MM2024",
+    size: "medium",
     type: "beast",
-    alignment: ["U"],
-    ac: [12],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 12,
+    hitPoints: {
       average: 19,
-      formula: "3d8 + 6",
+      formula: { count: 3, faces: 8, bonus: 6 },
     },
     speed: {
       walk: 30,
       climb: 30,
+      unit: "ft",
     },
-    str: 16,
-    dex: 14,
-    con: 14,
-    int: 6,
-    wis: 12,
-    cha: 7,
-    skill: {
-      athletics: "+5",
-      perception: "+3",
+    environment: ["forest"],
+    abilityScores: {
+      strength: 16,
+      dexterity: 14,
+      constitution: 14,
+      intelligence: 6,
+      wisdom: 12,
+      charisma: 7,
     },
-    passive: 13,
-    cr: "1/2",
-    action: [
+    proficiencyBonus: {
+      skills: [
+        { skill: "athletics", bonus: 5 },
+        { skill: "perception", bonus: 3 },
+      ],
+    },
+    senses: {
+      passivePerception: 13,
+    },
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Multiattack",
-        entries: ["The ape makes two Fist attacks."],
-      },
-      {
-        name: "Fist",
-        entries: [
-          "{@atkr m} {@hit 5}, reach 5 ft. {@h}5 ({@damage 1d4 + 3}) Bludgeoning damage.",
-        ],
-      },
-      {
-        name: "Rock {@recharge}",
-        entries: [
-          "{@atkr r} {@hit 5}, range 25/50 ft. {@h}10 ({@damage 2d6 + 3}) Bludgeoning damage.",
-        ],
+        name: "Escalada Ágil",
+        description:
+          "O macaco pode escalar superfícies difíceis sem precisar fazer um teste de habilidade.",
       },
     ],
-    environment: ["forest"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/ape.mp3",
-    },
-    actionTags: ["Multiattack"],
-    damageTags: ["B"],
-    miscTags: ["MA", "RA"],
+    effects: [
+      {
+        type: "multiAttack",
+        name: "Ataque Múltiplo",
+        attacksName: ["Soco"],
+        amount: 2,
+        actionId: "action-multiattack",
+        parameters: {
+          activation: { type: "action" },
+        },
+      },
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Soco",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 5,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4, bonus: 3 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+          ],
+        },
+      },
+      {
+        type: "activatableAction",
+        name: "Pedra",
+        actionId: "action-throw-item",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["rangedWeaponAttack"],
+          attackBonus: 5,
+          charges: {
+            type: "dice",
+            max: 1,
+            successOn: [1],
+            roll: { count: 1, faces: 6 },
+            triggers: { events: [{ type: "onTurnStart" }] },
+          },
+          range: { normal: 25, long: 50, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 6, bonus: 3 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Black Bear",
-    source: "XMM",
-    page: 349,
-    otherSources: [
-      {
-        source: "XPHB",
-        page: 346,
-      },
-    ],
-    size: ["M"],
+    id: "monster-black-bear",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Urso Negro", "Black Bear"],
+    description:
+      "O Urso Negro é um mamífero poderoso e territorial, encontrado em florestas densas. É conhecido por sua força e habilidade de escalar árvores.",
+    source: "MM2024",
+    size: "medium",
     type: "beast",
-    alignment: ["U"],
-    ac: [11],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 11,
+    hitPoints: {
       average: 19,
-      formula: "3d8 + 6",
+      formula: { count: 3, faces: 8, bonus: 6 },
     },
     speed: {
       walk: 30,
       climb: 30,
       swim: 30,
+      unit: "ft",
     },
-    str: 15,
-    dex: 12,
-    con: 14,
-    int: 2,
-    wis: 12,
-    cha: 7,
-    skill: {
-      perception: "+5",
+    environment: ["forest"],
+    abilityScores: {
+      strength: 15,
+      dexterity: 12,
+      constitution: 14,
+      intelligence: 2,
+      wisdom: 12,
+      charisma: 7,
     },
-    senses: ["darkvision 60 ft."],
-    passive: 15,
-    cr: "1/2",
-    action: [
+    proficiencyBonus: {
+      skills: [{ skill: "perception", bonus: 5 }],
+    },
+    senses: {
+      passivePerception: 15,
+      vision: { darkvision: 60 },
+    },
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Multiattack",
-        entries: ["The bear makes two Rend attacks."],
-      },
-      {
-        name: "Rend",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}5 ({@damage 1d6 + 2}) Slashing damage.",
-        ],
+        name: "Faro Aguçado",
+        description:
+          "O urso tem vantagem em testes de Sabedoria (Percepção) que dependam do olfato.",
       },
     ],
-    environment: ["forest"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/black-bear.mp3",
-    },
-    senseTags: ["D"],
-    actionTags: ["Multiattack"],
-    damageTags: ["S"],
-    miscTags: ["MA"],
+    effects: [
+      {
+        type: "multiAttack",
+        name: "Ataque Múltiplo",
+        attacksName: ["Dilacerar"],
+        amount: 2,
+        actionId: "action-multiattack",
+        parameters: {
+          activation: { type: "action" },
+        },
+      },
+      {
+        type: "activatableAction",
+        name: "Dilacerar",
+        actionId: "action-attack",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 2 },
+                damageTypeOptions: ["slashing"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Cockatrice",
-    source: "XMM",
-    page: 75,
-    otherSources: [
-      {
-        source: "DrDe",
-      },
-    ],
-    size: ["S"],
+    id: "monster-cockatrice",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Cocatriz", "Cockatrice"],
+    description:
+      "A Cocatriz é uma criatura pequena e feroz, conhecida por sua mordida capaz de petrificar suas vítimas.",
+    source: "MM2024",
+    size: "small",
     type: "monstrosity",
-    alignment: ["U"],
-    ac: [11],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 11,
+    hitPoints: {
       average: 22,
-      formula: "5d6 + 5",
+      formula: { count: 5, faces: 6, bonus: 5 },
     },
     speed: {
       walk: 20,
       fly: 40,
+      unit: "ft",
     },
-    str: 6,
-    dex: 12,
-    con: 12,
-    int: 2,
-    wis: 13,
-    cha: 5,
-    senses: ["darkvision 60 ft."],
-    passive: 11,
-    conditionImmune: ["petrified"],
-    cr: "1/2",
-    action: [
+    environment: ["grassland"],
+    abilityScores: {
+      strength: 6,
+      dexterity: 12,
+      constitution: 12,
+      intelligence: 2,
+      wisdom: 13,
+      charisma: 5,
+    },
+    senses: {
+      passivePerception: 11,
+      vision: { darkvision: 60 },
+    },
+    defenses: {
+      immunities: {
+        condition: ["petrified"],
+      },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    effects: [
       {
-        name: "Petrifying Bite",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}3 ({@damage 1d4 + 1}) Piercing damage. If the target is a creature, it is subjected to the following effect. {@actSave con} {@dc 11}. {@actSaveFail 1} The target has the {@condition Restrained|XPHB} condition. The target repeats the save at the end of its next turn if it is still {@condition Restrained|XPHB}, ending the effect on itself on a success. {@actSaveFail 2} The target has the {@condition Petrified|XPHB} condition, instead of the {@condition Restrained|XPHB} condition, for 24 hours.",
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Mordida Petrificante",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4, bonus: 1 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+        chainedEffects: [
+          {
+            triggers: { events: [{ type: "attackHit" }] },
+            save: {
+              type: "fixed",
+              attributes: ["constitution"],
+              value: 11,
+            },
+            outcomes: [
+              {
+                on: "fail",
+                type: "applyCondition",
+                condition: "restrained",
+                duration: {
+                  unit: "turn",
+                  value: 1,
+                },
+              },
+            ],
+          },
         ],
       },
     ],
-    environment: ["grassland"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/cockatrice.mp3",
-    },
-    senseTags: ["D"],
-    damageTags: ["P"],
-    miscTags: ["MA"],
-    conditionInflict: ["petrified", "restrained"],
-    savingThrowForced: ["constitution"],
   },
   {
-    name: "Crocodile",
-    source: "XMM",
-    page: 352,
-    otherSources: [
-      {
-        source: "XPHB",
-        page: 348,
-      },
-    ],
-    size: ["L"],
+    id: "monster-crocodile",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Crocodilo", "Crocodile"],
+    description:
+      "O Crocodilo é um réptil predador que habita áreas alagadas e é conhecido por sua mordida poderosa e emboscadas sorrateiras.",
+    source: "MM2024",
+    size: "large",
     type: "beast",
-    alignment: ["U"],
-    ac: [12],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 12,
+    hitPoints: {
       average: 13,
-      formula: "2d10 + 2",
+      formula: { count: 2, faces: 10, bonus: 2 },
     },
     speed: {
       walk: 20,
       swim: 30,
+      unit: "ft",
     },
-    str: 15,
-    dex: 10,
-    con: 13,
-    int: 2,
-    wis: 10,
-    cha: 5,
-    save: {
-      con: "+3",
+    environment: ["coast", "swamp", "urban"],
+    abilityScores: {
+      strength: 15,
+      dexterity: 10,
+      constitution: 13,
+      intelligence: 2,
+      wisdom: 10,
+      charisma: 5,
     },
-    skill: {
-      stealth: "+2",
+    proficiencyBonus: {
+      skills: [{ skill: "stealth", bonus: 2 }],
     },
-    passive: 10,
-    cr: "1/2",
-    trait: [
+    senses: {
+      passivePerception: 10,
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Hold Breath",
-        entries: ["The crocodile can hold its breath for 1 hour."],
+        name: "Fôlego Prolongado",
+        description: "O crocodilo pode prender a respiração por 1 hora.",
       },
     ],
-    action: [
+    effects: [
       {
-        name: "Bite",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}6 ({@damage 1d8 + 2}) Piercing damage. If the target is a Medium or smaller creature, it has the {@condition Grappled|XPHB} condition (escape {@dc 12}). While {@condition Grappled|XPHB}, the target has the {@condition Restrained|XPHB} condition.",
-        ],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Mordida",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8, bonus: 2 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+            {
+              on: "hit",
+              type: "applyCondition",
+              condition: "grappled",
+              duration: { unit: "indefinite" },
+              requirements: {
+                target: {
+                  events: [
+                    {
+                      type: "isCreatureOfSize",
+                      creatureSizes: ["medium", "small", "tiny"],
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              on: "hit",
+              type: "applyCondition",
+              condition: "restrained",
+              duration: { unit: "indefinite" },
+              requirements: {
+                target: {
+                  events: [
+                    {
+                      type: "isCreatureOfSize",
+                      creatureSizes: ["medium", "small", "tiny"],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
       },
     ],
-    environment: ["coastal", "swamp", "urban"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/crocodile.mp3",
-    },
-    traitTags: ["Hold Breath"],
-    damageTags: ["P"],
-    miscTags: ["MA"],
-    conditionInflict: ["grappled", "restrained"],
   },
   {
-    name: "Darkmantle",
-    source: "XMM",
-    page: 90,
-    otherSources: [
-      {
-        source: "DrDe",
-      },
-    ],
-    size: ["S"],
+    id: "monster-darkmantle",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Manto Sombrio", "Darkmantle"],
+    description:
+      "O Manto Sombrio é uma criatura das profundezas que caça suas presas mergulhando do teto de cavernas e sufocando-as na escuridão.",
+    source: "MM2024",
+    size: "small",
     type: "aberration",
-    alignment: ["U"],
-    ac: [11],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 11,
+    hitPoints: {
       average: 22,
-      formula: "5d6 + 5",
+      formula: { count: 5, faces: 6, bonus: 5 },
     },
     speed: {
       walk: 10,
       fly: 30,
+      unit: "ft",
     },
-    initiative: {
-      proficiency: 1,
+    environment: ["underdark"],
+    abilityScores: {
+      strength: 16,
+      dexterity: 12,
+      constitution: 13,
+      intelligence: 2,
+      wisdom: 10,
+      charisma: 5,
     },
-    str: 16,
-    dex: 12,
-    con: 13,
-    int: 2,
-    wis: 10,
-    cha: 5,
-    skill: {
-      stealth: "+3",
+    proficiencyBonus: {
+      skills: [{ skill: "stealth", bonus: 3 }],
     },
-    senses: ["blindsight 60 ft."],
-    passive: 10,
-    cr: "1/2",
-    action: [
+    senses: {
+      passivePerception: 10,
+      vision: { blindsight: 60 },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    effects: [
       {
-        name: "Crush",
-        entries: [
-          "{@atkr m} {@hit 5}, reach 5 ft. {@h}6 ({@damage 1d6 + 3}) Bludgeoning damage, and the darkmantle attaches to the target. If the target is a Medium or smaller creature and the darkmantle had {@variantrule Advantage|XPHB} on the attack roll, it covers the target, which has the {@condition Blinded|XPHB} condition and is suffocating while the darkmantle is attached in this way.",
-          "While attached to a target, the darkmantle can attack only the target but has {@variantrule Advantage|XPHB} on its attack rolls. Its {@variantrule Speed|XPHB} becomes 0, it can't benefit from any bonus to its {@variantrule Speed|XPHB}, and it moves with the target.",
-          "A creature can take an action to try to detach the darkmantle from itself, doing so with a successful {@dc 13} Strength ({@skill Athletics|XPHB}) check. On its turn, the darkmantle can detach itself by using 5 feet of movement.",
-        ],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Esmagar",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 5,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 3 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+          ],
+        },
       },
+
       {
-        name: "Darkness Aura (1/Day)",
-        entries: [
-          "Magical {@variantrule Darkness|XPHB} fills a 15-foot {@variantrule Emanation [Area of Effect]|XPHB|Emanation} originating from the darkmantle. This effect lasts while the darkmantle maintains {@status Concentration|XPHB} on it, up to 10 minutes. Darkvision can't penetrate this area, and no light can illuminate it.",
-        ],
+        type: "activatableAction",
+        actionId: "action-create-area-of-effect",
+        name: "Escuridão",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 15, unit: "ft" },
+          area: { shape: "sphere", radius: 15, unit: "ft" },
+          outcomes: [
+            {
+              type: "createAreaEffect",
+              duration: { unit: "minute", value: 10 },
+              on: "any",
+              surfaceType: "darkness",
+              id: "darkness-area",
+            },
+          ],
+        },
       },
     ],
-    environment: ["underdark"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/darkmantle.mp3",
-    },
-    senseTags: ["B"],
-    damageTags: ["B"],
-    miscTags: ["MA"],
-    conditionInflict: ["blinded"],
   },
   {
-    name: "Dust Mephit",
-    source: "XMM",
-    page: 206,
-    size: ["S"],
+    id: "monster-dust-mephit",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Mefit de Poeira", "Dust Mephit"],
+    description:
+      "O Mefit de Poeira é um elemental travesso formado de poeira e vento, conhecido por suas explosões ao morrer.",
+    source: "MM2024",
+    size: "small",
     type: "elemental",
-    alignment: ["N", "E"],
-    ac: [12],
-    hp: {
+    alignment: "neutralEvil",
+    armorClass: 12,
+    hitPoints: {
       average: 17,
-      formula: "5d6",
+      formula: { count: 5, faces: 6 },
     },
     speed: {
       walk: 30,
       fly: 30,
+      unit: "ft",
     },
-    str: 5,
-    dex: 14,
-    con: 10,
-    int: 9,
-    wis: 11,
-    cha: 10,
-    skill: {
-      perception: "+2",
-      stealth: "+4",
+    environment: ["planar"],
+    abilityScores: {
+      strength: 5,
+      dexterity: 14,
+      constitution: 10,
+      intelligence: 9,
+      wisdom: 11,
+      charisma: 10,
     },
-    senses: ["darkvision 60 ft."],
-    passive: 12,
-    immune: ["poison"],
-    vulnerable: ["fire"],
-    conditionImmune: ["exhaustion", "poisoned"],
-    languages: ["Primordial (Auran, Terran)"],
-    cr: "1/2",
-    spellcasting: [
+    proficiencyBonus: {
+      skills: [
+        { skill: "perception", bonus: 2 },
+        { skill: "stealth", bonus: 4 },
+      ],
+    },
+    senses: {
+      passivePerception: 12,
+      vision: { darkvision: 60 },
+    },
+    defenses: {
+      immunities: { damage: ["poison"], condition: ["exhausted", "poisoned"] },
+      vulnerabilities: ["fire"],
+    },
+    languages: ["primordial"],
+    challengeRating: "1/2",
+
+    effects: [
       {
-        name: "Sleep (1/Day)",
-        type: "spellcasting",
-        headerEntries: [
-          "The mephit casts the {@spell Sleep|XPHB} spell, requiring no spell components and using Charisma as the spellcasting ability (spell save {@dc 10}).",
-        ],
-        daily: {
-          "1": ["{@spell Sleep|XPHB}"],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Garra",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4, bonus: 2 },
+                damageTypeOptions: ["slashing"],
+              },
+            },
+          ],
         },
-        ability: "cha",
-        displayAs: "action",
-        hidden: ["daily"],
       },
-    ],
-    trait: [
       {
-        name: "Death Burst",
-        entries: [
-          "The mephit explodes when it dies. {@actSave dex} {@dc 10}, each creature in a 5-foot {@variantrule Emanation [Area of Effect]|XPHB|Emanation} originating from the mephit. {@actSaveFail} 5 ({@damage 2d4}) Bludgeoning damage. {@actSaveSuccess} Half damage.",
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        name: "Sopro Cegante",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 15, unit: "ft" },
+          area: { shape: "cone", length: 15, unit: "ft" },
+          save: {
+            ability: "dexterity",
+            dc: { type: "fixed", value: 10 },
+          },
+          outcomes: [
+            {
+              on: "fail",
+              type: "applyCondition",
+              condition: "blinded",
+              duration: { unit: "turn", value: 1 },
+            },
+          ],
+          charges: {
+            type: "dice",
+            max: 1,
+            roll: { count: 1, faces: 6 },
+            successOn: [6],
+            triggers: { events: [{ type: "onTurnStart" }] },
+          },
+        },
+      },
+      {
+        type: "triggeredEffect",
+        triggers: { events: [{ type: "died" }] },
+        name: "Explosão Mortal",
+        parameters: {
+          activation: { type: "special" },
+          area: { shape: "sphere", radius: 15, unit: "ft" },
+        },
+        save: {
+          type: "fixed",
+          value: 10,
+          attributes: ["dexterity"],
+        },
+        outcomes: [
+          {
+            on: "fail",
+            type: "modifyTargetHP",
+            vitals: ["currentHp"],
+            formula: {
+              type: "damage",
+              roll: { count: 2, faces: 4 },
+              damageTypeOptions: ["bludgeoning"],
+            },
+          },
         ],
       },
     ],
-    action: [
-      {
-        name: "Claw",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}4 ({@damage 1d4 + 2}) Slashing damage.",
-        ],
-      },
-      {
-        name: "Blinding Breath {@recharge}",
-        entries: [
-          "{@actSave dex} {@dc 10}, each creature in a 15-foot {@variantrule Cone [Area of Effect]|XPHB|Cone}. {@actSaveFail} The target has the {@condition Blinded|XPHB} condition until the end of the mephit's next turn.",
-        ],
-      },
-    ],
-    environment: ["planar, elemental"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/mephit.mp3",
-    },
-    traitTags: ["Death Burst"],
-    senseTags: ["D"],
-    actionTags: ["Breath Weapon"],
-    languageTags: ["AU", "P", "T"],
-    damageTags: ["B", "S"],
-    spellcastingTags: ["O"],
-    miscTags: ["MA"],
-    conditionInflict: ["blinded"],
-    conditionInflictSpell: ["incapacitated", "unconscious"],
-    savingThrowForced: ["dexterity"],
-    savingThrowForcedSpell: ["wisdom"],
   },
   {
-    name: "Gas Spore Fungus",
-    source: "XMM",
-    page: 125,
-    size: ["L"],
+    id: "monster-gas-spore-fungus",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Fungo Esporo de Gás", "Gas Spore Fungus"],
+    description:
+      "O Fungo Esporo de Gás se assemelha a um perigoso beholder, mas explode liberando esporos mortais ao ser atacado.",
+    source: "MM2024",
+    size: "large",
     type: "plant",
-    alignment: ["U"],
-    ac: [8],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 8,
+    hitPoints: {
       average: 13,
-      formula: "9d10 - 36",
+      formula: { count: 9, faces: 10, bonus: -36 },
     },
     speed: {
       walk: 5,
-      fly: {
-        number: 10,
-        condition: "(hover)",
-      },
-      canHover: true,
+      fly: 10,
+      unit: "ft",
     },
-    str: 5,
-    dex: 1,
-    con: 3,
-    int: 1,
-    wis: 1,
-    cha: 1,
-    senses: ["blindsight 30 ft."],
-    passive: 5,
-    immune: ["poison"],
-    conditionImmune: [
-      "blinded",
-      "charmed",
-      "deafened",
-      "frightened",
-      "paralyzed",
-      "poisoned",
-      "prone",
-    ],
-    cr: "1/2",
-    trait: [
-      {
-        name: "Death Burst",
-        entries: [
-          "The gas spore bursts when it dies. {@actSave con} {@dc 10}, each creature in a 20-foot {@variantrule Emanation [Area of Effect]|XPHB|Emanation} originating from the gas spore. {@actSaveFail} The target takes 10 ({@damage 3d6}) Poison damage and has the {@condition Poisoned|XPHB} condition for {@dice 1d12} hours. Unless the {@condition Poisoned|XPHB} condition is removed, the target dies at the end of that time and sprouts {@dice 2d4} Tiny Gas Spore Fungi (each with 1 {@variantrule Hit Points|XPHB|Hit Point}). After {@dice 2d6} days, they become Large and have 13 {@variantrule Hit Points|XPHB}.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Tendril",
-        entries: [
-          "{@atkr m} {@hit 0}, reach 5 ft. {@h}3 ({@damage 1d6}) Poison damage, and the target has the {@condition Poisoned|XPHB} condition until the end of its next turn.",
-        ],
-      },
-    ],
     environment: ["underdark"],
-    traitTags: ["Death Burst"],
-    senseTags: ["B"],
-    damageTags: ["I"],
-    miscTags: ["MA"],
-    conditionInflict: ["poisoned"],
-    savingThrowForced: ["constitution"],
+    abilityScores: {
+      strength: 5,
+      dexterity: 1,
+      constitution: 3,
+      intelligence: 1,
+      wisdom: 1,
+      charisma: 1,
+    },
+    senses: {
+      passivePerception: 5,
+      vision: { blindsight: 30 },
+    },
+    defenses: {
+      immunities: {
+        damage: ["poison"],
+        condition: [
+          "blinded",
+          "charmed",
+          "deafened",
+          "frightened",
+          "paralyzed",
+          "poisoned",
+          "prone",
+        ],
+      },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Explosão Mortal",
+        description:
+          "O esporo de gás explode ao morrer. Teste de resistência de Constituição CD 10, cada criatura em uma área de 6 metros de emanação originada do esporo. Em caso de falha: O alvo sofre 10 (3d6) de dano de veneno e fica envenenado por 1d12 horas. Se a condição não for removida, o alvo morre ao final desse tempo e brotam 2d4 Fungos Esporo de Gás Pequenos (cada um com 1 Ponto de Vida). Após 2d6 dias, eles se tornam Grandes e têm 13 Pontos de Vida.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Tentáculo",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 0,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6 },
+                damageTypeOptions: ["poison"],
+              },
+            },
+            {
+              on: "hit",
+              type: "applyCondition",
+              condition: "poisoned",
+              duration: { unit: "turn", value: 1 },
+            },
+          ],
+        },
+      },
+      {
+        type: "triggeredEffect",
+        name: "Explosão de Esporos",
+        triggers: { events: [{ type: "died" }] },
+        outcomes: [
+          {
+            on: "any",
+            type: "descriptive",
+            details:
+              "O fungo explode, causando dano de veneno e a condição de Envenenado.",
+          },
+        ],
+      },
+    ],
   },
   {
-    name: "Giant Goat",
-    source: "XMM",
-    page: 357,
-    otherSources: [
-      {
-        source: "XPHB",
-        page: 350,
-      },
-    ],
-    size: ["L"],
+    id: "monster-giant-goat",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Cabra Gigante", "Giant Goat"],
+    description:
+      "A Cabra Gigante é um animal robusto e ágil, capaz de escalar terrenos íngremes e sobreviver em ambientes montanhosos hostis.",
+    source: "MM2024",
+    size: "large",
     type: "beast",
-    alignment: ["U"],
-    ac: [11],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 11,
+    hitPoints: {
       average: 19,
-      formula: "3d10 + 3",
+      formula: { count: 3, faces: 10, bonus: 3 },
     },
     speed: {
       walk: 40,
       climb: 30,
+      unit: "ft",
     },
-    str: 17,
-    dex: 13,
-    con: 12,
-    int: 3,
-    wis: 12,
-    cha: 6,
-    save: {
-      str: "+5",
+    environment: ["grassland", "hill", "mountain"],
+    abilityScores: {
+      strength: 17,
+      dexterity: 13,
+      constitution: 12,
+      intelligence: 3,
+      wisdom: 12,
+      charisma: 6,
     },
-    skill: {
-      perception: "+3",
+    proficiencyBonus: {
+      skills: [{ skill: "perception", bonus: 3 }],
     },
-    senses: ["darkvision 60 ft."],
-    passive: 13,
-    cr: "1/2",
-    action: [
+    senses: {
+      passivePerception: 13,
+      vision: { darkvision: 60 },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    effects: [
       {
-        name: "Ram",
-        entries: [
-          "{@atkr m} {@hit 5}, reach 5 ft. {@h}6 ({@damage 1d6 + 3}) Bludgeoning damage. If the target is a Large or smaller creature and the goat moved 20+ feet straight toward it immediately before the hit, the target takes an extra 5 ({@damage 2d4}) Bludgeoning damage and has the {@condition Prone|XPHB} condition.",
-        ],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Investida",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 5,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 3 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 4 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+              requirements: {
+                user: {
+                  events: [
+                    {
+                      type: "movesAtLeast",
+                      distance: { normal: 20, unit: "ft" },
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              on: "hit",
+              type: "applyCondition",
+              condition: "prone",
+              requirements: {
+                user: {
+                  events: [
+                    {
+                      type: "movesAtLeast",
+                      distance: { normal: 20, unit: "ft" },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
       },
     ],
-    environment: ["grassland", "hill", "mountain"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/giant-goat.mp3",
-    },
-    senseTags: ["D"],
-    damageTags: ["B"],
-    miscTags: ["MA"],
-    conditionInflict: ["prone"],
   },
   {
-    name: "Giant Seahorse",
-    source: "XMM",
-    page: 359,
-    otherSources: [
-      {
-        source: "XPHB",
-        page: 350,
-      },
-    ],
-    size: ["L"],
+    id: "monster-giant-seahorse",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Cavalo-Marinho Gigante", "Giant Seahorse"],
+    description:
+      "O Cavalo-Marinho Gigante é uma criatura aquática de grande porte, frequentemente usada como montaria por criaturas submarinas.",
+    source: "MM2024",
+    size: "large",
     type: "beast",
-    alignment: ["U"],
-    ac: [14],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 14,
+    hitPoints: {
       average: 16,
-      formula: "3d10",
+      formula: { count: 3, faces: 10 },
     },
     speed: {
       walk: 5,
       swim: 40,
+      unit: "ft",
     },
-    str: 15,
-    dex: 12,
-    con: 11,
-    int: 2,
-    wis: 12,
-    cha: 5,
-    passive: 11,
-    cr: "1/2",
-    trait: [
-      {
-        name: "Water Breathing",
-        entries: ["The seahorse can breathe only underwater."],
-      },
-    ],
-    action: [
-      {
-        name: "Ram",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}9 ({@damage 2d6 + 2}) Bludgeoning damage, or 11 ({@damage 2d8 + 2}) Bludgeoning damage if the seahorse moved 20+ feet straight toward the target immediately before the hit.",
-        ],
-      },
-    ],
-    bonus: [
-      {
-        name: "Bubble Dash",
-        entries: [
-          "While underwater, the seahorse moves up to half its {@variantrule Swim Speed|XPHB} without provoking {@action Opportunity Attack|XPHB|Opportunity Attacks}.",
-        ],
-      },
-    ],
     environment: ["underwater"],
-    traitTags: ["Water Breathing"],
-    damageTags: ["B"],
-    miscTags: ["MA"],
+    abilityScores: {
+      strength: 15,
+      dexterity: 12,
+      constitution: 11,
+      intelligence: 2,
+      wisdom: 12,
+      charisma: 5,
+    },
+    senses: { passivePerception: 11 },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Respiração Aquática",
+        description: "O cavalo-marinho só pode respirar debaixo d'água.",
+      },
+      {
+        name: "Corrida Borbulhante",
+        description:
+          "Enquanto estiver debaixo d'água, o cavalo-marinho se move até metade de sua Velocidade de Natação sem provocar Ataques de Oportunidade.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Investida",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 6, bonus: 2 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 8, bonus: 2 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+              requirements: {
+                user: {
+                  events: [
+                    {
+                      type: "movesAtLeast",
+                      distance: { normal: 20, unit: "ft" },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Giant Wasp",
-    source: "XMM",
-    page: 361,
-    size: ["M"],
+    id: "monster-giant-wasp",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Vespa Gigante", "Giant Wasp"],
+    description:
+      "A Vespa Gigante é um inseto predador de tamanho impressionante, conhecido por seu ferrão venenoso e voo ágil.",
+    source: "MM2024",
+    size: "medium",
     type: "beast",
-    alignment: ["U"],
-    ac: [13],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 13,
+    hitPoints: {
       average: 22,
-      formula: "5d8",
+      formula: { count: 5, faces: 8 },
     },
     speed: {
       walk: 10,
       fly: 50,
+      unit: "ft",
     },
-    str: 10,
-    dex: 14,
-    con: 10,
-    int: 1,
-    wis: 10,
-    cha: 3,
-    passive: 10,
-    cr: "1/2",
-    trait: [
-      {
-        name: "Flyby",
-        entries: [
-          "The wasp doesn't provoke an Opportunity Attack when it flies out of an enemy's reach.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Sting",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}5 ({@damage 1d6 + 2}) Piercing damage plus 5 ({@damage 2d4}) Poison damage.",
-        ],
-      },
-    ],
     environment: ["forest", "grassland", "urban"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/giant-wasp.mp3",
+    abilityScores: {
+      strength: 10,
+      dexterity: 14,
+      constitution: 10,
+      intelligence: 1,
+      wisdom: 10,
+      charisma: 3,
     },
-    traitTags: ["Flyby"],
-    damageTags: ["I", "P"],
-    miscTags: ["MA"],
+    senses: { passivePerception: 10 },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Voo Rasante",
+        description:
+          "A vespa não provoca Ataques de Oportunidade quando voa para fora do alcance de um inimigo.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Ferrão",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 2 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 4 },
+                damageTypeOptions: ["poison"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Gnoll Warrior",
-    source: "XMM",
-    page: 140,
-    size: ["M"],
+    id: "monster-gnoll-warrior",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Gnoll Guerreiro", "Gnoll Warrior"],
+    description:
+      "O Gnoll Guerreiro é um feroz combatente das tribos gnoll, conhecido por sua selvageria e táticas brutais em batalha.",
+    source: "MM2024",
+    size: "medium",
     type: "fiend",
-    alignment: ["C", "E"],
-    ac: [15],
-    hp: {
+    alignment: "chaoticEvil",
+    armorClass: 15,
+    hitPoints: {
       average: 27,
-      formula: "6d8",
+      formula: { count: 6, faces: 8 },
     },
     speed: {
       walk: 30,
+      unit: "ft",
     },
-    str: 14,
-    dex: 12,
-    con: 11,
-    int: 6,
-    wis: 10,
-    cha: 7,
-    senses: ["darkvision 60 ft."],
-    passive: 10,
-    languages: ["Gnoll"],
-    cr: "1/2",
-    action: [
-      {
-        name: "Rend",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}5 ({@damage 1d6 + 2}) Piercing damage.",
-        ],
-      },
-      {
-        name: "Bone Bow",
-        entries: [
-          "{@atkr r} {@hit 3}, range 150/600 ft. {@h}6 ({@damage 1d10 + 1}) Piercing damage.",
-        ],
-      },
-    ],
-    bonus: [
-      {
-        name: "Rampage (1/Day)",
-        entries: [
-          "Immediately after dealing damage to a creature that is already {@variantrule Bloodied|XPHB}, the gnoll moves up to half its {@variantrule Speed|XPHB}, and it makes one Rend attack.",
-        ],
-      },
-    ],
     environment: ["desert", "forest", "grassland", "hill"],
-    treasure: ["armaments", "individual"],
-    senseTags: ["D"],
-    languageTags: ["OTH"],
-    damageTags: ["P"],
-    miscTags: ["MA", "RA"],
+    abilityScores: {
+      strength: 14,
+      dexterity: 12,
+      constitution: 11,
+      intelligence: 6,
+      wisdom: 10,
+      charisma: 7,
+    },
+    senses: {
+      passivePerception: 10,
+      vision: { darkvision: 60 },
+    },
+    languages: ["gnoll"],
+    challengeRating: "1/2",
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Rasgar",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 2 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+      },
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Arco de Ossos",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["rangedWeaponAttack"],
+          attackBonus: 3,
+          range: { normal: 150, long: 600, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 10, bonus: 1 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Gray Ooze",
-    source: "XMM",
-    page: 151,
-    otherSources: [
-      {
-        source: "ScoEE",
-      },
-    ],
-    size: ["M"],
+    id: "monster-gray-ooze",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Lodo Cinzento", "Gray Ooze"],
+    description:
+      "O Lodo Cinzento é uma criatura amorfa e corrosiva, encontrada em masmorras e cavernas, capaz de dissolver metal e carne.",
+    source: "MM2024",
+    size: "medium",
     type: "ooze",
-    alignment: ["U"],
-    ac: [9],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 9,
+    hitPoints: {
       average: 22,
-      formula: "3d8 + 9",
+      formula: { count: 3, faces: 8, bonus: 9 },
     },
     speed: {
       walk: 10,
       climb: 10,
+      unit: "ft",
     },
-    str: 12,
-    dex: 6,
-    con: 16,
-    int: 1,
-    wis: 6,
-    cha: 2,
-    skill: {
-      stealth: "+2",
-    },
-    senses: ["blindsight 60 ft."],
-    passive: 8,
-    resist: ["acid", "cold", "fire"],
-    conditionImmune: [
-      "blinded",
-      "charmed",
-      "deafened",
-      "exhaustion",
-      "frightened",
-      "grappled",
-      "prone",
-      "restrained",
-    ],
-    cr: "1/2",
-    trait: [
-      {
-        name: "Amorphous",
-        entries: [
-          "The ooze can move through a space as narrow as 1 inch without expending extra movement to do so.",
-        ],
-      },
-      {
-        name: "Corrosive Form",
-        entries: [
-          "Nonmagical ammunition is destroyed immediately after hitting the ooze and dealing any damage. Any nonmagical weapon takes a cumulative -1 penalty to attack rolls immediately after dealing damage to the ooze and coming into contact with it. The weapon is destroyed if the penalty reaches -5. The penalty can be removed by casting the {@spell Mending|XPHB} spell on the weapon.",
-          "The ooze can eat through 2-inch-thick, nonmagical metal or wood in 1 round.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Pseudopod",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}10 ({@damage 2d8 + 1}) Acid damage. Nonmagical armor worn by the target takes a -1 penalty to the AC it offers. The armor is destroyed if the penalty reduces its AC to 10. The penalty can be removed by casting the {@spell Mending|XPHB} spell on the armor.",
-        ],
-      },
-    ],
     environment: ["underdark"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/gray-ooze.mp3",
+    abilityScores: {
+      strength: 12,
+      dexterity: 6,
+      constitution: 16,
+      intelligence: 1,
+      wisdom: 6,
+      charisma: 2,
     },
-    traitTags: ["Amorphous"],
-    senseTags: ["B"],
-    damageTags: ["A"],
-    miscTags: ["MA"],
+    proficiencyBonus: {
+      skills: [{ skill: "stealth", bonus: 2 }],
+    },
+    senses: {
+      passivePerception: 8,
+      vision: { blindsight: 60 },
+    },
+    defenses: {
+      resistances: ["acid", "cold", "fire"],
+      immunities: {
+        condition: [
+          "blinded",
+          "charmed",
+          "deafened",
+          "exhausted",
+          "frightened",
+          "grappled",
+          "prone",
+          "restrained",
+        ],
+      },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Amorfo",
+        description:
+          "O lodo pode se mover por espaços tão estreitos quanto 2,5 cm sem gastar movimento extra para isso.",
+      },
+      {
+        name: "Forma Corrosiva",
+        description:
+          "Munição não mágica é destruída imediatamente após atingir o lodo e causar qualquer dano. Qualquer arma não mágica recebe um penalizador cumulativo de -1 nas jogadas de ataque após causar dano ao lodo e entrar em contato com ele. A arma é destruída se o penalizador chegar a -5. O penalizador pode ser removido com a magia Reparar. O lodo pode corroer metal ou madeira não mágica de até 5 cm de espessura em 1 rodada.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Pseudópode",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 8, bonus: 1 },
+                damageTypeOptions: ["acid"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Hobgoblin Warrior",
-    group: ["Goblinoids"],
-    source: "XMM",
-    page: 170,
-    size: ["M"],
-    type: {
-      type: "fey",
-      tags: ["goblinoid"],
-    },
-    alignment: ["L", "E"],
-    ac: [18],
-    hp: {
+    id: "monster-hobgoblin-warrior",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Hobgoblin Guerreiro", "Hobgoblin Warrior"],
+    description:
+      "O Hobgoblin Guerreiro é um soldado disciplinado das legiões hobgoblin, treinado em táticas de combate em grupo.",
+    source: "MM2024",
+    size: "medium",
+    type: "fey",
+    alignment: "lawfulEvil",
+    armorClass: 18,
+    hitPoints: {
       average: 11,
-      formula: "2d8 + 2",
+      formula: { count: 2, faces: 8, bonus: 2 },
     },
     speed: {
       walk: 30,
+      unit: "ft",
     },
-    initiative: {
-      proficiency: 1,
-    },
-    str: 13,
-    dex: 12,
-    con: 12,
-    int: 10,
-    wis: 10,
-    cha: 9,
-    senses: ["darkvision 60 ft."],
-    passive: 10,
-    languages: ["Common", "Goblin"],
-    cr: "1/2",
-    gear: [
-      "half plate armor|xphb",
-      "longbow|xphb",
-      "longsword|xphb",
-      "shield|xphb",
-    ],
-    trait: [
-      {
-        name: "Pack Tactics",
-        entries: [
-          "The hobgoblin has {@variantrule Advantage|XPHB} on an attack roll against a creature if at least one of the hobgoblin's allies is within 5 feet of the creature and the ally doesn't have the {@condition Incapacitated|XPHB} condition.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Longsword",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}12 ({@damage 2d10 + 1}) Slashing damage.",
-        ],
-      },
-      {
-        name: "Longbow",
-        entries: [
-          "{@atkr r} {@hit 3}, range 150/600 ft. {@h}5 ({@damage 1d8 + 1}) Piercing damage plus 7 ({@damage 3d4}) Poison damage.",
-        ],
-      },
-    ],
     environment: [
       "desert",
       "forest",
       "grassland",
       "hill",
       "mountain",
-      "planar, acheron",
+      "planar",
+      "acheron",
       "underdark",
     ],
-    treasure: ["armaments", "individual"],
-    traitTags: ["Pack Tactics"],
-    senseTags: ["D"],
-    languageTags: ["C", "GO"],
-    damageTags: ["I", "P", "S"],
-    miscTags: ["MA", "MLW", "RA", "RNG"],
-  },
-  {
-    name: "Ice Mephit",
-    source: "XMM",
-    page: 206,
-    otherSources: [
+    abilityScores: {
+      strength: 13,
+      dexterity: 12,
+      constitution: 12,
+      intelligence: 10,
+      wisdom: 10,
+      charisma: 9,
+    },
+    senses: {
+      passivePerception: 10,
+      vision: { darkvision: 60 },
+    },
+    languages: ["common", "goblin"],
+    challengeRating: "1/2",
+    traits: [
       {
-        source: "DrDe",
+        name: "Táticas de Matilha",
+        description:
+          "O hobgoblin tem vantagem em jogadas de ataque contra uma criatura se pelo menos um aliado do hobgoblin estiver a até 1,5 metro da criatura e não estiver incapacitado.",
       },
     ],
-    size: ["S"],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Espada Longa",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeWeaponAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 10, bonus: 1 },
+                damageTypeOptions: ["slashing"],
+              },
+            },
+          ],
+        },
+      },
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Arco Longo",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["rangedWeaponAttack"],
+          attackBonus: 3,
+          range: { normal: 150, long: 600, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8, bonus: 1 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 3, faces: 4 },
+                damageTypeOptions: ["poison"],
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "monster-ice-mephit",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Mefit de Gelo", "Ice Mephit"],
+    description:
+      "O Mefit de Gelo é um elemental travesso formado de gelo e ar frio, capaz de liberar rajadas congelantes.",
+    source: "MM2024",
+    size: "small",
     type: "elemental",
-    alignment: ["N", "E"],
-    ac: [11],
-    hp: {
+    alignment: "neutralEvil",
+    armorClass: 11,
+    hitPoints: {
       average: 21,
-      formula: "6d6",
+      formula: { count: 6, faces: 6 },
     },
     speed: {
       walk: 30,
       fly: 30,
+      unit: "ft",
     },
-    str: 7,
-    dex: 13,
-    con: 10,
-    int: 9,
-    wis: 11,
-    cha: 12,
-    skill: {
-      perception: "+2",
-      stealth: "+3",
+    environment: ["planar"],
+    abilityScores: {
+      strength: 7,
+      dexterity: 13,
+      constitution: 10,
+      intelligence: 9,
+      wisdom: 11,
+      charisma: 12,
     },
-    senses: ["darkvision 60 ft."],
-    passive: 12,
-    immune: ["cold", "poison"],
-    vulnerable: ["fire"],
-    conditionImmune: ["exhaustion", "poisoned"],
-    languages: ["Primordial (Aquan, Auran)"],
-    cr: "1/2",
-    spellcasting: [
+    proficiencyBonus: {
+      skills: [
+        { skill: "perception", bonus: 2 },
+        { skill: "stealth", bonus: 3 },
+      ],
+    },
+    senses: {
+      passivePerception: 12,
+      vision: { darkvision: 60 },
+    },
+    defenses: {
+      immunities: {
+        damage: ["cold", "poison"],
+        condition: ["exhausted", "poisoned"],
+      },
+      vulnerabilities: ["fire"],
+    },
+    languages: ["primordial"],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Fog Cloud (1/Day)",
-        type: "spellcasting",
-        headerEntries: [
-          "The mephit casts {@spell Fog Cloud|XPHB}, requiring no spell components and using Charisma as the spellcasting ability.",
-        ],
-        daily: {
-          "1": ["{@spell Fog Cloud|XPHB}"],
+        name: "Explosão Mortal",
+        description:
+          "O mefit explode ao morrer. Teste de resistência de Constituição CD 10, cada criatura em uma área de 1,5 metro de emanação originada do mefit. Em caso de falha: 5 (2d4) de dano de frio. Sucesso: Metade do dano.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Garra",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4, bonus: 1 },
+                damageTypeOptions: ["slashing"],
+              },
+            },
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4 },
+                damageTypeOptions: ["cold"],
+              },
+            },
+          ],
         },
-        ability: "cha",
-        displayAs: "action",
-        hidden: ["daily"],
-      },
-    ],
-    trait: [
-      {
-        name: "Death Burst",
-        entries: [
-          "The mephit explodes when it dies. {@actSave con} {@dc 10}, each creature in a 5-foot {@variantrule Emanation [Area of Effect]|XPHB|Emanation} originating from the mephit. {@actSaveFail} 5 ({@damage 2d4}) Cold damage. {@actSaveSuccess} Half damage.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Claw",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}3 ({@damage 1d4 + 1}) Slashing damage plus 2 ({@damage 1d4}) Cold damage.",
-        ],
       },
       {
-        name: "Frost Breath {@recharge}",
-        entries: [
-          "{@actSave con} {@dc 10}, each creature in a 15-foot {@variantrule Cone [Area of Effect]|XPHB|Cone}. {@actSaveFail} 7 ({@damage 3d4}) Cold damage. {@actSaveSuccess} Half damage.",
-        ],
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        name: "Sopro Gélido",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 15, unit: "ft" },
+          area: { shape: "cone", length: 15, unit: "ft" },
+          save: {
+            ability: "constitution",
+            dc: { type: "fixed", value: 10 },
+          },
+          outcomes: [
+            {
+              on: "fail",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 3, faces: 4 },
+                damageTypeOptions: ["cold"],
+              },
+            },
+            {
+              on: "success",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "halfDamage",
+                of: "frost-breath-damage",
+              },
+            },
+          ],
+          charges: {
+            type: "dice",
+            max: 1,
+            roll: { count: 1, faces: 6 },
+            successOn: [6],
+            triggers: { events: [{ type: "onTurnStart" }] },
+          },
+        },
       },
     ],
-    environment: ["planar, elemental"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/ice-mephit.mp3",
-    },
-    traitTags: ["Death Burst"],
-    senseTags: ["D"],
-    actionTags: ["Breath Weapon"],
-    languageTags: ["AQ", "AU", "P"],
-    damageTags: ["C", "S"],
-    spellcastingTags: ["O"],
-    miscTags: ["MA"],
-    savingThrowForced: ["constitution"],
   },
   {
-    name: "Jackalwere",
-    source: "XMM",
-    page: 182,
-    size: ["S"],
+    id: "monster-jackalwere",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Homem-Chacal", "Jackalwere"],
+    description:
+      "O Homem-Chacal é uma criatura maligna capaz de alternar entre forma de chacal e humanoide, conhecida por sua astúcia e ataques em grupo.",
+    source: "MM2024",
+    size: "small",
     type: "fiend",
-    alignment: ["C", "E"],
-    ac: [12],
-    hp: {
+    alignment: "chaoticEvil",
+    armorClass: 12,
+    hitPoints: {
       average: 18,
-      formula: "4d6 + 4",
+      formula: { count: 4, faces: 6, bonus: 4 },
     },
     speed: {
       walk: 40,
+      unit: "ft",
     },
-    str: 11,
-    dex: 15,
-    con: 12,
-    int: 13,
-    wis: 11,
-    cha: 10,
-    skill: {
-      deception: "+4",
-      perception: "+4",
-      stealth: "+4",
-    },
-    senses: ["darkvision 90 ft."],
-    passive: 14,
-    languages: ["Common"],
-    cr: "1/2",
-    trait: [
-      {
-        name: "Pack Tactics",
-        entries: [
-          "The jackalwere has {@variantrule Advantage|XPHB} on an attack roll against a creature if at least one of the jackalwere's allies is within 5 feet of the creature and the ally doesn't have the {@condition Incapacitated|XPHB} condition.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Multiattack",
-        entries: ["The jackalwere makes two Rend or Slam attacks."],
-      },
-      {
-        name: "Rend (Jackal or Hybrid Form Only)",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}5 ({@damage 1d6 + 2}) Piercing damage.",
-        ],
-      },
-      {
-        name: "Slam (Human or Hybrid Form Only)",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}4 ({@damage 1d4 + 2}) Bludgeoning damage.",
-        ],
-      },
-      {
-        name: "Sleep Gaze {@recharge 5}",
-        entries: [
-          "{@actSave wis} {@dc 10}, one creature the jackalwere can see within 30 feet (Constructs and Undead succeed automatically). {@actSaveFail} The target has the {@condition Unconscious|XPHB} condition for 10 minutes or until it takes damage or a creature within 5 feet of it takes an action to wake it. {@actSaveSuccess} The target is immune to this jackalwere's Sleep Gaze for 24 hours.",
-        ],
-      },
-    ],
-    bonus: [
-      {
-        name: "Shape-Shift",
-        entries: [
-          "The jackalwere shape-shifts into a Medium human or a Medium jackal-humanoid hybrid, or it returns to its true form (that of a Small jackal). Other than its size, its game statistics are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
-        ],
-      },
-    ],
     environment: ["desert", "grassland"],
-    treasure: ["implements"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/jackalwere.mp3",
+    abilityScores: {
+      strength: 11,
+      dexterity: 15,
+      constitution: 12,
+      intelligence: 13,
+      wisdom: 11,
+      charisma: 10,
     },
-    traitTags: ["Pack Tactics"],
-    senseTags: ["D"],
-    actionTags: ["Multiattack"],
-    languageTags: ["C"],
-    damageTags: ["B", "P"],
-    miscTags: ["MA"],
-    conditionInflict: ["unconscious"],
-    savingThrowForced: ["wisdom"],
+    proficiencyBonus: {
+      skills: [
+        { skill: "deception", bonus: 4 },
+        { skill: "perception", bonus: 4 },
+        { skill: "stealth", bonus: 4 },
+      ],
+    },
+    senses: {
+      passivePerception: 14,
+      vision: { darkvision: 90 },
+    },
+    languages: ["common"],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Táticas de Matilha",
+        description:
+          "O chacalwere tem vantagem em jogadas de ataque contra uma criatura se pelo menos um aliado do chacalwere estiver a até 1,5 metro da criatura e não estiver incapacitado.",
+      },
+    ],
+    effects: [
+      {
+        type: "multiAttack",
+        name: "Ataque Múltiplo",
+        attacksName: ["Rend", "Slam"],
+        amount: 2,
+        actionId: "action-multiattack",
+        parameters: {
+          activation: { type: "action" },
+        },
+      },
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Rasgar",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 2 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+      },
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Slam",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4, bonus: 2 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Magma Mephit",
-    source: "XMM",
-    page: 207,
-    size: ["S"],
+    id: "monster-magma-mephit",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Mefit de Magma", "Magma Mephit"],
+    description:
+      "O Mefit de Magma é um elemental travesso composto de rocha derretida e fogo, explodindo em chamas ao morrer.",
+    source: "MM2024",
+    size: "small",
     type: "elemental",
-    alignment: ["N", "E"],
-    ac: [11],
-    hp: {
+    alignment: "neutralEvil",
+    armorClass: 11,
+    hitPoints: {
       average: 18,
-      formula: "4d6 + 4",
+      formula: { count: 4, faces: 6, bonus: 4 },
     },
     speed: {
       walk: 30,
       fly: 30,
+      unit: "ft",
     },
-    str: 8,
-    dex: 12,
-    con: 12,
-    int: 7,
-    wis: 10,
-    cha: 10,
-    skill: {
-      stealth: "+3",
+    environment: ["planar"],
+    abilityScores: {
+      strength: 8,
+      dexterity: 12,
+      constitution: 12,
+      intelligence: 7,
+      wisdom: 10,
+      charisma: 10,
     },
-    senses: ["darkvision 60 ft."],
-    passive: 10,
-    immune: ["fire", "poison"],
-    vulnerable: ["cold"],
-    conditionImmune: ["exhaustion", "poisoned"],
-    languages: ["Primordial (Ignan, Terran)"],
-    cr: "1/2",
-    trait: [
+    proficiencyBonus: {
+      skills: [{ skill: "stealth", bonus: 3 }],
+    },
+    senses: {
+      passivePerception: 10,
+      vision: { darkvision: 60 },
+    },
+    defenses: {
+      immunities: {
+        damage: ["fire", "poison"],
+        condition: ["exhausted", "poisoned"],
+      },
+      vulnerabilities: ["cold"],
+    },
+    languages: ["primordial"],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Death Burst",
-        entries: [
-          "The mephit explodes when it dies. {@actSave dex} {@dc 11}, each creature in a 5-foot {@variantrule Emanation [Area of Effect]|XPHB|Emanation} originating from the mephit. {@actSaveFail} 7 ({@damage 2d6}) Fire damage. {@actSaveSuccess} Half damage.",
-        ],
+        name: "Explosão Mortal",
+        description:
+          "O mefit explode ao morrer. Teste de resistência de Destreza CD 11, cada criatura em uma área de 1,5 metro de emanação originada do mefit. Em caso de falha: 7 (2d6) de dano de fogo. Sucesso: Metade do dano.",
       },
     ],
-    action: [
+    effects: [
       {
+        type: "activatableAction",
+        actionId: "action-attack",
         name: "Claw",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}3 ({@damage 1d4 + 1}) Slashing damage plus 3 ({@damage 1d6}) Fire damage.",
-        ],
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4, bonus: 1 },
+                damageTypeOptions: ["slashing"],
+              },
+            },
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6 },
+                damageTypeOptions: ["fire"],
+              },
+            },
+          ],
+        },
       },
       {
-        name: "Fire Breath {@recharge}",
-        entries: [
-          "{@actSave dex} {@dc 11}, each creature in a 15-foot {@variantrule Cone [Area of Effect]|XPHB|Cone}. {@actSaveFail} 7 ({@damage 2d6}) Fire damage. {@actSaveSuccess} Half damage.",
-        ],
+        type: "activatableCastSpell",
+        actionId: "action-cast-spell",
+        name: "Sopro de Fogo",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 15, unit: "ft" },
+          area: { shape: "cone", length: 15, unit: "ft" },
+          save: {
+            ability: "dexterity",
+            dc: { type: "fixed", value: 11 },
+          },
+          outcomes: [
+            {
+              on: "fail",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 6 },
+                damageTypeOptions: ["fire"],
+              },
+            },
+            {
+              on: "success",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "halfDamage",
+                of: "fire-breath-damage",
+              },
+            },
+          ],
+          charges: {
+            type: "dice",
+            max: 1,
+            roll: { count: 1, faces: 6 },
+            successOn: [6],
+            triggers: { events: [{ type: "onTurnStart" }] },
+          },
+        },
       },
     ],
-    environment: ["planar, elemental"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/magma-mephit.mp3",
-    },
-    traitTags: ["Death Burst"],
-    senseTags: ["D"],
-    actionTags: ["Breath Weapon"],
-    languageTags: ["IG", "P", "T"],
-    damageTags: ["F", "S"],
-    miscTags: ["MA"],
-    savingThrowForced: ["dexterity"],
   },
   {
-    name: "Magmin",
-    source: "XMM",
-    page: 200,
-    size: ["S"],
+    id: "monster-magmin",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Magmin", "Magmin"],
+    description:
+      "O Magmin é uma criatura elemental de fogo, pequena e incandescente, que incendeia tudo o que toca.",
+    source: "MM2024",
+    size: "small",
     type: "elemental",
-    alignment: ["C", "N"],
-    ac: [14],
-    hp: {
+    alignment: "chaoticNeutral",
+    armorClass: 14,
+    hitPoints: {
       average: 13,
-      formula: "3d6 + 3",
+      formula: { count: 3, faces: 6, bonus: 3 },
     },
     speed: {
       walk: 30,
+      unit: "ft",
     },
-    str: 7,
-    dex: 15,
-    con: 12,
-    int: 8,
-    wis: 11,
-    cha: 10,
-    senses: ["darkvision 60 ft."],
-    passive: 10,
-    immune: ["fire"],
-    languages: ["Primordial (Ignan)"],
-    cr: "1/2",
-    trait: [
-      {
-        name: "Death Burst",
-        entries: [
-          "The magmin explodes when it dies. {@actSave dex} {@dc 11}, each creature in a 10-foot {@variantrule Emanation [Area of Effect]|XPHB|Emanation} originating from the magmin. {@actSaveFail} 7 ({@damage 2d6}) Fire damage. {@actSaveSuccess} Half damage.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Touch",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}7 ({@damage 2d4 + 2}) Fire damage. If the target is a creature or a flammable object that isn't being worn or carried, it starts {@hazard burning|XPHB}.",
-        ],
-      },
-    ],
-    bonus: [
-      {
-        name: "Ignited Illumination",
-        entries: [
-          "The magmin sets itself ablaze or extinguishes its flames. While ablaze, the magmin sheds {@variantrule Bright Light|XPHB} in a 10-foot radius and {@variantrule Dim Light|XPHB} for an additional 10 feet.",
-        ],
-      },
-    ],
-    environment: ["planar, fire"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/magmin.mp3",
+    environment: ["planar"],
+    abilityScores: {
+      strength: 7,
+      dexterity: 15,
+      constitution: 12,
+      intelligence: 8,
+      wisdom: 11,
+      charisma: 10,
     },
-    traitTags: ["Death Burst"],
-    senseTags: ["D"],
-    languageTags: ["IG", "P"],
-    damageTags: ["F"],
-    miscTags: ["AOE", "MA"],
-    savingThrowForced: ["dexterity"],
+    senses: {
+      passivePerception: 10,
+      vision: { darkvision: 60 },
+    },
+    defenses: {
+      immunities: { damage: ["fire"] },
+    },
+    languages: ["primordial"],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Explosão Mortal",
+        description:
+          "O magmin explode ao morrer. Teste de resistência de Destreza CD 11, cada criatura em uma área de 3 metros de emanação originada do magmin. Em caso de falha: 7 (2d6) de dano de fogo. Sucesso: Metade do dano.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Toque",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 4, bonus: 2 },
+                damageTypeOptions: ["fire"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Modron Tridrone",
-    source: "XMM",
-    page: 217,
-    otherSources: [
-      {
-        source: "DrDe",
-      },
-    ],
-    size: ["M"],
+    id: "monster-modron-tridrone",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Modron Tridrone", "Modron Tridrone"],
+    description:
+      "O Modron Tridrone é um construto extraplanar de forma geométrica, servindo como soldado e supervisor nas fileiras modron.",
+    source: "MM2024",
+    size: "medium",
     type: "construct",
-    alignment: ["L", "N"],
-    ac: [15],
-    hp: {
+    alignment: "lawfulNeutral",
+    armorClass: 15,
+    hitPoints: {
       average: 16,
-      formula: "3d8 + 3",
+      formula: { count: 3, faces: 8, bonus: 3 },
     },
     speed: {
       walk: 30,
+      unit: "ft",
     },
-    str: 12,
-    dex: 13,
-    con: 12,
-    int: 9,
-    wis: 10,
-    cha: 9,
-    senses: ["truesight 120 ft."],
-    passive: 10,
-    conditionImmune: ["charmed"],
-    languages: ["Modron"],
-    cr: "1/2",
-    trait: [
+    environment: ["planar"],
+    abilityScores: {
+      strength: 12,
+      dexterity: 13,
+      constitution: 12,
+      intelligence: 9,
+      wisdom: 10,
+      charisma: 9,
+    },
+    senses: {
+      passivePerception: 10,
+      vision: { truesight: 120 },
+    },
+    defenses: {
+      immunities: { condition: ["charmed"] },
+    },
+    languages: ["modron"],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Disintegration",
-        entries: [
-          "If the modron dies, it disintegrates into dust, leaving behind anything it was wearing or carrying.",
-        ],
+        name: "Desintegração",
+        description:
+          "Se o modron morrer, ele se desintegra em pó, deixando para trás tudo o que estava vestindo ou carregando.",
       },
     ],
-    action: [
+    effects: [
       {
-        name: "Multiattack",
-        entries: ["The modron makes three Clockwork Spear attacks."],
+        type: "multiAttack",
+        name: "Ataque Múltiplo",
+        attacksName: ["Clockwork Spear"],
+        amount: 3,
+        actionId: "action-multiattack",
+        parameters: {
+          activation: { type: "action" },
+        },
       },
       {
-        name: "Clockwork Spear",
-        entries: [
-          "{@atkr m,r} {@hit 3}, reach 5 ft. or range 120 ft. {@h}4 ({@damage 1d6 + 1}) Force damage. {@hom}The spear magically returns to the modron's hand immediately after a ranged attack.",
-        ],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Lança Mecânica",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeWeaponAttack", "rangedWeaponAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft", long: 120 },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 1 },
+                damageTypeOptions: ["force"],
+              },
+            },
+          ],
+        },
       },
     ],
-    environment: ["planar, mechanus"],
-    senseTags: ["U"],
-    actionTags: ["Multiattack"],
-    languageTags: ["OTH"],
-    damageTags: ["O"],
-    miscTags: ["MA", "MLW", "RA", "THW"],
   },
   {
-    name: "Myconid Adult",
-    source: "XMM",
-    page: 223,
-    size: ["M"],
+    id: "monster-myconid-adult",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Miconídeo Adulto", "Myconid Adult"],
+    description:
+      "O Miconídeo Adulto é um fungo inteligente do Subterrâneo, vivendo em colônias e comunicando-se por esporos telepáticos.",
+    source: "MM2024",
+    size: "medium",
     type: "plant",
-    alignment: ["L", "N"],
-    ac: [12],
-    hp: {
+    alignment: "lawfulNeutral",
+    armorClass: 12,
+    hitPoints: {
       average: 16,
-      formula: "3d8 + 3",
+      formula: { count: 3, faces: 8, bonus: 3 },
     },
     speed: {
       walk: 20,
+      unit: "ft",
     },
-    str: 10,
-    dex: 10,
-    con: 12,
-    int: 10,
-    wis: 13,
-    cha: 7,
-    senses: ["darkvision 120 ft."],
-    passive: 11,
-    languages: ["telepathy 240 ft."],
-    cr: "1/2",
-    trait: [
-      {
-        name: "Sun Sickness",
-        entries: [
-          "While in sunlight, the myconid has {@variantrule Disadvantage|XPHB} on {@variantrule D20 Test|XPHB|D20 Tests}. The myconid dies if it spends more than 1 hour in sunlight.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Slam",
-        entries: [
-          "{@atkr m} {@hit 2}, reach 5 ft. {@h}4 ({@damage 1d8}) Bludgeoning damage plus 3 ({@damage 1d6}) Poison damage.",
-        ],
-      },
-      {
-        name: "Pacifying Spores (1/Day)",
-        entries: [
-          "{@actSave con} {@dc 11}, one creature the myconid can see within 10 feet. {@actSaveFail} The target has the {@condition Stunned|XPHB} condition and repeats the save at the end of each of its turns, ending the effect on itself on a success. After 1 minute, it succeeds automatically.",
-        ],
-      },
-      {
-        name: "Rapport Spores",
-        entries: [
-          "The myconid expels spores in a 30-foot {@variantrule Emanation [Area of Effect]|XPHB|Emanation} originating from itself. Creatures in that area with an Intelligence score of 2 or higher that aren't Constructs, Elementals, or Undead gain telepathy with a range of 30 feet for 1 hour.",
-        ],
-      },
-    ],
     environment: ["underdark"],
-    treasure: ["any"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/myconid-adult.mp3",
+    abilityScores: {
+      strength: 10,
+      dexterity: 10,
+      constitution: 12,
+      intelligence: 10,
+      wisdom: 13,
+      charisma: 7,
     },
-    altArt: [
+    senses: {
+      passivePerception: 11,
+      vision: { darkvision: 120 },
+    },
+    languages: ["telepathy"],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Myconid Adult (Alt)",
-        source: "XMM",
+        name: "Doença Solar",
+        description:
+          "Enquanto estiver sob luz solar, o miconídeo tem desvantagem em testes de D20. O miconídeo morre se passar mais de 1 hora sob luz solar.",
       },
     ],
-    senseTags: ["SD"],
-    languageTags: ["TP"],
-    damageTags: ["B", "I"],
-    miscTags: ["MA"],
-    conditionInflict: ["stunned"],
-    savingThrowForced: ["constitution"],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Esmagamento",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 2,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6 },
+                damageTypeOptions: ["poison"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Performer",
-    source: "XMM",
-    page: 236,
-    otherSources: [
-      {
-        source: "DrDe",
-      },
-    ],
-    size: ["S", "M"],
+    id: "monster-performer",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Artista", "Performer"],
+    description:
+      "O Artista é um humanoide talentoso em apresentações, usando agilidade e carisma tanto no palco quanto em situações de perigo.",
+    source: "MM2024",
+    size: "medium",
     type: "humanoid",
-    alignment: ["N"],
-    ac: [13],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 13,
+    hitPoints: {
       average: 27,
-      formula: "5d8 + 5",
+      formula: { count: 5, faces: 8, bonus: 5 },
     },
     speed: {
       walk: 30,
+      unit: "ft",
     },
-    str: 12,
-    dex: 16,
-    con: 12,
-    int: 13,
-    wis: 14,
-    cha: 16,
-    save: {
-      dex: "+5",
-      cha: "+5",
-    },
-    skill: {
-      acrobatics: "+5",
-      athletics: "+3",
-      performance: "+7",
-    },
-    passive: 12,
-    languages: ["Common plus one other language"],
-    cr: "1/2",
-    gear: ["shortsword|xphb"],
-    action: [
-      {
-        name: "Shortsword",
-        entries: [
-          "{@atkr m} {@hit 5}, reach 5 ft. {@h}6 ({@damage 1d6 + 3}) Piercing damage.",
-        ],
-      },
-    ],
-    reaction: [
-      {
-        name: "Uncanny Dodge",
-        entries: [
-          "{@actTrigger} The performer is hit by an attack roll. {@actResponse} The performer halves the damage (round down) it takes from that attack.",
-        ],
-      },
-    ],
     environment: ["any"],
-    treasure: ["implements", "individual"],
-    languageTags: ["C", "X"],
-    damageTags: ["P"],
-    miscTags: ["MA", "MLW"],
+    abilityScores: {
+      strength: 12,
+      dexterity: 16,
+      constitution: 12,
+      intelligence: 13,
+      wisdom: 14,
+      charisma: 16,
+    },
+    proficiencyBonus: {
+      skills: [
+        { skill: "acrobatics", bonus: 5 },
+        { skill: "athletics", bonus: 3 },
+        { skill: "performance", bonus: 7 },
+      ],
+    },
+    senses: {
+      passivePerception: 12,
+    },
+    languages: ["common"],
+    challengeRating: "1/2",
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Shortsword",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeWeaponAttack"],
+          attackBonus: 5,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 3 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Piercer",
-    source: "XMM",
-    page: 240,
-    otherSources: [
-      {
-        source: "DrDe",
-      },
-    ],
-    size: ["M"],
+    id: "monster-piercer",
+    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    name: ["Perfurador", "Piercer"],
+    description:
+      "O Perfurador é uma aberração cavernícola que se assemelha a uma estalactite, caindo do teto para atacar suas presas.",
+    source: "MM2024",
+    size: "medium",
     type: "aberration",
-    alignment: ["U"],
-    ac: [15],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 15,
+    hitPoints: {
       average: 22,
-      formula: "3d8 + 9",
+      formula: { count: 3, faces: 8, bonus: 9 },
     },
     speed: {
       walk: 5,
       climb: 15,
+      unit: "ft",
     },
-    initiative: {
-      proficiency: 1,
-    },
-    str: 13,
-    dex: 13,
-    con: 16,
-    int: 1,
-    wis: 7,
-    cha: 3,
-    skill: {
-      stealth: "+5",
-    },
-    senses: ["blindsight 30 ft.", "darkvision 60 ft."],
-    passive: 8,
-    cr: "1/2",
-    trait: [
-      {
-        name: "Spider Climb",
-        entries: [
-          "The piercer can climb difficult surfaces, including along ceilings, without needing to make an ability check.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Bite",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}5 ({@damage 1d8 + 1}) Piercing damage.",
-        ],
-      },
-      {
-        name: "Drop",
-        entries: [
-          "The piercer falls. {@actSave dex} {@dc 11}, one creature directly underneath the piercer. {@actSaveFail} 10 ({@damage 3d6}) Piercing damage. {@actSaveSuccessOrFail} The piercer reduces any damage it takes from the fall by 20.",
-        ],
-      },
-    ],
     environment: ["underdark"],
-    treasure: ["individual"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/piercer.mp3",
+    abilityScores: {
+      strength: 13,
+      dexterity: 13,
+      constitution: 16,
+      intelligence: 1,
+      wisdom: 7,
+      charisma: 3,
     },
-    traitTags: ["Spider Climb"],
-    senseTags: ["B", "D"],
-    damageTags: ["P"],
-    miscTags: ["MA"],
-    savingThrowForced: ["dexterity"],
+    proficiencyBonus: {
+      skills: [{ skill: "stealth", bonus: 5 }],
+    },
+    senses: {
+      passivePerception: 8,
+      vision: { blindsight: 30, darkvision: 60 },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Escalar como Aranha",
+        description:
+          "O perfurador pode escalar superfícies difíceis, incluindo tetos, sem precisar fazer um teste de habilidade.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Mordida",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8, bonus: 1 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+      },
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Queda",
+        parameters: {
+          activation: { type: "action" },
+          range: { normal: 5, unit: "ft" },
+          save: {
+            ability: "dexterity",
+            dc: { type: "fixed", value: 11 },
+          },
+          outcomes: [
+            {
+              on: "fail",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 3, faces: 6 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Reef Shark",
-    source: "XMM",
-    page: 368,
-    otherSources: [
-      {
-        source: "XPHB",
-        page: 356,
-      },
-    ],
-    size: ["M"],
+    id: "monster-reef-shark",
+    name: ["Tubarão de Recife", "Reef Shark"],
+    description:
+      "O Tubarão de Recife é um predador ágil dos mares rasos, caçando em grupos e atacando presas feridas.",
+    source: "MM2024",
+    size: "medium",
     type: "beast",
-    alignment: ["U"],
-    ac: [12],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 12,
+    hitPoints: {
       average: 22,
-      formula: "4d8 + 4",
+      formula: { count: 4, faces: 8, bonus: 4 },
     },
     speed: {
       walk: 5,
       swim: 30,
+      unit: "ft",
     },
-    str: 14,
-    dex: 15,
-    con: 13,
-    int: 1,
-    wis: 10,
-    cha: 4,
-    skill: {
-      perception: "+2",
-    },
-    senses: ["blindsight 30 ft."],
-    passive: 12,
-    cr: "1/2",
-    trait: [
-      {
-        name: "Pack Tactics",
-        entries: [
-          "The shark has {@variantrule Advantage|XPHB} on an attack roll against a creature if at least one of the shark's allies is within 5 feet of the creature and the ally doesn't have the {@condition Incapacitated|XPHB} condition.",
-        ],
-      },
-      {
-        name: "Water Breathing",
-        entries: ["The shark can breathe only underwater."],
-      },
-    ],
-    action: [
-      {
-        name: "Bite",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}7 ({@damage 2d4 + 2}) Piercing damage.",
-        ],
-      },
-    ],
     environment: ["underwater"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/reef-shark.mp3",
+    abilityScores: {
+      strength: 14,
+      dexterity: 15,
+      constitution: 13,
+      intelligence: 1,
+      wisdom: 10,
+      charisma: 4,
     },
-    traitTags: ["Pack Tactics", "Water Breathing"],
-    senseTags: ["B"],
-    damageTags: ["P"],
-    miscTags: ["MA"],
+    senses: {
+      passivePerception: 12,
+      vision: { blindsight: 30 },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Táticas de Matilha",
+        description:
+          "O tubarão tem vantagem em jogadas de ataque contra uma criatura se pelo menos um aliado do tubarão estiver a até 1,5 metro da criatura e não estiver incapacitado.",
+      },
+      {
+        name: "Respiração Aquática",
+        description: "O tubarão só pode respirar debaixo d'água.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Bite",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 4, bonus: 2 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Rust Monster",
-    source: "XMM",
-    page: 263,
-    size: ["M"],
+    id: "monster-rust-monster",
+    name: ["Monstro da Ferrugem", "Rust Monster"],
+    description:
+      "O Monstro da Ferrugem é uma criatura subterrânea que se alimenta de metais, especialmente ferro, sendo temida por aventureiros equipados.",
+    source: "MM2024",
+    size: "medium",
     type: "monstrosity",
-    alignment: ["U"],
-    ac: [14],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 14,
+    hitPoints: {
       average: 33,
-      formula: "6d8 + 6",
+      formula: { count: 6, faces: 8, bonus: 6 },
     },
     speed: {
       walk: 40,
+      unit: "ft",
     },
-    str: 13,
-    dex: 12,
-    con: 13,
-    int: 2,
-    wis: 13,
-    cha: 6,
-    senses: ["darkvision 60 ft."],
-    passive: 11,
-    cr: "1/2",
-    trait: [
-      {
-        name: "Iron Scent",
-        entries: [
-          "The rust monster can pinpoint the location of ferrous metal within 30 feet of itself.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Multiattack",
-        entries: [
-          "The rust monster makes one Bite attack and uses Antennae twice.",
-        ],
-      },
-      {
-        name: "Bite",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}5 ({@damage 1d8 + 1}) Piercing damage.",
-        ],
-      },
-      {
-        name: "Antennae",
-        entries: [
-          "The rust monster targets one nonmagical metal object—armor or a weapon—worn or carried by a creature within 5 feet of itself. {@actSave dex} {@dc 11}, the creature with the object. {@actSaveFail} The object takes a -1 penalty to the AC it offers (armor) or to its attack rolls (weapon). Armor is destroyed if the penalty reduces its AC to 10, and a weapon is destroyed if its penalty reaches -5. The penalty can be removed by casting the {@spell Mending|XPHB} spell on the armor or weapon.",
-        ],
-      },
-      {
-        name: "Destroy Metal",
-        entries: [
-          "The rust monster touches a nonmagical metal object within 5 feet of itself that isn't being worn or carried. The touch destroys a 1-foot {@variantrule Cube [Area of Effect]|XPHB|Cube} of the object.",
-        ],
-      },
-    ],
-    reaction: [
-      {
-        name: "Reflexive Antennae",
-        entries: [
-          "{@actTrigger} An attack roll hits the rust monster. {@actResponse} The rust monster uses Antennae.",
-        ],
-      },
-    ],
     environment: ["underdark"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/rust-monster.mp3",
+    abilityScores: {
+      strength: 13,
+      dexterity: 12,
+      constitution: 13,
+      intelligence: 2,
+      wisdom: 13,
+      charisma: 6,
     },
-    senseTags: ["D"],
-    actionTags: ["Multiattack"],
-    damageTags: ["P"],
-    miscTags: ["MA"],
-    savingThrowForced: ["dexterity"],
+    senses: {
+      passivePerception: 11,
+      vision: { darkvision: 60 },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Olfato de Ferro",
+        description:
+          "O monstro da ferrugem pode localizar com precisão metais ferrosos em um raio de 9 metros.",
+      },
+    ],
+    effects: [
+      {
+        type: "multiAttack",
+        name: "Ataque Múltiplo",
+        attacksName: ["Bite", "Antennae"],
+        amount: 2,
+        actionId: "action-multiattack",
+        parameters: {
+          activation: { type: "action" },
+        },
+      },
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Bite",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8, bonus: 1 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Sahuagin Warrior",
-    source: "XMM",
-    page: 264,
-    size: ["M"],
+    id: "monster-sahuagin-warrior",
+    name: ["Sahuagin Guerreiro", "Sahuagin Warrior"],
+    description:
+      "O Sahuagin Guerreiro é um feroz habitante dos mares, conhecido por sua agressividade e domínio sobre tubarões.",
+    source: "MM2024",
+    size: "medium",
     type: "fiend",
-    alignment: ["L", "E"],
-    ac: [12],
-    hp: {
+    alignment: "lawfulEvil",
+    armorClass: 12,
+    hitPoints: {
       average: 22,
-      formula: "4d8 + 4",
+      formula: { count: 4, faces: 8, bonus: 4 },
     },
     speed: {
       walk: 30,
       swim: 40,
+      unit: "ft",
     },
-    str: 13,
-    dex: 11,
-    con: 12,
-    int: 12,
-    wis: 13,
-    cha: 9,
-    skill: {
-      perception: "+5",
+    environment: ["coast", "underwater"],
+    abilityScores: {
+      strength: 13,
+      dexterity: 11,
+      constitution: 12,
+      intelligence: 12,
+      wisdom: 13,
+      charisma: 9,
     },
-    senses: ["darkvision 120 ft."],
-    passive: 15,
-    resist: ["acid", "cold"],
-    languages: ["Sahuagin"],
-    cr: "1/2",
-    trait: [
+    proficiencyBonus: {
+      skills: [{ skill: "perception", bonus: 5 }],
+    },
+    senses: {
+      passivePerception: 15,
+      vision: { darkvision: 120 },
+    },
+    defenses: {
+      resistances: ["acid", "cold"],
+    },
+    languages: ["sahuagin"],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Blood Frenzy",
-        entries: [
-          "The sahuagin has {@variantrule Advantage|XPHB} on attack rolls against any creature that doesn't have all its {@variantrule Hit Points|XPHB}.",
-        ],
+        name: "Frenesi de Sangue",
+        description:
+          "O sahuagin tem vantagem nas jogadas de ataque contra qualquer criatura que não esteja com todos os seus pontos de vida.",
       },
       {
-        name: "Limited Amphibiousness",
-        entries: [
-          "The sahuagin can breathe air and water, but it must be submerged at least once every 4 hours to avoid suffocating outside water.",
-        ],
+        name: "Anfíbio Limitado",
+        description:
+          "O sahuagin pode respirar ar e água, mas deve submergir pelo menos uma vez a cada 4 horas para evitar sufocamento fora d'água.",
       },
       {
-        name: "Shark Telepathy",
-        entries: [
-          "The sahuagin can magically control sharks within 120 feet of itself, using a special telepathy.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Multiattack",
-        entries: ["The sahuagin makes two Claw attacks."],
-      },
-      {
-        name: "Claw",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}4 ({@damage 1d6 + 1}) Slashing damage.",
-        ],
+        name: "Telepatia com Tubarões",
+        description:
+          "O sahuagin pode controlar magicamente tubarões em um raio de 36 metros, usando uma telepatia especial.",
       },
     ],
-    bonus: [
+    effects: [
       {
-        name: "Aquatic Charge",
-        entries: [
-          "The sahuagin swims up to its {@variantrule Swim Speed|XPHB} straight toward an enemy it can see.",
-        ],
+        type: "multiAttack",
+        name: "Ataque Múltiplo",
+        attacksName: ["Claw"],
+        amount: 2,
+        actionId: "action-multiattack",
+        parameters: {
+          activation: { type: "action" },
+        },
+      },
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Garra",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 1 },
+                damageTypeOptions: ["slashing"],
+              },
+            },
+          ],
+        },
       },
     ],
-    environment: ["coastal", "underwater"],
-    treasure: ["any"],
-    senseTags: ["SD"],
-    actionTags: ["Multiattack"],
-    languageTags: ["OTH"],
-    damageTags: ["S"],
-    miscTags: ["MA"],
   },
   {
-    name: "Satyr",
-    source: "XMM",
-    page: 268,
-    size: ["M"],
+    id: "monster-satyr",
+    name: ["Sátiro", "Satyr"],
+    description:
+      "O Sátiro é uma criatura fey festiva e travessa, famosa por sua música, dança e resistência mágica.",
+    source: "MM2024",
+    size: "medium",
     type: "fey",
-    alignment: ["C", "N"],
-    ac: [13],
-    hp: {
+    alignment: "chaoticNeutral",
+    armorClass: 13,
+    hitPoints: {
       average: 31,
-      formula: "7d8",
+      formula: { count: 7, faces: 8 },
     },
     speed: {
       walk: 40,
+      unit: "ft",
     },
-    str: 12,
-    dex: 16,
-    con: 11,
-    int: 12,
-    wis: 10,
-    cha: 14,
-    skill: {
-      perception: "+2",
-      performance: "+6",
-      stealth: "+5",
+    environment: ["forest", "planar", "feywild"],
+    abilityScores: {
+      strength: 12,
+      dexterity: 16,
+      constitution: 11,
+      intelligence: 12,
+      wisdom: 10,
+      charisma: 14,
     },
-    passive: 12,
-    languages: ["Common", "Elvish", "Sylvan"],
-    cr: "1/2",
-    trait: [
+    proficiencyBonus: {
+      skills: [
+        { skill: "perception", bonus: 2 },
+        { skill: "performance", bonus: 6 },
+        { skill: "stealth", bonus: 5 },
+      ],
+    },
+    senses: {
+      passivePerception: 12,
+      vision: { darkvision: 60 },
+    },
+    languages: ["common", "elvish", "sylvan"],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Magic Resistance",
-        entries: [
-          "The satyr has {@variantrule Advantage|XPHB} on saving throws against spells and other magical effects.",
-        ],
+        name: "Resistência à Magia",
+        description:
+          "O sátiro tem vantagem em testes de resistência contra magias e outros efeitos mágicos.",
       },
     ],
-    action: [
+    effects: [
       {
+        type: "activatableAction",
+        actionId: "action-attack",
         name: "Hooves",
-        entries: [
-          "{@atkr m} {@hit 5}, reach 5 ft. {@h}5 ({@damage 1d4 + 3}) Bludgeoning damage. If the target is a Medium or smaller creature, the satyr pushes the target up to 10 feet straight away from itself.",
-        ],
-      },
-      {
-        name: "Mockery",
-        entries: [
-          "{@actSave wis} {@dc 12}, one creature the satyr can see within 90 feet. {@actSaveFail} 5 ({@damage 1d6 + 2}) Psychic damage.",
-        ],
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 5,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 4, bonus: 3 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+          ],
+        },
       },
     ],
-    environment: ["forest", "planar, feywild"],
-    treasure: ["implements"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/satyr.mp3",
-    },
-    traitTags: ["Magic Resistance"],
-    languageTags: ["C", "E", "S"],
-    damageTags: ["B", "Y"],
-    miscTags: ["MA"],
-    savingThrowForced: ["wisdom"],
   },
   {
-    name: "Scout",
-    source: "XMM",
-    page: 270,
-    otherSources: [
-      {
-        source: "HBTD",
-      },
-      {
-        source: "DrDe",
-      },
-    ],
-    size: ["S", "M"],
+    id: "monster-scout",
+    name: ["Batedor", "Scout"],
+    description:
+      "O Batedor é um explorador habilidoso, mestre em sobrevivência, furtividade e reconhecimento de terreno.",
+    source: "MM2024",
+    size: "medium",
     type: "humanoid",
-    alignment: ["N"],
-    ac: [13],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 13,
+    hitPoints: {
       average: 16,
-      formula: "3d8 + 3",
+      formula: { count: 3, faces: 8, bonus: 3 },
     },
     speed: {
       walk: 30,
+      unit: "ft",
     },
-    str: 11,
-    dex: 14,
-    con: 12,
-    int: 11,
-    wis: 13,
-    cha: 11,
-    skill: {
-      nature: "+4",
-      perception: "+5",
-      stealth: "+6",
-      survival: "+5",
+    environment: ["any"],
+    abilityScores: {
+      strength: 11,
+      dexterity: 14,
+      constitution: 12,
+      intelligence: 11,
+      wisdom: 13,
+      charisma: 11,
     },
-    passive: 15,
-    languages: ["Common plus one other language"],
-    cr: "1/2",
-    gear: ["leather armor|xphb", "longbow|xphb", "shortsword|xphb"],
-    action: [
+    proficiencyBonus: {
+      skills: [
+        { skill: "nature", bonus: 4 },
+        { skill: "perception", bonus: 5 },
+        { skill: "stealth", bonus: 6 },
+        { skill: "survival", bonus: 5 },
+      ],
+    },
+    senses: {
+      passivePerception: 15,
+    },
+    languages: ["common"],
+    challengeRating: "1/2",
+    effects: [
       {
-        name: "Multiattack",
-        entries: [
-          "The scout makes two attacks, using Shortsword and Longbow in any combination.",
-        ],
+        type: "multiAttack",
+        name: "Ataque Múltiplo",
+        attacksName: ["Shortsword", "Longbow"],
+        amount: 2,
+        actionId: "action-multiattack",
+        parameters: {
+          activation: { type: "action" },
+        },
       },
       {
-        name: "Shortsword",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}5 ({@damage 1d6 + 2}) Piercing damage.",
-        ],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Espada Curta",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeWeaponAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 2 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
       },
       {
-        name: "Longbow",
-        entries: [
-          "{@atkr r} {@hit 4}, range 150/600 ft. {@h}6 ({@damage 1d8 + 2}) Piercing damage.",
-        ],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Arco Longo",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["rangedWeaponAttack"],
+          attackBonus: 4,
+          range: { normal: 150, long: 600, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8, bonus: 2 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
       },
     ],
-    environment: ["any"],
-    treasure: ["implements", "individual"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/scout.mp3",
-    },
-    actionTags: ["Multiattack"],
-    languageTags: ["C", "X"],
-    damageTags: ["P"],
-    miscTags: ["MA", "MLW", "RA", "RNG"],
   },
   {
-    name: "Shadow",
-    source: "XMM",
-    page: 272,
-    otherSources: [
-      {
-        source: "HBTD",
-      },
-    ],
-    size: ["M"],
+    id: "monster-shadow",
+    name: ["Sombra", "Shadow"],
+    description:
+      "A Sombra é um morto-vivo incorpóreo que drena a força vital de suas vítimas, temendo a luz do sol.",
+    source: "MM2024",
+    size: "medium",
     type: "undead",
-    alignment: ["C", "E"],
-    ac: [12],
-    hp: {
+    alignment: "chaoticEvil",
+    armorClass: 12,
+    hitPoints: {
       average: 27,
-      formula: "5d8 + 5",
+      formula: { count: 5, faces: 8, bonus: 5 },
     },
     speed: {
       walk: 40,
+      unit: "ft",
     },
-    str: 6,
-    dex: 14,
-    con: 13,
-    int: 6,
-    wis: 10,
-    cha: 8,
-    skill: {
-      stealth: "+6",
+    environment: ["planar", "underdark", "urban"],
+    abilityScores: {
+      strength: 6,
+      dexterity: 14,
+      constitution: 13,
+      intelligence: 6,
+      wisdom: 10,
+      charisma: 8,
     },
-    senses: ["darkvision 60 ft."],
-    passive: 10,
-    resist: ["acid", "cold", "fire", "lightning", "thunder"],
-    immune: ["necrotic", "poison"],
-    vulnerable: ["radiant"],
-    conditionImmune: [
-      "exhaustion",
-      "frightened",
-      "grappled",
-      "paralyzed",
-      "petrified",
-      "poisoned",
-      "prone",
-      "restrained",
-      "unconscious",
-    ],
-    cr: "1/2",
-    trait: [
-      {
-        name: "Amorphous",
-        entries: [
-          "The shadow can move through a space as narrow as 1 inch without expending extra movement to do so.",
-        ],
-      },
-      {
-        name: "Sunlight Weakness",
-        entries: [
-          "While in sunlight, the shadow has {@variantrule Disadvantage|XPHB} on {@variantrule D20 Test|XPHB|D20 Tests}.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Draining Swipe",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}5 ({@damage 1d6 + 2}) Necrotic damage, and the target's Strength score decreases by {@dice 1d4}. The target dies if this reduces that score to 0. If a Humanoid is slain by this attack, a Shadow rises from the corpse {@dice 1d4} hours later.",
-        ],
-      },
-    ],
-    bonus: [
-      {
-        name: "Shadow Stealth",
-        entries: [
-          "While in {@variantrule Dim Light|XPHB} or {@variantrule Darkness|XPHB}, the shadow takes the Hide action.",
-        ],
-      },
-    ],
-    environment: ["planar, shadowfell", "underdark", "urban"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/shadow.mp3",
+    proficiencyBonus: {
+      skills: [{ skill: "stealth", bonus: 6 }],
     },
-    traitTags: ["Amorphous"],
-    senseTags: ["D"],
-    damageTags: ["N"],
-    miscTags: ["MA"],
+    senses: {
+      passivePerception: 10,
+      vision: { darkvision: 60 },
+    },
+    defenses: {
+      resistances: ["acid", "cold", "fire", "lightning", "thunder"],
+      immunities: {
+        damage: ["necrotic", "poison"],
+        condition: [
+          "exhausted",
+          "frightened",
+          "grappled",
+          "paralyzed",
+          "petrified",
+          "poisoned",
+          "prone",
+          "restrained",
+          "unconscious",
+        ],
+      },
+      vulnerabilities: ["radiant"],
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
+      {
+        name: "Amorfo",
+        description:
+          "A sombra pode se mover através de espaços tão estreitos quanto 2,5 centímetros sem gastar movimento extra para isso.",
+      },
+      {
+        name: "Vulnerabilidade à Luz Solar",
+        description:
+          "Enquanto estiver sob luz solar, a sombra tem desvantagem em testes de d20.",
+      },
+    ],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Toque Drenante",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 2 },
+                damageTypeOptions: ["necrotic"],
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Swarm of Insects",
-    source: "XMM",
-    page: 370,
-    otherSources: [
-      {
-        source: "DrDe",
-      },
-    ],
-    size: ["M"],
-    type: {
-      type: "beast",
-      swarmSize: "T",
-    },
-    alignment: ["U"],
-    ac: [11],
-    hp: {
+    id: "monster-swarm-of-insects",
+    name: ["Enxame de Insetos", "Swarm of Insects"],
+    description:
+      "O Enxame de Insetos é uma massa de criaturas pequenas que ataca em conjunto, difícil de ser contida por ataques convencionais.",
+    source: "MM2024",
+    size: "medium",
+    type: "beast",
+    alignment: "unaligned",
+    armorClass: 11,
+    hitPoints: {
       average: 19,
-      formula: "3d8 + 6",
+      formula: { count: 3, faces: 8, bonus: 6 },
     },
     speed: {
       walk: 20,
-      choose: {
-        from: ["climb", "fly"],
-        amount: 20,
-        note: "(DM's choice)",
-      },
+      climb: 20,
+      fly: 20,
+      unit: "ft",
     },
-    str: 3,
-    dex: 13,
-    con: 14,
-    int: 1,
-    wis: 7,
-    cha: 1,
-    senses: ["blindsight 30 ft."],
-    passive: 8,
-    resist: ["bludgeoning", "piercing", "slashing"],
-    conditionImmune: [
-      "charmed",
-      "frightened",
-      "grappled",
-      "paralyzed",
-      "petrified",
-      "prone",
-      "restrained",
-      "stunned",
-    ],
-    cr: "1/2",
-    trait: [
-      {
-        name: "Spider Climb",
-        entries: [
-          "If the swarm has a {@variantrule Climb Speed|XPHB}, the swarm can climb difficult surfaces, including along ceilings, without needing to make an ability check.",
-        ],
-      },
-      {
-        name: "Swarm",
-        entries: [
-          "The swarm can occupy another creature's space and vice versa, and the swarm can move through any opening large enough for a Tiny insect. The swarm can't regain {@variantrule Hit Points|XPHB} or gain {@variantrule Temporary Hit Points|XPHB}.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Bites",
-        entries: [
-          "{@atkr m} {@hit 3}, reach 5 ft. {@h}6 ({@damage 2d4 + 1}) Poison damage, or 3 ({@damage 1d4 + 1}) Poison damage if the swarm is {@variantrule Bloodied|XPHB}.",
-        ],
-      },
-    ],
     environment: [
       "desert",
       "forest",
@@ -1890,340 +2554,555 @@ export const monsters_cr_1_2 = [
       "underdark",
       "urban",
     ],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/swarm-of-insects.mp3",
+    abilityScores: {
+      strength: 3,
+      dexterity: 13,
+      constitution: 14,
+      intelligence: 1,
+      wisdom: 7,
+      charisma: 1,
     },
-    traitTags: ["Spider Climb"],
-    senseTags: ["B"],
-    damageTags: ["I"],
-    miscTags: ["MA"],
-  },
-  {
-    name: "Tough",
-    source: "XMM",
-    page: 307,
-    otherSources: [
+    senses: {
+      passivePerception: 8,
+      vision: { blindsight: 30 },
+    },
+    defenses: {
+      resistances: ["bludgeoning", "piercing", "slashing"],
+      immunities: {
+        condition: [
+          "charmed",
+          "frightened",
+          "grappled",
+          "paralyzed",
+          "petrified",
+          "prone",
+          "restrained",
+          "stunned",
+        ],
+      },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
       {
-        source: "DrDe",
+        name: "Escalada de Aranha",
+        description:
+          "Se o enxame tiver velocidade de escalada, ele pode escalar superfícies difíceis, incluindo tetos, sem precisar fazer testes de habilidade.",
+      },
+      {
+        name: "Enxame",
+        description:
+          "O enxame pode ocupar o espaço de outra criatura e vice-versa, e o enxame pode se mover através de qualquer abertura grande o suficiente para um inseto Minúsculo. O enxame não pode recuperar pontos de vida ou ganhar pontos de vida temporários.",
       },
     ],
-    size: ["S", "M"],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Mordidas",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 3,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 4, bonus: 1 },
+                damageTypeOptions: ["poison"],
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "monster-tough",
+    name: ["Durão", "Tough"],
+    description:
+      "O Durão é um humanoide robusto e resistente, acostumado a combates e a proteger aliados em situações perigosas.",
+    source: "MM2024",
+    size: "medium",
     type: "humanoid",
-    alignment: ["N"],
-    ac: [12],
-    hp: {
+    alignment: "unaligned",
+    armorClass: 12,
+    hitPoints: {
       average: 32,
-      formula: "5d8 + 10",
+      formula: { count: 5, faces: 8, bonus: 10 },
     },
     speed: {
       walk: 30,
+      unit: "ft",
     },
-    str: 15,
-    dex: 12,
-    con: 14,
-    int: 10,
-    wis: 10,
-    cha: 11,
-    passive: 10,
-    languages: ["Common"],
-    cr: "1/2",
-    gear: ["heavy crossbow|xphb", "leather armor|xphb", "mace|xphb"],
-    trait: [
-      {
-        name: "Pack Tactics",
-        entries: [
-          "The tough has {@variantrule Advantage|XPHB} on an attack roll against a creature if at least one of the tough's allies is within 5 feet of the creature and the ally doesn't have the {@condition Incapacitated|XPHB} condition.",
-        ],
-      },
-    ],
-    action: [
-      {
-        name: "Mace",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 5 ft. {@h}5 ({@damage 1d6 + 2}) Bludgeoning damage.",
-        ],
-      },
-      {
-        name: "Heavy Crossbow",
-        entries: [
-          "{@atkr r} {@hit 3}, range 100/400 ft. {@h}6 ({@damage 1d10 + 1}) Piercing damage.",
-        ],
-      },
-    ],
     environment: ["any"],
-    treasure: ["armaments"],
-    traitTags: ["Pack Tactics"],
-    languageTags: ["C"],
-    damageTags: ["B", "P"],
-    miscTags: ["MA", "MLW", "RA", "RNG"],
-  },
-  {
-    name: "Troll Limb",
-    source: "XMM",
-    page: 310,
-    size: ["S"],
-    type: "giant",
-    alignment: ["C", "E"],
-    ac: [13],
-    hp: {
-      average: 14,
-      formula: "4d6",
+    abilityScores: {
+      strength: 15,
+      dexterity: 12,
+      constitution: 14,
+      intelligence: 10,
+      wisdom: 10,
+      charisma: 11,
     },
-    speed: {
-      walk: 20,
-    },
-    str: 18,
-    dex: 12,
-    con: 10,
-    int: 1,
-    wis: 9,
-    cha: 1,
-    senses: ["darkvision 60 ft."],
-    passive: 9,
-    cr: "1/2",
-    trait: [
+    senses: { passivePerception: 10 },
+    languages: ["common"],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Regeneration",
-        entries: [
-          "The limb regains 5 {@variantrule Hit Points|XPHB} at the start of each of its turns. If the limb takes Acid or Fire damage, this trait doesn't function on the limb's next turn. The limb dies only if it starts its turn with 0 {@variantrule Hit Points|XPHB} and doesn't regenerate.",
-        ],
-      },
-      {
-        name: "Troll Spawn",
-        entries: [
-          "The limb uncannily has the same senses as a whole troll. If the limb isn't destroyed within 24 hours, roll {@dice 1d12}. On a 12, the limb turns into a {@creature Troll|XMM}. Otherwise, the limb withers away.",
-        ],
+        name: "Táticas de Grupo",
+        description:
+          "O durão tem vantagem nas jogadas de ataque contra uma criatura se pelo menos um dos aliados do durão estiver a 1,5 metro da criatura e o aliado não estiver incapacitado.",
       },
     ],
-    action: [
+    effects: [
       {
-        name: "Rend",
-        entries: [
-          "{@atkr m} {@hit 6}, reach 5 ft. {@h}9 ({@damage 2d4 + 4}) Slashing damage.",
-        ],
-      },
-    ],
-    environment: ["arctic", "forest", "hill", "mountain", "swamp", "underdark"],
-    traitTags: ["Regeneration"],
-    senseTags: ["D"],
-    damageTags: ["S"],
-    miscTags: ["MA"],
-  },
-  {
-    name: "Vine Blight",
-    source: "XMM",
-    page: 44,
-    otherSources: [
-      {
-        source: "DrDe",
-      },
-    ],
-    size: ["M"],
-    type: "plant",
-    alignment: ["N", "E"],
-    ac: [12],
-    hp: {
-      average: 19,
-      formula: "3d8 + 6",
-    },
-    speed: {
-      walk: 20,
-    },
-    str: 15,
-    dex: 8,
-    con: 14,
-    int: 5,
-    wis: 10,
-    cha: 3,
-    skill: {
-      stealth: "+1",
-    },
-    senses: ["blindsight 60 ft."],
-    passive: 10,
-    conditionImmune: ["deafened"],
-    languages: ["Common"],
-    cr: "1/2",
-    spellcasting: [
-      {
-        name: "Entangling Plants {@recharge 5}",
-        type: "spellcasting",
-        headerEntries: [
-          "The blight casts the {@spell Entangle|XPHB} spell, using Constitution as the spellcasting ability (spell save {@dc 12}).",
-        ],
-        recharge: {
-          "5": ["{@spell Entangle|XPHB}"],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Maça",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeWeaponAttack"],
+          attackBonus: 4,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 2 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+          ],
         },
-        ability: "con",
-        displayAs: "action",
-        hidden: ["recharge"],
       },
-    ],
-    action: [
       {
-        name: "Constricting Vine",
-        entries: [
-          "{@atkr m} {@hit 4}, reach 10 ft. {@h}6 ({@damage 1d8 + 2}) Bludgeoning damage. If the target is a Large or smaller creature, it has the {@condition Grappled|XPHB} condition (escape {@dc 12}). Until the grapple ends, the target takes 4 ({@damage 1d8}) Bludgeoning damage at the start of each of its turns, and the blight can't make Constricting Vine attacks.",
-        ],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Besta Pesada",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["rangedWeaponAttack"],
+          attackBonus: 3,
+          range: { normal: 100, long: 400, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 10, bonus: 1 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+          ],
+        },
       },
     ],
-    environment: ["forest"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/vine-blight.mp3",
-    },
-    senseTags: ["B"],
-    languageTags: ["C"],
-    damageTags: ["B"],
-    spellcastingTags: ["O"],
-    miscTags: ["MA", "RCH"],
-    conditionInflict: ["grappled"],
-    conditionInflictSpell: ["restrained"],
-    savingThrowForcedSpell: ["strength"],
   },
   {
-    name: "Warhorse",
-    source: "XMM",
-    page: 373,
-    otherSources: [
+    id: "monster-troll-limb",
+    name: ["Membro de Troll", "Troll Limb"],
+    description:
+      "O Membro de Troll é uma parte viva e independente de um troll, capaz de se mover e atacar até regenerar ou definhar.",
+    source: "MM2024",
+    size: "small",
+    type: "giant",
+    alignment: "chaoticEvil",
+    armorClass: 13,
+    hitPoints: {
+      average: 14,
+      formula: { count: 4, faces: 6 },
+    },
+    speed: {
+      walk: 20,
+      unit: "ft",
+    },
+    environment: ["arctic", "forest", "hill", "mountain", "swamp", "underdark"],
+    abilityScores: {
+      strength: 18,
+      dexterity: 12,
+      constitution: 10,
+      intelligence: 1,
+      wisdom: 9,
+      charisma: 1,
+    },
+    senses: {
+      passivePerception: 9,
+      vision: { darkvision: 60 },
+    },
+    languages: [],
+    challengeRating: "1/2",
+    traits: [
       {
-        source: "XPHB",
-        page: 359,
+        name: "Regeneração",
+        description:
+          "O membro recupera 5 pontos de vida no início de cada um de seus turnos. Se o membro sofrer dano de ácido ou fogo, esta característica não funciona no próximo turno do membro. O membro só morre se começar seu turno com 0 pontos de vida e não se regenerar.",
+      },
+      {
+        name: "Prole de Troll",
+        description:
+          "O membro estranhamente tem os mesmos sentidos de um troll completo. Se o membro não for destruído dentro de 24 horas, role 1d12. Em um resultado 12, o membro se transforma em um Troll. Caso contrário, o membro murcha.",
       },
     ],
-    size: ["L"],
-    type: "beast",
-    alignment: ["U"],
-    ac: [11],
-    hp: {
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Rasgar",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 6,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 4, bonus: 4 },
+                damageTypeOptions: ["slashing"],
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "monster-vine-blight",
+    name: ["Praga de Videira", "Vine Blight"],
+    description:
+      "A Praga de Videira é uma planta monstruosa que usa vinhas para agarrar e sufocar suas vítimas em florestas sombrias.",
+    source: "MM2024",
+    size: "medium",
+    type: "plant",
+    alignment: "neutralEvil",
+    armorClass: 12,
+    hitPoints: {
       average: 19,
-      formula: "3d10 + 3",
+      formula: { count: 3, faces: 8, bonus: 6 },
+    },
+    speed: {
+      walk: 20,
+      unit: "ft",
+    },
+    environment: ["forest"],
+    abilityScores: {
+      strength: 15,
+      dexterity: 8,
+      constitution: 14,
+      intelligence: 5,
+      wisdom: 10,
+      charisma: 3,
+    },
+    proficiencyBonus: {
+      skills: [{ skill: "stealth", bonus: 1 }],
+    },
+    senses: {
+      passivePerception: 10,
+      vision: { blindsight: 60 },
+    },
+    defenses: {
+      immunities: { condition: ["deafened"] },
+    },
+    languages: ["common"],
+    challengeRating: "1/2",
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Vinha Constritora",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 4,
+          range: { normal: 10, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8, bonus: 2 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+            {
+              on: "hit",
+              type: "applyCondition",
+              condition: "grappled",
+              duration: { unit: "indefinite" },
+              requirements: {
+                target: {
+                  events: [
+                    {
+                      type: "isCreatureOfSize",
+                      creatureSizes: ["medium", "small", "tiny"],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "monster-warhorse",
+    name: ["Cavalo de Guerra", "Warhorse"],
+    description:
+      "O Cavalo de Guerra é um animal treinado para batalha, forte e veloz, usado como montaria por cavaleiros e soldados.",
+    source: "MM2024",
+    size: "large",
+    type: "beast",
+    alignment: "unaligned",
+    armorClass: 11,
+    hitPoints: {
+      average: 19,
+      formula: { count: 3, faces: 10, bonus: 3 },
     },
     speed: {
       walk: 60,
+      unit: "ft",
     },
-    str: 18,
-    dex: 12,
-    con: 13,
-    int: 2,
-    wis: 12,
-    cha: 7,
-    save: {
-      wis: "+3",
-    },
-    passive: 11,
-    cr: "1/2",
-    action: [
-      {
-        name: "Hooves",
-        entries: [
-          "{@atkr m} {@hit 6}, reach 5 ft. {@h}9 ({@damage 2d4 + 4}) Bludgeoning damage. If the target is a Large or smaller creature and the horse moved 20+ feet straight toward it immediately before the hit, the target takes an extra 5 ({@damage 2d4}) Bludgeoning damage and has the {@condition Prone|XPHB} condition.",
-        ],
-      },
-    ],
     environment: ["urban"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/war-horse.mp3",
+    abilityScores: {
+      strength: 18,
+      dexterity: 12,
+      constitution: 13,
+      intelligence: 2,
+      wisdom: 12,
+      charisma: 7,
     },
-    damageTags: ["B"],
-    miscTags: ["MA"],
-    conditionInflict: ["prone"],
+    senses: {
+      passivePerception: 11,
+    },
+    languages: [],
+    challengeRating: "1/2",
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Casco",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 6,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 4, bonus: 4 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 2, faces: 4 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+              requirements: {
+                user: {
+                  events: [
+                    {
+                      type: "movesAtLeast",
+                      distance: { normal: 20, unit: "ft" },
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              on: "hit",
+              type: "applyCondition",
+              condition: "prone",
+              requirements: {
+                user: {
+                  events: [
+                    {
+                      type: "movesAtLeast",
+                      distance: { normal: 20, unit: "ft" },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Warhorse Skeleton",
-    source: "XMM",
-    page: 282,
-    size: ["L"],
+    id: "monster-warhorse-skeleton",
+    name: ["Cavalo de Guerra Esqueleto", "Warhorse Skeleton"],
+    description:
+      "O Cavalo de Guerra Esqueleto é um morto-vivo animado por magia, servindo como montaria incansável em exércitos necromânticos.",
+    source: "MM2024",
+    size: "large",
     type: "undead",
-    alignment: ["L", "E"],
-    ac: [13],
-    hp: {
+    alignment: "lawfulEvil",
+    armorClass: 13,
+    hitPoints: {
       average: 22,
-      formula: "3d10 + 6",
+      formula: { count: 3, faces: 10, bonus: 6 },
     },
     speed: {
       walk: 60,
+      unit: "ft",
     },
-    str: 18,
-    dex: 12,
-    con: 15,
-    int: 2,
-    wis: 8,
-    cha: 5,
-    senses: ["darkvision 60 ft."],
-    passive: 9,
-    immune: ["poison"],
-    vulnerable: ["bludgeoning"],
-    conditionImmune: ["exhaustion", "poisoned"],
-    cr: "1/2",
-    action: [
+    environment: ["planar", "underdark", "urban"],
+    abilityScores: {
+      strength: 18,
+      dexterity: 12,
+      constitution: 15,
+      intelligence: 2,
+      wisdom: 8,
+      charisma: 5,
+    },
+    senses: {
+      passivePerception: 9,
+      vision: { darkvision: 60 },
+    },
+    defenses: {
+      vulnerabilities: ["bludgeoning"],
+      immunities: { damage: ["poison"], condition: ["exhausted", "poisoned"] },
+    },
+    languages: ["common"],
+    challengeRating: "1/2",
+    traits: [
       {
-        name: "Hooves",
-        entries: [
-          "{@atkr m} {@hit 6}, reach 5 ft. {@h}7 ({@damage 1d6 + 4}) Bludgeoning damage. If the target is a Large or smaller creature and the skeleton moved 20+ feet straight toward it immediately before the hit, the target has the {@condition Prone|XPHB} condition.",
-        ],
+        name: "Fortitude Morto-vivo",
+        description:
+          "Se um dano reduzir o zumbi a 0 pontos de vida, ele faz um teste de resistência de Constituição (CD 5 + o dano sofrido), a menos que o dano seja radiante ou de um acerto crítico. Em caso de sucesso, o zumbi cai para 1 ponto de vida em vez disso.",
       },
     ],
-    environment: ["planar, shadowfell", "underdark", "urban"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/warhorse-skeleton.mp3",
-    },
-    senseTags: ["D"],
-    damageTags: ["B"],
-    miscTags: ["MA"],
-    conditionInflict: ["prone"],
+    effects: [
+      {
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Casco",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 6,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 6, bonus: 4 },
+                damageTypeOptions: ["bludgeoning"],
+              },
+            },
+            {
+              on: "hit",
+              type: "applyCondition",
+              condition: "prone",
+              requirements: {
+                user: {
+                  events: [
+                    {
+                      type: "movesAtLeast",
+                      distance: { normal: 20, unit: "ft" },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    ],
   },
   {
-    name: "Worg",
-    source: "XMM",
-    page: 335,
-    otherSources: [
-      {
-        source: "UtHftLH",
-      },
-    ],
-    size: ["L"],
+    id: "monster-worg",
+    name: ["Worg", "Worg"],
+    description:
+      "O Worg é uma criatura lupina inteligente e maligna, frequentemente aliada a goblins e usada como montaria.",
+    source: "MM2024",
+    size: "large",
     type: "fey",
-    alignment: ["N", "E"],
-    ac: [13],
-    hp: {
+    alignment: "neutralEvil",
+    armorClass: 13,
+    hitPoints: {
       average: 26,
-      formula: "4d10 + 4",
+      formula: { count: 4, faces: 10, bonus: 4 },
     },
     speed: {
       walk: 50,
+      unit: "ft",
     },
-    str: 16,
-    dex: 13,
-    con: 13,
-    int: 7,
-    wis: 11,
-    cha: 8,
-    skill: {
-      perception: "+4",
+    environment: ["forest", "grassland", "hill", "planar", "feywild"],
+    abilityScores: {
+      strength: 16,
+      dexterity: 13,
+      constitution: 13,
+      intelligence: 7,
+      wisdom: 11,
+      charisma: 8,
     },
-    senses: ["darkvision 60 ft."],
-    passive: 14,
-    languages: ["Goblin", "Worg"],
-    cr: "1/2",
-    action: [
+    proficiencyBonus: {
+      skills: [{ skill: "perception", bonus: 4 }],
+    },
+    senses: {
+      passivePerception: 14,
+      vision: { darkvision: 60 },
+    },
+    languages: ["goblin", "worg"],
+    challengeRating: "1/2",
+    effects: [
       {
-        name: "Bite",
-        entries: [
-          "{@atkr m} {@hit 5}, reach 5 ft. {@h}7 ({@damage 1d8 + 3}) Piercing damage, and the next attack roll made against the target before the start of the worg's next turn has {@variantrule Advantage|XPHB}.",
-        ],
+        type: "activatableAction",
+        actionId: "action-attack",
+        name: "Mordida",
+        parameters: {
+          activation: { type: "action" },
+          attackType: ["meleeNaturalAttack"],
+          attackBonus: 5,
+          range: { normal: 5, unit: "ft" },
+          outcomes: [
+            {
+              on: "hit",
+              type: "modifyTargetHP",
+              vitals: ["currentHp"],
+              formula: {
+                type: "damage",
+                roll: { count: 1, faces: 8, bonus: 3 },
+                damageTypeOptions: ["piercing"],
+              },
+            },
+            {
+              on: "hit",
+              type: "descriptive",
+              details:
+                "O próximo ataque feito contra o alvo antes do início do próximo turno do worg tem vantagem.",
+            },
+          ],
+        },
       },
     ],
-    environment: ["forest", "grassland", "hill", "planar, feywild"],
-    soundClip: {
-      type: "internal",
-      path: "bestiary/worg.mp3",
-    },
-    senseTags: ["D"],
-    languageTags: ["GO", "OTH"],
-    damageTags: ["P"],
-    miscTags: ["MA"],
   },
 ];

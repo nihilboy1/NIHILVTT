@@ -1,12 +1,10 @@
 import z from "zod";
 import { EffectSchema } from "../../shared/effect.schema";
 
-// Schema data-driven para capacidades de tokens invocados
-// Capabilities minimalista: apenas flags fundamentais para automação básica
 export const TokenCapabilitiesSchema = z.object({
-  controllable: z.boolean().optional(), // Pode ser comandado pelo conjurador?
-  autonomous: z.boolean().optional(), // Age por conta própria?
-  physical: z.boolean().optional(), // Tem corpo físico? (pode bloquear, ser alvo, etc)
+  controllable: z.boolean().optional(),
+  autonomous: z.boolean().optional(),
+  physical: z.boolean().optional(),
 });
 
 export const SummonedTokenSchema = z.object({

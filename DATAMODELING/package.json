@@ -6,7 +6,8 @@
   "scripts": {
     "validate:data": "npx tsx src/tooling/validate.ts",
     "enums": "npx tsx src/tooling/generate-enums.ts",
-    "monsters": "npx tsx src/tooling/generate-monsters.ts"
+    "monsters": "npx tsx src/tooling/generate-monsters.ts",
+    "lint": "eslint \"src/**/*.ts\" --fix"
   },
   "keywords": [],
   "author": "",
@@ -14,8 +15,15 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^24.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.1",
     "zod": "^4.0.8"
   },
   "dependencies": {

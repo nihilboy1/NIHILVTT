@@ -36,7 +36,7 @@ DATAMODELING/
 │ │ └─ spell.schema.ts
 │ ├─ shared/
 │ │ ├─ blocks.schema.ts
-│ │ ├─ data-based-enums.schema.ts
+│ │ ├─ data-based-enums.ts
 │ │ ├─ effect.schema.ts
 │ │ ├─ outcome.schema.ts
 │ │ └─ primitives.ts

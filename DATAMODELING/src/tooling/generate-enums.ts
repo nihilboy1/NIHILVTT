@@ -49,7 +49,7 @@ function getPaths(
   obj: Record<string, any>,
   options: { ignoreKeys?: string[] } = {},
   currentPath = "",
-  paths = new Set<string>()
+  paths = new Set<string>(),
 ): Set<string> {
   for (const key in obj) {
     if (options.ignoreKeys?.includes(key)) {
@@ -110,8 +110,8 @@ function generateZodEnumFromSet(name: string, values: Set<string>): string {
   if (values.size === 0) {
     console.log(
       chalk.yellow(
-        `\n⚠️ Nenhum ID encontrado para ${name}. Gerando enum vazio.`
-      )
+        `\n⚠️ Nenhum ID encontrado para ${name}. Gerando enum vazio.`,
+      ),
     );
     return `export const ${name} = z.enum([]);`;
   }
@@ -126,7 +126,7 @@ function generateZodEnumFromSet(name: string, values: Set<string>): string {
  */
 function generateZodEnumFromPaths(
   paths: Set<string>,
-  sourceType: "parameters" | "outcomes"
+  sourceType: "parameters" | "outcomes",
 ): string {
   const variableName =
     sourceType === "parameters"
@@ -137,15 +137,15 @@ function generateZodEnumFromPaths(
 
   console.log(
     chalk.cyan(
-      `\n🔍 Gerando enum para caminhos de: ${chalk.bold.underline(dataName)}...`
-    )
+      `\n🔍 Gerando enum para caminhos de: ${chalk.bold.underline(dataName)}...`,
+    ),
   );
 
   if (paths.size === 0) {
     console.log(
       chalk.yellow(
-        `\n⚠️ Nenhum caminho encontrado em ${dataName}. Gerando enum vazio.`
-      )
+        `\n⚠️ Nenhum caminho encontrado em ${dataName}. Gerando enum vazio.`,
+      ),
     );
     return `// No paths found for ${dataName}\nexport const ${variableName} = z.enum([]);`;
   }
@@ -155,7 +155,7 @@ function generateZodEnumFromPaths(
   const zodEnumString = `export const ${variableName} = z.enum([\n${enumValues}\n]);`;
 
   console.log(
-    chalk.green(`  -> ${sortedPaths.length} caminhos únicos encontrados.`)
+    chalk.green(`  -> ${sortedPaths.length} caminhos únicos encontrados.`),
   );
 
   return zodEnumString;
@@ -169,7 +169,7 @@ async function main() {
   const projectRoot = path.resolve(__dirname, "../..");
 
   console.log(
-    chalk.blue("Buscando arquivos de dados para geração de schemas...")
+    chalk.blue("Buscando arquivos de dados para geração de schemas..."),
   );
 
   // Unifica todos os padrões de busca em um só lugar
@@ -212,8 +212,8 @@ async function main() {
       const module = await import(finalImportPath);
       console.log(
         chalk.gray(
-          `- Processando ${path.relative(projectRoot, absolutePath)}...`
-        )
+          `- Processando ${path.relative(projectRoot, absolutePath)}...`,
+        ),
       );
 
       // Lógica de extração de ID (do script generate-enums.ts)
@@ -223,11 +223,11 @@ async function main() {
       ) {
         console.log(
           chalk.green(
-            `  -> Encontrado 'itemsWeapon' com ${module.itemsWeapon.length} itens para extração de ID.`
-          )
+            `  -> Encontrado 'itemsWeapon' com ${module.itemsWeapon.length} itens para extração de ID.`,
+          ),
         );
         module.itemsWeapon.forEach((item: { id: string }) =>
-          allWeaponIds.add(item.id)
+          allWeaponIds.add(item.id),
         );
       }
       if (
@@ -236,11 +236,11 @@ async function main() {
       ) {
         console.log(
           chalk.green(
-            `  -> Encontrado 'ACTIONS' com ${module.ACTIONS.length} itens para extração de ID.`
-          )
+            `  -> Encontrado 'ACTIONS' com ${module.ACTIONS.length} itens para extração de ID.`,
+          ),
         );
         module.ACTIONS.forEach((item: { id: string }) =>
-          allActionIds.add(item.id)
+          allActionIds.add(item.id),
         );
       }
 
@@ -250,8 +250,8 @@ async function main() {
           if (Array.isArray(module[key])) {
             console.log(
               chalk.cyan(
-                `  -> Encontrado '${key}' com ${module[key].length} magias para extração de ID.`
-              )
+                `  -> Encontrado '${key}' com ${module[key].length} magias para extração de ID.`,
+              ),
             );
             module[key].forEach((item: { id: string }) => {
               if (item.id) {
@@ -270,13 +270,13 @@ async function main() {
           if (
             exportedItem.every(
               (item) =>
-                typeof item === "object" && item !== null && "id" in item
+                typeof item === "object" && item !== null && "id" in item,
             )
           ) {
             console.log(
               chalk.magenta(
-                `  -> Encontrado array exportado '${key}' com ${exportedItem.length} itens para extração de caminhos.`
-              )
+                `  -> Encontrado array exportado '${key}' com ${exportedItem.length} itens para extração de caminhos.`,
+              ),
             );
             allDataForPaths = allDataForPaths.concat(exportedItem);
           }
@@ -287,10 +287,10 @@ async function main() {
         chalk.red(
           `\n🚨 Erro ao carregar o arquivo ${path.relative(
             projectRoot,
-            absolutePath
-          )}:`
+            absolutePath,
+          )}:`,
         ),
-        error
+        error,
       );
     }
   }
@@ -298,29 +298,26 @@ async function main() {
   // --- Geração dos Enums de ID ---
   const weaponIdEnumString = generateZodEnumFromSet(
     "WeaponIdEnum",
-    allWeaponIds
+    allWeaponIds,
   );
   const actionIdEnumString = generateZodEnumFromSet(
     "ActionIdEnum",
-    allActionIds
+    allActionIds,
   );
-  const spellIdEnumString = generateZodEnumFromSet(
-    "SpellIdEnum",
-    allSpellIds
-  );
+  const spellIdEnumString = generateZodEnumFromSet("SpellIdEnum", allSpellIds);
 
   // --- Geração dos Enums de Caminho ---
   const parameterPaths = extractParameterPaths(allDataForPaths);
   const outcomePaths = extractOutcomePaths(allDataForPaths);
   const parameterEnumString = generateZodEnumFromPaths(
     parameterPaths,
-    "parameters"
+    "parameters",
   );
   const outcomeEnumString = generateZodEnumFromPaths(outcomePaths, "outcomes");
 
   // --- Montagem do Conteúdo Final do Arquivo ---
   const fileContent = `// Este arquivo é gerado automaticamente. Não edite manualmente.
-// Use o script 'npm run <seu-script>' para atualizar.
+// Use o script 'npm run enums' para atualizar.
 
 import { z } from 'zod';
 
@@ -342,7 +339,7 @@ ${outcomeEnumString}
     projectRoot,
     "src",
     "shared",
-    "data-based-enums.schema.ts"
+    "data-based-enums.ts",
   );
   const outputDir = path.dirname(outputPath);
 
@@ -356,14 +353,14 @@ ${outcomeEnumString}
       chalk.bgGreen.bold(
         `\n✅ Arquivo de schemas gerado com sucesso em: ${path.relative(
           projectRoot,
-          outputPath
-        )}\n`
-      )
+          outputPath,
+        )}\n`,
+      ),
     );
   } catch (error) {
     console.error(
       chalk.bgRed.white(`\n🚨 Erro ao escrever o arquivo de schemas:`),
-      error
+      error,
     );
   }
 }

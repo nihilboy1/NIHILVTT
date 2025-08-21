@@ -1,5 +1,6 @@
 import { on } from "events";
 import type { Spell } from "../../domain/spell/spell.schema.js";
+
 export const spellsLevel0 = [
   {
     id: "spell-bolha-acida",
@@ -19,6 +20,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Bolha Ácida",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -110,8 +112,9 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Proteção Contra Lâminas",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: { events: [{ type: "lostConcentration" }] },
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
@@ -121,11 +124,15 @@ export const spellsLevel0 = [
               on: "any",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: ["onBeingAttacked"] }],
+                name: "Proteção de Lâminas",
+                triggers: {
+                  events: [{ type: "wasAttacked", byVisibleCreature: false }],
+                },
+
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
-                  target: "attackRoll",
+                  target: ["attackRoll"],
                   appliesTo: "attacker",
                 },
                 duration: {
@@ -154,6 +161,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Toque Arrepiante",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -176,6 +184,7 @@ export const spellsLevel0 = [
               on: "hit",
               effect: {
                 type: "preventsHealing",
+                name: "Proibição de Cura",
                 duration: { unit: "turn", value: 1 },
               },
             },
@@ -239,6 +248,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Luzes Dançantes",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -256,6 +266,7 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "activatableAction",
+                name: "Mover Luzes",
                 actionId: "action-move-summoned-token",
               },
             },
@@ -282,6 +293,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Druidismo",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -346,6 +358,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Rajada Mística",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -418,6 +431,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Manipulação Elemental",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -489,6 +503,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Raio de Fogo",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -521,14 +536,16 @@ export const spellsLevel0 = [
               on: "hit",
               condition: "burning",
               requirements: {
-                user: [
-                  {
-                    type: "isObject",
-                    isFlammable: true,
-                    isWorn: false,
-                    isCarried: false,
-                  },
-                ],
+                user: {
+                  events: [
+                    {
+                      type: "isObject",
+                      isCarried: false,
+                      isFlammable: true,
+                      isWorn: false,
+                    },
+                  ],
+                },
               },
               duration: { unit: "indefinite" },
             },
@@ -580,7 +597,7 @@ export const spellsLevel0 = [
     level: 0,
     school: "enchantment",
     description:
-      "Você emana magicamente uma sensação de amizade para uma criatura que você possa ver dentro do alcance. O alvo deve ser bem-sucedido em um teste de resistência de Sabedoria ou ficará com a condição Encantado (Charmed) pela duração. Quando a magia termina, o alvo sabe que foi encantado por você.",
+      "Você emana magicamente uma sensação de amizade para uma criatura que possa ver dentro de 10 pés. O alvo deve realizar um teste de resistência de Sabedoria. Se falhar, ele fica encantado por você enquanto a magia durar (concentração, até 1 minuto). O alvo tem sucesso automaticamente se não for um Humanoide, se você ou seus aliados estiverem lutando contra ele, ou se você já tiver conjurado esta magia nele nas últimas 24 horas. A magia termina mais cedo se o alvo sofrer dano, se você fizer uma jogada de ataque, causar dano ou forçar alguém a fazer um teste de resistência. Quando a magia termina, o alvo sabe que foi encantado por você.",
     components: {
       types: ["somatic", "material"],
       material: {
@@ -590,57 +607,15 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Encantar Criatura",
         actionId: "action-cast-spell",
-        endConditions: [
-          {
-            on: [
-              "onUserLoseConcentration",
-              "onTakingDamage",
-              "onUserActsHostile",
-            ],
-          },
-        ],
-        requirements: {
-          target: [
-            {
-              type: "isCreatureType",
-              creatureTypes: ["humanoid"],
-            },
-            {
-              type: "hasStatus",
-              status: "hostile",
-              is: false,
-            },
-            {
-              type: "hasBeenAffectedBySpell",
-              spellId: "spell-friends",
-              withinLast: { value: 24, unit: "hour" },
-            },
-          ],
-        },
         parameters: {
-          activation: {
-            type: "action",
-          },
-          range: {
-            normal: 10,
-            unit: "ft",
-          },
-          target: {
-            type: "creature",
-            quantity: 1,
-          },
-          save: {
-            ability: "wisdom",
-            dc: {
-              type: "calculated",
-              base: 8,
-              attributes: ["proficiency", "spellcasting"],
-            },
-          },
+          activation: { type: "action" },
+          range: { normal: 10, unit: "ft" },
+          target: { type: "creature", quantity: 1 },
           outcomes: [
             {
-              id: "friends-charmed",
+              id: "friends-apply-charmed",
               type: "applyCondition",
               on: "fail",
               condition: "charmed",
@@ -649,16 +624,6 @@ export const spellsLevel0 = [
                 value: 1,
                 isConcentration: true,
               },
-            },
-            {
-              id: "friends-becomes-hostile",
-              type: "applyCondition",
-              on: "spellEnd",
-              condition: "hostile",
-            },
-            {
-              type: "none",
-              on: "success",
             },
           ],
         },
@@ -685,8 +650,9 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Orientação",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: { events: [{ type: "lostConcentration" }] },
         parameters: {
           activation: {
             type: "action",
@@ -703,6 +669,7 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "grantConditionalBonus",
+                name: "Bônus de Orientação",
                 on: "skillCheck",
                 modifier: { count: 1, faces: 4 },
                 requiresChoice: "skill",
@@ -721,7 +688,7 @@ export const spellsLevel0 = [
     level: 0,
     school: "evocation",
     description:
-      "Você toca um objeto Grande ou menor que não esteja sendo vestido ou carregado por outra pessoa. Até o fim da magia, o objeto emite Luz Brilhante em um raio de 20 pés e Penumbra por mais 20 pés. A luz pode ser colorida como você desejar.",
+      "Você toca um objeto Grande ou menor que não esteja sendo vestido ou carregado por outra pessoa. Até o fim da magia, o objeto emite Luz Brilhante em um raio de 20 pés e Penumbra por mais 20 pés. A luz pode ser colorida como você desejar. Cobrir o objeto com algo opaco bloqueia a luz. A magia termina se você a conjurar novamente.",
     components: {
       types: ["verbal", "material"],
       material: {
@@ -735,8 +702,9 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Luz",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserCastSpellAgain"] }],
+        endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
           activation: {
             type: "action",
@@ -756,18 +724,12 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "passive_providesLight",
+                name: "Emitir Luz",
                 properties: {
                   bright: 20,
                   dim: 20,
                 },
               },
-            },
-            {
-              id: "light-special-rules",
-              type: "descriptive",
-              on: "any",
-              details:
-                "Cobrir o objeto com algo opaco bloqueia a luz. A magia termina se você a conjurar novamente.",
             },
           ],
         },
@@ -782,7 +744,7 @@ export const spellsLevel0 = [
     level: 0,
     school: "conjuration",
     description:
-      "Uma mão espectral e flutuante aparece em um ponto que você escolhe dentro do alcance. A mão dura pela duração da magia.",
+      "Uma mão espectral e flutuante aparece em um ponto que você escolhe dentro do alcance e dura pela duração. Você pode mover a mão até 30 pés e usá-la para manipular um objeto, abrir uma porta ou recipiente destrancado, guardar ou pegar um item de um recipiente aberto, ou derramar o conteúdo de um frasco. A mão desaparece se ficar a mais de 30 pés de você ou se você conjurar esta magia novamente. Ela não pode atacar, ativar itens mágicos ou carregar mais de 10 libras.",
     components: {
       types: ["verbal", "somatic"],
     },
@@ -793,8 +755,9 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Mão Mágica",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserCastSpellAgain"] }],
+        endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
           activation: {
             type: "action",
@@ -817,39 +780,6 @@ export const spellsLevel0 = [
                 unit: "minute",
                 value: 1,
               },
-            },
-            {
-              id: "mage-hand-grant-control-action",
-              type: "applyEffect",
-              on: "success",
-              effect: {
-                type: "activatableAction",
-                actionId: "action-move-summoned-token",
-                duration: {
-                  unit: "minute",
-                  value: 1,
-                },
-                parameters: {
-                  activation: {
-                    type: "action",
-                  },
-                  outcomes: [
-                    {
-                      type: "descriptive",
-                      on: "any",
-                      details:
-                        "Você pode mover a mão até 30 pés e usá-la para manipular um objeto, abrir uma porta ou recipiente destrancado, guardar ou pegar um item de um recipiente aberto, ou derramar o conteúdo de um frasco.",
-                    },
-                  ],
-                },
-              },
-            },
-            {
-              id: "mage-hand-rules",
-              type: "descriptive",
-              on: "any",
-              details:
-                "A mão desaparece se ficar a mais de 30 pés de você ou se você conjurar esta magia novamente. A mão não pode atacar, ativar itens mágicos ou carregar mais de 10 libras.",
             },
           ],
         },
@@ -881,6 +811,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Consertar Objeto",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -929,6 +860,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Enviar Mensagem Telepática",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -973,6 +905,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Fagulha Mental",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -1012,11 +945,12 @@ export const spellsLevel0 = [
               on: "fail",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: ["onSavingThrow"] }],
+                name: "Mente Fragmentada",
+                triggers: { events: [{ type: "madeSavingThrow" }] },
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
-                  target: "saveRoll",
+                  target: ["saveRoll"],
                   appliesTo: "target",
                 },
                 duration: {
@@ -1073,7 +1007,7 @@ export const spellsLevel0 = [
     level: 0,
     school: "illusion",
     description:
-      "Você cria um som ou a imagem de um objeto dentro do alcance que dura pela duração. A ilusão também termina se você conjurar esta magia novamente.",
+      "Você cria um som ou a imagem de um objeto dentro do alcance que dura pela duração. A ilusão termina se você conjurar esta magia novamente. Uma criatura pode usar a ação de Estudar para examinar o som ou a imagem; se for bem-sucedida em um teste de Inteligência (Investigação) contra a CD da sua magia, discerne que é uma ilusão e a ilusão se torna esmaecida para ela.\n\n• Som: o volume pode variar de um sussurro a um grito. Pode ser sua voz, a voz de outra pessoa, o rugido de um leão, o som de tambores ou qualquer outro som. O som continua durante toda a duração, ou você pode produzir sons discretos em momentos diferentes antes do término da magia.\n\n• Imagem: deve caber em um cubo de até 1,5 metro (5 pés). Pode ser, por exemplo, uma cadeira, pegadas lamacentas ou um pequeno baú. A imagem não pode criar som, luz, cheiro ou qualquer outro efeito sensorial. Interação física com a imagem revela que é ilusória, já que coisas passam através dela.",
     components: {
       types: ["somatic", "material"],
       material: {
@@ -1087,24 +1021,9 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Ilusão Menor",
         actionId: "action-cast-spell",
-        endConditions: [
-          { on: ["onUserCastSpellAgain"] },
-          {
-            on: ["onSavingThrow"],
-            specific: {
-              savingThrow: {
-                ability: "intelligence",
-                source: "effect",
-                dc: {
-                  type: "calculated",
-                  attributes: ["spellcasting"],
-                  base: 8,
-                },
-              },
-            },
-          },
-        ],
+        endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
           activation: {
             type: "action",
@@ -1118,36 +1037,15 @@ export const spellsLevel0 = [
           },
           outcomes: [
             {
-              type: "chooseEffect",
-              on: "any",
-              options: [
-                {
-                  id: "create-minor-ilusion-token",
-                  name: "Criar Ilusão Menor",
-                  outcome: {
-                    id: "minor-illusion-image",
-                    type: "summonToken",
-                    on: "success",
-                    tokenId: "token-minor-illusion",
-                    quantity: 1,
-                    duration: {
-                      unit: "minute",
-                      value: 1,
-                    },
-                  },
-                },
-                {
-                  id: "emmit-minor-ilusion-sound",
-                  name: "Emitir Som da Ilusão menor",
-                  outcome: {
-                    id: "minor-illusion-sound",
-                    type: "descriptive",
-                    on: "any",
-                    details:
-                      "Cria um som, de um sussurro a um grito. Pode ser contínuo ou sons discretos.",
-                  },
-                },
-              ],
+              id: "minor-illusion-summon",
+              type: "summonToken",
+              on: "success",
+              tokenId: "token-minor-illusion",
+              quantity: 1,
+              duration: {
+                unit: "minute",
+                value: 1,
+              },
             },
           ],
         },
@@ -1172,6 +1070,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Rajada de Veneno",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -1257,6 +1156,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Prestidigitação",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -1331,8 +1231,9 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Conjurar Chama",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserCastSpellAgain"] }],
+        endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "self" },
@@ -1343,6 +1244,7 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "passive_providesLight",
+                name: "Luz da Chama",
                 properties: {
                   bright: 20,
                   dim: 20,
@@ -1356,6 +1258,7 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "activatableAction",
+                name: "Arremessar Chama",
                 actionId: "action-cast-spell",
                 duration: { unit: "minute", value: 10 },
                 parameters: {
@@ -1443,6 +1346,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Raio de Gelo",
         actionId: "action-cast-spell",
         parameters: {
           activation: {
@@ -1536,8 +1440,9 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Resistência",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserLoseConcentration"] }],
+        endConditions: { events: [{ type: "lostConcentration" }] },
         parameters: {
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
@@ -1549,12 +1454,13 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "triggeredModifier",
-                triggers: [{ on: ["onTakingDamage"] }],
+                name: "Resistência ao Dano",
+                triggers: { events: [{ type: "tookDamage" }] },
                 requiresChoice: "damageType",
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
-                  target: "damageRoll",
+                  target: ["damageRoll"],
                   appliesTo: "self",
                 },
                 duration: { unit: "minute", value: 1, isConcentration: true },
@@ -1586,6 +1492,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Chama Sagrada",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -1667,18 +1574,20 @@ export const spellsLevel0 = [
     },
     duration: { unit: "minute", value: 1 },
     requirements: {
-      user: [
-        {
-          type: "isEquippingItem",
-          itemIds: ["item-clava", "item-bordao"],
-        },
-      ],
+      user: {
+        events: [
+          { type: "hasEquippedItem", itemIds: ["item-clava", "item-bordao"] },
+        ],
+      },
     },
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Bordão Místico",
         actionId: "action-cast-spell",
-        endConditions: [{ on: ["onUserCastSpellAgain", "onDropItem"] }],
+        endConditions: {
+          events: [{ type: "castSpellAgain" }, { type: "droppedItem" }],
+        },
         parameters: {
           activation: { type: "bonusAction" },
           target: { type: "object", quantity: 1 },
@@ -1689,6 +1598,7 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "activatableAction",
+                name: "Ataque com Bordão Místico",
                 actionId: "action-attack",
                 duration: { unit: "minute", value: 1 },
                 parameters: {
@@ -1765,6 +1675,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Toque Chocante",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -1789,6 +1700,7 @@ export const spellsLevel0 = [
               on: "hit",
               effect: {
                 type: "preventsReaction",
+                name: "Choque Paralisante",
                 duration: {
                   unit: "turn",
                   value: 1,
@@ -1849,6 +1761,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Explosão Feiticeira",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -1971,12 +1884,13 @@ export const spellsLevel0 = [
     components: { types: ["verbal", "somatic"] },
     duration: { unit: "instantaneous" },
     requirements: {
-      target: [{ type: "hasStatus", status: "hasZeroHp", is: true }],
+      target: { events: [{ type: "hasZeroHP" }] },
     },
 
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Estabilizar Moribundo",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2036,6 +1950,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Císcaro Estrelado",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2060,6 +1975,7 @@ export const spellsLevel0 = [
               on: "hit",
               effect: {
                 type: "passive_providesLight",
+                name: "Marca Luminosa",
                 properties: {
                   bright: 0,
                   dim: 10,
@@ -2069,10 +1985,14 @@ export const spellsLevel0 = [
             },
             {
               id: "starry-wisp-invisible-debuff",
-              type: "descriptive",
+              type: "applyEffect",
               on: "hit",
-              details:
-                "O alvo não pode se beneficiar da condição Invisível até o final do seu próximo turno.",
+              effect: {
+                type: "preventsCondition",
+                name: "Revela Invisíveis",
+                condition: "invisible",
+                duration: { unit: "turn", value: 1 },
+              },
             },
           ],
         },
@@ -2128,6 +2048,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Taumaturgia",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2146,6 +2067,7 @@ export const spellsLevel0 = [
               on: "success",
               effect: {
                 type: "passive_grantAdvantage",
+                name: "Voz Trovejante",
                 on: "skillCheck",
                 skill: "intimidation",
                 duration: { unit: "minute", value: 1 },
@@ -2207,6 +2129,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Chicote de Espinhos",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2290,6 +2213,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Estrondo de Trovão",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2380,12 +2304,13 @@ export const spellsLevel0 = [
     level: 0,
     school: "necromancy",
     description:
-      "Você aponta para uma criatura e o som de um sino fúnebre soa. O alvo deve passar em um teste de resistência de Sabedoria ou sofrerá 1d8 de dano necrótico. Se o alvo não estiver com todos os seus Pontos de Vida, ele sofre 1d12 de dano necrótico em vez disso.",
+      "Você aponta para uma criatura e o som de um sino fúnebre soa. O alvo deve passar em um teste de resistência de Sabedoria ou sofrerá 1d8 de dano necrótico. Se o alvo não estiver com todos os seus Pontos de Vida, ele sofre 1d12 de dano necrótico em vez disso. O som de um sino fúnebre é audível a até 10 pés do alvo.",
     components: { types: ["verbal", "somatic"] },
     duration: { unit: "instantaneous" },
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Soar dos Mortos",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2407,7 +2332,7 @@ export const spellsLevel0 = [
               on: "fail",
               formula: {
                 type: "conditional",
-                conditionals: [{ type: "targetIsWounded" }],
+                variables: { events: [{ type: "isWounded" }] },
                 ifTrue: {
                   type: "damage",
                   roll: { count: 1, faces: 12 },
@@ -2420,13 +2345,6 @@ export const spellsLevel0 = [
                 },
               },
             },
-            {
-              id: "toll-the-dead-sound",
-              type: "descriptive",
-              on: "any",
-              details:
-                "O som de um sino fúnebre é audível a até 10 pés do alvo.",
-            },
           ],
         },
         scaling: {
@@ -2438,7 +2356,7 @@ export const spellsLevel0 = [
               outcomeId: "toll-the-dead-damage",
               newFormula: {
                 type: "conditional",
-                conditionals: [{ type: "targetIsWounded" }],
+                variables: { events: [{ type: "isWounded" }] },
                 ifTrue: {
                   type: "damage",
                   roll: { count: 2, faces: 12 },
@@ -2457,7 +2375,7 @@ export const spellsLevel0 = [
               outcomeId: "toll-the-dead-damage",
               newFormula: {
                 type: "conditional",
-                conditionals: [{ type: "targetIsWounded" }],
+                variables: { events: [{ type: "isWounded" }] },
                 ifTrue: {
                   type: "damage",
                   roll: { count: 3, faces: 12 },
@@ -2476,7 +2394,7 @@ export const spellsLevel0 = [
               outcomeId: "toll-the-dead-damage",
               newFormula: {
                 type: "conditional",
-                conditionals: [{ type: "targetIsWounded" }],
+                variables: { events: [{ type: "isWounded" }] },
                 ifTrue: {
                   type: "damage",
                   roll: { count: 4, faces: 12 },
@@ -2508,15 +2426,19 @@ export const spellsLevel0 = [
     },
     duration: { unit: "instantaneous" },
     requirements: {
-      user: [
-        {
-          type: "isProficientWithEquippedWeapon",
-        },
-      ],
+      user: {
+        events: [
+          {
+            type: "isProficientWith",
+            other: "equippedWeapon",
+          },
+        ],
+      },
     },
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Ataque Certeiro",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2595,6 +2517,7 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Zombaria Viciosa",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
@@ -2626,6 +2549,7 @@ export const spellsLevel0 = [
               on: "fail",
               effect: {
                 type: "imposeDisadvantage",
+                name: "Desconcentração por Insulto",
                 on: "attackRoll",
                 count: 1,
                 duration: {
@@ -2691,10 +2615,11 @@ export const spellsLevel0 = [
     effects: [
       {
         type: "activatableCastSpell",
+        name: "Lançar Palavra de Radiância",
         actionId: "action-cast-spell",
         parameters: {
           activation: { type: "action" },
-          target: { type: "selfArea" },
+          target: { type: "selfArea", excludeSelf: true, selective: true },
           area: { shape: "sphere", radius: 5, unit: "ft" },
           save: {
             ability: "constitution",
@@ -2715,13 +2640,6 @@ export const spellsLevel0 = [
                 roll: { count: 1, faces: 6 },
                 damageTypeOptions: ["radiant"],
               },
-            },
-            {
-              id: "word-of-radiance-targeting-rule",
-              type: "descriptive",
-              on: "any",
-              details:
-                "Você pode escolher quais criaturas dentro da área de 5 pés são afetadas pela magia.",
             },
           ],
         },

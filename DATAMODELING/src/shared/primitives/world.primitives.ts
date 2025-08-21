@@ -23,6 +23,7 @@ export const DistanceUnitEnum = z.enum(["ft", "mile"]);
 export const SurfaceTypeEnum = z.enum([
   "fire",
   "ice",
+  "darkness",
   "acid",
   "grease",
   "water",
@@ -32,18 +33,3 @@ export const SurfaceTypeEnum = z.enum([
   "ballBearings",
   "caltrops",
 ]);
-
-export const SourceEnum = z.enum(["LDJ2024"]);
-
-export const MagicSchoolEnum = z.enum([
-  "abjuration",
-  "conjuration",
-  "divination",
-  "enchantment",
-  "evocation",
-  "illusion",
-  "necromancy",
-  "transmutation",
-]);
-
-export const SpellComponentEnum = z.enum(["verbal", "somatic", "material"]);

@@ -1,10 +1,11 @@
-import { z } from "zod";
+import { array, z } from "zod";
 
 import {
   AreaSchema,
   DcSchema,
   DiceRollSchema,
   RangeSchema,
+  RechargeSchema,
   RequirementSchema,
   RollModifierSchema,
   TargetSchema,
@@ -18,11 +19,11 @@ import {
   ActionTypeEnum,
   AttackTypeEnum,
   CoverEnum,
-  EventTriggerEnum,
   RechargeEventEnum,
   ResourceCostIdEnum,
 } from "../../shared/primitives/combat.primitives.js";
 import { AbilityScoreEnum } from "../../shared/primitives/character.primitives.js";
+import { GameEventSchema } from "../../shared/game-events.schema.js";
 
 export const ActionParametersSchema = z.object({
   activation: z
@@ -35,16 +36,17 @@ export const ActionParametersSchema = z.object({
           resourceId: ResourceCostIdEnum,
         })
         .optional(),
-      trigger: EventTriggerEnum.optional(),
-      details: z.string().optional(),
+      triggers: GameEventSchema.optional(),
     })
     .optional(),
   attackType: AttackTypeEnum.array().optional(),
+  attackBonus: z.number().int().optional(),
   range: RangeSchema.optional(),
   overrideAbilityScore: AbilityScoreEnum.or(
-    z.literal("spellcasting")
+    z.literal("spellcasting"),
   ).optional(),
   requirements: RequirementSchema.optional(),
+  triggers: GameEventSchema.optional(),
 
   area: AreaSchema.optional(),
   target: TargetSchema.optional(),
@@ -56,14 +58,7 @@ export const ActionParametersSchema = z.object({
       rollModifier: RollModifierSchema.optional(), // <-- aqui
     })
     .optional(),
-  charges: z
-    .object({
-      max: z.number().int(),
-      recharge: z
-        .object({ amount: DiceRollSchema, event: RechargeEventEnum })
-        .optional(),
-    })
-    .optional(),
+  charges: RechargeSchema.optional(),
   outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
   choices: ChooseEffectOutcomeSchema.optional(),
 });
@@ -76,7 +71,7 @@ export interface ActionParametersType {
       source: "item" | "character";
       resourceId: z.infer<typeof ResourceCostIdEnum>;
     };
-    trigger?: z.infer<typeof EventTriggerEnum>;
+    trigger?: z.infer<typeof GameEventSchema>;
   };
   attackType?: z.infer<typeof AttackTypeEnum>;
   overrideAbilityScore?: z.infer<typeof AbilityScoreEnum> | "spellcasting";
