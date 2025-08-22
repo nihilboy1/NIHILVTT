@@ -165,7 +165,7 @@ export const spellsLevel0 = [
         parameters: {
           activation: { type: "action" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["meleeSpellAttack"],
+          attackType: [{ source: "spell", range: "melee" }],
           outcomes: [
             {
               id: "chill-touch-damage",
@@ -371,7 +371,7 @@ export const spellsLevel0 = [
             type: "creature",
             quantity: 1,
           },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           outcomes: [
             {
               id: "eldritch-blast-damage",
@@ -516,7 +516,7 @@ export const spellsLevel0 = [
             type: "creature",
             quantity: 1,
           },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           outcomes: [
             {
               id: "fire-bolt-damage",
@@ -1079,7 +1079,7 @@ export const spellsLevel0 = [
             normal: 30,
             unit: "ft",
           },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           target: {
             type: "creature",
             quantity: 1,
@@ -1264,7 +1264,7 @@ export const spellsLevel0 = [
                   activation: { type: "action" },
                   range: { normal: 60, unit: "ft" },
                   target: { type: "creature", quantity: 1 },
-                  attackType: ["rangedSpellAttack"],
+                  attackType: [{ source: "spell", range: "ranged" }],
                   outcomes: [
                     {
                       id: "produce-flame-damage",
@@ -1355,7 +1355,7 @@ export const spellsLevel0 = [
             normal: 60,
             unit: "ft",
           },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           target: {
             type: "creature",
             quantity: 1,
@@ -1602,7 +1602,7 @@ export const spellsLevel0 = [
                 duration: { unit: "minute", value: 1 },
                 parameters: {
                   activation: { type: "action" },
-                  attackType: ["meleeWeaponAttack"],
+                  attackType: [{ source: "weapon", range: "melee" }],
                   overrideAbilityScore: "spellcasting",
                   outcomes: [
                     {
@@ -1680,7 +1680,7 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["meleeSpellAttack"],
+          attackType: [{ source: "spell", range: "melee" }],
           outcomes: [
             {
               id: "shocking-grasp-damage",
@@ -1766,7 +1766,7 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           outcomes: [
             {
               id: "sorcerous-burst-damage",
@@ -1955,7 +1955,7 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           outcomes: [
             {
               id: "starry-wisp-damage",
@@ -2134,7 +2134,7 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["meleeSpellAttack"],
+          attackType: [{ source: "spell", range: "melee" }],
           outcomes: [
             {
               id: "thorn-whip-damage",
@@ -2442,7 +2442,10 @@ export const spellsLevel0 = [
         parameters: {
           activation: { type: "action" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["rangedWeaponAttack", "meleeWeaponAttack"],
+          attackType: [
+            { source: "weapon", range: "ranged" },
+            { source: "weapon", range: "melee" },
+          ],
           overrideAbilityScore: "spellcasting",
           outcomes: [
             {

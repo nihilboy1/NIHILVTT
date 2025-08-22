@@ -20,7 +20,7 @@ export const itemsGear = [
         actionId: "action-throw-item",
         parameters: {
           range: { normal: 20, unit: "ft" },
-          attackType: ["rangedItemAttack"],
+          attackType: [{ source: "item", range: "ranged" }],
           outcomes: [
             {
               on: "hit",
@@ -54,7 +54,7 @@ export const itemsGear = [
         name: "Arremessar Fogo Alquímico",
         actionId: "action-throw-item",
         parameters: {
-          attackType: ["rangedItemAttack"],
+          attackType: [{ source: "item", range: "ranged" }],
           range: { normal: 20, unit: "ft" },
           save: { ability: "dexterity", dc: { type: "fixed", value: 10 } },
           outcomes: [
@@ -486,7 +486,7 @@ export const itemsGear = [
         name: "Arremessar Água Benta",
         actionId: "action-throw-item",
         parameters: {
-          attackType: ["rangedItemAttack"],
+          attackType: [{ source: "item", range: "ranged" }],
           range: { normal: 20, unit: "ft" },
           target: {
             type: "creature",
@@ -577,7 +577,7 @@ export const itemsGear = [
           outcomes: [
             {
               type: "summonToken",
-              tokenId: "template-hunting-trap-armed",
+              tokenId: "token-hunting-trap-armed",
               on: "any",
               quantity: 1,
             },
@@ -675,7 +675,7 @@ export const itemsGear = [
               ],
               transformRules: [
                 {
-                  trigger: {
+                  triggers: {
                     events: [{ type: "tookDamage", damageTypes: ["fire"] }],
                   },
                   newSurface: {

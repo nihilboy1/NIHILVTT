@@ -2,8 +2,10 @@ import { z } from "zod";
 
 import {
   AreaSchema,
+  AttackTypeSchema,
   DcSchema,
   DiceRollSchema,
+  GameEventSchema,
   RangeSchema,
   RechargeSchema,
   RequirementSchema,
@@ -17,13 +19,11 @@ import {
 } from "../../shared/outcome.schema.js";
 import {
   ActionTypeEnum,
-  AttackTypeEnum,
   CoverEnum,
   RechargeEventEnum,
   ResourceCostIdEnum,
 } from "../../shared/primitives/combat.primitives.js";
 import { AbilityScoreEnum } from "../../shared/primitives/character.primitives.js";
-import { GameEventSchema } from "../../shared/game-events.schema.js";
 
 export const ActionParametersSchema = z.object({
   activation: z
@@ -39,7 +39,7 @@ export const ActionParametersSchema = z.object({
       triggers: GameEventSchema.optional(),
     })
     .optional(),
-  attackType: AttackTypeEnum.array().optional(),
+  attackType: AttackTypeSchema.array().optional(),
   attackBonus: z.number().int().optional(),
   range: RangeSchema.optional(),
   overrideAbilityScore: AbilityScoreEnum.or(
@@ -73,7 +73,7 @@ export interface ActionParametersType {
     };
     trigger?: z.infer<typeof GameEventSchema>;
   };
-  attackType?: z.infer<typeof AttackTypeEnum>;
+  attackType?: z.infer<typeof AttackTypeSchema>;
   overrideAbilityScore?: z.infer<typeof AbilityScoreEnum> | "spellcasting";
 
   range?: z.infer<typeof RangeSchema>;

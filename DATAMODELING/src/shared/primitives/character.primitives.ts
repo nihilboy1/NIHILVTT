@@ -189,3 +189,5 @@ export const VisionTypeEnum = z.enum([
   "tremorsense",
   "truesight",
 ]);
+
+export const DispositionEnum = z.enum(["friendly", "neutral", "hostile"]);

@@ -1,4 +1,3 @@
-import z from "zod";
 import { Item } from "../../domain/item/items.schema";
 
 export const itemsWeapon = [
@@ -1087,16 +1086,4 @@ export const itemsWeapon = [
   },
 ] as const satisfies Item[];
 
-const allWeaponIds = itemsWeapon.map((weapon) => weapon.id);
 
-if (allWeaponIds.length === 0) {
-  throw new Error(
-    "Nenhuma arma encontrada em items-weapon.ts para criar o WeaponIdEnum.",
-  );
-}
-
-const [firstId, ...restIds] = allWeaponIds;
-
-export const WeaponIdEnum = z.enum([firstId, ...restIds]);
-
-export type WeaponId = z.infer<typeof WeaponIdEnum>;

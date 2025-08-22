@@ -9,8 +9,7 @@
     "monsters": "npx tsx src/tooling/generate-monsters.ts",
     "lint": "eslint \"src/**/*.ts\" --fix"
   },
-  "keywords": [],
-  "author": "",
+  "author": "NIHILBOY",
   "license": "ISC",
   "type": "module",
   "devDependencies": {

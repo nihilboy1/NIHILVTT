@@ -12,20 +12,13 @@ export const ActionTypeEnum = z.enum([
   "special",
 ]);
 
-export const AttackTypeEnum = z.enum([
-  "meleeWeaponAttack",
-  "rangedNaturalAttack",
-  "meleeNaturalAttack",
-  "rangedWeaponAttack",
-  "meleeSpellAttack",
-  "rangedSpellAttack",
-  "rangedItemAttack",
-  "meleeItemAttack",
-  "meleeUnarmedAttack",
-  "rangedUnarmedAttack",
-  "meleeAttack",
-  "rangedAttack",
-  // mais a
+export const AttackSourceEnum = z.enum([
+  "weapon",
+  "spell",
+  "natural",
+  "item",
+  "unarmed",
+  "any",
 ]);
 
 export const DamageTypeEnum = z.enum([

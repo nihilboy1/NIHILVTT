@@ -11,7 +11,7 @@ import {
 import { ActionOutcomeType } from "../../shared/outcome.schema.js";
 import { SourceEnum } from "../../shared/primitives/system.primitives.js";
 import {
-  MagicSchoolEnum,
+  MagicSchoolEnum, 
   SpellComponentEnum,
 } from "../../shared/primitives/spell.primitives.js";
 

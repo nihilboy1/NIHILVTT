@@ -5,6 +5,7 @@ import {
   DcSchema,
   DiceRollSchema,
   DurationSchema,
+  GameEventSchema,
   HPFormulaSchema,
   RangeSchema,
   RequirementSchema,
@@ -30,7 +31,6 @@ import {
   AbilityScoreEnum,
   SkillEnum,
 } from "./primitives/character.primitives.js";
-import { GameEventSchema } from "./game-events.schema.js";
 import { ConditionStatusEnum } from "./primitives/system.primitives.js";
 
 const ChainedEffectSchema = z.object({

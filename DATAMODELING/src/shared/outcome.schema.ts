@@ -3,6 +3,7 @@ import {
   AcSchema,
   DcSchema,
   DurationSchema,
+  GameEventSchema,
   HPFormulaSchema,
   RequirementSchema,
   TargetSchema,
@@ -26,7 +27,7 @@ import {
   CreatureSizeEnum,
   SystemStatusEnum,
 } from "./primitives/system.primitives.js";
-import { GameEventSchema } from "./game-events.schema.js";
+import { SummonedTokenIdEnum } from "./data-based-enums.js";
 
 export const NoneOutcomeSchema = z.object({
   id: z.string().optional(),
@@ -204,7 +205,7 @@ const SummonTokenOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("summonToken"),
   on: EffectOutcomeEnum,
-  tokenId: z.string(),
+  tokenId: SummonedTokenIdEnum,
   quantity: z.number().int().min(1),
   duration: DurationSchema.optional(),
 });
@@ -243,7 +244,7 @@ export type ChooseEffectOutcomeType = {
 };
 
 export interface TransformRuleType {
-  trigger: z.infer<typeof GameEventSchema>;
+  triggers: z.infer<typeof GameEventSchema>;
   newSurface: CreateAreaEffectOutcomeType;
 }
 

@@ -13,7 +13,6 @@ import { DistanceUnitEnum } from "../../shared/primitives/world.primitives";
 import { ArmorIdEnum } from "../../data/items/items-armor";
 import { GearIdEnum } from "../../data/items/items-gear";
 import { ToolIdEnum } from "../../data/items/items-tool";
-import { WeaponIdEnum } from "../../data/items/items-weapon";
 import {
   ChallengeRatingEnum,
   ConditionStatusEnum,
@@ -21,6 +20,7 @@ import {
   CreatureTypeEnum,
   SourceEnum,
 } from "../../shared/primitives/system.primitives";
+import { WeaponIdEnum } from "../../shared/data-based-enums";
 
 const ItemIdEnum = z.union([WeaponIdEnum, ArmorIdEnum, GearIdEnum, ToolIdEnum]);
 const AbilityScoresSchema = z.object({
@@ -123,3 +123,4 @@ export const MonsterSchema = z.object({
 });
 
 export type Monster = z.infer<typeof MonsterSchema>;
+export const FinalMonsterDataSchema = z.array(MonsterSchema);

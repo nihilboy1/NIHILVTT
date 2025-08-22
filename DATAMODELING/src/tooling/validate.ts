@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { FinalSpellDataSchema } from "../domain/spell/spell.schema.js";
 import { FinalItemDataSchema } from "../domain/item/items.schema.js";
+import { FinalMonsterDataSchema } from "../domain/monster/monster.schema.js";
 
 process.on("uncaughtException", (err) => {
   console.error(chalk.bgRed.white(" Uncaught Exception "), err);
@@ -15,13 +16,17 @@ process.on("unhandledRejection", (reason) => {
   process.exit(1);
 });
 
-function validateData(data: unknown[], schema: z.ZodSchema<unknown>, dataName: string) {
+function validateData(
+  data: unknown[],
+  schema: z.ZodSchema<unknown>,
+  dataName: string,
+) {
   console.log(
     chalk.cyan(
       `\n🔍 Iniciando a validação dos dados de: ${chalk.bold.underline(
-        dataName
-      )}...`
-    )
+        dataName,
+      )}...`,
+    ),
   );
 
   try {
@@ -31,9 +36,9 @@ function validateData(data: unknown[], schema: z.ZodSchema<unknown>, dataName: s
       console.log(
         chalk.green(
           `✅ Validação de ${chalk.bold.underline(
-            dataName
-          )} concluída com sucesso!`
-        )
+            dataName,
+          )} concluída com sucesso!`,
+        ),
       );
       return;
     }
@@ -41,9 +46,9 @@ function validateData(data: unknown[], schema: z.ZodSchema<unknown>, dataName: s
     console.error(
       chalk.redBright(
         `\n❌ Erro(s) de validação encontrado(s) em ${chalk.bold.underline(
-          dataName
-        )}!\n`
-      )
+          dataName,
+        )}!\n`,
+      ),
     );
 
     const errorsById: Record<string, string[]> = {};
@@ -54,12 +59,12 @@ function validateData(data: unknown[], schema: z.ZodSchema<unknown>, dataName: s
 
       const itemWithError = data[index as number];
       const itemWithErrorTyped = itemWithError as { id?: string };
-      const itemId = itemWithErrorTyped?.id || `Índice ${String(index)} (ID não encontrado)`;
-
+      const itemId =
+        itemWithErrorTyped?.id || `Índice ${String(index)} (ID não encontrado)`;
 
       const readableField = fieldPath || "(campo não identificado)";
       const message = `${chalk.yellow("- Campo")} '${chalk.cyan(
-        readableField
+        readableField,
       )}': ${chalk.red(issue.message)}`;
 
       if (!errorsById[itemId]) {
@@ -77,10 +82,10 @@ function validateData(data: unknown[], schema: z.ZodSchema<unknown>, dataName: s
     console.error(
       chalk.bgRed.white(
         ` Erro inesperado durante a validação de ${chalk.bold.underline(
-          dataName
-        )}: `
+          dataName,
+        )}: `,
       ),
-      e
+      e,
     );
   }
 }
@@ -100,29 +105,55 @@ async function main() {
   while (true) {
     choice = (
       await ask(
-        "\nO que você quer testar?\n[1] Magias\n[2] Itens\n[3] Testar todos\nInforme: "
+        "\nO que você quer testar?\n[1] Testar todos\n[2] Magias\n[3] Itens\n[4] Monstros\nInforme: ",
       )
     ).trim();
 
-    if (["1", "2", "3"].includes(choice)) break;
+    if (["1", "2", "3", "4"].includes(choice)) break;
 
-    console.log(chalk.red("❌ Opção inválida! Digite 1, 2 ou 3."));
+    console.log(chalk.red("❌ Opção inválida! Digite 1, 2, 3 ou 4."));
   }
 
-  if (choice === "1" || choice === "3") {
-    console.log(chalk.blue("Carregando dados de magias..."));
+  if (choice === "1" || choice === "2") {
+    if (choice === "1" || choice === "2") {
+      console.log(chalk.blue("Carregando dados de magias..."));
 
-    const { PHB2024SPELLS } = await import("../data/spells/spells-union.js");
+      const { PHB2024SPELLS } = await import("../data/spells/spells-union.js");
 
-    validateData(PHB2024SPELLS, FinalSpellDataSchema, "Magias");
-  }
+      validateData(PHB2024SPELLS, FinalSpellDataSchema, "Magias");
+    }
 
-  if (choice === "2" || choice === "3") {
+    if (choice === "1") {
+      console.log(chalk.blue("Carregando dados de itens..."));
+
+      const { PHB2024ITEMS } = await import("../data/items/items-union.js");
+
+      validateData(PHB2024ITEMS, FinalItemDataSchema, "Itens");
+    }
+
+    if (choice === "1") {
+      console.log(chalk.blue("Carregando dados de monstros..."));
+
+      const { PHB2024MONSTERS } = await import(
+        "../data/monsters/monsters.union.js"
+      );
+
+      validateData(PHB2024MONSTERS, FinalMonsterDataSchema, "Monstros");
+    }
+  } else if (choice === "3") {
     console.log(chalk.blue("Carregando dados de itens..."));
 
     const { PHB2024ITEMS } = await import("../data/items/items-union.js");
 
     validateData(PHB2024ITEMS, FinalItemDataSchema, "Itens");
+  } else if (choice === "4") {
+    console.log(chalk.blue("Carregando dados de monstros..."));
+
+    const { PHB2024MONSTERS } = await import(
+      "../data/monsters/monsters.union.js"
+    );
+
+    validateData(PHB2024MONSTERS, FinalMonsterDataSchema, "Monstros");
   }
 
   rl.close();

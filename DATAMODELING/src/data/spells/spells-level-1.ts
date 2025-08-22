@@ -631,7 +631,12 @@ export const spellsLevel1 = [
                 name: "Retaliação de Agathys",
                 type: "triggeredEffect",
                 triggers: {
-                  events: [{ type: "tookDamage", attackType: ["meleeAttack"] }],
+                  events: [
+                    {
+                      type: "tookDamage",
+                      attackType: [{ source: "weapon", range: "melee" }],
+                    },
+                  ],
                 },
                 outcomes: [
                   {
@@ -705,7 +710,7 @@ export const spellsLevel1 = [
             {
               type: "tookDamage",
               from: ["caster", "casterAllies"],
-              attackType: ["any"],
+              attackType: [{ source: "any", range: "melee" }],
             },
           ],
         },
@@ -782,7 +787,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 90, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           outcomes: [
             {
               id: "chromatic-orb-damage",
@@ -1988,7 +1993,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           outcomes: [
             {
               id: "guiding-bolt-damage",
@@ -2047,7 +2052,10 @@ export const spellsLevel1 = [
             type: "bonusAction",
             triggers: {
               events: [
-                { type: "madeAttackRoll", attackType: "rangedWeaponAttack" },
+                {
+                  type: "madeAttackRoll",
+                  attackType: { source: "weapon", range: "ranged" },
+                },
               ],
             },
           },
@@ -2353,7 +2361,10 @@ export const spellsLevel1 = [
                     {
                       type: "tookDamage",
                       from: ["caster"],
-                      attackType: ["meleeWeaponAttack", "rangedWeaponAttack"],
+                      attackType: [
+                        { source: "weapon", range: "melee" },
+                        { source: "weapon", range: "ranged" },
+                      ],
                     },
                   ],
                 },
@@ -2403,7 +2414,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
 
           // --- PARTE 2: Os resultados diretos do ataque ---
           outcomes: [
@@ -2892,7 +2903,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           outcomes: [
             {
               id: "ray-of-sickness-damage",
@@ -2989,7 +3000,10 @@ export const spellsLevel1 = [
             type: "bonusAction",
             triggers: {
               events: [
-                { type: "madeAttackRoll", attackType: "meleeWeaponAttack" },
+                {
+                  type: "madeAttackRoll",
+                  attackType: { source: "weapon", range: "melee" },
+                },
               ],
             },
           },
@@ -3408,7 +3422,10 @@ export const spellsLevel1 = [
             type: "bonusAction",
             triggers: {
               events: [
-                { type: "madeAttackRoll", attackType: "meleeWeaponAttack" },
+                {
+                  type: "madeAttackRoll",
+                  attackType: { source: "weapon", range: "melee" },
+                },
               ],
             },
           },
@@ -3603,7 +3620,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: ["rangedSpellAttack"],
+          attackType: [{ source: "spell", range: "ranged" }],
           outcomes: [
             {
               id: "witch-bolt-initial-damage",
@@ -3680,7 +3697,10 @@ export const spellsLevel1 = [
             type: "bonusAction",
             triggers: {
               events: [
-                { type: "madeAttackRoll", attackType: "meleeWeaponAttack" },
+                {
+                  type: "madeAttackRoll",
+                  attackType: { source: "weapon", range: "melee" },
+                },
               ],
             },
           },

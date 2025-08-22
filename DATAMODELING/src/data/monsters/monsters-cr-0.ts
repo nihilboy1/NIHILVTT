@@ -1,4 +1,4 @@
-import { Monster } from "../../domain/creature/creature.schema";
+import { Monster } from "../../domain/monster/monster.schema.js";
 
 export const monsters_cr_0: Monster[] = [
   {
@@ -51,7 +51,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Rastrar",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 1,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -124,7 +124,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 1,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -194,7 +194,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -270,7 +270,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 4,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -344,7 +344,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Garras",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 4,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -404,7 +404,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Clava",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeWeaponAttack"],
+          attackType: [{ source: "weapon", range: "melee" }],
           range: { normal: 5, unit: "ft" },
           target: { type: "creature", quantity: 1 },
           outcomes: [
@@ -478,7 +478,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Garra",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -568,7 +568,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Pancada",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 3,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -638,7 +638,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Chifres",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -709,7 +709,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Garras",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 4,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -790,7 +790,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 3,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -865,7 +865,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 1,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -936,7 +936,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Chifres",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1007,7 +1007,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Garras",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 4,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1099,7 +1099,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 4,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1188,7 +1188,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 3,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1257,7 +1257,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 1,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1320,7 +1320,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 1,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1397,7 +1397,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Limo Vil",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1468,7 +1468,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 1,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1543,7 +1543,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Pancada",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 3,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1648,7 +1648,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Tentáculos",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 4,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1730,7 +1730,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Garras",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1805,7 +1805,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 5,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1879,7 +1879,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -1950,7 +1950,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Bico",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -2013,7 +2013,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Ferrão",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -2206,7 +2206,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -2300,7 +2300,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Bico",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 4,
           range: { normal: 5, unit: "ft" },
           outcomes: [
@@ -2378,7 +2378,7 @@ export const monsters_cr_0: Monster[] = [
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: ["meleeNaturalAttack"],
+          attackType: [{ source: "natural", range: "melee" }],
           attackBonus: 2,
           range: { normal: 5, unit: "ft" },
           outcomes: [

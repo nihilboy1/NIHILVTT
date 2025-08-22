@@ -88,7 +88,6 @@ export const SystemStatusEnum = z.enum([
   "wet",
   "frozen",
   "burning",
-  "hostile",
   "lightlyObscured",
   "heavilyObscured",
 ]);

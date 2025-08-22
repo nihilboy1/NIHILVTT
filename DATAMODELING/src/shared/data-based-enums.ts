@@ -1,6 +1,4 @@
 // Este arquivo é gerado automaticamente. Não edite manualmente.
-// Use o script 'npm run enums' para atualizar.
-
 import { z } from 'zod';
 
 // --- Enums de ID ---
@@ -181,7 +179,19 @@ export const SpellIdEnum = z.enum([
   'spell-vicious-mockery',
   'spell-witch-bolt',
   'spell-word-of-radiance',
-  'spell-wrathful-smite'
+  'spell-wrathful-smite',
+  'undefined'
+]);
+
+export const SummonedTokenIdEnum = z.enum([
+  'token-dancing-lights',
+  'token-find-familiar',
+  'token-hunting-trap-armed',
+  'token-magic-hand',
+  'token-minor-illusion',
+  'token-silent-image',
+  'token-tensers-floating-disk',
+  'token-unseen-servant'
 ]);
 
 // --- Enums de Caminho de Propriedade ---
@@ -230,6 +240,7 @@ export const OutcomeParameterPaths = z.enum([
   'addedEffect.save.dc.value',
   'addedEffect.trigger',
   'allowedSizes',
+  'amount',
   'appliesTo',
   'appliesToFilter.status',
   'attribute',

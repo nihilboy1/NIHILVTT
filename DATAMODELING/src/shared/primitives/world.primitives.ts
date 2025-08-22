@@ -1,7 +1,3 @@
-// ============================================================================
-// PRIMITIVOS DE MEDIDA E AMBIENTE
-// Proposta: Mover para 'world.primitives.ts'
-// ============================================================================
 
 export const TemplateType = z.enum(["areaOfEffect", "Token"]);
 
