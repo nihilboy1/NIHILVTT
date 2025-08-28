@@ -92,6 +92,11 @@ export const SystemStatusEnum = z.enum([
   "heavilyObscured",
 ]);
 
+export const OperationsEnum = z.enum(["add", "subtract", "multiply", "divide"]);
+
+export const ComparisonEnum = z.enum(["equal", "greaterThan", "lessThan", "greaterOrEqual", "lessOrEqual"]);
+
+
 // União de condições e status do sistema.
 export const ConditionStatusEnum = z.union([
   BaseConditionEnum,

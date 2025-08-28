@@ -113,7 +113,10 @@ export const spellsLevel0 = [
         type: "activatableCastSpell",
         name: "Conjurar Proteção Contra Lâminas",
         actionId: "action-cast-spell",
-        endConditions: { events: [{ type: "lostConcentration" }] },
+        endConditions: {
+          events: [{ type: "lostConcentration" }],
+          conditionMode: "all",
+        },
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
@@ -126,6 +129,7 @@ export const spellsLevel0 = [
                 name: "Proteção de Lâminas",
                 triggers: {
                   events: [{ type: "wasAttacked", byVisibleCreature: false }],
+                  conditionMode: "all",
                 },
 
                 modifier: {
@@ -165,7 +169,7 @@ export const spellsLevel0 = [
         parameters: {
           activation: { type: "action" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "melee" }],
+          attackType: [{ source: "spell", range: "melee", handsInUse: "one" }],
           outcomes: [
             {
               id: "chill-touch-damage",
@@ -371,7 +375,7 @@ export const spellsLevel0 = [
             type: "creature",
             quantity: 1,
           },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               id: "eldritch-blast-damage",
@@ -516,7 +520,7 @@ export const spellsLevel0 = [
             type: "creature",
             quantity: 1,
           },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               id: "fire-bolt-damage",
@@ -544,6 +548,7 @@ export const spellsLevel0 = [
                       isWorn: false,
                     },
                   ],
+                  conditionMode: "all",
                 },
               },
               duration: { unit: "indefinite" },
@@ -945,7 +950,10 @@ export const spellsLevel0 = [
               effect: {
                 type: "triggeredModifier",
                 name: "Mente Fragmentada",
-                triggers: { events: [{ type: "madeSavingThrow" }] },
+                triggers: {
+                  conditionMode: "all",
+                  events: [{ type: "madeSavingThrow" }],
+                },
                 modifier: {
                   operation: "subtract",
                   dice: { count: 1, faces: 4 },
@@ -1079,7 +1087,7 @@ export const spellsLevel0 = [
             normal: 30,
             unit: "ft",
           },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           target: {
             type: "creature",
             quantity: 1,
@@ -1234,7 +1242,7 @@ export const spellsLevel0 = [
         actionId: "action-cast-spell",
         endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           target: { type: "self" },
           outcomes: [
             {
@@ -1264,7 +1272,9 @@ export const spellsLevel0 = [
                   activation: { type: "action" },
                   range: { normal: 60, unit: "ft" },
                   target: { type: "creature", quantity: 1 },
-                  attackType: [{ source: "spell", range: "ranged" }],
+                  attackType: [
+                    { source: "spell", range: "ranged", handsInUse: "one" },
+                  ],
                   outcomes: [
                     {
                       id: "produce-flame-damage",
@@ -1355,7 +1365,7 @@ export const spellsLevel0 = [
             normal: 60,
             unit: "ft",
           },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           target: {
             type: "creature",
             quantity: 1,
@@ -1588,7 +1598,7 @@ export const spellsLevel0 = [
           events: [{ type: "castSpellAgain" }, { type: "droppedItem" }],
         },
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           target: { type: "object", quantity: 1 },
           outcomes: [
             {
@@ -1602,7 +1612,9 @@ export const spellsLevel0 = [
                 duration: { unit: "minute", value: 1 },
                 parameters: {
                   activation: { type: "action" },
-                  attackType: [{ source: "weapon", range: "melee" }],
+                  attackType: [
+                    { source: "weapon", range: "melee", handsInUse: "one" },
+                  ],
                   overrideAbilityScore: "spellcasting",
                   outcomes: [
                     {
@@ -1680,7 +1692,7 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "melee" }],
+          attackType: [{ source: "spell", range: "melee", handsInUse: "one" }],
           outcomes: [
             {
               id: "shocking-grasp-damage",
@@ -1766,7 +1778,7 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               id: "sorcerous-burst-damage",
@@ -1955,7 +1967,7 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               id: "starry-wisp-damage",
@@ -2134,7 +2146,7 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "melee" }],
+          attackType: [{ source: "spell", range: "melee", handsInUse: "one" }],
           outcomes: [
             {
               id: "thorn-whip-damage",
@@ -2443,8 +2455,8 @@ export const spellsLevel0 = [
           activation: { type: "action" },
           target: { type: "creature", quantity: 1 },
           attackType: [
-            { source: "weapon", range: "ranged" },
-            { source: "weapon", range: "melee" },
+            { source: "weapon", range: "ranged", handsInUse: "one" },
+            { source: "weapon", range: "melee", handsInUse: "one" },
           ],
           overrideAbilityScore: "spellcasting",
           outcomes: [

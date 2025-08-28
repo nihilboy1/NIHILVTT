@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { RequirementSchema } from "../../shared/blocks.schema.js";
 import { EffectSchema } from "../../shared/effect.schema.js";
 import {
   CostUnitEnum,
@@ -8,6 +7,7 @@ import {
   WeightUnitEnum,
 } from "../../shared/primitives/item.primitives.js";
 import { SourceEnum } from "../../shared/primitives/system.primitives.js";
+import { RequirementSchema } from "../../shared/game-events.schema.js";
 
 const BaseItemSchema = z.object({
   id: z.string().min(1),

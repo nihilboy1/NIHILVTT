@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  RequirementSchema,
   DurationSchema,
 } from "../../shared/blocks.schema.js";
 import {
@@ -14,6 +13,7 @@ import {
   MagicSchoolEnum, 
   SpellComponentEnum,
 } from "../../shared/primitives/spell.primitives.js";
+import { RequirementSchema } from "../../shared/game-events.schema.js";
 
 const baseSpellSchema = z.object({
   id: z.string().min(1),

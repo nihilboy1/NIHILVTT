@@ -61,7 +61,17 @@ export const spellsLevel1 = [
         name: "Conjurar Amizade Animal",
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
-        endConditions: {},
+        endConditions: {
+          events: [
+            {
+              type: "tookDamage",
+              from: ["caster", "casterAllies"],
+              attackType: [
+                { source: "any", range: "melee", handsInUse: "one" },
+              ],
+            },
+          ],
+        },
         parameters: {
           activation: {
             type: "action",
@@ -196,7 +206,7 @@ export const spellsLevel1 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
           },
           range: {
             normal: 60,
@@ -607,7 +617,7 @@ export const spellsLevel1 = [
         endConditions: { events: [{ type: "tempHPDepleted" }] },
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
           },
           target: {
             type: "self",
@@ -634,7 +644,9 @@ export const spellsLevel1 = [
                   events: [
                     {
                       type: "tookDamage",
-                      attackType: [{ source: "weapon", range: "melee" }],
+                      attackType: [
+                        { source: "weapon", range: "melee", handsInUse: "one" },
+                      ],
                     },
                   ],
                 },
@@ -710,7 +722,9 @@ export const spellsLevel1 = [
             {
               type: "tookDamage",
               from: ["caster", "casterAllies"],
-              attackType: [{ source: "any", range: "melee" }],
+              attackType: [
+                { source: "any", range: "melee", handsInUse: "one" },
+              ],
             },
           ],
         },
@@ -787,7 +801,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 90, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               id: "chromatic-orb-damage",
@@ -973,7 +987,7 @@ export const spellsLevel1 = [
         },
 
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           range: { normal: 30, unit: "ft" },
           target: { type: "creature", quantity: 1 },
           save: {
@@ -1348,7 +1362,7 @@ export const spellsLevel1 = [
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           target: { type: "self" },
           outcomes: [
             {
@@ -1398,7 +1412,7 @@ export const spellsLevel1 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
           },
           target: {
             type: "descriptive",
@@ -1475,7 +1489,7 @@ export const spellsLevel1 = [
         },
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
           },
           target: {
             type: "creature",
@@ -1622,7 +1636,7 @@ export const spellsLevel1 = [
           events: [{ type: "lostConcentration" }],
         },
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           target: { type: "self" },
           outcomes: [
             {
@@ -1993,7 +2007,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               id: "guiding-bolt-damage",
@@ -2049,12 +2063,16 @@ export const spellsLevel1 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
             triggers: {
               events: [
                 {
                   type: "madeAttackRoll",
-                  attackType: { source: "weapon", range: "ranged" },
+                  attackType: {
+                    source: "weapon",
+                    range: "ranged",
+                    handsInUse: "any",
+                  },
                 },
               ],
             },
@@ -2275,7 +2293,7 @@ export const spellsLevel1 = [
           events: [{ type: "lostConcentration" }],
         },
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           range: { normal: 90, unit: "ft" },
           target: { type: "creature", quantity: 1 },
           outcomes: [
@@ -2345,7 +2363,7 @@ export const spellsLevel1 = [
           events: [{ type: "lostConcentration" }],
         },
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           range: { normal: 90, unit: "ft" },
           target: { type: "creature", quantity: 1 },
           outcomes: [
@@ -2362,8 +2380,12 @@ export const spellsLevel1 = [
                       type: "tookDamage",
                       from: ["caster"],
                       attackType: [
-                        { source: "weapon", range: "melee" },
-                        { source: "weapon", range: "ranged" },
+                        { source: "weapon", range: "melee", handsInUse: "one" },
+                        {
+                          source: "weapon",
+                          range: "ranged",
+                          handsInUse: "one",
+                        },
                       ],
                     },
                   ],
@@ -2410,13 +2432,11 @@ export const spellsLevel1 = [
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
-          // --- PARTE 1: O ataque à distância inicial ---
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
 
-          // --- PARTE 2: Os resultados diretos do ataque ---
           outcomes: [
             {
               id: "ice-knife-piercing-damage",
@@ -2647,7 +2667,7 @@ export const spellsLevel1 = [
         type: "activatableCastSpell",
         actionId: "action-cast-spell",
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           range: { unit: "ft", normal: 5 },
           target: { type: "creature", quantity: 1 },
           outcomes: [
@@ -2903,7 +2923,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               id: "ray-of-sickness-damage",
@@ -2963,7 +2983,7 @@ export const spellsLevel1 = [
         },
 
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           range: { normal: 30, unit: "ft" },
           target: { type: "creature", quantity: 1 },
           outcomes: [
@@ -2997,12 +3017,16 @@ export const spellsLevel1 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
             triggers: {
               events: [
                 {
                   type: "madeAttackRoll",
-                  attackType: { source: "weapon", range: "melee" },
+                  attackType: {
+                    source: "weapon",
+                    range: "melee",
+                    handsInUse: "one",
+                  },
                 },
               ],
             },
@@ -3125,7 +3149,7 @@ export const spellsLevel1 = [
           events: [{ type: "lostConcentration" }],
         },
         parameters: {
-          activation: { type: "bonusAction" },
+          activation: { type: "bonus" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
           outcomes: [
@@ -3419,12 +3443,16 @@ export const spellsLevel1 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
             triggers: {
               events: [
                 {
                   type: "madeAttackRoll",
-                  attackType: { source: "weapon", range: "melee" },
+                  attackType: {
+                    source: "weapon",
+                    range: "melee",
+                    handsInUse: "one",
+                  },
                 },
               ],
             },
@@ -3620,7 +3648,7 @@ export const spellsLevel1 = [
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
           target: { type: "creature", quantity: 1 },
-          attackType: [{ source: "spell", range: "ranged" }],
+          attackType: [{ source: "spell", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               id: "witch-bolt-initial-damage",
@@ -3643,7 +3671,7 @@ export const spellsLevel1 = [
                 actionId: "action-witch-bolt-channel",
                 duration: { unit: "minute", value: 1, isConcentration: true },
                 parameters: {
-                  activation: { type: "bonusAction" },
+                  activation: { type: "bonus" },
                   outcomes: [
                     {
                       id: "witch-bolt-recurring-damage",
@@ -3694,12 +3722,16 @@ export const spellsLevel1 = [
         actionId: "action-cast-spell",
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
             triggers: {
               events: [
                 {
                   type: "madeAttackRoll",
-                  attackType: { source: "weapon", range: "melee" },
+                  attackType: {
+                    source: "weapon",
+                    range: "melee",
+                    handsInUse: "one",
+                  },
                 },
               ],
             },

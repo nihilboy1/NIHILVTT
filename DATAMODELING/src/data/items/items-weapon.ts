@@ -1,4 +1,4 @@
-import { Item } from "../../domain/item/items.schema";
+import { Item } from "../../domain/item/item.schema";
 
 export const itemsWeapon = [
   {
@@ -16,8 +16,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Machado de Batalha",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["versatile"],
         mastery: ["topple"],
         damageFormulas: {
@@ -50,8 +50,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Clava",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["light"],
         mastery: ["slow"],
         damageFormulas: {
@@ -79,8 +79,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Adaga",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["light", "thrown"],
         mastery: ["nick"],
         damageFormulas: {
@@ -108,8 +108,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Dardo",
-        weaponCategory: "simple",
-        weaponType: "ranged",
+        weaponType: "simple",
+        weaponRange: "ranged",
         properties: ["finesse", "thrown"],
         mastery: ["vex"],
         damageFormulas: {
@@ -138,8 +138,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Mangual",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         mastery: ["sap"],
         damageFormulas: {
           primary: {
@@ -166,8 +166,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Glaive",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["heavy", "reach", "twoHanded"],
         mastery: ["graze"],
         damageFormulas: {
@@ -195,8 +195,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Machado Grande",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["heavy", "twoHanded"],
         mastery: ["cleave"],
         damageFormulas: {
@@ -224,8 +224,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Clava Grande",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["twoHanded"],
         mastery: ["push"],
         damageFormulas: {
@@ -253,8 +253,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Espada Grande",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["heavy", "twoHanded"],
         mastery: ["graze"],
         damageFormulas: {
@@ -282,8 +282,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Alabarda",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["heavy", "reach", "twoHanded"],
         mastery: ["cleave"],
         damageFormulas: {
@@ -311,8 +311,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Besta de Mão",
-        weaponCategory: "martial",
-        weaponType: "ranged",
+        weaponType: "martial",
+        weaponRange: "ranged",
         properties: ["ammunition", "light", "loading"],
         mastery: ["vex"],
         range: { normal: 30, long: 120, unit: "ft" },
@@ -341,8 +341,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Machadinha",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["light", "thrown"],
         mastery: ["vex"],
         range: { normal: 20, long: 60, unit: "ft" },
@@ -371,8 +371,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Besta Pesada",
-        weaponCategory: "martial",
-        weaponType: "ranged",
+        weaponType: "martial",
+        weaponRange: "ranged",
         properties: ["ammunition", "heavy", "loading", "twoHanded"],
         mastery: ["push"],
         range: { normal: 100, long: 400, unit: "ft" },
@@ -401,8 +401,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Azagaia",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["thrown"],
         mastery: ["slow"],
         range: { normal: 30, long: 120, unit: "ft" },
@@ -431,8 +431,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Besta Leve",
-        weaponCategory: "simple",
-        weaponType: "ranged",
+        weaponType: "simple",
+        weaponRange: "ranged",
         properties: ["ammunition", "loading", "twoHanded"],
         mastery: ["slow"],
         range: { normal: 80, long: 320, unit: "ft" },
@@ -460,8 +460,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Martelo Leve",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["light", "thrown"],
         mastery: ["nick"],
         range: { normal: 20, long: 60, unit: "ft" },
@@ -490,8 +490,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Arco Longo",
-        weaponCategory: "martial",
-        weaponType: "ranged",
+        weaponType: "martial",
+        weaponRange: "ranged",
         properties: ["ammunition", "heavy", "twoHanded"],
         mastery: ["slow"],
         range: { normal: 150, long: 600, unit: "ft" },
@@ -520,8 +520,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Espada Longa",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["versatile"],
         mastery: ["sap"],
         damageFormulas: {
@@ -554,8 +554,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Maça",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         mastery: ["sap"],
         damageFormulas: {
           primary: {
@@ -582,8 +582,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Malho",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["heavy", "twoHanded"],
         mastery: ["topple"],
         damageFormulas: {
@@ -611,8 +611,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Estrela-d'alva",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         mastery: ["sap"],
         damageFormulas: {
           primary: {
@@ -639,8 +639,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Mosquete",
-        weaponCategory: "martial",
-        weaponType: "ranged",
+        weaponType: "martial",
+        weaponRange: "ranged",
         properties: ["ammunition", "loading", "twoHanded"],
         mastery: ["slow"],
         range: { normal: 40, long: 120, unit: "ft" },
@@ -669,8 +669,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Pique",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["heavy", "reach", "twoHanded"],
         mastery: ["push"],
         damageFormulas: {
@@ -698,8 +698,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Pistola",
-        weaponCategory: "martial",
-        weaponType: "ranged",
+        weaponType: "martial",
+        weaponRange: "ranged",
         properties: ["ammunition", "loading"],
         mastery: ["vex"],
         range: { normal: 30, long: 90, unit: "ft" },
@@ -728,8 +728,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Bordão",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["versatile"],
         mastery: ["topple"],
         damageFormulas: {
@@ -762,8 +762,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Rapieira",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["finesse"],
         mastery: ["vex"],
         damageFormulas: {
@@ -790,8 +790,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Cimitarra",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["finesse", "light"],
         mastery: ["nick"],
         damageFormulas: {
@@ -819,8 +819,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Arco Curto",
-        weaponCategory: "simple",
-        weaponType: "ranged",
+        weaponType: "simple",
+        weaponRange: "ranged",
         properties: ["ammunition", "twoHanded"],
         mastery: ["vex"],
         range: { normal: 80, long: 320, unit: "ft" },
@@ -849,8 +849,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Espada Curta",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["finesse", "light"],
         mastery: ["vex"],
         damageFormulas: {
@@ -878,8 +878,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Foice Curta",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["light"],
         mastery: ["nick"],
         damageFormulas: {
@@ -907,8 +907,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Funda",
-        weaponCategory: "simple",
-        weaponType: "ranged",
+        weaponType: "simple",
+        weaponRange: "ranged",
         properties: ["ammunition"],
         mastery: ["slow"],
         range: { normal: 30, long: 120, unit: "ft" },
@@ -937,8 +937,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Lança",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         properties: ["thrown", "versatile"],
         mastery: ["sap"],
         range: { normal: 20, long: 60, unit: "ft" },
@@ -972,8 +972,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Tridente",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["thrown", "versatile"],
         mastery: ["topple"],
         range: { normal: 20, long: 60, unit: "ft" },
@@ -1007,8 +1007,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Picareta de Guerra",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["versatile"],
         mastery: ["sap"],
         damageFormulas: {
@@ -1036,8 +1036,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Martelo de Guerra",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["versatile"],
         mastery: ["push"],
         damageFormulas: {
@@ -1070,8 +1070,8 @@ export const itemsWeapon = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Chicote",
-        weaponCategory: "martial",
-        weaponType: "melee",
+        weaponType: "martial",
+        weaponRange: "melee",
         properties: ["finesse", "reach"],
         mastery: ["slow"],
         damageFormulas: {
@@ -1085,5 +1085,3 @@ export const itemsWeapon = [
     ],
   },
 ] as const satisfies Item[];
-
-

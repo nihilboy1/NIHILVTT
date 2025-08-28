@@ -1,4 +1,4 @@
-import { Item } from "../../domain/item/items.schema";
+import { Item } from "../../domain/item/item.schema";
 import z from "zod";
 
 export const itemsGear = [
@@ -20,7 +20,7 @@ export const itemsGear = [
         actionId: "action-throw-item",
         parameters: {
           range: { normal: 20, unit: "ft" },
-          attackType: [{ source: "item", range: "ranged" }],
+          attackType: [{ source: "item", range: "ranged", handsInUse: "one" }],
           outcomes: [
             {
               on: "hit",
@@ -54,7 +54,7 @@ export const itemsGear = [
         name: "Arremessar Fogo Alquímico",
         actionId: "action-throw-item",
         parameters: {
-          attackType: [{ source: "item", range: "ranged" }],
+          attackType: [{ source: "item", range: "ranged", handsInUse: "one" }],
           range: { normal: 20, unit: "ft" },
           save: { ability: "dexterity", dc: { type: "fixed", value: 10 } },
           outcomes: [
@@ -99,7 +99,7 @@ export const itemsGear = [
         actionId: "action-consume-item",
         parameters: {
           activation: {
-            type: "bonusAction",
+            type: "bonus",
           },
           outcomes: [
             {
@@ -486,7 +486,7 @@ export const itemsGear = [
         name: "Arremessar Água Benta",
         actionId: "action-throw-item",
         parameters: {
-          attackType: [{ source: "item", range: "ranged" }],
+          attackType: [{ source: "item", range: "ranged", handsInUse: "one" }],
           range: { normal: 20, unit: "ft" },
           target: {
             type: "creature",
@@ -808,8 +808,8 @@ export const itemsGear = [
       {
         type: "onWield_grantWeaponAttack",
         name: "Ataque com Tocha",
-        weaponCategory: "simple",
-        weaponType: "melee",
+        weaponType: "simple",
+        weaponRange: "melee",
         mastery: [],
         properties: ["light"],
         damageFormulas: {

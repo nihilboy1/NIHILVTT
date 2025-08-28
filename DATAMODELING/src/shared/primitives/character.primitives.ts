@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const AncestryIdEnum = z.enum([
+export const AncestryNameEnum = z.enum([
   "human",
   "elf",
   "dwarf",
@@ -12,6 +12,10 @@ export const AncestryIdEnum = z.enum([
   "goliath",
   "orc",
 ]);
+
+
+
+export const ClassesIdEnum = z.enum(["paladin", "rogue", "wizard", "fighter", "barbarian", "monk", "cleric", "druid", "ranger", "sorcerer", "warlock", "bard"]);
 
 export const LanguageEnum = z.enum([
   "common",
@@ -189,5 +193,7 @@ export const VisionTypeEnum = z.enum([
   "tremorsense",
   "truesight",
 ]);
+
+export const FeatCategoryEnum = z.enum(["general", "fightingStyle", "origin", "epicBoon"]);
 
 export const DispositionEnum = z.enum(["friendly", "neutral", "hostile"]);

@@ -19,9 +19,9 @@ export const ItemTypeEnum = z.enum(["gear", "tool", "weapon", "armor"]);
 
 export const ArmorTypeEnum = z.enum(["light", "medium", "heavy", "shield"]);
 
-export const WeaponTypeEnum = z.enum(["melee", "ranged"]);
+export const WeaponRangeEnum = z.enum(["melee", "ranged"]);
+export const WeaponTypeEnum = z.enum(["simple", "martial"]);
 
-export const WeaponCategoryEnum = z.enum(["simple", "martial"]);
 
 export const WeaponPropertyEnum = z.enum([
   "versatile",

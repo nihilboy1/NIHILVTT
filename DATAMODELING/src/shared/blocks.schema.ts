@@ -3,24 +3,13 @@ import {
   DistanceUnitEnum,
   DurationUnitEnum,
 } from "./primitives/world.primitives.js";
+import { AbilityScoreEnum } from "./primitives/character.primitives.js";
 import {
-  AbilityScoreEnum,
-  AncestryIdEnum,
-  SkillEnum,
-} from "./primitives/character.primitives.js";
-import {
-  AttackSourceEnum,
-  CoverEnum,
   DamageTypeEnum,
   RechargeEventEnum,
   RollModeEnum,
 } from "./primitives/combat.primitives.js";
-import {
-  ConditionStatusEnum,
-  CreatureSizeEnum,
-  CreatureTypeEnum,
-} from "./primitives/system.primitives.js";
-import { SpellIdEnum, WeaponIdEnum } from "./data-based-enums.js";
+import { GameEventSchema } from "./game-events.schema.js";
 
 interface ConditionalHPFormulaType {
   type: "conditional";
@@ -28,52 +17,26 @@ interface ConditionalHPFormulaType {
   ifTrue: HPFormulaType;
   ifFalse?: HPFormulaType;
 }
+
 type HPFormulaType =
   | z.infer<typeof HealingFormulaSchema>
   | z.infer<typeof DamageFormulaSchema>
   | ConditionalHPFormulaType
   | z.infer<typeof HalfDamageFormulaSchema>;
 
-export const DcSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("fixed"),
-    value: z.number().int(),
-    attributes: z
-      .array(
-        AbilityScoreEnum.or(z.literal("proficiency")).or(
-          z.literal("spellcasting"),
-        ),
-      )
-      .optional(),
-  }),
-  z.object({
-    type: z.literal("calculated"),
-    base: z.number().int(),
-    attributes: z.array(
-      AbilityScoreEnum.or(z.literal("proficiency")).or(
-        z.literal("spellcasting"),
-      ),
-    ),
-  }),
-]);
 
 export const BaseRollModifierSchema = z.object({
   type: z.literal("rollModifier"),
   mode: RollModeEnum,
 });
 
-export const SavingThrowSchema = z.object({
-  ability: AbilityScoreEnum,
-  dc: DcSchema,
-  ignoreCovers: z.array(CoverEnum).optional(),
-});
+
 
 export const DurationSchema = z.object({
   unit: DurationUnitEnum,
   value: z.number().int().optional(),
   isConcentration: z.boolean().default(false).optional(),
 });
-
 export const DiceRollSchema = z.object({
   count: z.number().int().min(1, "A quantidade de dados deve ser no mínimo 1."),
   faces: z
@@ -87,342 +50,22 @@ export const DiceRollSchema = z.object({
     .optional(),
 });
 
-export const AttackTypeSchema = z.object({
-  range: z.enum(["melee", "ranged"]),
-  source: AttackSourceEnum,
-});
-
-export const RangeSchema = z.object({
-  normal: z.number().int().optional(),
-  long: z.number().int().optional(),
-  unit: DistanceUnitEnum.default("ft"),
-});
-
-export const TargetSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("self") }),
-  z.object({
-    type: z.literal("selfArea"),
-    selective: z.boolean().default(false).optional(),
-    excludeSelf: z.boolean().default(false).optional(),
-  }),
-  z.object({
-    type: z.literal("creature"),
-    quantity: z.number().int().default(1),
-    creatureTypes: z.array(CreatureTypeEnum).optional(),
-  }),
-  z.object({
-    type: z.literal("object"),
-    quantity: z.number().int().default(1),
-  }),
-  z.object({
-    type: z.literal("weapon"),
-    quantity: z.number().int().default(1),
-    properties: z.array(DamageTypeEnum).optional(),
-  }),
-  z.object({ type: z.literal("point") }),
-  z.object({
-    type: z.literal("descriptive"),
-    details: z.string(),
-  }),
-]);
-
-const EventConditionSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("hasAttribute"),
-    attribute: AbilityScoreEnum,
-    value: z.number().int().min(0),
-    comparison: z
-      .enum([
-        "equal",
-        "greaterThan",
-        "lessThan",
-        "greaterOrEqual",
-        "lessOrEqual",
-      ])
-      .default("greaterOrEqual"),
-  }),
-  z.object({
-    type: z.literal("dicePatternRolled"),
-    diceType: z.number().int().positive(),
-    rollCount: z.number().int().min(2),
-    condition: z.enum(["anyDoubles", "anyTriples", "allDifferent"]),
-    minRepeats: z.number().int().min(2).optional(),
-  }),
-  z.object({
-    type: z.literal("hasAllyNearby"),
-    allyIsNotIncapacitated: z.boolean().default(true),
-    range: RangeSchema,
-  }),
-  z.object({
-    type: z.literal("isOfAncestry"),
-    ancestry: AncestryIdEnum,
-  }),
-  z.object({
-    type: z.literal("hasLevel"),
-    value: z.number().int().min(1),
-    comparison: z
-      .enum([
-        "equal",
-        "greaterThan",
-        "lessThan",
-        "greaterOrEqual",
-        "lessOrEqual",
-      ])
-      .default("greaterOrEqual"),
-  }),
-
-  z.object({
-    type: z.literal("isAttuned"),
-    itemId: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("hasEquippedItem"),
-    itemIds: WeaponIdEnum.array().nonempty(),
-  }),
-  z.object({
-    type: z.literal("isProficientWith"),
-    other: z.enum(["equippedWeapon"]).optional(),
-    skill: SkillEnum.optional(),
-    specificItems: WeaponIdEnum.array().optional(),
-  }),
-  z.object({
-    type: z.literal("droppedItem"),
-    itemId: z.string().optional(),
-  }),
-
-  z.object({
-    type: z.literal("madeAttackRoll"),
-    attackType: AttackTypeSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("attackHit"),
-    attackType: AttackTypeSchema.optional(),
-    weaponIds: WeaponIdEnum.array().optional(),
-  }),
-  z.object({
-    type: z.literal("attackMissed"),
-    attackType: AttackTypeSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("wasAttacked"),
-    attackType: AttackTypeSchema.optional(),
-    byVisibleCreature: z.boolean().default(true),
-    maxDistance: RangeSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("dealtDamage"),
-    damageTypes: DamageTypeEnum.array().optional(),
-    minDamage: z.number().int().optional(),
-  }),
-  z.object({
-    type: z.literal("tookDamage"),
-    damageTypes: DamageTypeEnum.array().optional(),
-    attackType: AttackTypeSchema.array().optional(),
-    from: z.enum(["caster", "casterAllies"]).array().optional(),
-    minDamage: z.number().int().optional(),
-  }),
-  z.object({
-    type: z.literal("allyDamagedTarget"),
-    allyDistance: RangeSchema.optional(),
-    minDamage: z.number().int().optional(),
-  }),
-  z.object({
-    type: z.literal("allyWasHit"),
-    allyDistance: RangeSchema.optional(),
-  }),
-
-  z.object({
-    type: z.literal("onTurnStart"),
-  }),
-  z.object({
-    type: z.literal("onTurnEnd"),
-  }),
-  z.object({
-    type: z.literal("startedTurnInArea"),
-    areaId: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("endedTurnInArea"),
-    areaId: z.string().optional(),
-  }),
-
-  z.object({
-    type: z.literal("enteredArea"),
-    areaId: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("leftArea"),
-    areaId: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("movedInArea"),
-    areaId: z.string().optional(),
-    minDistance: RangeSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("movesAtLeast"),
-    distance: RangeSchema,
-  }),
-  z.object({
-    type: z.literal("approachedTarget"),
-    target: TargetSchema,
-    threshold: RangeSchema,
-  }),
-  z.object({
-    type: z.literal("targetEnteredReach"),
-    distance: RangeSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("isFarFromCaster"),
-    distance: RangeSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("targetLeftReach"),
-    distance: RangeSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("userIsFarFromTarget"),
-    distance: RangeSchema.optional(),
-  }),
-
-  z.object({
-    type: z.literal("hasZeroHP"),
-  }),
-  z.object({
-    type: z.literal("hasFallen"),
-    affectedTarget: TargetSchema.array(),
-    maxDistance: RangeSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("isWounded"),
-    hpThreshold: z.number().int().optional(),
-    thresholdType: z
-      .enum(["absolute", "percentage"])
-      .default("absolute")
-      .optional(),
-  }),
-  z.object({
-    type: z.literal("hasCondition"),
-    condition: ConditionStatusEnum,
-    is: z.boolean().default(true),
-  }),
-  z.object({
-    type: z.literal("gainedCondition"),
-    condition: ConditionStatusEnum,
-  }),
-  z.object({
-    type: z.literal("lostCondition"),
-    condition: ConditionStatusEnum,
-  }),
-  z.object({
-    type: z.literal("tempHPDepleted"),
-  }),
-  z.object({
-    type: z.literal("wasHitByStrongWind"),
-  }),
-  z.object({
-    type: z.literal("wasHealed"),
-    minAmount: z.number().int().optional(),
-  }),
-  z.object({
-    type: z.literal("hasHPBelowThreshold"),
-    threshold: z.number().int(),
-    thresholdType: z.enum(["absolute", "percentage"]).default("absolute"),
-  }),
-  z.object({
-    type: z.literal("madeSavingThrow"),
-    ability: AbilityScoreEnum.optional(),
-    success: z.boolean().optional(),
-    dc: DcSchema.optional(),
-  }),
-  z.object({
-    type: z.literal("wasAffectedBySpell"),
-    spellId: SpellIdEnum,
-    withinLast: z
-      .object({
-        value: z.number().positive(),
-        unit: DurationUnitEnum,
-      })
-      .optional(),
-  }),
-
-  z.object({
-    type: z.literal("castSpellAgain"),
-    spellId: SpellIdEnum.optional(),
-  }),
-  z.object({
-    type: z.literal("castOnNonTargetEnemy"),
-  }),
-  z.object({
-    type: z.literal("attackedOtherTarget"),
-    targetId: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("hostile"),
-    who: z.enum(["user", "userAllies", "enemy", "any"]).array(),
-    is: z.boolean().default(true),
-  }),
-  z.object({
-    type: z.literal("lostConcentration"),
-    spellId: SpellIdEnum.optional(),
-  }),
-
-  z.object({
-    type: z.literal("died"),
-    characterId: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("rolledDice"),
-    diceType: z.number().int().positive(),
-    result: z.number().int().optional(),
-    comparator: z
-      .enum([
-        "equal",
-        "greaterThan",
-        "lessThan",
-        "greaterOrEqual",
-        "lessOrEqual",
-      ])
-      .optional(),
-  }),
-
-  z.object({
-    type: z.literal("isObject"),
-    isFlammable: z.boolean().optional(),
-    isWorn: z.boolean().optional(),
-    isCarried: z.boolean().optional(),
-  }),
-  z.object({
-    type: z.literal("isCreatureOfType"),
-    creatureTypes: CreatureTypeEnum.array().nonempty(),
-  }),
-  z.object({
-    type: z.literal("isCreatureOfSize"),
-    creatureSizes: CreatureSizeEnum.array().nonempty(),
-  }),
-]);
-
-export const GameEventSchema = z.object({
-  events: z.array(EventConditionSchema).optional(),
-  conditionMode: z.enum(["any", "all"]).default("all").optional(),
-});
-
 export const RechargeSchema = z.discriminatedUnion("type", [
   z.object({
-    type: z.literal("dice"), // p/ "Recharge 6" ou "Recharge 5-6"
-    roll: DiceRollSchema, // ex: "1d6"
-    successOn: z.array(z.number()), // ex: [6] ou [5,6]
+    type: z.literal("dice"),
+    roll: DiceRollSchema,
+    successOn: z.array(z.number()),
     triggers: GameEventSchema,
     max: z.number().int().min(1),
   }),
   z.object({
-    type: z.literal("rest"), // p/ varinhas, bastões, etc.
-    rest: RechargeEventEnum, // "longRest" | "shortRest"
+    type: z.literal("rest"),
+    rest: RechargeEventEnum,
     amount: z.union([z.number(), DiceRollSchema]).optional(),
     max: z.number().int().min(1),
   }),
   z.object({
-    type: z.literal("time"), // recarrega após X tempo
+    type: z.literal("time"),
     duration: DurationSchema,
     max: z.number().int().min(1),
   }),
@@ -511,12 +154,6 @@ export const AcSchema = z.discriminatedUnion("calculation", [
 
 const SelectionModeEnum = z.enum(["choice", "all"]);
 
-export const RequirementSchema = z.object({
-  user: GameEventSchema.optional(),
-  target: GameEventSchema.optional(),
-  allTargetsInArea: GameEventSchema.optional(),
-  environment: z.array(z.any()).optional(),
-});
 
 export const AreaSchema = z.discriminatedUnion("shape", [
   z.object({

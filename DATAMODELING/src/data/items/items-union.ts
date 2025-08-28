@@ -1,4 +1,4 @@
-import type { Item } from "../../domain/item/items.schema";
+import type { Item } from "../../domain/item/item.schema";
 import { itemsArmor } from "./items-armor";
 import { itemsGear } from "./items-gear";
 import { itemsTool } from "./items-tool";

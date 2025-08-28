@@ -48,55 +48,50 @@
   --color-feedback-negative-hover: #e04444; /* Vermelho mais escuro para hover */
 }
 
-.iceberg-regular { // para títulos
+.iceberg-regular { 
   font-family: "Iceberg", sans-serif;
   font-weight: 400;
   font-style: normal;
 }
 
-.work-sans-base { // para texto comum
+.work-sans-base { 
   font-family: "Work Sans", sans-serif;
   font-optical-sizing: auto;
-  font-weight: normal; /* Assuming a default weight if not specified */
+  font-weight: normal;
   font-style: normal;
 }
 
 @layer utilities {
-  /* Usado para esconder as setas de inputs do tipo number em alguns navegadores */
   .hide-arrows::-webkit-outer-spin-button,
   .hide-arrows::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
 
-  /* Para Firefox */
   .hide-arrows[type="number"] {
     -moz-appearance: textfield;
   }
 
   .hide-scrollbar {
-    /* Para Webkit (Chrome, Safari, Edge) */
     &::-webkit-scrollbar {
       display: none;
     }
 
-    /* Para Firefox */
-    scrollbar-width: none; /* Oculta a scrollbar */
+    scrollbar-width: none; 
   }
 }
 
-/* Estilos para as alças de redimensionamento do modal */
 .resize-handle {
   position: absolute;
   background: transparent;
-  z-index: 1; /* Acima do conteúdo, mas abaixo do header */
+  z-index: 1; 
 }
 
 .resize-s {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 0.5rem; /* Converted from 8px */
+  height: 0.5rem; 
   cursor: ns-resize;
 }
 
@@ -104,7 +99,7 @@
   top: 0;
   bottom: 0;
   right: 0;
-  width: 0.5rem; /* Converted from 8px */
+  width: 0.5rem; 
   cursor: ew-resize;
 }
 
@@ -112,7 +107,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 0.5rem; /* Converted from 8px */
+  height: 0.5rem; 
   cursor: ns-resize;
 }
 
@@ -120,40 +115,38 @@
   top: 0;
   bottom: 0;
   left: 0;
-  width: 0.5rem; /* Converted from 8px */
+  width: 0.5rem; 
   cursor: ew-resize;
 }
 
 .resize-se {
   bottom: 0;
   right: 0;
-  width: 1rem; /* Converted from 16px */
-  height: 1rem; /* Converted from 16px */
+  width: 1rem; 
+  height: 1rem; 
   cursor: se-resize;
 }
 
 .resize-sw {
   bottom: 0;
   left: 0;
-  width: 1rem; /* Converted from 16px */
-  height: 1rem; /* Converted from 16px */
+  width: 1rem; 
+  height: 1rem; 
   cursor: sw-resize;
 }
 
 .resize-ne {
   top: 0;
   right: 0;
-  width: 1rem; /* Converted from 16px */
-  height: 1rem; /* Converted from 16px */
+  width: 1rem; 
+  height: 1rem; 
   cursor: ne-resize;
 }
 
 .resize-nw {
   top: 0;
   left: 0;
-  width: 1rem; /* Converted from 16px */
-  height: 1rem; /* Converted from 16px */
+  width: 1rem; 
+  height: 1rem;
   cursor: nw-resize;
 }
-
-/* Classe para esconder a scrollbar */

@@ -82,6 +82,7 @@ export const ActionIdEnum = z.enum([
 
 export const SpellIdEnum = z.enum([
   'spell-aid',
+  "spell-misty-step",
   'spell-alarme',
   'spell-amizade-animal',
   'spell-armor-of-agathys',

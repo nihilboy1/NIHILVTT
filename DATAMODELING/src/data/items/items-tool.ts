@@ -1,4 +1,4 @@
-import { Item } from "../../domain/item/items.schema";
+import { Item } from "../../domain/item/item.schema";
 import z from "zod";
 
 export const itemsTool = [

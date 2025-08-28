@@ -2,15 +2,9 @@ import { z } from "zod";
 
 import {
   AreaSchema,
-  AttackTypeSchema,
-  DcSchema,
   DiceRollSchema,
-  GameEventSchema,
-  RangeSchema,
   RechargeSchema,
-  RequirementSchema,
   RollModifierSchema,
-  TargetSchema,
 } from "../../shared/blocks.schema.js";
 import {
   ActionOutcomesSchema,
@@ -24,6 +18,16 @@ import {
   ResourceCostIdEnum,
 } from "../../shared/primitives/combat.primitives.js";
 import { AbilityScoreEnum } from "../../shared/primitives/character.primitives.js";
+import {
+  AttackTypeSchema,
+  DcSchema,
+  RangeSchema,
+  TargetSchema,
+} from "../../shared/character-blocks.schema.js";
+import {
+  GameEventSchema,
+  RequirementSchema,
+} from "../../shared/game-events.schema.js";
 
 export const ActionParametersSchema = z.object({
   activation: z

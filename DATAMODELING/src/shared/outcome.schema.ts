@@ -1,12 +1,8 @@
 import { z } from "zod";
 import {
   AcSchema,
-  DcSchema,
   DurationSchema,
-  GameEventSchema,
   HPFormulaSchema,
-  RequirementSchema,
-  TargetSchema,
 } from "../shared/blocks.schema.js";
 import {
   ApplicableEffectSchema,
@@ -19,15 +15,19 @@ import {
 import {
   DamageTypeEnum,
   EffectOutcomeEnum,
+  HPTypesEnum,
   RollModeEnum,
 } from "./primitives/combat.primitives.js";
 import { AbilityScoreEnum } from "./primitives/character.primitives.js";
 import {
   ConditionStatusEnum,
   CreatureSizeEnum,
+  OperationsEnum,
   SystemStatusEnum,
 } from "./primitives/system.primitives.js";
 import { SummonedTokenIdEnum } from "./data-based-enums.js";
+import { GameEventSchema, RequirementSchema } from "./game-events.schema.js";
+import { DcSchema, TargetSchema } from "./character-blocks.schema.js";
 
 export const NoneOutcomeSchema = z.object({
   id: z.string().optional(),
@@ -41,7 +41,7 @@ export const ModifyTargetHPOutcomeSchema = z.object({
   on: EffectOutcomeEnum,
   formula: HPFormulaSchema,
   vitals: z
-    .array(z.enum(["maxHp", "currentHp", "tempHp"]))
+    .array(HPTypesEnum)
     .default(["currentHp"]),
   requirements: RequirementSchema.optional(),
 });
@@ -135,7 +135,7 @@ export const ModifyAttributeOutcomeSchema = z.object({
   on: EffectOutcomeEnum,
   attribute: z.enum(["speed"]),
   stacking: z.enum(["none", "intensity", "duration"]),
-  operation: z.enum(["add", "subtract"]),
+  operation: OperationsEnum,
   value: z.union([
     z.number().int().positive("O valor da modificação deve ser positivo."),
     z.literal("all"),

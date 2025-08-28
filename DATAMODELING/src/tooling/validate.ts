@@ -3,7 +3,7 @@ import chalk from "chalk";
 import { z } from "zod";
 
 import { FinalSpellDataSchema } from "../domain/spell/spell.schema.js";
-import { FinalItemDataSchema } from "../domain/item/items.schema.js";
+import { FinalItemDataSchema } from "../domain/item/item.schema.js";
 import { FinalMonsterDataSchema } from "../domain/monster/monster.schema.js";
 
 process.on("uncaughtException", (err) => {

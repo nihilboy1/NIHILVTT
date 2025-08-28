@@ -6,7 +6,7 @@ export const CoverEnum = z.enum(["half", "threeQuarters", "total"]);
 
 export const ActionTypeEnum = z.enum([
   "action",
-  "bonusAction",
+  "bonus",
   "reaction",
   "free",
   "special",
@@ -20,6 +20,8 @@ export const AttackSourceEnum = z.enum([
   "unarmed",
   "any",
 ]);
+
+export const HPTypesEnum = z.enum(["maxHp", "currentHp", "tempHp"]);
 
 export const DamageTypeEnum = z.enum([
   "slashing",
