@@ -1,6 +1,6 @@
 import { Feat } from "../../domain/feat/feat.schema.js";
 
-export const feats: Feat[] = [
+export const featsGeneral: Feat[] = [
   {
     id: "feat-ability-score-improvement",
     name: [
@@ -13,7 +13,7 @@ export const feats: Feat[] = [
       canBeRepeated: true,
     },
     description:
-      "Aumente um atributo em 2, ou dois atributos em 1. Você pode pegar este talento múltiplas vezes.",
+      "Aumente um de seus atributos em 2, ou dois atributos em 1. Você pode pegar este talento várias vezes.",
     effects: [
       {
         type: "passive_modifyAbilityScore",
@@ -53,6 +53,13 @@ export const feats: Feat[] = [
         name: "Melhoramento nos Pontos de Habilidade",
       },
     ],
+    traits: [
+      {
+        name: "Aumento de Atributo",
+        description:
+          "Aumente um de seus atributos em 2, ou dois atributos em 1.",
+      },
+    ],
   },
   {
     name: ["Ator", "Actor"],
@@ -62,7 +69,7 @@ export const feats: Feat[] = [
       canBeRepeated: false,
     },
     description:
-      "Você é um mestre da interpretação e pode imitar outras criaturas com facilidade.",
+      "Você é um mestre da atuação, capaz de imitar outras criaturas e se passar por outras pessoas com notável facilidade.",
     category: "general",
     requirements: {
       user: {
@@ -78,14 +85,18 @@ export const feats: Feat[] = [
     },
     traits: [
       {
+        name: "Aumento de Atributo",
+        description: "Aumente seu valor de Carisma em 1 ponto.",
+      },
+      {
         name: "Interpretação",
         description:
-          "Enquanto você está disfarçado como uma pessoa real ou fictícia, você tem Vantagem em testes de Carisma (Enganação ou Performance) para convencer os outros de que você é essa pessoa.",
+          "Você tem Vantagem em testes de Carisma (Enganação ou Atuação) feitos para se passar por outra pessoa.",
       },
       {
         name: "Mímico",
         description:
-          "Você pode imitar os sons de outras criaturas, incluindo a fala. Uma criatura que ouve a imitação deve ter sucesso em um teste de Sabedoria (Intuição) para determinar se o efeito é falso (CD 8) + seu modificador de Carisma + seu Bônus de Proficiência.",
+          "Você pode imitar os sons de criaturas ou a fala. Uma criatura que ouve a imitação precisa ser bem-sucedida em um teste de Sabedoria (Intuição) contra uma CD igual a 8 + seu modificador de Carisma + seu Bônus de Proficiência para perceber que a imitação é falsa.",
       },
     ],
     effects: [
@@ -112,7 +123,7 @@ export const feats: Feat[] = [
     source: "LDJ2024",
     category: "general",
     description:
-      "Você treinou para ser excepcionalmente forte e ágil, ganhando habilidades físicas aprimoradas.",
+      "Você treinou intensamente para ser um atleta excepcional, aprimorando sua força e agilidade.",
     repeatable: {
       canBeRepeated: false,
     },
@@ -147,19 +158,23 @@ export const feats: Feat[] = [
     },
     traits: [
       {
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
+      },
+      {
         name: "Velocidade de Escalada",
         description:
-          "Você ganha uma Velocidade de Escalada igual à sua Velocidade.",
+          "Você ganha uma Velocidade de Escalada igual à sua Velocidade de Caminhada.",
       },
       {
         name: "Levantar-se Rapidamente",
         description:
-          "Quando você tem a condição Caído, você pode se levantar com apenas 5 pés de movimento.",
+          "Quando você tem a condição Caído, você pode se levantar gastando apenas 5 pés de movimento.",
       },
       {
-        name: "Salto",
+        name: "Salto Aprimorado",
         description:
-          "Você pode fazer um Salto em Distância ou Altura correndo após se mover apenas 5 pés.",
+          "Você pode realizar um Salto em Distância ou Salto em Altura após se mover apenas 5 pés, em vez dos 10 pés normais.",
       },
     ],
     effects: [
@@ -184,7 +199,7 @@ export const feats: Feat[] = [
     id: "feat-charger",
     name: ["Investida", "Charger"],
     description:
-      "Você é especialista em avançar rapidamente e atacar com força após se mover.",
+      "Você é um especialista em investidas rápidas, atacando com força e aproveitando o impulso do seu movimento.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -238,14 +253,18 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Improved Dash",
-        description:
-          "Quando você realiza a ação de Dash, sua Velocidade aumenta em 10 pés durante essa ação.",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
       },
       {
-        name: "Charge Attack",
+        name: "Investida Aprimorada",
         description:
-          "Se você se mover pelo menos 10 pés em linha reta em direção a um alvo imediatamente antes de atingi-lo com um ataque corpo a corpo como parte da ação de Ataque, escolha um dos seguintes efeitos: ganhe um bônus de 1d8 na rolagem de dano do ataque ou empurre o alvo até 10 pés para longe de você se ele não for mais do que um tamanho maior que você. Você pode usar esse benefício apenas uma vez em cada um dos seus turnos.",
+          "Quando você usa a ação **Disparada**, seu deslocamento aumenta em 10 pés durante esse turno.",
+      },
+      {
+        name: "Ataque de Investida",
+        description:
+          "Se você se mover no mínimo 10 pés em linha reta em direção a um alvo e o acertar com um ataque corpo a corpo no mesmo turno, você pode escolher um dos seguintes efeitos: adicione um bônus de 1d8 à rolagem de dano do ataque ou empurre o alvo até 10 pés para longe de você. O alvo deve ser, no máximo, uma categoria de tamanho maior que a sua. Você só pode usar este benefício uma vez por turno.",
       },
     ],
   },
@@ -253,7 +272,7 @@ export const feats: Feat[] = [
     id: "feat-chef",
     name: ["Cozinheiro", "Chef"],
     description:
-      "Você é habilidoso em preparar refeições que restauram e fortalecem seus aliados.",
+      "Você é um mestre culinário, capaz de preparar refeições especiais que curam e fortalecem seus companheiros durante a aventura.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -283,19 +302,24 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Cook's Utensils",
+        name: "Aumento de Atributo",
         description:
-          "You gain proficiency with Cook's Utensils if you don't already have it.",
+          "Aumenta seu valor de Constituição ou Sabedoria em 1 ponto.",
       },
       {
-        name: "Replenishing Meal",
+        name: "Utensílios de Cozinha",
         description:
-          "As part of a Short Rest, you can cook special food if you have ingredients and Cook's Utensils on hand. You can prepare enough of this food for a number of creatures equal to 4 plus your Proficiency Bonus. At the end of the Short Rest, any creature who eats the food and spends one or more Hit Dice to regain Hit Points regains an extra {@dice 1d8} Hit Points.",
+          "Você ganha proficiência com utensílios de cozinha, caso ainda não a tenha.",
       },
       {
-        name: "Bolstering Treats",
+        name: "Refeição Restauradora",
         description:
-          "With 1 hour of work or when you finish a Long Rest, you can cook a number of treats equal to your Proficiency Bonus if you have ingredients and Cook's Utensils on hand. These special treats last 8 hours after being made. A creature can use a Bonus Action to eat one of those treats to gain a number of Temporary Hit Points equal to your Proficiency Bonus.",
+          "Durante um **Descanso Curto**, se tiver ingredientes e utensílios de cozinha, você pode preparar uma refeição especial para até **4 + seu Bônus de Proficiência** criaturas. Ao final do descanso, qualquer criatura que comer a refeição e gastar um ou mais Dados de Vida para recuperar pontos de vida, recupera um bônus de **1d8** pontos de vida.",
+      },
+      {
+        name: "Doces Fortificantes",
+        description:
+          "Com 1 hora de trabalho ou ao terminar um **Descanso Longo**, você pode cozinhar um número de doces igual ao seu Bônus de Proficiência. Esses doces duram 8 horas. Uma criatura pode usar uma **Ação Bônus** para comer um desses doces e ganhar pontos de vida temporários iguais ao seu Bônus de Proficiência.",
       },
     ],
   },
@@ -303,7 +327,7 @@ export const feats: Feat[] = [
     id: "feat-crossbow-expert",
     name: ["Especialista em Bestas", "Crossbow Expert"],
     description:
-      "Você é treinado no uso de bestas, podendo recarregá-las rapidamente e atacar à queima-roupa.",
+      "Você domina o uso de bestas, podendo recarregar e atirar em combate corpo a corpo com uma velocidade impressionante.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -338,19 +362,23 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Ignore Loading",
-        description:
-          "You ignore the Loading property of the Hand Crossbow, Heavy Crossbow, and Light Crossbow (all called crossbows elsewhere in this feat). If you're holding one of them, you can load a piece of ammunition into it even if you lack a free hand.",
+        name: "Aumento de Destreza",
+        description: "Aumenta seu valor de Destreza em 1 ponto.",
       },
       {
-        name: "Firing in Melee",
+        name: "Ignorar Recarga",
         description:
-          "Being within 5 feet of an enemy doesn't impose Disadvantage on your attack rolls with crossbows.",
+          "Você ignora a propriedade Recarga das bestas de mão, pesadas e leves. Se estiver segurando uma, você pode recarregar uma munição mesmo sem ter uma mão livre.",
       },
       {
-        name: "Dual Wielding",
+        name: "Disparar em Combate Corpo a Corpo",
         description:
-          "When you make the extra attack of the Light property, you can add your ability modifier to the damage of the extra attack if that attack is with a crossbow that has the Light property and you aren't already adding that modifier to the damage.",
+          "Estar a 5 pés de um inimigo não impõe Desvantagem em suas jogadas de ataque com bestas.",
+      },
+      {
+        name: "Empunhadura Dupla",
+        description:
+          "Quando você faz o ataque extra da propriedade Leve, você pode adicionar seu modificador de habilidade ao dano desse ataque extra se a arma for uma besta com a propriedade Leve e você ainda não tiver adicionado o modificador ao dano.",
       },
     ],
   },
@@ -358,7 +386,7 @@ export const feats: Feat[] = [
     id: "feat-crusher",
     name: ["Esmagador", "Crusher"],
     description:
-      "Você é especialista em ataques contundentes, empurrando inimigos e aproveitando acertos críticos.",
+      "Seus ataques de concussão são brutais, permitindo que você empurre inimigos e crie aberturas para seus aliados após um acerto crítico.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -395,6 +423,10 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Constituição em 1 ponto.",
+      },
+      {
         name: "Empurrar",
         description:
           "Uma vez por turno, quando você acerta uma criatura com um ataque que causa dano de Concussão, você pode movê-la 5 pés para um espaço desocupado se o alvo não for mais de um tamanho maior que você.",
@@ -402,7 +434,7 @@ export const feats: Feat[] = [
       {
         name: "Crítico Aprimorado",
         description:
-          "Quando você faz um Acerto Crítico que causa dano de Concussão a uma criatura, jogadas de ataque contra essa criatura têm Vantagem até o início do seu próximo turno.",
+          "Quando você consegue um acerto crítico que causa dano de Concussão a uma criatura, as jogadas de ataque contra essa criatura têm Vantagem até o início do seu próximo turno.",
       },
     ],
   },
@@ -410,7 +442,7 @@ export const feats: Feat[] = [
     id: "feat-defensive-duelist",
     name: ["Duelista Defensivo", "Defensive Duelist"],
     description:
-      "Você é hábil em se defender com armas de uma mão, desviando ataques com destreza.",
+      "Você domina a arte do duelo, utilizando uma arma leve para desviar ataques e defender-se com agilidade.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -445,9 +477,13 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
+        name: "Aumento de Destreza",
+        description: "Aumenta seu valor de Destreza em 1 ponto.",
+      },
+      {
         name: "Aparar",
         description:
-          "Se você estiver empunhando uma arma com a propriedade Acuidade e outra criatura acertar você com um ataque corpo a corpo, você pode usar uma Reação para adicionar seu Bônus de Proficiência à sua Classe de Armadura, potencialmente fazendo com que o ataque erre. Você ganha esse bônus à sua CA contra ataques corpo a corpo até o início do seu próximo turno.",
+          "Se você estiver empunhando uma arma com a propriedade Acuidade e for alvo de um ataque corpo a corpo, você pode usar sua **Reação** para adicionar seu Bônus de Proficiência à sua Classe de Armadura (CA) contra esse ataque. Isso pode fazer com que o ataque erre. O bônus dura até o início do seu próximo turno.",
       },
     ],
   },
@@ -455,7 +491,7 @@ export const feats: Feat[] = [
     id: "feat-dual-wielder",
     name: ["Ambidestro", "Dual Wielder"],
     description:
-      "Você pode lutar com uma arma em cada mão com mais eficiência do que a maioria.",
+      "Você é um combatente mortal com uma arma em cada mão, dominando a arte da empunhadura dupla.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -483,9 +519,13 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Empunhadura Dupla Aprimorada",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Destreza ou Força em 1 ponto.",
+      },
+      {
+        name: "Combate com Duas Armas Aprimorado",
         description:
-          "Quando você usa a ação de Ataque no seu turno e ataca com uma arma que tem a propriedade Leve, você pode fazer um ataque extra como uma Ação Bônus mais tarde no mesmo turno com uma arma diferente, que deve ser uma arma Corpo a Corpo que não tenha a propriedade de Duas Mãos. Você não adiciona seu modificador de habilidade ao dano do ataque extra, a menos que esse modificador seja negativo.",
+          "Quando você usa a ação **Ataque** e ataca com uma arma com a propriedade Leve, pode usar sua **Ação Bônus** para fazer um ataque extra com uma arma diferente que não tenha a propriedade de Duas Mãos. Você adiciona seu modificador de habilidade ao dano, a menos que ele seja negativo.",
       },
       {
         name: "Saque Rápido",
@@ -498,7 +538,7 @@ export const feats: Feat[] = [
     id: "feat-durable",
     name: ["Durável", "Durable"],
     description:
-      "Você é notavelmente resistente, recuperando-se rapidamente de ferimentos.",
+      "Sua resistência física é notável, permitindo que você se recupere rapidamente de ferimentos graves.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -528,6 +568,10 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Constituição em 1 ponto.",
+      },
+      {
         name: "Desafiar a Morte",
         description:
           "Você tem Vantagem em Testes de Resistência contra a Morte.",
@@ -535,7 +579,7 @@ export const feats: Feat[] = [
       {
         name: "Recuperação Rápida",
         description:
-          "Como uma Ação Bônus, você pode gastar um dos seus Dados de Vida, rolar o dado e recuperar um número de Pontos de Vida igual ao resultado.",
+          "Como uma **Ação Bônus**, você pode gastar um de seus Dados de Vida, rolar o dado e recuperar um número de Pontos de Vida igual ao resultado.",
       },
     ],
   },
@@ -543,7 +587,7 @@ export const feats: Feat[] = [
     id: "feat-elemental-adept",
     name: ["Adepto Elemental", "Elemental Adept"],
     description:
-      "Você ignora resistência a um tipo de dano elemental e melhora o dano de magias desse tipo.",
+      "Sua conexão com a magia de um elemento específico é tão forte que suas magias ignoram a resistência do alvo e causam um dano ainda maior.",
     source: "LDJ2024",
     category: "general",
     requirements: {
@@ -576,14 +620,19 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Maestria Elemental",
+        name: "Aumento de Atributo",
         description:
-          "Escolha um dos seguintes tipos de dano: Ácido, Frio, Fogo, Elétrico ou Trovão. As magias que você conjura ignoram a Resistência ao dano do tipo escolhido. Além disso, quando você rolar dano para uma magia que conjura e que causa dano desse tipo, você pode tratar qualquer resultado 1 em um dado de dano como 2.",
+          "Aumenta seu valor de Inteligência, Sabedoria ou Carisma em 1 ponto.",
       },
       {
-        name: "Repetível",
+        name: "Maestria Elemental",
         description:
-          "Você pode escolher este talento mais de uma vez, mas deve escolher um tipo de dano diferente para Maestria Elemental a cada vez.",
+          "Escolha um tipo de dano (Ácido, Frio, Fogo, Elétrico ou Trovão). Suas magias de dano desse tipo ignoram resistência a esse dano. Além disso, sempre que você rolar um '1' em um dado de dano para uma magia desse tipo, pode tratá-lo como um '2'.",
+      },
+      {
+        name: "Foco Expandido",
+        description:
+          "Você pode escolher este talento mais de uma vez, mas deve selecionar um tipo de dano diferente para a Maestria Elemental a cada vez.",
       },
     ],
   },
@@ -591,7 +640,7 @@ export const feats: Feat[] = [
     id: "feat-fey-touched",
     name: ["Tocado pela Fey", "Fey-Touched"],
     description:
-      "Sua exposição à magia do Plano Feérico concede a você os seguintes benefícios: Magia Feérica - Escolha uma magia de nível 1 da escola de Adivinhação ou Encantamento. Você sempre tem essa magia e a magia Passo Nebuloso preparadas. Você pode conjurar cada uma dessas magias sem gastar um espaço de magia. Uma vez que você conjure qualquer uma dessas magias dessa maneira, você não pode conjurá-la novamente até completar um descanso longo. Você também pode conjurar essas magias usando espaços de magia que você tenha do nível apropriado. A habilidade de conjuração das magias é a habilidade aumentada por este talento.",
+      "A exposição à magia do Plano Feérico deixou uma marca em você, concedendo a habilidade de conjurar magias etéreas.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -620,33 +669,50 @@ export const feats: Feat[] = [
         maxScore: 20,
       },
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         mode: "fixedSpells",
         spells: ["spell-misty-step"],
         canBeSwappedOn: "never",
         freeCasting: {
           amount: 1,
-          recharge: { max: 1, rest: "dawn", type: "rest" },
+          recharge: { maxCharges: 1, rechargeOn: "dawn", type: "event", recoveryAmount:1 },
         },
         name: "Magia Feérica",
         castingAbilityOptions: ["selectedByFeat"],
         description:
-          "Você ganha a magia Passo Nebuloso como uma magia conhecida.",
+          "Você aprende a magia Passo Nebuloso. Você pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia.",
       },
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         mode: "filter",
         filter: { school: ["divination", "enchantment"], level: 1 },
         amount: 1,
         freeCasting: {
           amount: 1,
-          recharge: { max: 1, rest: "dawn", type: "rest" },
+          recharge: { maxCharges: 1, rechargeOn: "dawn", type: "event", recoveryAmount: 1 },
         },
         canBeSwappedOn: "levelUp",
         description:
-          "Você ganha uma magia de nível 1 da escola de Adivinhação ou Encantamento como uma magia conhecida.",
-        name: "Magia Feérica",
+          "Você aprende uma magia de 1º nível à sua escolha das escolas de Adivinhação ou Encantamento. Você pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia.",
+        name: "Magia Bônus",
         castingAbilityOptions: ["selectedByFeat"],
+      },
+    ],
+    traits: [
+      {
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Inteligência, Sabedoria ou Carisma em 1 ponto.",
+      },
+      {
+        name: "Magia Feérica",
+        description:
+          "Você aprende a magia Passo Nebuloso e pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia.",
+      },
+      {
+        name: "Magia Bônus",
+        description:
+          "Você aprende uma magia de 1º nível à sua escolha das escolas de Adivinhação ou Encantamento. Você pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia.",
       },
     ],
   },
@@ -654,7 +720,7 @@ export const feats: Feat[] = [
     id: "feat-grappler",
     name: ["Agarrador", "Grappler"],
     description:
-      "Você é especialista em agarrar inimigos e mantê-los sob controle.",
+      "Você é um mestre em combate corpo a corpo, capaz de agarrar e imobilizar seus oponentes com facilidade.",
     source: "LDJ2024",
     category: "general",
     repeatable: { canBeRepeated: false },
@@ -680,19 +746,23 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
+      },
+      {
         name: "Golpear e Agarrar",
         description:
-          "Quando você acerta uma criatura com um Ataque Desarmado como parte da ação de Ataque em seu turno, você pode usar tanto a opção de Dano quanto a de Agarrar. Você pode usar esse benefício apenas uma vez por turno.",
+          "Quando você acerta uma criatura com um ataque desarmado na sua ação **Ataque**, você pode tentar agarrá-la como parte da mesma ação. Você só pode usar este benefício uma vez por turno.",
       },
       {
         name: "Vantagem no Ataque",
         description:
-          "Você tem Vantagem em jogadas de ataque contra uma criatura Agarrada por você.",
+          "Você tem Vantagem em jogadas de ataque contra uma criatura que você está agarrando.",
       },
       {
         name: "Lutador Ágil",
         description:
-          "Você não precisa gastar movimento extra para mover uma criatura Agarrada por você se a criatura for do seu tamanho ou menor.",
+          "Você não precisa gastar movimento extra para mover uma criatura que você está agarrando se a criatura for do seu tamanho ou menor.",
       },
     ],
   },
@@ -700,7 +770,7 @@ export const feats: Feat[] = [
     id: "feat-great-weapon-master",
     name: ["Mestre de Arma Pesada", "Great Weapon Master"],
     description:
-      "Você é especialista em causar grandes danos com armas pesadas, podendo atacar novamente ao abater ou critar.",
+      "Você domina o uso de armas pesadas de duas mãos, capaz de desferir golpes devastadores e encadear ataques ao derrotar seus inimigos ou conseguir um acerto crítico.",
     source: "LDJ2024",
     category: "general",
     repeatable: { canBeRepeated: false },
@@ -736,14 +806,18 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Heavy Weapon Mastery",
-        description:
-          "Quando você acerta uma criatura com uma arma que tem a propriedade Pesada como parte da ação de Ataque em seu turno, você pode fazer com que a arma cause dano extra ao alvo. O dano extra é igual ao seu Bônus de Proficiência.",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força em 1 ponto.",
       },
       {
-        name: "Golpe de Corte",
+        name: "Maestria com Arma Pesada",
         description:
-          "Imediatamente após você conseguir um Acerto Crítico com uma arma Corpo a Corpo ou reduzir uma criatura a 0 Pontos de Vida com uma, você pode fazer um ataque com a mesma arma como uma Ação Bônus.",
+          "Quando você atinge uma criatura com uma arma que tem a propriedade Pesada, o ataque causa um dano extra igual ao seu Bônus de Proficiência.",
+      },
+      {
+        name: "Ataque Furioso",
+        description:
+          "Após conseguir um acerto crítico com uma arma corpo a corpo ou reduzir uma criatura a 0 Pontos de Vida, você pode fazer um ataque extra com a mesma arma como uma **Ação Bônus**.",
       },
     ],
   },
@@ -751,7 +825,7 @@ export const feats: Feat[] = [
     id: "feat-heavily-armored",
     name: ["Pesadamente Armadurado", "Heavily Armored"],
     description:
-      "Você treinou para usar armaduras pesadas com eficiência, aumentando sua proteção.",
+      "Você treinou exaustivamente para usar armaduras pesadas, ganhando proficiência com elas e um bônus em um de seus atributos.",
     source: "LDJ2024",
     category: "general",
     repeatable: { canBeRepeated: false },
@@ -789,8 +863,12 @@ export const feats: Feat[] = [
 
     traits: [
       {
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Constituição em 1 ponto.",
+      },
+      {
         name: "Treinamento com Armadura",
-        description: "Você ganha treinamento com armaduras Pesadas.",
+        description: "Você ganha proficiência com armaduras Pesadas.",
       },
     ],
   },
@@ -798,7 +876,7 @@ export const feats: Feat[] = [
     id: "feat-heavy-armor-master",
     name: ["Mestre em Armadura Pesada", "Heavy Armor Master"],
     description:
-      "Você recebe menos dano de ataques físicos enquanto usa armadura pesada.",
+      "Sua armadura pesada é uma verdadeira fortaleza, absorvendo os impactos de ataques físicos e reduzindo o dano recebido.",
     source: "LDJ2024",
     category: "general",
     repeatable: { canBeRepeated: false },
@@ -826,9 +904,13 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Damage Reduction",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Constituição em 1 ponto.",
+      },
+      {
+        name: "Redução de Dano",
         description:
-          "When you're hit by an attack while you're wearing Heavy armor, any Bludgeoning, Piercing, and Slashing damage dealt to you by that attack is reduced by an amount equal to your Proficiency Bonus.",
+          "Quando você é atingido por um ataque enquanto veste armadura Pesada, o dano de Concussão, Perfurante e Cortante que você recebe é reduzido em um valor igual ao seu Bônus de Proficiência.",
       },
     ],
   },
@@ -836,7 +918,7 @@ export const feats: Feat[] = [
     id: "feat-inspiring-leader",
     name: ["Líder Inspirador", "Inspiring Leader"],
     description:
-      "Você pode inspirar seus aliados, concedendo pontos de vida temporários após um discurso.",
+      "Seu carisma e sua liderança são inspiradores, motivando seus aliados e concedendo-lhes pontos de vida temporários com um discurso encorajador.",
     source: "LDJ2024",
     category: "general",
     repeatable: { canBeRepeated: false },
@@ -886,16 +968,21 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Bolstering Performance",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Carisma ou Sabedoria em 1 ponto.",
+      },
+      {
+        name: "Performance de Encorajamento",
         description:
-          "When you finish a Short or Long Rest, you can give an inspiring performance: a speech, song, or dance. When you do so, choose up to six allies (which can include yourself) within 30 feet of yourself who witness the performance. The chosen creatures each gain Temporary Hit Points equal to your character level plus the modifier of the ability you increased with this feat.",
+          "Ao terminar um **Descanso Curto ou Longo**, você pode fazer uma apresentação inspiradora (discurso, canção ou dança). Escolha até 6 aliados (incluindo você) a até 30 pés de distância. Cada criatura escolhida ganha Pontos de Vida Temporários iguais ao seu nível de personagem mais o modificador do atributo que você aumentou com este talento.",
       },
     ],
   },
   {
     id: "feat-keen-mind",
     name: ["Mente Aguçada", "Keen Mind"],
-    description: "Você tem memória excepcional e senso de direção perfeito.",
+    description:
+      "Sua mente é afiada como uma lâmina, permitindo que você retenha informações e se localize com precisão.",
     source: "LDJ2024",
     category: "general",
     repeatable: { canBeRepeated: false },
@@ -918,8 +1005,18 @@ export const feats: Feat[] = [
     },
     traits: [
       {
-        name: "Estudo Rápido",
-        description: "Você pode realizar a ação Estudar como uma Ação Bônus.",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Inteligência em 1 ponto.",
+      },
+      {
+        name: "Conhecimento Histórico",
+        description:
+          "Você ganha proficiência em uma das seguintes habilidades: Arcana, História, Investigação, Natureza ou Religião. Se você não tiver proficiência na habilidade escolhida, você ganha proficiência nela, e se você já tiver proficiência nela, você ganha Especialização nela.",
+      },
+      {
+        name: "Estudo Aprimorado",
+        description:
+          "Você pode usar a ação de **Estudar** como uma **Ação Bônus**.",
       },
     ],
     effects: [
@@ -953,9 +1050,11 @@ export const feats: Feat[] = [
     id: "feat-lightly-armored",
     name: ["Levemente Armadurado", "Lightly Armored"],
     description:
-      "Você treinou para usar armaduras leves, aumentando sua defesa.",
+      "Você aprendeu a usar armaduras leves e escudos, aumentando sua capacidade de defesa de forma ágil.",
     source: "LDJ2024",
     category: "general",
+    repeatable: { canBeRepeated: false },
+
     requirements: {
       user: {
         events: [{ type: "hasLevel", value: 4, comparison: "greaterOrEqual" }],
@@ -978,17 +1077,20 @@ export const feats: Feat[] = [
         type: "passive_grantProficiency",
         on: "armorType",
         choose: {
-          from: ["light", "heavy"],
-          count: 1,
+          from: ["light", "shield"],
+          count: 2,
         },
-        name: "Treinamento com Armadura Pesada",
+        name: "Treinamento com Armadura Leve",
       },
     ],
-    repeatable: { canBeRepeated: false },
     traits: [
       {
-        name: "Armor Training",
-        description: "You gain training with Light armor and Shields.",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
+      },
+      {
+        name: "Treinamento com Armadura",
+        description: "Você ganha proficiência com armaduras Leves e Escudos.",
       },
     ],
   },
@@ -996,7 +1098,7 @@ export const feats: Feat[] = [
     id: "feat-mage-slayer",
     name: ["Matador de Magos", "Mage Slayer"],
     description:
-      "Você é eficaz em combater conjuradores, interrompendo magias e atacando à curta distância.",
+      "Você é um caçador de magos, capaz de romper a concentração de conjuradores, resistir a seus efeitos e atacá-los com ferocidade.",
     source: "LDJ2024",
     category: "general",
     repeatable: { canBeRepeated: false },
@@ -1021,14 +1123,18 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Concentration Breaker",
-        description:
-          "When you damage a creature that is {@status Concentration|XPHB|Concentrating}, it has Disadvantage on the saving throw it makes to maintain {@status Concentration|XPHB}.",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
       },
       {
-        name: "Guarded Mind",
+        name: "Quebrador de Concentração",
         description:
-          "If you fail an Intelligence, a Wisdom, or a Charisma saving throw, you can cause yourself to succeed instead. Once you use this benefit, you can't use it again until you finish a Short or Long Rest.",
+          "Quando você causa dano a uma criatura que está se concentrando em uma magia, ela faz com Desvantagem o teste de resistência para manter a concentração.",
+      },
+      {
+        name: "Mente Guardada",
+        description:
+          "Se você falhar em um teste de resistência de Inteligência, Sabedoria ou Carisma, pode usar sua **Reação** para ser bem-sucedido em vez disso. Após usar este benefício, você não pode usá-lo novamente até terminar um Descanso Curto ou Longo.",
       },
     ],
   },
@@ -1036,7 +1142,7 @@ export const feats: Feat[] = [
     id: "feat-martial-weapon-training",
     name: ["Treinamento em Armas Marciais", "Martial Weapon Training"],
     description:
-      "Você recebe proficiência com armas marciais, ampliando seu arsenal de combate.",
+      "Você é um guerreiro versátil, ganhando proficiência com todas as armas marciais para expandir seu arsenal de combate.",
     source: "LDJ2024",
     category: "general",
     repeatable: { canBeRepeated: false },
@@ -1069,12 +1175,22 @@ export const feats: Feat[] = [
         description: "Você ganha proficiência com armas marciais.",
       },
     ],
+    traits: [
+      {
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
+      },
+      {
+        name: "Treinamento em Armas Marciais",
+        description: "Você ganha proficiência com armas marciais.",
+      },
+    ],
   },
   {
     id: "feat-medium-armor-master",
     name: ["Mestre em Armadura Média", "Medium Armor Master"],
     description:
-      "Você usa armaduras médias com mais eficiência, reduzindo penalidades e aumentando a defesa.",
+      "Você domina o uso de armaduras médias, maximizando sua defesa e minimizando as restrições de movimento.",
     source: "LDJ2024",
     repeatable: { canBeRepeated: false },
     category: "general",
@@ -1102,9 +1218,13 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Dexterous Wearer",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
+      },
+      {
+        name: "Usuário de Armadura Ágil",
         description:
-          "While you're wearing Medium armor, you can add 3, rather than 2 to your AC if you have a Dexterity score of 16 or higher.",
+          "Enquanto veste uma armadura Média, você pode adicionar até +3, em vez de +2, à sua Classe de Armadura (CA) se tiver Destreza 16 ou superior.",
       },
     ],
   },
@@ -1112,29 +1232,35 @@ export const feats: Feat[] = [
     id: "feat-moderately-armored",
     name: ["Moderadamente Armadurado", "Moderately Armored"],
     description:
-      "Você treinou para usar armaduras médias e escudos, aumentando sua proteção.",
+      "Você se tornou proficiente no uso de armaduras médias e escudos, aprimorando significativamente sua proteção em combate.",
     source: "LDJ2024",
     category: "general",
-    prerequisite: [
-      {
-        level: 4,
-        proficiency: [
+    repeatable: { canBeRepeated: false },
+    requirements: {
+      user: {
+        events: [
           {
-            armor: "light",
+            type: "hasLevel",
+            value: 4,
+            comparison: "greaterOrEqual",
+          },
+          {
+            type: "isProficientWith",
+            armorType: "light",
           },
         ],
       },
-    ],
+    },
     effects: [
       {
         type: "passive_grantProficiency",
         on: "armorType",
         choose: {
-          from: ["medium"],
-          count: "all",
+          from: ["medium", "shield"],
+          count: 2,
         },
         name: "Treinamento com Armadura Média",
-        description: "Você ganha proficiência com armaduras Médias",
+        description: "Você ganha proficiência com armaduras Médias e Escudos.",
       },
       {
         type: "passive_modifyAbilityScore",
@@ -1149,12 +1275,22 @@ export const feats: Feat[] = [
         name: "Aumento no valor de Atributo",
       },
     ],
+    traits: [
+      {
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
+      },
+      {
+        name: "Treinamento com Armadura",
+        description: "Você ganha proficiência com armaduras Médias e escudos.",
+      },
+    ],
   },
   {
     id: "feat-mounted-combatant",
     name: ["Combatente Montado", "Mounted Combatant"],
     description:
-      "Você é especialista em lutar montado, protegendo sua montaria e atacando com precisão.",
+      "Você é um guerreiro formidável em sua montaria, capaz de proteger seu corcel e desferir ataques com precisão.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -1165,31 +1301,41 @@ export const feats: Feat[] = [
         events: [{ type: "hasLevel", value: 4, comparison: "greaterOrEqual" }],
       },
     },
-    ability: [
+
+    effects: [
       {
-        choose: {
-          from: ["strength", "dexterity", "wisdom"],
-        },
+        type: "passive_modifyAbilityScore",
+        maxScore: 20,
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["strength", "dexterity", "wisdom"], amount: 1 },
+            value: 1,
+          },
+        ],
+        name: "Aumento no valor de Atributo",
       },
     ],
     traits: [
       {
-        name: "Mounted Strike",
-        description: [
-          "While {@book mounted|XPHB|1|Mounted Combat}, you have Advantage on attack rolls against any unmounted creature within 5 feet of your mount that is at least one size smaller than the mount.",
-        ],
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Força, Destreza ou Sabedoria em 1 ponto.",
       },
       {
-        name: "Leap Aside",
-        description: [
-          "If your mount is subjected to an effect that allows it to make a Dexterity saving throw to take only half damage, it instead takes no damage if it succeeds on the saving throw and only half damage if it fails. For your mount to gain this benefit, you must be riding it, and neither of you can have the {@condition Incapacitated|XPHB} condition.",
-        ],
+        name: "Ataque Montado",
+        description:
+          "Enquanto estiver montado, você tem Vantagem em jogadas de ataque contra qualquer criatura não-montada a 5 pés de sua montaria que seja pelo menos um tamanho menor que ela.",
       },
       {
-        name: "Veer",
-        description: [
-          "While {@book mounted|XPHB|1|Mounted Combat}, you can force an attack that hits your mount to hit you instead if you don't have the {@condition Incapacitated|XPHB} condition.",
-        ],
+        name: "Salto Evasivo",
+        description:
+          "Se sua montaria for alvo de um efeito que permite um teste de resistência de Destreza para receber apenas metade do dano, ela não recebe dano algum se for bem-sucedida no teste, e recebe apenas metade do dano se falhar. Para que sua montaria obtenha este benefício, você deve estar montado nela e nenhum dos dois pode estar Incapacitado.",
+      },
+      {
+        name: "Desviar Ataque",
+        description:
+          "Enquanto estiver montado, você pode forçar um ataque que atinge sua montaria a atingir você em vez disso, desde que você não esteja Incapacitado.",
       },
     ],
   },
@@ -1197,7 +1343,7 @@ export const feats: Feat[] = [
     id: "feat-observant",
     name: ["Observador", "Observant"],
     description:
-      "Você é atento aos detalhes, percebendo pistas e lendo lábios com facilidade.",
+      "Sua atenção aos detalhes é inigualável, permitindo que você perceba pistas, leia lábios e encontre coisas escondidas com facilidade.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -1232,32 +1378,50 @@ export const feats: Feat[] = [
         ],
       },
     },
-    ability: [
+
+    effects: [
       {
+        type: "passive_grantProficiency",
+        on: "skill",
+        name: "Proficiência em Habilidade",
         choose: {
-          from: ["intelligence", "wisdom"],
-        },
-      },
-    ],
-    skillProficiencies: [
-      {
-        choose: {
+          count: 1,
           from: ["insight", "investigation", "perception"],
         },
+      },
+      {
+        type: "passive_modifyAbilityScore",
+        maxScore: 20,
+        name: "Aumento no valor de Atributo",
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["intelligence", "wisdom"], amount: 1 },
+            value: 1,
+          },
+        ],
       },
     ],
     traits: [
       {
-        name: "Keen Observer",
-        description: [
-          "Choose one of the following skills: {@skill Insight|XPHB}, {@skill Investigation|XPHB}, or {@skill Perception|XPHB}. If you lack proficiency with the chosen skill, you gain proficiency in it, and if you already have proficiency in it, you gain Expertise in it.",
-        ],
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Inteligência ou Sabedoria em 1 ponto.",
       },
       {
-        name: "Quick Search",
-        description: [
-          "You can take the {@action Search|XPHB} action as a Bonus Action.",
-        ],
+        name: "Proficiência em Perícia",
+        description:
+          "Escolha uma das seguintes perícias: **Intuição, Investigação ou Percepção**. Você ganha proficiência nela.",
+      },
+      {
+        name: "Observador Ávido",
+        description:
+          "Se você já for proficiente em uma das perícias de Intuição, Investigação ou Percepção, você ganha Especialização (Expertise) em vez disso.",
+      },
+      {
+        name: "Busca Rápida",
+        description:
+          "Você pode usar a ação de **Buscar** como uma **Ação Bônus**.",
       },
     ],
   },
@@ -1265,7 +1429,7 @@ export const feats: Feat[] = [
     id: "feat-piercer",
     name: ["Perfurador", "Piercer"],
     description:
-      "Você é especialista em causar dano perfurante, podendo aumentar o dano e acertar com mais precisão.",
+      "Você é um especialista em ataques que perfuram a armadura, capaz de aumentar o dano e desferir golpes críticos devastadores.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -1292,14 +1456,18 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Puncture",
-        description:
-          "Uma vez por turno, quando você acerta uma criatura com um ataque que causa dano perfurante, você pode rolar novamente um dos dados de dano do ataque, e deve usar o novo resultado.",
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
       },
       {
-        name: "Enhanced Critical",
+        name: "Perfurar",
         description:
-          "Quando você faz um Acerto Crítico que causa dano perfurante a uma criatura, você pode rolar um dado de dano adicional ao determinar o dano perfurante extra que o alvo sofre.",
+          "Uma vez por turno, ao acertar uma criatura com um ataque que causa dano perfurante, você pode rolar novamente um dos dados de dano do ataque e deve usar o novo resultado.",
+      },
+      {
+        name: "Crítico Aprimorado",
+        description:
+          "Quando você consegue um acerto crítico que causa dano perfurante, você pode rolar um dado de dano adicional e adicioná-lo ao dano total do ataque.",
       },
     ],
   },
@@ -1307,7 +1475,7 @@ export const feats: Feat[] = [
     id: "feat-poisoner",
     name: ["Envenenador", "Poisoner"],
     description:
-      "Você domina o uso de venenos, aplicando-os rapidamente e com eficácia.",
+      "Você domina a arte da toxicologia, capaz de criar e aplicar venenos de forma rápida e letal.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -1318,30 +1486,47 @@ export const feats: Feat[] = [
         events: [{ type: "hasLevel", value: 4, comparison: "greaterOrEqual" }],
       },
     },
-    ability: [
+
+    effects: [
       {
-        choose: {
-          from: ["dexterity", "intelligence"],
-        },
+        type: "passive_modifyAbilityScore",
+        maxScore: 20,
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["dexterity", "intelligence"], amount: 1 },
+            value: 1,
+          },
+        ],
+        name: "Aumento no valor de Atributo",
+      },
+      {
+        type: "passive_grantProficiency",
+        on: "tool",
+        name: "Proficiência em kit de venenos",
+        choose: { count: "all", from: ["tool-poisoners-kit"] },
       },
     ],
-    toolProficiencies: [
-      {
-        "poisoner's kit": true,
-      },
-    ],
+
     traits: [
       {
-        name: "Potent Poison",
-        description: [
-          "When you make a damage roll that deals Poison damage, it ignores Resistance to Poison damage.",
-        ],
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Destreza ou Inteligência em 1 ponto.",
       },
       {
-        name: "Brew Poison",
-        description: [
-          "You gain proficiency with the Poisoner's Kit. With 1 hour of work using such a kit and expending 50 GP worth of materials, you can create a number of poison doses equal to your Proficiency Bonus. As a Bonus Action, you can apply a poison dose to a weapon or piece of ammunition. Once applied, the poison retains its potency for 1 minute or until you deal damage with the poisoned item, whichever is shorter. When a creature takes damage from the poisoned item, that creature must succeed on a Constitution saving throw ({@dc 8} plus the modifier of the ability increased by this feat and your Proficiency Bonus) or take {@damage 2d8} Poison damage and have the {@condition Poisoned|XPHB} condition until the end of your next turn.",
-        ],
+        name: "Proficiência em Kit de Envenenador",
+        description: "Você ganha proficiência com o **Kit de Envenenador**.",
+      },
+      {
+        name: "Veneno Potente",
+        description:
+          "Quando você causa dano de Veneno, ele ignora Resistência a esse tipo de dano.",
+      },
+      {
+        name: "Preparar Veneno",
+        description:
+          "Com 1 hora de trabalho e 50 PO em materiais, você pode criar um número de doses de veneno igual ao seu Bônus de Proficiência. Com uma **Ação Bônus**, você pode aplicar uma dose em uma arma ou munição. O veneno dura por 1 minuto ou até causar dano. Quando uma criatura é atingida pela arma envenenada, ela deve ser bem-sucedida em um teste de resistência de Constituição (CD = **8 + mod. do atributo aumentado + Bônus de Proficiência**) ou receber **2d8** de dano de Veneno e ficar com a condição Envenenado até o final do seu próximo turno.",
       },
     ],
   },
@@ -1349,7 +1534,7 @@ export const feats: Feat[] = [
     id: "feat-polearm-master",
     name: ["Mestre em Haste", "Polearm Master"],
     description:
-      "Você é hábil com armas de haste, podendo atacar ao receber inimigos e com a outra extremidade da arma.",
+      "Você é um mestre no combate com armas de haste, capaz de controlar o campo de batalha e atacar com a ponta e a extremidade da arma.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -1361,25 +1546,35 @@ export const feats: Feat[] = [
         conditionMode: "all",
       },
     },
-    ability: [
+
+    effects: [
       {
-        choose: {
-          from: ["dexterity", "strength"],
-        },
+        type: "passive_modifyAbilityScore",
+        maxScore: 20,
+        name: "Aumento no valor de Atributo",
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["dexterity", "strength"], amount: 1 },
+            value: 1,
+          },
+        ],
       },
     ],
     traits: [
       {
-        name: "Pole Strike",
-        description: [
-          "Immediately after you take the {@action Attack|XPHB} action and attack with a {@item Quarterstaff|XPHB}, a {@item Spear|XPHB}, or a {@filter weapon that has the Heavy and Reach properties|items|type=melee weapon;ranged weapon|property=heavy;reach}, you can use a Bonus Action to make a melee attack with the opposite end of the weapon. The weapon deals Bludgeoning damage, and the weapon's damage die for this attack is a {@dice d4}.",
-        ],
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
       },
       {
-        name: "Reactive Strike",
-        description: [
-          "While you're holding a {@item Quarterstaff|XPHB}, a {@item Spear|XPHB}, or a {@filter weapon that has the Heavy and Reach properties|items|type=melee weapon;ranged weapon|property=heavy;reach}, you can take a Reaction to make one melee attack against a creature that enters the reach you have with that weapon.",
-        ],
+        name: "Ataque com Haste",
+        description:
+          "Logo após usar a ação **Ataque** com um bordão, lança, ou uma arma com as propriedades Pesada e Alcance, você pode usar uma **Ação Bônus** para fazer um ataque corpo a corpo com a outra extremidade da arma. O ataque causa dano de Concussão e o dado de dano é um d4.",
+      },
+      {
+        name: "Ataque Reativo",
+        description:
+          "Enquanto estiver segurando um bordão, lança, ou uma arma com as propriedades Pesada e Alcance, você pode usar sua **Reação** para fazer um ataque corpo a corpo contra uma criatura que entrar no seu alcance.",
       },
     ],
   },
@@ -1392,7 +1587,7 @@ export const feats: Feat[] = [
     source: "LDJ2024",
     category: "general",
     description:
-      "Você aumenta um atributo à sua escolha em +1 e ganha proficiência nas salvaguardas desse atributo.",
+      "Sua resiliência é a sua maior força. Você aumenta um atributo à sua escolha em +1 e ganha proficiência nos testes de resistência desse mesmo atributo.",
     requirements: {
       user: {
         events: [
@@ -1444,14 +1639,29 @@ export const feats: Feat[] = [
         },
       },
     ],
+    traits: [
+      {
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de um atributo à sua escolha em 1 ponto.",
+      },
+      {
+        name: "Proficiência em Salvaguarda",
+        description:
+          "Você ganha proficiência nos testes de resistência do mesmo atributo que você aumentou.",
+      },
+    ],
   },
   {
     id: "feat-ritual-caster",
     name: ["Ritualista", "Ritual Caster"],
     description:
-      "Você pode preparar e conjurar magias como rituais, ampliando sua versatilidade mágica.",
+      "Você aprofundou seus estudos em magia, tornando-se capaz de conjurar magias como rituais, o que expande sua versatilidade mágica sem a necessidade de espaços de magia.",
     source: "LDJ2024",
     category: "general",
+    repeatable: {
+      canBeRepeated: false,
+    },
     requirements: {
       user: {
         conditionMode: "all",
@@ -1487,13 +1697,7 @@ export const feats: Feat[] = [
         ],
       },
     },
-    ability: [
-      {
-        choose: {
-          from: ["intelligence", "wisdom", "charisma"],
-        },
-      },
-    ],
+
     effects: [
       {
         type: "passive_modifyAbilityScore",
@@ -1511,54 +1715,22 @@ export const feats: Feat[] = [
         maxScore: 20,
       },
     ],
-    additionalSpells: [
-      {
-        prepared: {
-          "1": [
-            {
-              choose: "level=1|components & miscellaneous=ritual",
-              amount: 2,
-            },
-          ],
-          "5": [
-            {
-              choose: "level=1|components & miscellaneous=ritual",
-              amount: 1,
-            },
-          ],
-          "9": [
-            {
-              choose: "level=1|components & miscellaneous=ritual",
-              amount: 1,
-            },
-          ],
-          "13": [
-            {
-              choose: "level=1|components & miscellaneous=ritual",
-              amount: 1,
-            },
-          ],
-          "17": [
-            {
-              choose: "level=1|components & miscellaneous=ritual",
-              amount: 1,
-            },
-          ],
-        },
-      },
-    ],
+
     traits: [
       {
-        name: "Ritual Spells",
-        description: [
-          "Choose a number of level 1 spells equal to your Proficiency Bonus that have the {@filter Ritual tag|spells|level=1|components & miscellaneous=ritual}. You always have those spells prepared, and you can cast them with any spell slots you have. The spells' spellcasting ability is the ability increased by this feat. Whenever your Proficiency Bonus increases thereafter, you can add an additional level 1 spell with the Ritual tag to the spells always prepared with this feature.",
-        ],
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Inteligência, Sabedoria ou Carisma em 1 ponto.",
       },
       {
-        name: "Quick Ritual",
-        description: [
-          "With this benefit, you can cast a Ritual spell that you have prepared using its regular casting time rather than the extended time for a Ritual. Doing so doesn't require a spell slot. Once you cast the spell in this way, you can't use this benefit again until you finish a Long Rest.",
-        ],
+        name: "Magias Rituais",
+        description:
+          "Escolha um número de magias de 1º nível com a tag Ritual, igual ao seu Bônus de Proficiência. Você sempre tem essas magias preparadas e pode conjurá-las com seus espaços de magia. Quando seu Bônus de Proficiência aumentar, você pode adicionar uma magia de 1º nível com a tag Ritual à sua lista.",
+      },
+      {
+        name: "Ritual Rápido",
+        description:
+          "Você pode conjurar uma magia com a tag Ritual que você tenha preparada usando seu tempo de conjuração normal, em vez do tempo estendido de ritual. Isso não gasta um espaço de magia. Após usar este benefício, você não pode usá-lo novamente até terminar um Descanso Longo.",
       },
     ],
   },
@@ -1566,9 +1738,12 @@ export const feats: Feat[] = [
     id: "feat-sentinel",
     name: ["Sentinela", "Sentinel"],
     description:
-      "Você impede inimigos de fugir e pode atacar quem atinge aliados próximos.",
+      "Você é um guardião implacável, capaz de impedir que inimigos fujam do seu alcance e de atacar aqueles que se atrevem a ferir seus aliados.",
     source: "LDJ2024",
     category: "general",
+    repeatable: {
+      canBeRepeated: false,
+    },
     requirements: {
       user: {
         events: [{ type: "hasLevel", value: 4, comparison: "greaterOrEqual" }],
@@ -1591,16 +1766,18 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Guardian",
-        description: [
-          "Immediately after a creature within 5 feet of you takes the {@action Disengage|XPHB} action or hits a target other than you with an attack, you can make an {@action Opportunity Attack|XPHB} against that creature.",
-        ],
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
       },
       {
-        name: "Halt",
-        description: [
-          "When you hit a creature with an {@action Opportunity Attack|XPHB}, the creature's Speed becomes 0 for the rest of the current turn.",
-        ],
+        name: "Guardião",
+        description:
+          "Logo após uma criatura a 5 pés de você usar a ação **Desengajar** ou atingir um alvo que não seja você, você pode fazer um **Ataque de Oportunidade** contra ela.",
+      },
+      {
+        name: "Imobilizar",
+        description:
+          "Quando você atinge uma criatura com um **Ataque de Oportunidade**, o deslocamento dela se torna 0 pelo resto do turno.",
       },
     ],
   },
@@ -1608,7 +1785,8 @@ export const feats: Feat[] = [
     id: "feat-shadow-touched",
     name: ["Tocado pelas Sombras", "Shadow-Touched"],
     description:
-      "Você foi tocado pela energia sombria, ganhando magias e aumento de atributo.",
+      "O contato com as Sombras deixou uma marca em você, concedendo a habilidade de conjurar magias furtivas.",
+    repeatable: { canBeRepeated: false },
     source: "LDJ2024",
     category: "general",
     requirements: {
@@ -1616,13 +1794,7 @@ export const feats: Feat[] = [
         events: [{ type: "hasLevel", value: 4, comparison: "greaterOrEqual" }],
       },
     },
-    ability: [
-      {
-        choose: {
-          from: ["intelligence", "wisdom", "charisma"],
-        },
-      },
-    ],
+
     effects: [
       {
         type: "passive_modifyAbilityScore",
@@ -1639,34 +1811,64 @@ export const feats: Feat[] = [
         ],
         maxScore: 20,
       },
-    ],
-    additionalSpells: [
       {
-        ability: "inherit",
-        innate: {
-          _: {
-            daily: {
-              "1e": [
-                "invisibility|xphb",
-                {
-                  choose: "level=1|school=I;N",
-                },
-              ],
-            },
-          },
+        type: "passive_providesSpellKnowledge",
+        mode: "fixedSpells",
+        spells: ["spell-invisibility"],
+        canBeSwappedOn: "never",
+        name: "Magia Sombria",
+        castingAbilityOptions: ["selectedByFeat"],
+        freeCasting: {
+          amount: 1,
+          recharge: { maxCharges: 1, rechargeOn: "dawn", type: "event", recoveryAmount: 1 },
         },
+        description:
+          "Você aprende a magia Invisibilidade. Você pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia.",
+      },
+      {
+        type: "passive_providesSpellKnowledge",
+        mode: "filter",
+        filter: { school: ["illusion", "necromancy"], level: 1 },
+        amount: 1,
+        freeCasting: {
+          amount: 1,
+          recharge: { maxCharges: 1, rechargeOn: "dawn", type: "event", recoveryAmount: 1 },
+        },
+        canBeSwappedOn: "levelUp",
+        description:
+          "Você aprende uma magia de 1º nível à sua escolha das escolas de Ilusão ou Necromancia. Você pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia.",
+        name: "Magia Bônus",
+        castingAbilityOptions: ["selectedByFeat"],
       },
     ],
-    description:
-      "Sua exposição à magia do Plano das Sombras concede a você os seguintes benefícios: Magia das Sombras - Escolha uma magia de nível 1 da escola de Ilusão ou Necromancia. Você sempre tem essa magia e a magia Invisibilidade preparadas. Você pode conjurar cada uma dessas magias sem gastar um espaço de magia. Uma vez que você conjure qualquer uma dessas magias dessa maneira, você não pode conjurá-la novamente até completar um descanso longo. Você também pode conjurar essas magias usando espaços de magia que você tenha do nível apropriado. A habilidade de conjuração das magias é a habilidade aumentada por este talento.",
+    traits: [
+      {
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Inteligência, Sabedoria ou Carisma em 1 ponto.",
+      },
+      {
+        name: "Magia Sombria",
+        description:
+          "Você aprende a magia Invisibilidade e pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia.",
+      },
+      {
+        name: "Magia Bônus",
+        description:
+          "Você aprende uma magia de 1º nível à sua escolha das escolas de Ilusão ou Necromancia. Você pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia.",
+      },
+    ],
   },
   {
     id: "feat-sharpshooter",
     name: ["Franco-atirador", "Sharpshooter"],
     description:
-      "Você é especialista em ataques à distância, ignorando cobertura e causando mais dano.",
+      "Você é um franco-atirador letal, capaz de acertar alvos a longas distâncias, ignorar a cobertura do inimigo e desferir golpes mais precisos.",
     source: "LDJ2024",
     category: "general",
+    repeatable: {
+      canBeRepeated: false,
+    },
     requirements: {
       user: {
         events: [
@@ -1696,22 +1898,23 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Bypass Cover",
-        description: [
-          "Your ranged attacks with weapons ignore Half Cover and Three-Quarters Cover.",
-        ],
+        name: "Aumento de Destreza",
+        description: "Aumenta seu valor de Destreza em 1 ponto.",
       },
       {
-        name: "Firing in Melee",
-        description: [
-          "Being within 5 feet of an enemy doesn't impose Disadvantage on your attack rolls with Ranged weapons.",
-        ],
+        name: "Ignorar Cobertura",
+        description:
+          "Seus ataques com armas de longo alcance ignoram as defesas de Meia Cobertura e Três Quartos de Cobertura.",
       },
       {
-        name: "Long Shots",
-        description: [
-          "Attacking at long range doesn't impose Disadvantage on your attack rolls with Ranged weapons.",
-        ],
+        name: "Disparar em Combate Corpo a Corpo",
+        description:
+          "Estar a 5 pés de um inimigo não impõe Desvantagem em suas jogadas de ataque com armas de longo alcance.",
+      },
+      {
+        name: "Tiros de Longa Distância",
+        description:
+          "Atacar no alcance longo de uma arma de longo alcance não impõe Desvantagem em suas jogadas de ataque.",
       },
     ],
   },
@@ -1719,36 +1922,52 @@ export const feats: Feat[] = [
     id: "feat-shield-master",
     name: ["Mestre do Escudo", "Shield Master"],
     description:
-      "Você usa o escudo de forma ofensiva e defensiva, protegendo-se de efeitos e ataques.",
+      "Você não usa o escudo apenas para se defender, mas como uma extensão de seu corpo em combate, capaz de usá-lo para atacar, derrubar inimigos e se proteger de efeitos mágicos.",
     source: "LDJ2024",
     category: "general",
-    prerequisite: [
-      {
-        level: 4,
-        proficiency: [
+    repeatable: {
+      canBeRepeated: false,
+    },
+    requirements: {
+      user: {
+        events: [
+          { type: "hasLevel", value: 4, comparison: "greaterOrEqual" },
           {
-            armor: "shield",
+            type: "isProficientWith",
+            armorType: "shield",
           },
         ],
       },
-    ],
-    ability: [
+    },
+
+    effects: [
       {
-        str: 1,
+        type: "passive_modifyAbilityScore",
+        name: "Aumento de Força",
+        choices: [
+          {
+            pick: { from: ["strength"], amount: 1 },
+            value: 1,
+            operation: "add",
+          },
+        ],
+        maxScore: 20,
       },
     ],
     traits: [
       {
-        name: "Shield Bash",
-        description: [
-          "If you attack a creature within 5 feet of you as part of the {@action Attack|XPHB} action and hit with a Melee weapon, you can immediately bash the target with your Shield if it's equipped, forcing the target to make a Strength saving throw ({@dc 8} plus your Strength modifier and Proficiency Bonus). On a failed save, you either push the target 5 feet from you or cause it to have the {@condition Prone|XPHB} condition (your choice). You can use this benefit only once on each of your turns.",
-        ],
+        name: "Aumento de Força",
+        description: "Aumenta seu valor de Força em 1 ponto.",
       },
       {
-        name: "Interpose Shield",
-        description: [
-          "If you're subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you can take a Reaction to take no damage if you succeed on the saving throw and are holding a Shield.",
-        ],
+        name: "Pancada de Escudo",
+        description:
+          "Se você acertar uma criatura a 5 pés de você com um ataque corpo a corpo, pode usar seu escudo para empurrá-la ou derrubá-la como uma **Ação Bônus**. O alvo deve ser bem-sucedido em um teste de resistência de Força (CD = **8 + mod. de Força + Bônus de Proficiência**) para evitar o efeito.",
+      },
+      {
+        name: "Interpor Escudo",
+        description:
+          "Se você for alvo de um efeito que permite um teste de resistência de Destreza para receber apenas metade do dano, pode usar sua **Reação** para não receber dano se for bem-sucedido, desde que esteja segurando um escudo.",
       },
     ],
   },
@@ -1756,47 +1975,67 @@ export const feats: Feat[] = [
     id: "feat-skill-expert",
     name: ["Especialista em Perícias", "Skill Expert"],
     description:
-      "Você aprimora uma perícia, ganha proficiência em outra e aumenta um atributo à sua escolha.",
+      "Seu treinamento focou em aprimorar suas capacidades, concedendo proficiência e especialização em perícias, além de aumentar um de seus atributos.",
     source: "LDJ2024",
+    repeatable: { canBeRepeated: false },
     category: "general",
     requirements: {
       user: {
         events: [{ type: "hasLevel", value: 4, comparison: "greaterOrEqual" }],
       },
     },
-    ability: [
+
+    effects: [
       {
-        choose: {
-          from: [
-            "strength",
-            "dexterity",
-            "constitution",
-            "intelligence",
-            "wisdom",
-            "charisma",
-          ],
-        },
+        type: "passive_modifyAbilityScore",
+        maxScore: 20,
+        choices: [
+          {
+            operation: "add",
+            pick: {
+              from: [
+                "strength",
+                "dexterity",
+                "constitution",
+                "intelligence",
+                "wisdom",
+                "charisma",
+              ],
+              amount: 1,
+            },
+            value: 1,
+          },
+        ],
+        name: "Aumento no valor de Atributo",
+      },
+      {
+        type: "passive_grantProficiency",
+        on: "skill",
+        choose: { count: 1, from: "any" },
+        name: "Proficiência em Perícia",
+      },
+      {
+        type: "passive_grantExpertise",
+        on: "skill",
+        choose: { count: 1, from: "anyProficient" },
+        name: "Especialização em Perícia",
       },
     ],
-    skillProficiencies: [
-      {
-        any: 1,
-      },
-    ],
-    expertise: [
-      {
-        anyProficientSkill: 1,
-      },
-    ],
+
     traits: [
       {
-        name: "Skill Proficiency",
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de um atributo à sua escolha em 1 ponto.",
+      },
+      {
+        name: "Proficiência em Perícia",
         description: "Você ganha proficiência em uma perícia à sua escolha.",
       },
       {
-        name: "Expertise",
+        name: "Especialização",
         description:
-          "Escolha uma perícia na qual você tenha proficiência, mas não tenha Especialização. Você ganha Especialização nessa perícia.",
+          "Escolha uma perícia na qual você já seja proficiente e ganhe Especialização nela.",
       },
     ],
   },
@@ -1804,8 +2043,9 @@ export const feats: Feat[] = [
     id: "feat-skulker",
     name: ["Furtivo", "Skulker"],
     description:
-      "Você é mestre em se esconder, mesmo em condições difíceis de visibilidade.",
+      "Você é um mestre da furtividade, capaz de se esconder e se mover sem ser notado mesmo em situações de visibilidade limitada ou no calor do combate.",
     source: "LDJ2024",
+    repeatable: { canBeRepeated: false },
     category: "general",
     requirements: {
       user: {
@@ -1833,30 +2073,32 @@ export const feats: Feat[] = [
         ],
         maxScore: 20,
       },
-    ],
-    senses: [
       {
-        blindsight: 10,
+        type: "passive_providesVision",
+        name: "Visão no Escuro",
+        vision: "blindsight",
+        range: { normal: 10, unit: "ft" },
       },
     ],
+
     traits: [
       {
-        name: "Blindsight",
-        description: [
-          "You have {@sense Blindsight|XPHB} with a range of 10 feet.",
-        ],
+        name: "Aumento de Destreza",
+        description: "Aumenta seu valor de Destreza em 1 ponto.",
       },
       {
-        name: "Fog of War",
-        description: [
-          "You exploit the distractions of battle, gaining Advantage on any Dexterity ({@skill Stealth|XPHB}) check you make as part of the {@action Hide|XPHB} action during combat.",
-        ],
+        name: "Visão Cega",
+        description: "Você tem Visão Cega até um alcance de 10 pés.",
       },
       {
-        name: "Sniper",
-        description: [
-          "If you make an attack roll while hidden and the roll misses, making the attack roll doesn't reveal your location.",
-        ],
+        name: "Aproveitar o Combate",
+        description:
+          "Você explora as distrações do combate, ganhando Vantagem em qualquer teste de Destreza (**Furtividade**) que fizer como parte da ação de **Esconder** durante o combate.",
+      },
+      {
+        name: "Atirador",
+        description:
+          "Se você fizer um ataque enquanto estiver escondido e errar, a jogada de ataque não revela sua posição.",
       },
     ],
   },
@@ -1864,8 +2106,9 @@ export const feats: Feat[] = [
     id: "feat-slasher",
     name: ["Cortador", "Slasher"],
     description:
-      "Você é especialista em causar dano cortante, reduzindo a mobilidade dos inimigos.",
+      "Seus ataques cortantes são tão precisos que ferem seus inimigos de forma a dificultar seus movimentos, e um golpe crítico pode deixá-los atordoados.",
     source: "LDJ2024",
+    repeatable: { canBeRepeated: false },
     category: "general",
     requirements: {
       user: {
@@ -1888,16 +2131,18 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Hamstring",
-        description: [
-          "Once per turn when you hit a creature with an attack that deals Slashing damage, you can reduce the Speed of that creature by 10 feet until the start of your next turn.",
-        ],
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
       },
       {
-        name: "Enhanced Critical",
-        description: [
-          "When you score a Critical Hit that deals Slashing damage to a creature, it has Disadvantage on attack rolls until the start of your next turn.",
-        ],
+        name: "Tendão Cortado",
+        description:
+          "Uma vez por turno, ao acertar uma criatura com um ataque que causa dano Cortante, você pode reduzir o deslocamento dela em 10 pés até o início do seu próximo turno.",
+      },
+      {
+        name: "Crítico Aprimorado",
+        description:
+          "Quando você consegue um acerto crítico que causa dano Cortante, o alvo faz suas jogadas de ataque com Desvantagem até o início do seu próximo turno.",
       },
     ],
   },
@@ -1905,8 +2150,9 @@ export const feats: Feat[] = [
     id: "feat-speedy",
     name: ["Veloz", "Speedy"],
     description:
-      "Você se move mais rápido do que o normal, aumentando sua velocidade base.",
+      "Sua velocidade e agilidade são superiores, permitindo que você se mova rapidamente pelo campo de batalha e evite ataques de oportunidade.",
     source: "LDJ2024",
+    repeatable: { canBeRepeated: false },
     category: "general",
     requirements: {
       user: {
@@ -1933,26 +2179,41 @@ export const feats: Feat[] = [
         ],
       },
     },
-    ability: [
+
+    effects: [
       {
-        choose: {
-          from: ["dexterity", "constitution"],
-        },
+        type: "passive_modifyAbilityScore",
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["dexterity", "constitution"], amount: 1 },
+            value: 1,
+          },
+        ],
+        maxScore: 20,
+        name: "Aumento no valor de Atributo",
       },
     ],
+
     traits: [
       {
-        name: "Speed Increase",
-        description: "Sua Velocidade aumenta em 10 pés.",
-      },
-      {
-        name: "Dash over Difficult Terrain",
+        name: "Aumento de Atributo",
         description:
-          "Quando você usa a ação de Disparada no seu turno, o Terreno Difícil não custa movimento extra pelo resto do turno.",
+          "Aumenta seu valor de Destreza ou Constituição em 1 ponto.",
       },
       {
-        name: "Agile Movement",
-        description: "Ataques de Oportunidade têm Desvantagem contra você.",
+        name: "Aumento de Deslocamento",
+        description: "Seu deslocamento aumenta em 10 pés.",
+      },
+      {
+        name: "Disparada em Terreno Difícil",
+        description:
+          "Quando você usa a ação **Disparada**, o Terreno Difícil não reduz seu deslocamento durante este turno.",
+      },
+      {
+        name: "Movimento Ágil",
+        description:
+          "Ataques de Oportunidade feitos contra você têm Desvantagem.",
       },
     ],
   },
@@ -1960,47 +2221,63 @@ export const feats: Feat[] = [
     id: "feat-spell-sniper",
     name: ["Franco-atirador de Magia", "Spell Sniper"],
     description:
-      "Você dobra o alcance de magias de ataque e ignora cobertura parcial.",
+      "Você é um mestre da magia de longo alcance. Suas magias de ataque atingem alvos a distâncias impressionantes e ignoram as defesas de cobertura.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
       canBeRepeated: false,
     },
-    prerequisite: [
-      {
-        level: 4,
-        spellcasting2020: true,
+    requirements: {
+      user: {
+        events: [
+          { type: "hasLevel", value: 4, comparison: "greaterOrEqual" },
+          { type: "hasSpellcasting" },
+        ],
       },
-    ],
-    ability: [
+    },
+
+    effects: [
       {
-        choose: {
-          from: ["intelligence", "wisdom", "charisma"],
-        },
+        type: "passive_modifyAbilityScore",
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["intelligence", "wisdom", "charisma"], amount: 1 },
+            value: 1,
+          },
+        ],
+        maxScore: 20,
+        name: "Aumento no valor de Atributo",
       },
     ],
     traits: [
       {
-        name: "Bypass Cover",
+        name: "Aumento de Atributo",
         description:
-          "Suas jogadas de ataque com magias ignoram Meia Cobertura e Três Quartos de Cobertura.",
+          "Aumenta seu valor de Inteligência, Sabedoria ou Carisma em 1 ponto.",
       },
       {
-        name: "Casting in Melee",
+        name: "Ignorar Cobertura",
+        description:
+          "Suas magias de ataque ignoram as defesas de Meia Cobertura e Três Quartos de Cobertura.",
+      },
+      {
+        name: "Conjurando em Combate Corpo a Corpo",
         description:
           "Estar a até 5 pés de um inimigo não impõe Desvantagem nas suas jogadas de ataque com magias.",
       },
       {
-        name: "Increased Range",
+        name: "Alcance Aprimorado",
         description:
-          "Quando você conjura uma magia que tem um alcance de pelo menos 10 pés e exige que você faça uma jogada de ataque, você pode aumentar o alcance da magia em 60 pés.",
+          "Quando você conjura uma magia que tem um alcance de pelo menos 10 pés e exige que você faça uma jogada de ataque, o alcance da magia é dobrado.",
       },
     ],
   },
   {
     id: "feat-telekinetic",
     name: ["Telecinético", "Telekinetic"],
-    description: "Você pode mover objetos e criaturas com o poder da mente.",
+    description:
+      "Sua mente é uma ferramenta poderosa. Você é capaz de mover objetos e criaturas usando apenas telecinese, além de conjurar a magia Mão do Mago.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -2011,40 +2288,59 @@ export const feats: Feat[] = [
         events: [{ type: "hasLevel", value: 4, comparison: "greaterOrEqual" }],
       },
     },
-    ability: [
+
+    effects: [
       {
-        choose: {
-          from: ["intelligence", "wisdom", "charisma"],
+        type: "passive_modifyAbilityScore",
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["intelligence", "wisdom", "charisma"], amount: 1 },
+            value: 1,
+          },
+        ],
+        maxScore: 20,
+        name: "Aumento no valor de Atributo",
+      },
+      {
+        type: "passive_providesSpellKnowledge",
+        mode: "fixedSpells",
+        spells: ["spell-mage-hand"],
+        canBeSwappedOn: "never",
+        freeCasting: {
+          amount: 1,
+          recharge: { maxCharges: 1, rechargeOn: "dawn", type: "event", recoveryAmount: 1 },
         },
+        name: "Magia Telecinética",
+        castingAbilityOptions: ["selectedByFeat"],
+        description:
+          "Você aprende a magia Mão do Mago. Você pode conjurá-la sem componentes verbais ou somáticos, torná-la invisível, e o alcance e a distância que ela pode se afastar de você aumentam em 30 pés. O atributo de conjuração é o atributo que você aumentou com este talento.",
       },
     ],
-    additionalSpells: [
-      {
-        ability: "inherit",
-        known: {
-          _: ["mage hand|xphb#c"],
-        },
-      },
-    ],
+
     traits: [
       {
-        name: "Minor Telekinesis",
-        description: [
-          "You learn the {@spell Mage Hand|XPHB} spell. You can cast it without Verbal or Somatic components, you can make the spectral hand {@condition Invisible|XPHB}, and its range and the distance it can be away from you both increase by 30 feet when you cast it. The spell's spellcasting ability is the ability increased by this feat.",
-        ],
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Inteligência, Sabedoria ou Carisma em 1 ponto.",
       },
       {
-        name: "Telekinetic Shove",
-        description: [
-          "As a Bonus Action, you can telekinetically shove one creature you can see within 30 feet of yourself. When you do so, the target must succeed on a Strength saving throw ({@dc 8} plus the ability modifier of the score increased by this feat and your Proficiency Bonus) or be moved 5 feet toward or away from you.",
-        ],
+        name: "Telecinese Menor",
+        description:
+          "Você aprende a magia **Mão do Mago**. Você pode conjurá-la sem componentes verbais ou somáticos, torná-la invisível, e o alcance e a distância que ela pode se afastar de você aumentam em 30 pés. O atributo de conjuração é o atributo que você aumentou com este talento.",
+      },
+      {
+        name: "Empurrão Telecinético",
+        description:
+          "Como uma **Ação Bônus**, você pode empurrar telecineticamente uma criatura que possa ver a até 30 pés de você. A criatura deve ser bem-sucedida em um teste de resistência de Força (CD = **8 + mod. do atributo aumentado + Bônus de Proficiência**) ou ser movida 5 pés para perto ou para longe de você.",
       },
     ],
   },
   {
     id: "feat-telepathic",
     name: ["Telepata", "Telepathic"],
-    description: "Você pode se comunicar telepaticamente com outras criaturas.",
+    description:
+      "Você despertou suas habilidades psíquicas. Agora, pode se comunicar telepaticamente com outras criaturas e até mesmo detectar seus pensamentos.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -2055,37 +2351,51 @@ export const feats: Feat[] = [
         events: [{ type: "hasLevel", value: 4, comparison: "greaterOrEqual" }],
       },
     },
-    ability: [
+
+    effects: [
       {
-        choose: {
-          from: ["intelligence", "wisdom", "charisma"],
-        },
-      },
-    ],
-    additionalSpells: [
-      {
-        ability: "inherit",
-        innate: {
-          _: {
-            daily: {
-              "1": ["detect thoughts|xphb"],
-            },
+        type: "passive_modifyAbilityScore",
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["intelligence", "wisdom", "charisma"], amount: 1 },
+            value: 1,
           },
+        ],
+        maxScore: 20,
+        name: "Aumento no valor de Atributo",
+      },
+      {
+        type: "passive_providesSpellKnowledge",
+        mode: "fixedSpells",
+        spells: ["spell-detect-thoughts"],
+        canBeSwappedOn: "never",
+        freeCasting: {
+          amount: 1,
+          recharge: { maxCharges: 1, rechargeOn: "dawn", type: "event", recoveryAmount: 1 },
         },
+        name: "Magia Feérica",
+        castingAbilityOptions: ["selectedByFeat"],
+        description:
+          "Você ganha a magia Passo Nebuloso como uma magia conhecida.",
       },
     ],
+
     traits: [
       {
-        name: "Telepathic Utterance",
-        description: [
-          "You can speak telepathically to any creature you can see within 60 feet of yourself. Your telepathic utterances are in a language you know, and the creature understands you only if it knows that language. Your communication doesn't give the creature the ability to respond to you telepathically.",
-        ],
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Inteligência, Sabedoria ou Carisma em 1 ponto.",
       },
       {
-        name: "Detect Thoughts",
-        description: [
-          "You always have the {@spell Detect Thoughts|XPHB} spell prepared. You can cast it without a spell slot or spell components, and you must finish a Long Rest before you can cast it in this way again. You can also cast it using spell slots you have of the appropriate level. Your spellcasting ability for the spell is the ability increased by this feat.",
-        ],
+        name: "Comunicação Telepática",
+        description:
+          "Você pode se comunicar telepaticamente com qualquer criatura que possa ver a até 60 pés. A comunicação é em uma língua que você conhece, e a criatura só a entende se também souber a língua. A criatura não pode responder telepatidamente.",
+      },
+      {
+        name: "Detectar Pensamentos",
+        description:
+          "Você sempre tem a magia **Detectar Pensamentos** preparada. Você pode conjurá-la uma vez por Descanso Longo sem gastar um espaço de magia. Você também pode conjurá-la normalmente usando seus espaços de magia. O atributo de conjuração é o atributo que você aumentou com este talento.",
       },
     ],
   },
@@ -2093,50 +2403,62 @@ export const feats: Feat[] = [
     id: "feat-war-caster",
     name: ["Conjurador de Guerra", "War Caster"],
     description:
-      "Você é especialista em conjurar magias em combate, mantendo concentração e usando reações.",
+      "Você é um conjurador treinado para o combate. Você consegue manter a concentração em suas magias sob ataque, pode conjurar magias de forma reativa e até mesmo realizar os componentes somáticos com as mãos ocupadas.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
       canBeRepeated: false,
     },
-    prerequisite: [
-      {
-        level: 4,
-        spellcasting2020: true,
+    requirements: {
+      user: {
+        events: [
+          { type: "hasLevel", value: 4, comparison: "greaterOrEqual" },
+          { type: "hasSpellcasting" },
+        ],
       },
-    ],
-    ability: [
+    },
+    effects: [
       {
-        choose: {
-          from: ["intelligence", "wisdom", "charisma"],
-        },
+        type: "passive_modifyAbilityScore",
+        choices: [
+          {
+            operation: "add",
+            pick: { from: ["intelligence", "wisdom", "charisma"], amount: 1 },
+            value: 1,
+          },
+        ],
+        maxScore: 20,
+        name: "Aumento no valor de Atributo",
       },
     ],
     traits: [
       {
-        name: "Concentration",
-        description: [
-          "You have Advantage on Constitution saving throws that you make to maintain {@status Concentration|XPHB}.",
-        ],
+        name: "Aumento de Atributo",
+        description:
+          "Aumenta seu valor de Inteligência, Sabedoria ou Carisma em 1 ponto.",
       },
       {
-        name: "Reactive Spell",
-        description: [
-          "When a creature provokes an {@action Opportunity Attack|XPHB} from you by leaving your reach, you can take a Reaction to cast a spell at the creature rather than making an {@action Opportunity Attack|XPHB}. The spell must have a casting time of one action and must target only that creature.",
-        ],
+        name: "Concentração",
+        description:
+          "Você tem Vantagem em testes de resistência de Constituição feitos para manter a concentração em magias.",
       },
       {
-        name: "Somatic Components",
-        description: [
-          "You can perform the Somatic components of spells even when you have weapons or a Shield in one or both hands.",
-        ],
+        name: "Magia Reativa",
+        description:
+          "Quando uma criatura provoca um **Ataque de Oportunidade** ao deixar seu alcance, você pode usar sua **Reação** para conjurar uma magia que tenha um tempo de conjuração de 1 ação e que afete apenas a criatura que o provocou.",
+      },
+      {
+        name: "Componentes Somáticos",
+        description:
+          "Você pode realizar os componentes somáticos de magias mesmo quando estiver segurando armas ou um escudo em uma ou ambas as mãos.",
       },
     ],
   },
   {
     id: "feat-weapon-master",
     name: ["Mestre em Armas", "Weapon Master"],
-    description: "Você adquire proficiência com quatro armas à sua escolha.",
+    description:
+      "Seu domínio com armas é notável. Você ganha proficiência com um conjunto de armas, e pode usar a propriedade de Maestria de uma delas.",
     source: "LDJ2024",
     category: "general",
     repeatable: {
@@ -2163,10 +2485,18 @@ export const feats: Feat[] = [
     ],
     traits: [
       {
-        name: "Mastery Property",
-        description: [
-          "Your training with weapons allows you to use the mastery property of one kind of Simple or Martial weapon of your choice, provided you have proficiency with it. Whenever you finish a Long Rest, you can change the kind of weapon to another eligible kind.",
-        ],
+        name: "Aumento de Atributo",
+        description: "Aumenta seu valor de Força ou Destreza em 1 ponto.",
+      },
+      {
+        name: "Propriedade de Maestria",
+        description:
+          "Seu treinamento com armas permite que você use a propriedade de Maestria de um tipo de arma Simples ou Marcial de sua escolha, desde que seja proficiente nela. Ao terminar um **Descanso Longo**, você pode mudar o tipo de arma para outro elegível.",
+      },
+      {
+        name: "Proficiência com Arma",
+        description:
+          "Você adquire proficiência com quatro armas à sua escolha.",
       },
     ],
   },

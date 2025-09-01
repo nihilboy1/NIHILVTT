@@ -1,9 +1,8 @@
 import { Item } from "../../domain/item/item.schema";
-import z from "zod";
 
 export const itemsGear = [
   {
-    id: "item-acido",
+    id: "gear-acido",
     name: ["Ácido", "Acid"],
     source: "LDJ2024",
     page: 222,
@@ -17,7 +16,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Arremessar Ácido",
-        actionId: "action-throw-item",
+        actionId: "act-throw",
         parameters: {
           range: { normal: 20, unit: "ft" },
           attackType: [{ source: "item", range: "ranged", handsInUse: "one" }],
@@ -38,7 +37,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-fogo-alquimico",
+    id: "gear-fogo-alquimico",
     name: ["Fogo Alquímico", "Alchemist's Fire"],
     source: "LDJ2024",
     page: 222,
@@ -52,7 +51,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Arremessar Fogo Alquímico",
-        actionId: "action-throw-item",
+        actionId: "act-throw",
         parameters: {
           attackType: [{ source: "item", range: "ranged", handsInUse: "one" }],
           range: { normal: 20, unit: "ft" },
@@ -82,7 +81,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-antidoto",
+    id: "gear-antidoto",
     name: ["Antídoto", "Antitoxin"],
     source: "LDJ2024",
     page: 222,
@@ -96,7 +95,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Consumir Antídoto",
-        actionId: "action-consume-item",
+        actionId: "act-consume",
         parameters: {
           activation: {
             type: "bonus",
@@ -120,7 +119,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-mochila",
+    id: "gear-mochila",
     name: ["Mochila", "Backpack"],
     source: "LDJ2024",
     page: 224,
@@ -142,7 +141,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-esferas-metalicas",
+    id: "gear-esferas-metalicas",
     name: ["Esferas Metálicas", "Ball Bearings"],
     source: "LDJ2024",
     page: 224,
@@ -156,7 +155,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Espalhar Esferas",
-        actionId: "action-use-gear-area",
+        actionId: "act-create-area-of-effect",
         parameters: {
           range: { normal: 5, unit: "ft" },
           area: { shape: "cube", size: 10, unit: "ft" },
@@ -188,7 +187,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-veneno-basico",
+    id: "gear-veneno-basico",
     name: ["Veneno Básico", "Basic Poison"],
     source: "LDJ2024",
     page: 227,
@@ -208,7 +207,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Aplicar Veneno em Arma",
-        actionId: "action-apply-poison",
+        actionId: "act-apply-effect",
         parameters: {
           activation: {
             type: "action",
@@ -259,7 +258,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-estrepes",
+    id: "gear-estrepes",
     name: ["Estrepes", "Caltrops"],
     source: "LDJ2024",
     page: 224,
@@ -279,7 +278,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Espalhar Estrepes",
-        actionId: "action-use-gear-area",
+        actionId: "act-create-area-of-effect",
         parameters: {
           area: {
             shape: "cube",
@@ -347,7 +346,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-vela",
+    id: "gear-vela",
     name: ["Vela", "Candle"],
     source: "LDJ2024",
     page: 224,
@@ -370,12 +369,12 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Acender Vela",
-        actionId: "action-light-item",
+        actionId: "act-light-item",
       },
     ],
   },
   {
-    id: "item-corrente",
+    id: "gear-corrente",
     name: ["Corrente", "Chain"],
     source: "LDJ2024",
     page: 224,
@@ -395,7 +394,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-pe-de-cabra",
+    id: "gear-pe-de-cabra",
     name: ["Pé de Cabra", "Crowbar"],
     source: "LDJ2024",
     page: 225,
@@ -411,66 +410,13 @@ export const itemsGear = [
         name: "Vantagem em Força",
         on: "abilityCheck",
         ability: "strength",
-        appliesToActions: ["action-force-open"],
+        appliesToActions: ["act-utilize"],
       },
     ],
   },
+
   {
-    id: "item-kit-de-curandeiro",
-    name: ["Kit de Curandeiro", "Healer's Kit"],
-    source: "LDJ2024",
-    page: 225,
-    type: "gear",
-    rarity: "common",
-    weight: {
-      value: 3,
-      unit: "lb",
-    },
-    price: {
-      quantity: 5,
-      unit: "gold",
-    },
-    description:
-      "Este kit tem 10 usos. Como uma ação, você pode gastar um uso para estabilizar uma criatura com 0 Pontos de Vida, fazendo-a retornar a 1 Ponto de Vida.",
-    effects: [
-      {
-        type: "activatableAction",
-        actionId: "action-use-kit-charge",
-        name: "Usar Kit de Curandeiro",
-        parameters: {
-          charges: { type: "static", amount: 10, max: 10 },
-          activation: {
-            type: "action",
-            extraCost: {
-              amount: 1,
-              source: "item",
-              resourceId: "itemCharge",
-            },
-          },
-          target: {
-            type: "creature",
-            quantity: 1,
-          },
-          requirements: {
-            target: { events: [{ type: "hasZeroHP" }] },
-          },
-          outcomes: [
-            {
-              on: "any",
-              type: "modifyTargetHP",
-              vitals: ["currentHp"],
-              formula: {
-                type: "healing",
-                fixed: 1,
-              },
-            },
-          ],
-        },
-      },
-    ],
-  },
-  {
-    id: "item-agua-benta",
+    id: "gear-agua-benta",
     name: ["Água Benta", "Holy Water"],
     source: "LDJ2024",
     page: 226,
@@ -484,7 +430,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Arremessar Água Benta",
-        actionId: "action-throw-item",
+        actionId: "act-throw",
         parameters: {
           attackType: [{ source: "item", range: "ranged", handsInUse: "one" }],
           range: { normal: 20, unit: "ft" },
@@ -520,7 +466,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-lanterna-coberta",
+    id: "gear-lanterna-coberta",
     name: ["Lanterna Coberta", "Hooded Lantern"],
     source: "LDJ2024",
     page: 226,
@@ -543,17 +489,17 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Acender Lanterna",
-        actionId: "action-light-item",
+        actionId: "act-light-item",
       },
       {
         type: "activatableAction",
         name: "Cobrir Lanterna",
-        actionId: "action-cover-lantern",
+        actionId: "act-use-object",
       },
     ],
   },
   {
-    id: "item-armadilha-de-caca",
+    id: "gear-armadilha-de-caca",
     name: ["Armadilha de Caça", "Hunting Trap"],
     source: "LDJ2024",
     page: 226,
@@ -567,7 +513,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Armar Armadilha",
-        actionId: "action-set-trap",
+        actionId: "act-set-trap",
         parameters: {
           target: { type: "point" },
           range: { normal: 5, unit: "ft" },
@@ -587,7 +533,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-lampiao",
+    id: "gear-lampiao",
     name: ["Lampião", "Lamp"],
     source: "LDJ2024",
     page: 226,
@@ -610,12 +556,12 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Acender Lampião",
-        actionId: "action-light-item",
+        actionId: "act-light-item",
       },
     ],
   },
   {
-    id: "item-cadeado",
+    id: "gear-cadeado",
     name: ["Cadeado", "Lock"],
     source: "LDJ2024",
     page: 226,
@@ -635,7 +581,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-oleo",
+    id: "gear-oleo",
     name: ["Óleo", "Oil"],
     source: "LDJ2024",
     page: 227,
@@ -649,7 +595,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Derramar Óleo",
-        actionId: "action-use-gear-area",
+        actionId: "act-create-area-of-effect",
         parameters: {
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
@@ -715,29 +661,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-bolsa-de-componentes",
-    name: ["Bolsa de Componentes", "Component Pouch"],
-    source: "LDJ2024",
-    page: 228,
-    type: "gear",
-    rarity: "common",
-    weight: { value: 1, unit: "lb" },
-    price: { quantity: 5, unit: "silver" },
-    description:
-      "Uma pequena bolsa de couro com um cinto, capaz de carregar até 6 libras de material.",
-    effects: [
-      {
-        type: "onEquip_providesContainer",
-        name: "Compartimento de Armazenamento",
-        properties: {
-          capacity: { value: 6, unit: "lb" },
-          volume: { value: 0.2, unit: "cubic_foot" },
-        },
-      },
-    ],
-  },
-  {
-    id: "item-corda",
+    id: "gear-corda",
     name: ["Corda", "Rope"],
     source: "LDJ2024",
     page: 228,
@@ -757,7 +681,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-pederneira",
+    id: "gear-pederneira",
     name: ["Pederneira", "Tinderbox"],
     source: "LDJ2024",
     page: 229,
@@ -771,7 +695,7 @@ export const itemsGear = [
       {
         type: "activatableAction",
         name: "Acender Fogo",
-        actionId: "action-light-item",
+        actionId: "act-light-item",
         parameters: {
           activation: {
             type: "action",
@@ -785,7 +709,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-tocha",
+    id: "gear-tocha",
     name: ["Tocha", "Torch"],
     source: "LDJ2024",
     page: 229,
@@ -810,7 +734,6 @@ export const itemsGear = [
         name: "Ataque com Tocha",
         weaponType: "simple",
         weaponRange: "melee",
-        mastery: [],
         properties: ["light"],
         damageFormulas: {
           primary: { type: "damage", fixed: 1, damageTypeOptions: ["fire"] },
@@ -819,7 +742,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-frasco",
+    id: "gear-frasco",
     name: ["Frasco", "Vial"],
     source: "LDJ2024",
     page: 229,
@@ -840,7 +763,7 @@ export const itemsGear = [
     ],
   },
   {
-    id: "item-odre",
+    id: "gear-odre",
     name: ["Odre", "Wineskin"],
     source: "LDJ2024",
     page: 229,
@@ -859,17 +782,280 @@ export const itemsGear = [
       },
     ],
   },
+  {
+    id: "gear-book",
+    name: ["Livro", "Book"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 5, unit: "lb" },
+    price: { quantity: 25, unit: "gold" },
+    description:
+      "Um livro de conhecimento com páginas em branco ou preenchidas com texto, desenhos ou diagramas.",
+    effects: [],
+  },
+  {
+    id: "gear-holy-symbol",
+    name: ["Símbolo Sagrado", "Holy Symbol"],
+    source: "LDJ2024",
+    page: 226,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 1, unit: "lb" },
+    price: { quantity: 5, unit: "gold" },
+    description:
+      "Um símbolo representando uma divindade ou panteão. Um clérigo ou paladino pode usar um símbolo sagrado como foco de conjuração.",
+    effects: [],
+  },
+  {
+    id: "gear-parchment",
+    name: ["Pergaminho", "Parchment"],
+    source: "LDJ2024",
+    page: 227,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 0, unit: "lb" },
+    price: { quantity: 1, unit: "silver" },
+    description:
+      "Uma folha de material preparado para escrita, tipicamente feito de pele animal tratada.",
+    effects: [],
+  },
+  {
+    id: "gear-robe",
+    name: ["Manto", "Robe"],
+    source: "LDJ2024",
+    page: 228,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 4, unit: "lb" },
+    price: { quantity: 1, unit: "gold" },
+    description:
+      "Um manto longo, geralmente usado por estudiosos, magos ou clérigos.",
+    effects: [],
+  },
+  {
+    id: "gear-pouch",
+    name: ["Bolsa", "Pouch"],
+    source: "LDJ2024",
+    page: 228,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 1, unit: "lb" },
+    price: { quantity: 5, unit: "silver" },
+    description:
+      "Uma pequena bolsa de couro que pode armazenar até 6 libras de material.",
+    effects: [
+      {
+        type: "onEquip_providesContainer",
+        name: "Compartimento da Bolsa",
+        properties: {
+          capacity: { value: 6, unit: "lb" },
+          volume: { value: 0.2, unit: "cubic_foot" },
+        },
+      },
+    ],
+  },
+  {
+    id: "gear-travelers-clothes",
+    name: ["Roupas de Viajante", "Traveler's Clothes"],
+    source: "LDJ2024",
+    page: 228,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 4, unit: "lb" },
+    price: { quantity: 2, unit: "gold" },
+    description:
+      "Este conjunto inclui botas resistentes, calças ou saias, camisas de linho, um cinto e uma capa com capuz.",
+    effects: [],
+  },
+  {
+    id: "gear-costume",
+    name: ["Fantasia", "Costume"],
+    source: "LDJ2024",
+    page: 225,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 4, unit: "lb" },
+    price: { quantity: 5, unit: "gold" },
+    description:
+      "Um conjunto de roupas estilizadas para uso em performances ou disfarces.",
+    effects: [],
+  },
+  {
+    id: "gear-fine-clothes",
+    name: ["Roupas Finas", "Fine Clothes"],
+    source: "LDJ2024",
+    page: 225,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 6, unit: "lb" },
+    price: { quantity: 15, unit: "gold" },
+    description:
+      "Roupas feitas de materiais de alta qualidade, incluindo tecidos bordados e adornos de prata.",
+    effects: [],
+  },
+  {
+    id: "gear-perfume",
+    name: ["Perfume", "Perfume"],
+    source: "LDJ2024",
+    page: 227,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 0, unit: "lb" },
+    price: { quantity: 5, unit: "gold" },
+    description:
+      "Uma fragrância agradável contida em um pequeno frasco de vidro.",
+    effects: [],
+  },
+  {
+    id: "gear-iron-pot",
+    name: ["Panela de Ferro", "Iron Pot"],
+    source: "LDJ2024",
+    page: 226,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 10, unit: "lb" },
+    price: { quantity: 2, unit: "gold" },
+    description:
+      "Uma panela de ferro resistente usada para cozinhar sobre uma fogueira.",
+    effects: [],
+  },
+  {
+    id: "gear-shovel",
+    name: ["Pá", "Shovel"],
+    source: "LDJ2024",
+    page: 228,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 5, unit: "lb" },
+    price: { quantity: 2, unit: "gold" },
+    description:
+      "Uma ferramenta com uma lâmina larga e um cabo longo, usada para cavar.",
+    effects: [],
+  },
+  {
+    id: "gear-dice-set",
+    name: ["Conjunto de Dados", "Dice Set"],
+    source: "LDJ2024",
+    page: 225,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 0, unit: "lb" },
+    price: { quantity: 1, unit: "silver" },
+    description: "Um conjunto de dados de seis faces para jogos de azar.",
+    effects: [],
+  },
+  {
+    id: "gear-hooded-lantern",
+    name: ["Lanterna Coberta", "Hooded Lantern"],
+    source: "LDJ2024",
+    page: 226,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 2, unit: "lb" },
+    price: { quantity: 5, unit: "gold" },
+    description:
+      "Uma lanterna coberta emite luz brilhante em um raio de 30 pés e penumbra por mais 30 pés. Uma vez acesa, ela queima por 6 horas com um frasco (1 pinto) de óleo. Como uma ação, você pode abaixar a cobertura, reduzindo a luz para penumbra em um raio de 5 pés.",
+    effects: [
+      {
+        type: "passive_providesLight",
+        name: "Iluminação de Lanterna",
+        properties: {
+          bright: 30,
+          dim: 30,
+          duration: { value: 6, unit: "hour" },
+        },
+      },
+      {
+        type: "activatableAction",
+        name: "Acender Lanterna",
+        actionId: "act-light-item",
+      },
+      {
+        type: "activatableAction",
+        name: "Cobrir Lanterna",
+        actionId: "act-use-object",
+      },
+    ],
+  },
+  {
+    id: "gear-manacles",
+    name: ["Algemas", "Manacles"],
+    source: "LDJ2024",
+    page: 226,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 6, unit: "lb" },
+    price: { quantity: 2, unit: "gold" },
+    description:
+      "Algemas de metal usadas para restringir um prisioneiro. Escapar exige um teste de Destreza (CD 20) ou quebrar as algemas com um teste de Força (CD 20).",
+    effects: [
+      {
+        type: "passive_property",
+        name: "CD para Arrebentar",
+        property: "burstDC",
+        value: 20,
+      },
+    ],
+  },
+  {
+    id: "gear-bedroll",
+    name: ["Saco de Dormir", "Bedroll"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 7, unit: "lb" },
+    price: { quantity: 1, unit: "gold" },
+    description:
+      "Um saco de dormir acolchoado para acampamento ou viagens longas.",
+    effects: [],
+  },
+  {
+    id: "gear-tent",
+    name: ["Tenda", "Tent"],
+    source: "LDJ2024",
+    page: 228,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 20, unit: "lb" },
+    price: { quantity: 2, unit: "gold" },
+    description:
+      "Uma tenda simples que abriga duas pessoas. Inclui estacas e um poste central.",
+    effects: [],
+  },
+  {
+    id: "gear-rope",
+    name: ["Corda", "Rope"],
+    source: "LDJ2024",
+    page: 228,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 10, unit: "lb" },
+    price: { quantity: 1, unit: "gold" },
+    description:
+      "Uma corda de 50 pés de comprimento. Pode ser arrebentada com um teste de Força (CD 17).",
+    effects: [
+      {
+        type: "passive_property",
+        name: "CD para Arrebentar",
+        property: "burstDC",
+        value: 17,
+      },
+    ],
+  },
+  {
+    id: "gear-mirror",
+    name: ["Espelho", "Mirror"],
+    source: "LDJ2024",
+    page: 227,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 0.5, unit: "lb" },
+    price: { quantity: 5, unit: "gold" },
+    description:
+      "Um pequeno espelho de metal polido com moldura, útil para observar ao redor de cantos ou verificar sua aparência.",
+    effects: [],
+  },
 ] as const satisfies Item[];
-
-const allGearIds = itemsGear.map((gear) => gear.id);
-
-if (allGearIds.length === 0) {
-  throw new Error(
-    "Nenhum equipamento encontrado em items-gear.ts para criar o GearIdEnum.",
-  );
-}
-
-const [firstGearId, ...restGearIds] = allGearIds;
-
-export const GearIdEnum = z.enum([firstGearId, ...restGearIds]);
-export type GearId = z.infer<typeof GearIdEnum>;

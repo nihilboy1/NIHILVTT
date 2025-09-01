@@ -20,7 +20,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Bolha Ácida",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -112,7 +112,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Proteção Contra Lâminas",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
           conditionMode: "all",
@@ -165,7 +165,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Toque Arrepiante",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "creature", quantity: 1 },
@@ -252,7 +252,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Luzes Dançantes",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
@@ -263,15 +263,6 @@ export const spellsLevel0 = [
               on: "success",
               tokenId: "token-dancing-lights",
               quantity: 4,
-            },
-            {
-              type: "applyEffect",
-              on: "success",
-              effect: {
-                type: "activatableAction",
-                name: "Mover Luzes",
-                actionId: "action-move-summoned-token",
-              },
             },
           ],
         },
@@ -297,7 +288,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Druidismo",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -362,7 +353,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Rajada Mística",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -435,7 +426,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Manipulação Elemental",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -507,7 +498,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Raio de Fogo",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -612,7 +603,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Encantar Criatura",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 10, unit: "ft" },
@@ -655,7 +646,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Orientação",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: { events: [{ type: "lostConcentration" }] },
         parameters: {
           activation: {
@@ -672,7 +663,7 @@ export const spellsLevel0 = [
               type: "applyEffect",
               on: "success",
               effect: {
-                type: "grantConditionalBonus",
+                type: "providesConditionalBonus",
                 name: "Bônus de Orientação",
                 on: "skillCheck",
                 modifier: { count: 1, faces: 4 },
@@ -707,7 +698,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Luz",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
           activation: {
@@ -760,7 +751,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Mão Mágica",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
           activation: {
@@ -816,7 +807,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Consertar Objeto",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "special",
@@ -865,7 +856,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Enviar Mensagem Telepática",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -910,7 +901,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Fagulha Mental",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -1029,7 +1020,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Ilusão Menor",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
           activation: {
@@ -1078,7 +1069,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Rajada de Veneno",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -1164,7 +1155,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Prestidigitação",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 10, unit: "ft" },
@@ -1239,7 +1230,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Chama",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: { events: [{ type: "castSpellAgain" }] },
         parameters: {
           activation: { type: "bonus" },
@@ -1266,7 +1257,7 @@ export const spellsLevel0 = [
               effect: {
                 type: "activatableAction",
                 name: "Arremessar Chama",
-                actionId: "action-cast-spell",
+                actionId: "act-cast-spell",
                 duration: { unit: "minute", value: 10 },
                 parameters: {
                   activation: { type: "action" },
@@ -1356,7 +1347,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Raio de Gelo",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -1450,7 +1441,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Resistência",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: { events: [{ type: "lostConcentration" }] },
         parameters: {
           activation: { type: "action" },
@@ -1502,7 +1493,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Chama Sagrada",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -1585,7 +1576,10 @@ export const spellsLevel0 = [
     requirements: {
       user: {
         events: [
-          { type: "hasEquippedItem", itemIds: ["item-clava", "item-bordao"] },
+          {
+            type: "hasEquippedItem",
+            itemIds: ["weapon-clava", "weapon-bordao"],
+          },
         ],
       },
     },
@@ -1593,7 +1587,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Bordão Místico",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "castSpellAgain" }, { type: "droppedItem" }],
         },
@@ -1608,7 +1602,7 @@ export const spellsLevel0 = [
               effect: {
                 type: "activatableAction",
                 name: "Ataque com Bordão Místico",
-                actionId: "action-attack",
+                actionId: "act-attack",
                 duration: { unit: "minute", value: 1 },
                 parameters: {
                   activation: { type: "action" },
@@ -1687,7 +1681,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Toque Chocante",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 5, unit: "ft" },
@@ -1773,7 +1767,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Explosão Feiticeira",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
@@ -1902,7 +1896,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Estabilizar Moribundo",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 15, unit: "ft" },
@@ -1962,7 +1956,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Císcaro Estrelado",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -2060,7 +2054,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Taumaturgia",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
@@ -2141,7 +2135,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Chicote de Espinhos",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
@@ -2225,7 +2219,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Estrondo de Trovão",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "selfArea" },
@@ -2322,7 +2316,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Soar dos Mortos",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -2450,7 +2444,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Ataque Certeiro",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "creature", quantity: 1 },
@@ -2532,7 +2526,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Zombaria Viciosa",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -2630,7 +2624,7 @@ export const spellsLevel0 = [
       {
         type: "activatableCastSpell",
         name: "Lançar Palavra de Radiância",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "selfArea", excludeSelf: true, selective: true },

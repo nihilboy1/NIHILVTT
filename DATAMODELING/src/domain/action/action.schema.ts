@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   AreaSchema,
+  BonusSchema,
   DiceRollSchema,
   RechargeSchema,
   RollModifierSchema,
@@ -44,7 +45,7 @@ export const ActionParametersSchema = z.object({
     })
     .optional(),
   attackType: AttackTypeSchema.array().optional(),
-  attackBonus: z.number().int().optional(),
+  attackBonus: BonusSchema.optional(),
   range: RangeSchema.optional(),
   overrideAbilityScore: AbilityScoreEnum.or(
     z.literal("spellcasting"),

@@ -1,6 +1,6 @@
 import { Feat } from "../../domain/feat/feat.schema.js";
 
-export const feats: Feat[] = [
+export const featsFightingStyle: Feat[] = [
   {
     name: ["Arquearia", "Archery"],
     source: "LDJ2024",
@@ -13,7 +13,7 @@ export const feats: Feat[] = [
     },
     effects: [
       {
-        type: "passive_grantBonus",
+        type: "passive_providesBonus",
         on: "attackRoll",
         name: "Bônus de Arquearia",
         value: 2,
@@ -55,7 +55,7 @@ export const feats: Feat[] = [
     },
     effects: [
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         amount: 2,
         filter: {
           level: 0,
@@ -63,6 +63,7 @@ export const feats: Feat[] = [
         },
         canBeSwappedOn: "levelUp",
         name: "Truques de Clérigo",
+        mode: "filter",
         castingAbilityOptions: ["charisma"],
         description:
           "Você aprende dois truques de Clérigo de sua escolha. Os truques escolhidos contam como feitiços de Paladino para você, e Carisma é sua habilidade de conjuração para eles. Sempre que você ganha um nível de Paladino, pode substituir um desses truques por outro cantrip de Clérigo.",
@@ -103,7 +104,7 @@ export const feats: Feat[] = [
     },
     effects: [
       {
-        type: "passive_grantBonus",
+        type: "passive_providesBonus",
         on: "ac",
         name: "Defensivo",
         appliesToArmor: ["light", "medium", "heavy"],
@@ -134,7 +135,8 @@ export const feats: Feat[] = [
     },
     effects: [
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
+        mode: "filter",
         amount: 2,
         filter: {
           level: 0,
@@ -160,7 +162,7 @@ export const feats: Feat[] = [
     },
     effects: [
       {
-        type: "passive_grantBonus",
+        type: "passive_providesBonus",
         on: "damageRoll",
         name: "Bônus de Duelismo",
         value: 2,
@@ -253,7 +255,7 @@ export const feats: Feat[] = [
     category: "fightingStyle",
     effects: [
       {
-        type: "passive_grantBonus",
+        type: "passive_providesBonus",
         on: "damageRoll",
         name: "Luta com Duas Armas",
         value: "abilityModifier",

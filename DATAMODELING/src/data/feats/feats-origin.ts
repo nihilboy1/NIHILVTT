@@ -1,6 +1,6 @@
 import { Feat } from "../../domain/feat/feat.schema.js";
 
-export const feats: Feat[] = [
+export const featsOrigin: Feat[] = [
   {
     name: ["Alerta", "Alert"],
     id: "feat-alert",
@@ -222,7 +222,7 @@ export const feats: Feat[] = [
   },
   {
     name: ["Durão", "Tough"],
-    id: "feat-durao",
+    id: "feat-tough",
     description: "Você é resistente e aguenta mais dano do que a maioria.",
     source: "LDJ2024",
     category: "origin",
@@ -252,7 +252,7 @@ export const feats: Feat[] = [
     },
     effects: [
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         mode: "filter",
         amount: 2,
         filter: {
@@ -266,7 +266,7 @@ export const feats: Feat[] = [
           "Você aprende dois truques de Mago de sua escolha. Os truques escolhidos contam como feitiços de Mago para você.",
       },
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         amount: 1,
         mode: "filter",
         filter: {
@@ -276,9 +276,10 @@ export const feats: Feat[] = [
         freeCasting: {
           amount: 1,
           recharge: {
-            type: "rest",
-            max: 1,
-            rest: "longRest",
+            type: "event",
+            maxCharges: 1,
+            rechargeOn: "longRest",
+            recoveryAmount: 1,
           },
         },
         canBeSwappedOn: "levelUp",
@@ -301,7 +302,7 @@ export const feats: Feat[] = [
     },
     effects: [
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         mode: "filter",
         amount: 2,
         filter: {
@@ -315,7 +316,7 @@ export const feats: Feat[] = [
           "Você aprende dois truques de Clérigo de sua escolha. Os truques escolhidos contam como feitiços de Clérigo para você.",
       },
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         amount: 1,
         mode: "filter",
         filter: {
@@ -325,9 +326,10 @@ export const feats: Feat[] = [
         freeCasting: {
           amount: 1,
           recharge: {
-            type: "rest",
-            max: 1,
-            rest: "longRest",
+            type: "event",
+            maxCharges: 1,
+            rechargeOn: "longRest",
+            recoveryAmount: 1,
           },
         },
         canBeSwappedOn: "levelUp",
@@ -350,7 +352,7 @@ export const feats: Feat[] = [
     },
     effects: [
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         mode: "filter",
         amount: 2,
         filter: {
@@ -364,7 +366,7 @@ export const feats: Feat[] = [
           "Você aprende dois truques de Druida de sua escolha. Os truques escolhidos contam como feitiços de Druida para você.",
       },
       {
-        type: "passive_grantSpellKnowledge",
+        type: "passive_providesSpellKnowledge",
         amount: 1,
         mode: "filter",
         filter: {
@@ -374,9 +376,10 @@ export const feats: Feat[] = [
         freeCasting: {
           amount: 1,
           recharge: {
-            type: "rest",
-            max: 1,
-            rest: "longRest",
+            type: "event",
+            maxCharges: 1,
+            rechargeOn: "longRest",
+            recoveryAmount: 1,
           },
         },
         canBeSwappedOn: "levelUp",

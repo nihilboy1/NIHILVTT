@@ -5,6 +5,7 @@ import { z } from "zod";
 import { FinalSpellDataSchema } from "../domain/spell/spell.schema.js";
 import { FinalItemDataSchema } from "../domain/item/item.schema.js";
 import { FinalMonsterDataSchema } from "../domain/monster/monster.schema.js";
+import { FinalFeatDataSchema } from "../domain/feat/feat.schema.js";
 
 process.on("uncaughtException", (err) => {
   console.error(chalk.bgRed.white(" Uncaught Exception "), err);
@@ -105,48 +106,32 @@ async function main() {
   while (true) {
     choice = (
       await ask(
-        "\nO que você quer testar?\n[1] Testar todos\n[2] Magias\n[3] Itens\n[4] Monstros\nInforme: ",
+        "\nO que você quer testar?\n[1] Testar todos\n[2] Magias\n[3] Itens\n[4] Monstros\n[5] Feats\nInforme: ",
       )
     ).trim();
 
-    if (["1", "2", "3", "4"].includes(choice)) break;
+    if (["1", "2", "3", "4", "5"].includes(choice)) break;
 
-    console.log(chalk.red("❌ Opção inválida! Digite 1, 2, 3 ou 4."));
+    console.log(chalk.red("❌ Opção inválida! Digite 1, 2, 3, 4 ou 5."));
   }
 
   if (choice === "1" || choice === "2") {
-    if (choice === "1" || choice === "2") {
-      console.log(chalk.blue("Carregando dados de magias..."));
+    console.log(chalk.blue("Carregando dados de magias..."));
 
-      const { PHB2024SPELLS } = await import("../data/spells/spells-union.js");
+    const { PHB2024SPELLS } = await import("../data/spells/spells-union.js");
 
-      validateData(PHB2024SPELLS, FinalSpellDataSchema, "Magias");
-    }
+    validateData(PHB2024SPELLS, FinalSpellDataSchema, "Magias");
+  }
 
-    if (choice === "1") {
-      console.log(chalk.blue("Carregando dados de itens..."));
-
-      const { PHB2024ITEMS } = await import("../data/items/items-union.js");
-
-      validateData(PHB2024ITEMS, FinalItemDataSchema, "Itens");
-    }
-
-    if (choice === "1") {
-      console.log(chalk.blue("Carregando dados de monstros..."));
-
-      const { PHB2024MONSTERS } = await import(
-        "../data/monsters/monsters.union.js"
-      );
-
-      validateData(PHB2024MONSTERS, FinalMonsterDataSchema, "Monstros");
-    }
-  } else if (choice === "3") {
+  if (choice === "1" || choice === "3") {
     console.log(chalk.blue("Carregando dados de itens..."));
 
     const { PHB2024ITEMS } = await import("../data/items/items-union.js");
 
     validateData(PHB2024ITEMS, FinalItemDataSchema, "Itens");
-  } else if (choice === "4") {
+  }
+
+  if (choice === "1" || choice === "4") {
     console.log(chalk.blue("Carregando dados de monstros..."));
 
     const { PHB2024MONSTERS } = await import(
@@ -154,6 +139,14 @@ async function main() {
     );
 
     validateData(PHB2024MONSTERS, FinalMonsterDataSchema, "Monstros");
+  }
+
+  if (choice === "1" || choice === "5") {
+    console.log(chalk.blue("Carregando dados de feats..."));
+
+    const { PHB2024FEATS } = await import("../data/feats/feats-union.js");
+
+    validateData(PHB2024FEATS, FinalFeatDataSchema, "Feats");
   }
 
   rl.close();

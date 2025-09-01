@@ -24,13 +24,17 @@ type HPFormulaType =
   | ConditionalHPFormulaType
   | z.infer<typeof HalfDamageFormulaSchema>;
 
-
 export const BaseRollModifierSchema = z.object({
   type: z.literal("rollModifier"),
   mode: RollModeEnum,
 });
 
-
+export const BonusSchema = z.object({
+  value: z.number().int().optional(),
+  variable: z
+    .enum(["spellcastingModifier", "proficiencyBonus", "level"])
+    .optional(),
+});
 
 export const DurationSchema = z.object({
   unit: DurationUnitEnum,
@@ -43,7 +47,7 @@ export const DiceRollSchema = z.object({
     .number()
     .int()
     .min(1, "O número de faces do dado deve ser no mínimo 1."),
-  bonus: z.number().int().optional(),
+  bonus: BonusSchema.optional(),
   explodesOn: z.number().optional(),
   explodeLimit: z
     .union([z.number().int(), z.literal("spellcastingModifier")])
@@ -59,10 +63,10 @@ export const RechargeSchema = z.discriminatedUnion("type", [
     max: z.number().int().min(1),
   }),
   z.object({
-    type: z.literal("rest"),
-    rest: RechargeEventEnum,
-    amount: z.union([z.number(), DiceRollSchema]).optional(),
-    max: z.number().int().min(1),
+    type: z.literal("event"),
+    rechargeOn: RechargeEventEnum,
+    recoveryAmount: z.union([z.number(), DiceRollSchema]),
+    maxCharges: z.number().int().min(1),
   }),
   z.object({
     type: z.literal("time"),
@@ -153,7 +157,6 @@ export const AcSchema = z.discriminatedUnion("calculation", [
 ]);
 
 const SelectionModeEnum = z.enum(["choice", "all"]);
-
 
 export const AreaSchema = z.discriminatedUnion("shape", [
   z.object({

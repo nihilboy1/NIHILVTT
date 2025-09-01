@@ -35,7 +35,7 @@ export const monsters_cr_0: Monster[] = [
       resistances: ["piercing"],
       vulnerabilities: ["fire"],
     },
-    languages: ["common", "other"],
+    languages: ["common", "any"],
     challengeRating: "0",
     traits: [
       {
@@ -47,12 +47,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Rastrar",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 1,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 1 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -120,12 +122,14 @@ export const monsters_cr_0: Monster[] = [
       },
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 1,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 1 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -134,7 +138,7 @@ export const monsters_cr_0: Monster[] = [
               vitals: ["currentHp"],
               formula: {
                 type: "damage",
-                roll: { count: 1, faces: 4, bonus: -1 },
+                roll: { count: 1, faces: 4, bonus: { value: -1 } },
                 damageTypeOptions: ["piercing"],
               },
             },
@@ -157,7 +161,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 11,
     hitPoints: {
       average: 5,
-      formula: { count: 1, faces: 4, bonus: 3 },
+      formula: { count: 1, faces: 4, bonus: { value: 3 } },
     },
     speed: {
       walk: 20,
@@ -175,7 +179,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 5,
     },
     proficiencyBonus: {
-      skills: [{ skill: "perception", bonus: 3 }],
+      skills: [{ skill: "perception", bonus: { value: 3 } }],
     },
     senses: {
       passivePerception: 13,
@@ -190,12 +194,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -227,7 +233,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 12,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 5,
@@ -266,12 +272,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 4,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 4 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -322,8 +330,8 @@ export const monsters_cr_0: Monster[] = [
     },
     proficiencyBonus: {
       skills: [
-        { skill: "perception", bonus: 3 },
-        { skill: "stealth", bonus: 4 },
+        { skill: "perception", bonus: { value: 3 } },
+        { skill: "stealth", bonus: { value: 4 } },
       ],
     },
     senses: {
@@ -340,12 +348,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Garras",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 4,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 4 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -400,11 +410,11 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Clava",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "weapon", range: "melee" }],
+          attackType: [{ source: "weapon", range: "melee", handsInUse: "one" }],
           range: { normal: 5, unit: "ft" },
           target: { type: "creature", quantity: 1 },
           outcomes: [
@@ -438,7 +448,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 11,
     hitPoints: {
       average: 3,
-      formula: { count: 1, faces: 4, bonus: 1 },
+      formula: { count: 1, faces: 4, bonus: { value: 1 } },
     },
     speed: {
       walk: 20,
@@ -456,7 +466,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 2,
     },
     proficiencyBonus: {
-      skills: [{ skill: "stealth", bonus: 2 }],
+      skills: [{ skill: "stealth", bonus: { value: 2 } }],
     },
     senses: {
       passivePerception: 9,
@@ -474,12 +484,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Garra",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -564,12 +576,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Pancada",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 3,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -618,7 +632,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 5,
     },
     proficiencyBonus: {
-      skills: [{ skill: "perception", bonus: 4 }],
+      skills: [{ skill: "perception", bonus: { value: 4 } }],
     },
     senses: {
       passivePerception: 14,
@@ -634,12 +648,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Chifres",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -671,7 +687,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 12,
     hitPoints: {
       average: 4,
-      formula: { count: 1, faces: 6, bonus: 1 },
+      formula: { count: 1, faces: 6, bonus: { value: 1 } },
     },
     speed: {
       walk: 10,
@@ -689,7 +705,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 7,
     },
     proficiencyBonus: {
-      skills: [{ skill: "perception", bonus: 6 }],
+      skills: [{ skill: "perception", bonus: { value: 6 } }],
     },
     senses: {
       passivePerception: 16,
@@ -705,12 +721,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Garras",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 4,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 4 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -719,7 +737,7 @@ export const monsters_cr_0: Monster[] = [
               vitals: ["currentHp"],
               formula: {
                 type: "damage",
-                roll: { count: 1, faces: 4, bonus: 2 },
+                roll: { count: 1, faces: 4, bonus: { value: 2 } },
                 damageTypeOptions: ["slashing"],
               },
             },
@@ -742,7 +760,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 11,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 20,
@@ -761,8 +779,8 @@ export const monsters_cr_0: Monster[] = [
     },
     proficiencyBonus: {
       skills: [
-        { skill: "perception", bonus: 1 },
-        { skill: "stealth", bonus: 3 },
+        { skill: "perception", bonus: { value: 1 } },
+        { skill: "stealth", bonus: { value: 3 } },
       ],
     },
     senses: {
@@ -786,12 +804,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 3,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -823,7 +843,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 13,
     hitPoints: {
       average: 4,
-      formula: { count: 1, faces: 6, bonus: 1 },
+      formula: { count: 1, faces: 6, bonus: { value: 1 } },
     },
     speed: {
       walk: 30,
@@ -861,12 +881,14 @@ export const monsters_cr_0: Monster[] = [
       },
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 1,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 1 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -932,12 +954,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Chifres",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -969,7 +993,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 13,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 10,
@@ -987,7 +1011,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 6,
     },
     proficiencyBonus: {
-      skills: [{ skill: "perception", bonus: 6 }],
+      skills: [{ skill: "perception", bonus: { value: 6 } }],
     },
     senses: {
       passivePerception: 16,
@@ -1003,12 +1027,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Garras",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 4,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 4 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1026,7 +1052,7 @@ export const monsters_cr_0: Monster[] = [
       },
       {
         type: "reaction",
-        actionId: "reaction-opportunity-attack",
+        actionId: "react-opportunity-attack",
         name: "Ataque de Oportunidade",
         parameters: {
           activation: { type: "reaction" },
@@ -1055,7 +1081,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 13,
     hitPoints: {
       average: 4,
-      formula: { count: 1, faces: 4, bonus: 2 },
+      formula: { count: 1, faces: 4, bonus: { value: 2 } },
     },
     speed: {
       walk: 20,
@@ -1083,7 +1109,7 @@ export const monsters_cr_0: Monster[] = [
         condition: ["charmed", "poisoned"],
       },
     },
-    languages: ["common", "other"],
+    languages: ["common", "any"],
     challengeRating: "0",
     traits: [
       {
@@ -1095,12 +1121,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 4,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 4 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1141,7 +1169,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 11,
     hitPoints: {
       average: 5,
-      formula: { count: 1, faces: 8, bonus: 1 },
+      formula: { count: 1, faces: 8, bonus: { value: 1 } },
     },
     speed: {
       walk: 50,
@@ -1158,7 +1186,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 5,
     },
     proficiencyBonus: {
-      skills: [{ skill: "perception", bonus: 3 }],
+      skills: [{ skill: "perception", bonus: { value: 3 } }],
     },
     senses: {
       passivePerception: 13,
@@ -1184,12 +1212,14 @@ export const monsters_cr_0: Monster[] = [
       },
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 3,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1239,8 +1269,8 @@ export const monsters_cr_0: Monster[] = [
     },
     proficiencyBonus: {
       skills: [
-        { skill: "perception", bonus: 5 },
-        { skill: "stealth", bonus: 4 },
+        { skill: "perception", bonus: { value: 5 } },
+        { skill: "stealth", bonus: { value: 4 } },
       ],
     },
     senses: {
@@ -1253,12 +1283,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 1,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 1 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1267,7 +1299,7 @@ export const monsters_cr_0: Monster[] = [
               vitals: ["currentHp"],
               formula: {
                 type: "damage",
-                roll: { count: 1, faces: 4, bonus: -1 },
+                roll: { count: 1, faces: 4, bonus: { value: -1 } },
                 damageTypeOptions: ["piercing"],
               },
             },
@@ -1311,17 +1343,19 @@ export const monsters_cr_0: Monster[] = [
         darkvision: 60,
       },
     },
-    languages: ["common", "other"],
+    languages: ["common", "any"],
     challengeRating: "0",
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 1,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 1 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1330,7 +1364,7 @@ export const monsters_cr_0: Monster[] = [
               vitals: ["currentHp"],
               formula: {
                 type: "damage",
-                roll: { count: 1, faces: 4, bonus: -1 },
+                roll: { count: 1, faces: 4, bonus: { value: -1 } },
                 damageTypeOptions: ["necrotic"],
               },
             },
@@ -1381,7 +1415,7 @@ export const monsters_cr_0: Monster[] = [
         condition: ["charmed", "frightened", "poisoned"],
       },
     },
-    languages: ["infernal", "other"],
+    languages: ["infernal", "any"],
     challengeRating: "0",
     traits: [
       {
@@ -1393,12 +1427,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Limo Vil",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1464,12 +1500,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 1,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 1 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1522,7 +1560,7 @@ export const monsters_cr_0: Monster[] = [
         darkvision: 120,
       },
     },
-    languages: ["other"],
+    languages: ["any"],
     challengeRating: "0",
     traits: [
       {
@@ -1539,12 +1577,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Pancada",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 3,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1553,7 +1593,7 @@ export const monsters_cr_0: Monster[] = [
               vitals: ["currentHp"],
               formula: {
                 type: "damage",
-                roll: { count: 1, faces: 4, bonus: -1 },
+                roll: { count: 1, faces: 4, bonus: { value: -1 } },
                 damageTypeOptions: ["bludgeoning"],
               },
             },
@@ -1605,8 +1645,8 @@ export const monsters_cr_0: Monster[] = [
     },
     proficiencyBonus: {
       skills: [
-        { skill: "perception", bonus: 2 },
-        { skill: "stealth", bonus: 6 },
+        { skill: "perception", bonus: { value: 2 } },
+        { skill: "stealth", bonus: { value: 6 } },
       ],
     },
     senses: {
@@ -1644,12 +1684,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Tentáculos",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 4,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 4 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1681,7 +1723,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 11,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 5,
@@ -1700,8 +1742,8 @@ export const monsters_cr_0: Monster[] = [
     },
     proficiencyBonus: {
       skills: [
-        { skill: "perception", bonus: 5 },
-        { skill: "stealth", bonus: 5 },
+        { skill: "perception", bonus: { value: 5 } },
+        { skill: "stealth", bonus: { value: 5 } },
       ],
     },
     senses: {
@@ -1726,12 +1768,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Garras",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1763,7 +1807,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 13,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 5,
@@ -1801,12 +1845,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 5,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 5 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1838,7 +1884,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 10,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 20,
@@ -1856,7 +1902,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 4,
     },
     proficiencyBonus: {
-      skills: [{ skill: "perception", bonus: 2 }],
+      skills: [{ skill: "perception", bonus: { value: 2 } }],
     },
     senses: {
       passivePerception: 12,
@@ -1875,12 +1921,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1930,7 +1978,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 6,
     },
     proficiencyBonus: {
-      skills: [{ skill: "perception", bonus: 3 }],
+      skills: [{ skill: "perception", bonus: { value: 3 } }],
     },
     senses: {
       passivePerception: 13,
@@ -1946,12 +1994,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Bico",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -1983,7 +2033,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 11,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 10,
@@ -2009,12 +2059,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Ferrão",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -2056,7 +2108,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 12,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 5,
@@ -2075,8 +2127,8 @@ export const monsters_cr_0: Monster[] = [
     },
     proficiencyBonus: {
       skills: [
-        { skill: "perception", bonus: 2 },
-        { skill: "stealth", bonus: 5 },
+        { skill: "perception", bonus: { value: 2 } },
+        { skill: "stealth", bonus: { value: 5 } },
       ],
     },
     senses: {
@@ -2155,7 +2207,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 12,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 20,
@@ -2173,7 +2225,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 2,
     },
     proficiencyBonus: {
-      skills: [{ skill: "stealth", bonus: 4 }],
+      skills: [{ skill: "stealth", bonus: { value: 4 } }],
     },
     senses: {
       passivePerception: 10,
@@ -2202,12 +2254,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -2248,7 +2302,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 10,
     hitPoints: {
       average: 5,
-      formula: { count: 1, faces: 8, bonus: 1 },
+      formula: { count: 1, faces: 8, bonus: { value: 1 } },
     },
     speed: {
       walk: 10,
@@ -2266,7 +2320,7 @@ export const monsters_cr_0: Monster[] = [
       charisma: 4,
     },
     proficiencyBonus: {
-      skills: [{ skill: "perception", bonus: 3 }],
+      skills: [{ skill: "perception", bonus: { value: 3 } }],
     },
     senses: {
       passivePerception: 13,
@@ -2296,12 +2350,14 @@ export const monsters_cr_0: Monster[] = [
       },
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Bico",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 4,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 4 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {
@@ -2333,7 +2389,7 @@ export const monsters_cr_0: Monster[] = [
     armorClass: 13,
     hitPoints: {
       average: 1,
-      formula: { count: 1, faces: 4, bonus: -1 },
+      formula: { count: 1, faces: 4, bonus: { value: -1 } },
     },
     speed: {
       walk: 30,
@@ -2352,9 +2408,9 @@ export const monsters_cr_0: Monster[] = [
     },
     proficiencyBonus: {
       skills: [
-        { skill: "acrobatics", bonus: 5 },
-        { skill: "perception", bonus: 3 },
-        { skill: "stealth", bonus: 5 },
+        { skill: "acrobatics", bonus: { value: 5 } },
+        { skill: "perception", bonus: { value: 3 } },
+        { skill: "stealth", bonus: { value: 5 } },
       ],
     },
     senses: {
@@ -2374,12 +2430,14 @@ export const monsters_cr_0: Monster[] = [
     effects: [
       {
         type: "activatableAction",
-        actionId: "action-attack",
+        actionId: "act-attack",
         name: "Mordida",
         parameters: {
           activation: { type: "action" },
-          attackType: [{ source: "natural", range: "melee" }],
-          attackBonus: 2,
+          attackType: [
+            { source: "natural", range: "melee", handsInUse: "one" },
+          ],
+          attackBonus: { value: 3 },
           range: { normal: 5, unit: "ft" },
           outcomes: [
             {

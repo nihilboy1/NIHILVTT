@@ -1,0 +1,108 @@
+import { Item } from "../../domain/item/item.schema";
+
+export const itemsMusicalInstruments = [
+  {
+    id: "musical-instrument-bagpipes",
+    name: ["Gaita de Foles", "Bagpipes"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 6, unit: "lb" },
+    price: { quantity: 30, unit: "gold" },
+    description:
+      "Um instrumento musical de sopro com várias palhetas e um reservatório de ar, produzindo um som característico.",
+    effects: [],
+  },
+  {
+    id: "musical-instrument-drum",
+    name: ["Tambor", "Drum"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 3, unit: "lb" },
+    price: { quantity: 6, unit: "gold" },
+    description:
+      "Um instrumento de percussão circular coberto com pele esticada, que é tocado batendo em sua superfície.",
+    effects: [],
+  },
+  {
+    id: "musical-instrument-flute",
+    name: ["Flauta", "Flute"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 1, unit: "lb" },
+    price: { quantity: 2, unit: "gold" },
+    description:
+      "Um instrumento musical de sopro em forma de tubo com orifícios que produzem sons quando cobertos e descobertos enquanto se sopra através dele.",
+    effects: [],
+  },
+  {
+    id: "musical-instrument-lyre",
+    name: ["Lira", "Lyre"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 2, unit: "lb" },
+    price: { quantity: 30, unit: "gold" },
+    description:
+      "Um instrumento musical de cordas semelhante a uma pequena harpa, com uma caixa de ressonância e cordas esticadas.",
+    effects: [],
+  },
+  {
+    id: "musical-instrument-horn",
+    name: ["Corneta", "Horn"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 2, unit: "lb" },
+    price: { quantity: 3, unit: "gold" },
+    description:
+      "Um instrumento musical de sopro em forma de tubo curvo, geralmente feito de metal ou chifre animal.",
+    effects: [],
+  },
+  {
+    id: "musical-instrument-pan-flute",
+    name: ["Flauta de Pã", "Pan Flute"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 2, unit: "lb" },
+    price: { quantity: 12, unit: "gold" },
+    description:
+      "Um instrumento musical composto por vários tubos de diferentes comprimentos amarrados lado a lado, produzindo diferentes notas quando soprados.",
+    effects: [],
+  },
+  {
+    id: "musical-instrument-shawm",
+    name: ["Shawm", "Shawm"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 1, unit: "lb" },
+    price: { quantity: 2, unit: "gold" },
+    description:
+      "Um instrumento musical de sopro antecessor do oboé, com um som penetrante e uma palheta dupla.",
+    effects: [],
+  },
+  {
+    id: "musical-instrument-viol",
+    name: ["Viola da Gamba", "Viol"],
+    source: "LDJ2024",
+    page: 224,
+    type: "gear",
+    rarity: "common",
+    weight: { value: 2, unit: "lb" },
+    price: { quantity: 30, unit: "gold" },
+    description:
+      "Um instrumento musical de cordas tocado com um arco, precursor do violoncelo moderno.",
+    effects: [],
+  },
+] as const satisfies Item[];

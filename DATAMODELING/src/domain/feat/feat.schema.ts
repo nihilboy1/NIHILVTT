@@ -24,3 +24,4 @@ export const FeatSchema = z.object({
 });
 
 export type Feat = z.infer<typeof FeatSchema>;
+export const FinalFeatDataSchema = z.array(FeatSchema);

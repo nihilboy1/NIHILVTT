@@ -1,9 +1,8 @@
 import { Item } from "../../domain/item/item.schema";
-import z from "zod";
 
 export const itemsArmor = [
   {
-    id: "item-peitoral-de-aco",
+    id: "armor-peitoral-de-aco",
     name: ["Peitoral de Aço", "Breastplate"],
     source: "LDJ2024",
     page: 219,
@@ -28,7 +27,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-cota-de-malha",
+    id: "armor-cota-de-malha",
     name: ["Cota de Malha", "Chain Mail"],
     source: "LDJ2024",
     page: 219,
@@ -66,7 +65,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-camisao-de-malha",
+    id: "armor-camisao-de-malha",
     name: ["Camisão de Malha", "Chain Shirt"],
     source: "LDJ2024",
     page: 219,
@@ -91,7 +90,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-meia-armadura-de-placas",
+    id: "armor-meia-armadura-de-placas",
     name: ["Meia Armadura de Placas", "Half Plate Armor"],
     source: "LDJ2024",
     page: 219,
@@ -122,7 +121,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-armadura-de-peles",
+    id: "armor-armadura-de-peles",
     name: ["Armadura de Peles", "Hide Armor"],
     source: "LDJ2024",
     page: 219,
@@ -147,7 +146,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-armadura-de-couro",
+    id: "armor-armadura-de-couro",
     name: ["Armadura de Couro", "Leather Armor"],
     source: "LDJ2024",
     page: 219,
@@ -171,7 +170,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-armadura-acolchoada",
+    id: "armor-armadura-acolchoada",
     name: ["Armadura Acolchoada", "Padded Armor"],
     source: "LDJ2024",
     page: 219,
@@ -201,7 +200,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-armadura-de-placas",
+    id: "armor-armadura-de-placas",
     name: ["Armadura de Placas", "Plate Armor"],
     source: "LDJ2024",
     page: 219,
@@ -239,7 +238,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-armadura-de-aneis",
+    id: "armor-armadura-de-aneis",
     name: ["Armadura de Anéis", "Ring Mail"],
     source: "LDJ2024",
     page: 219,
@@ -265,7 +264,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-armadura-de-escamas",
+    id: "armor-armadura-de-escamas",
     name: ["Armadura de Escamas", "Scale Mail"],
     source: "LDJ2024",
     page: 219,
@@ -296,7 +295,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-escudo",
+    id: "armor-escudo",
     name: ["Escudo", "Shield"],
     source: "LDJ2024",
     page: 219,
@@ -316,7 +315,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-armadura-de-talas",
+    id: "armor-armadura-de-talas",
     name: ["Armadura de Talas", "Splint Armor"],
     source: "LDJ2024",
     page: 219,
@@ -354,7 +353,7 @@ export const itemsArmor = [
     ],
   },
   {
-    id: "item-armadura-de-couro-batido",
+    id: "armor-armadura-de-couro-batido",
     name: ["Armadura de Couro Batido", "Studded Leather Armor"],
     source: "LDJ2024",
     page: 219,
@@ -379,15 +378,3 @@ export const itemsArmor = [
   },
 ] as const satisfies Item[];
 
-const allArmorIds = itemsArmor.map((armor) => armor.id);
-
-if (allArmorIds.length === 0) {
-  throw new Error(
-    "Nenhuma armadura encontrada em items-armor.ts para criar o ArmorIdEnum.",
-  );
-}
-
-const [firstArmorId, ...restArmorIds] = allArmorIds;
-
-export const ArmorIdEnum = z.enum([firstArmorId, ...restArmorIds]);
-export type ArmorId = z.infer<typeof ArmorIdEnum>;

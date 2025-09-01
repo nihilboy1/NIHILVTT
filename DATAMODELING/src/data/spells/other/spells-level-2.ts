@@ -1,3 +1,4 @@
+
 export const spellsLevel2 = [
   {
     id: "spell-aid",
@@ -763,6 +764,7 @@ export const spellsLevel2 = [
     areaTags: ["ST"],
   },
   {
+    id: "spell-detect-thoughts",
     name: "Detect Thoughts",
     source: "LDJ2024",
     page: 262,
@@ -1397,6 +1399,7 @@ export const spellsLevel2 = [
     areaTags: ["ST"],
   },
   {
+    id: "spell-invisibility",
     name: "Invisibility",
     source: "LDJ2024",
     page: 289,
@@ -1852,6 +1855,7 @@ export const spellsLevel2 = [
     ],
   },
   {
+    id: "spell-misty-step",
     name: "Misty Step",
     source: "LDJ2024",
     page: 299,

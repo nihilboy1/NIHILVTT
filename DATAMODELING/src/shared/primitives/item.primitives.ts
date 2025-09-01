@@ -36,16 +36,7 @@ export const WeaponPropertyEnum = z.enum([
   "special",
 ]);
 
-export const WeaponMasteryEnum = z.enum([
-  "topple",
-  "sap",
-  "vex",
-  "slow",
-  "push",
-  "nick",
-  "graze",
-  "cleave",
-]);
+
 
 export const ItemPropertyEnum = z.enum(["pickLockDC", "burstDC"]);
 

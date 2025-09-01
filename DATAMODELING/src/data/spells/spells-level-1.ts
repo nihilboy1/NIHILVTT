@@ -60,7 +60,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Amizade Animal",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [
             {
@@ -142,7 +142,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Curar Ferimentos",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -203,7 +203,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Palavra Curativa",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "bonus",
@@ -260,7 +260,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Braços de Hadar",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -348,7 +348,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Mãos Flamejantes",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -444,7 +444,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Benção",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -523,7 +523,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Perdição",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "action",
@@ -613,7 +613,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Armadura de Agathys",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: { events: [{ type: "tempHPDepleted" }] },
         parameters: {
           activation: {
@@ -716,7 +716,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Enfeitiçar Pessoa",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [
             {
@@ -796,7 +796,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Orbe Cromática",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 90, unit: "ft" },
@@ -877,7 +877,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Leque Cromático",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "selfArea" },
@@ -923,7 +923,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Comando",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -978,7 +978,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Duelo Forçado",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [
             { type: "lostConcentration" },
@@ -1045,7 +1045,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Compreender Idiomas",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
@@ -1080,7 +1080,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Criar ou Destruir Água",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
@@ -1139,7 +1139,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Detectar o Bem e o Mal",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -1176,7 +1176,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Detectar Magia",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -1216,7 +1216,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Detectar Veneno e Doença",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -1251,7 +1251,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Disfarçar-se",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
@@ -1283,7 +1283,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Sussurros Dissonantes",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -1360,7 +1360,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Favor Divino",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "bonus" },
           target: { type: "self" },
@@ -1409,7 +1409,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Golpe Divino",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "bonus",
@@ -1483,7 +1483,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Golpe Aprisionador",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -1570,7 +1570,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Emaranhar",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -1631,7 +1631,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Recuo Acelerado",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -1666,7 +1666,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Fogo das Fadas",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -1730,7 +1730,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Vida Falsa",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
@@ -1742,7 +1742,7 @@ export const spellsLevel1 = [
               vitals: ["tempHp"],
               formula: {
                 type: "healing",
-                roll: { count: 2, faces: 4, bonus: 4 },
+                roll: { count: 2, faces: 4, bonus: { value: 4 } },
               },
             },
           ],
@@ -1801,7 +1801,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Encontrar Familiar",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "special" },
           range: { normal: 10, unit: "ft" },
@@ -1834,7 +1834,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Nuvem de Neblina",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [
             { type: "lostConcentration" },
@@ -1890,7 +1890,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Boa Baga",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { unit: "ft", normal: 5 },
@@ -1927,7 +1927,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Graxa",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -2002,7 +2002,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Raio Guiador",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
@@ -2060,7 +2060,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Chuva de Espinhos",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "bonus",
@@ -2143,7 +2143,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Repreensão Infernal",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "reaction",
@@ -2220,7 +2220,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Heroísmo",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -2288,7 +2288,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Rogar Praga",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -2358,7 +2358,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Marca do Caçador",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -2430,7 +2430,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Faca de Gelo",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -2518,7 +2518,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Identificar",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "special" },
           range: { unit: "ft", normal: 5 },
@@ -2563,7 +2563,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Escrita Ilusória",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "special" },
           range: { unit: "ft", normal: 5 },
@@ -2596,7 +2596,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Infligir Ferimentos",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { unit: "ft", normal: 5 },
@@ -2665,7 +2665,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Salto",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "bonus" },
           range: { unit: "ft", normal: 5 },
@@ -2711,7 +2711,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Passos Longos",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { unit: "ft", normal: 5 },
@@ -2760,7 +2760,7 @@ export const spellsLevel1 = [
       {
         name: "Conjurar Armadura Arcana",
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { unit: "ft", normal: 5 },
@@ -2797,7 +2797,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Míssil Mágico",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 120, unit: "ft" },
@@ -2810,7 +2810,7 @@ export const spellsLevel1 = [
               vitals: ["currentHp"],
               formula: {
                 type: "damage",
-                roll: { count: 1, faces: 4, bonus: 1 },
+                roll: { count: 1, faces: 4, bonus: { value: 1 } },
                 damageTypeOptions: ["force"],
               },
             },
@@ -2849,7 +2849,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Proteção contra o Bem e o Mal",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -2886,7 +2886,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Purificar Comida e Bebida",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 10, unit: "ft" },
@@ -2918,7 +2918,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Raio da Doença",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -2977,7 +2977,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Santuário",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "hostile", who: ["user"], is: true }],
         },
@@ -3014,7 +3014,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Golpe Fervente",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "bonus",
@@ -3082,7 +3082,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Escudo Arcano",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "reaction",
@@ -3109,7 +3109,7 @@ export const spellsLevel1 = [
               on: "any",
               effect: {
                 name: "Bônus de CA do Escudo",
-                type: "passive_grantBonus",
+                type: "passive_providesBonus",
                 on: "ac",
                 value: 5,
                 duration: { unit: "round", value: 1 },
@@ -3143,7 +3143,7 @@ export const spellsLevel1 = [
     effects: [
       {
         type: "activatableCastSpell",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         name: "Conjurar Escudo Arcano",
         endConditions: {
           events: [{ type: "lostConcentration" }],
@@ -3159,7 +3159,7 @@ export const spellsLevel1 = [
               on: "any",
               effect: {
                 name: "Bônus de CA da Fé",
-                type: "passive_grantBonus",
+                type: "passive_providesBonus",
                 on: "ac",
                 value: 2,
                 duration: { unit: "minute", value: 10, isConcentration: true },
@@ -3188,7 +3188,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Imagem Silenciosa",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -3235,7 +3235,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Sono",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -3292,7 +3292,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Falar com Animais",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "self" },
@@ -3327,7 +3327,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Riso Histérico de Tasha",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -3399,7 +3399,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Disco Flutuante de Tenser",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 30, unit: "ft" },
@@ -3440,7 +3440,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Golpe Trovejante",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "bonus",
@@ -3522,7 +3522,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Onda Trovejante",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           target: { type: "selfArea" },
@@ -3596,7 +3596,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Conjurar Servo Invisível",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: { type: "action" },
           range: { normal: 60, unit: "ft" },
@@ -3640,7 +3640,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Raio Enfeitiçante",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         endConditions: {
           events: [{ type: "lostConcentration" }],
         },
@@ -3668,7 +3668,7 @@ export const spellsLevel1 = [
               effect: {
                 name: "Canalização do Witch Bolt",
                 type: "activatableAction",
-                actionId: "action-witch-bolt-channel",
+                actionId: "act-magic",
                 duration: { unit: "minute", value: 1, isConcentration: true },
                 parameters: {
                   activation: { type: "bonus" },
@@ -3719,7 +3719,7 @@ export const spellsLevel1 = [
       {
         type: "activatableCastSpell",
         name: "Raio Enfeitiçante",
-        actionId: "action-cast-spell",
+        actionId: "act-cast-spell",
         parameters: {
           activation: {
             type: "bonus",

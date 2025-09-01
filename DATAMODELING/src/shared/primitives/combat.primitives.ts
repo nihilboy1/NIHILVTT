@@ -37,7 +37,6 @@ export const DamageTypeEnum = z.enum([
   "thunder",
   "force",
   "psychic",
-  "weaponDefault",
 ]);
 
 export const EffectOutcomeEnum = z.enum([

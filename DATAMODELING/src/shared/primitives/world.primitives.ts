@@ -1,7 +1,5 @@
-
-export const TemplateType = z.enum(["areaOfEffect", "Token"]);
-
 import z from "zod";
+
 
 export const DurationUnitEnum = z.enum([
   "round",

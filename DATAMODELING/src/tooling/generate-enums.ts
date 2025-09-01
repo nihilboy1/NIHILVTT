@@ -1,3 +1,4 @@
+// scripts/generate-enums.ts
 import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
@@ -5,9 +6,6 @@ import chalk from "chalk";
 import { fileURLToPath } from "url";
 import { glob } from "glob";
 
-import { SummonedTokensData } from "../data/tokens/tokens.js";
-
-// --- Tipagem (do script generate-paths.ts) ---
 interface Outcome {
   id?: string;
   type: string;
@@ -25,23 +23,21 @@ interface Effect {
 }
 
 interface DataObject {
-  id: string;
+  id?: string;
+  type?: string;
   effects?: Effect[];
+  parameters?: Parameters;
+  outcomes?: Outcome[];
   [key: string]: unknown;
 }
 
-// --- Tratamento de Erros Globais ---
-process.on("uncaughtException", (err) => {
-  console.error(chalk.bgRed.white(" Uncaught Exception "), err);
-  process.exit(1);
-});
+function generateZodEnumFromSet(name: string, values: Set<string>): string {
+  const sortedValues = Array.from(values).sort();
+  const enumValues = sortedValues.map((val) => `  '${val}'`).join(",\n");
 
-process.on("unhandledRejection", (reason) => {
-  console.error(chalk.bgRed.white(" Unhandled Rejection "), reason);
-  process.exit(1);
-});
+  return `export const ${name} = z.enum([\n${enumValues}\n]);`;
+}
 
-// --- Funções Auxiliares ---
 function getPaths(
   obj: Record<string, unknown>,
   options: { ignoreKeys?: string[] } = {},
@@ -80,7 +76,7 @@ function extractOutcomePaths(data: DataObject[]): Set<string> {
 
   data.forEach((item) =>
     item.effects?.forEach((effect) => {
-      if (Array.isArray(effect.parameters?.outcomes)) {
+      if (effect.parameters?.outcomes) {
         effect.parameters.outcomes.forEach((outcome) =>
           getPaths(outcome, {}, "", allPaths),
         );
@@ -90,28 +86,6 @@ function extractOutcomePaths(data: DataObject[]): Set<string> {
   return allPaths;
 }
 
-function generateZodEnumFromSet(name: string, values: Set<string>): string {
-  const sortedValues = Array.from(values).sort();
-  const enumValues = sortedValues.map((val) => `  '${val}'`).join(",\n");
-
-  return `export const ${name} = z.enum([\n${enumValues}\n]);`;
-}
-
-function generateZodEnumFromPaths(
-  paths: Set<string>,
-  sourceType: "parameters" | "outcomes",
-): string {
-  const variableName =
-    sourceType === "parameters"
-      ? "RootParameterPaths"
-      : "OutcomeParameterPaths";
-  const sortedPaths = Array.from(paths).sort();
-  const enumValues = sortedPaths.map((path) => `  '${path}'`).join(",\n");
-
-  return `export const ${variableName} = z.enum([\n${enumValues}\n]);`;
-}
-
-// --- Função Principal ---
 async function main() {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -127,7 +101,17 @@ async function main() {
     path
       .join(projectRoot, "src", "data", "spells", "**", "*.ts")
       .replace(/\\/g, "/"),
+    path
+      .join(projectRoot, "src", "data", "feats", "**", "*.ts")
+      .replace(/\\/g, "/"),
+    path
+      .join(projectRoot, "src", "data", "tokens", "**", "*.ts")
+      .replace(/\\/g, "/"),
+    path
+      .join(projectRoot, "src", "data", "monsters", "**", "*.ts")
+      .replace(/\\/g, "/"),
   ];
+
   const ignorePattern = path
     .join(projectRoot, "src", "data", "**", "*-union.ts")
     .replace(/\\/g, "/");
@@ -135,9 +119,16 @@ async function main() {
   const dataFiles = await glob(globPatterns, { ignore: ignorePattern });
 
   const allWeaponIds = new Set<string>();
+  const allToolIds = new Set<string>();
+  const allGearIds = new Set<string>();
+  const allArmorIds = new Set<string>();
+  const allMusicalInstrumentIds = new Set<string>();
   const allActionIds = new Set<string>();
   const allSpellIds = new Set<string>();
-  const allTokenIds = new Set<string>(SummonedTokensData.map((t) => t.id));
+  const allFeatIds = new Set<string>();
+  const allTokenIds = new Set<string>();
+  const allMonsterIds = new Set<string>();
+
   let allDataForPaths: DataObject[] = [];
 
   for (const absolutePath of dataFiles) {
@@ -148,14 +139,45 @@ async function main() {
       const module = await import(relativeImportPath);
 
       for (const key in module) {
-        if (Array.isArray(module[key])) {
-          allDataForPaths = allDataForPaths.concat(module[key]);
-          if (key === "itemsWeapon")
-            module[key].forEach((i: { id: string }) => allWeaponIds.add(i.id));
-          if (key === "ACTIONS")
-            module[key].forEach((i: { id: string }) => allActionIds.add(i.id));
+        const exportedValue = module[key];
+
+        if (Array.isArray(exportedValue)) {
+          allDataForPaths = allDataForPaths.concat(
+            exportedValue as DataObject[],
+          );
+
+          // Captura de itens com base no prefixo do ID
+          exportedValue.forEach((i: { id?: string }) => {
+            if (!i.id) return;
+            if (i.id.startsWith("weapon-")) allWeaponIds.add(i.id);
+            else if (i.id.startsWith("tool-")) allToolIds.add(i.id);
+            else if (i.id.startsWith("gear-")) allGearIds.add(i.id);
+            else if (i.id.startsWith("armor-")) allArmorIds.add(i.id);
+            else if (i.id.startsWith("musical-instrument-"))
+              allMusicalInstrumentIds.add(i.id);
+          });
+
+          // Captura de IDs por módulo
+          if (absolutePath.includes("actions"))
+            exportedValue.forEach(
+              (i: { id?: string }) => i.id && allActionIds.add(i.id),
+            );
           if (absolutePath.includes("spells"))
-            module[key].forEach((i: { id: string }) => allSpellIds.add(i.id));
+            exportedValue.forEach(
+              (i: { id?: string }) => i.id && allSpellIds.add(i.id),
+            );
+          if (absolutePath.includes("feats"))
+            exportedValue.forEach(
+              (i: { id?: string }) => i.id && allFeatIds.add(i.id),
+            );
+          if (absolutePath.includes("tokens"))
+            exportedValue.forEach(
+              (i: { id?: string }) => i.id && allTokenIds.add(i.id),
+            );
+          if (absolutePath.includes("monsters"))
+            exportedValue.forEach(
+              (i: { id?: string }) => i.id && allMonsterIds.add(i.id),
+            );
         }
       }
     } catch (error) {
@@ -163,42 +185,75 @@ async function main() {
     }
   }
 
-  // --- Geração de Enums ---
+  // Geração dos enums
   const weaponIdEnumString = generateZodEnumFromSet(
     "WeaponIdEnum",
     allWeaponIds,
+  );
+  const toolIdEnumString = generateZodEnumFromSet("ToolIdEnum", allToolIds);
+  const gearIdEnumString = generateZodEnumFromSet("GearIdEnum", allGearIds);
+  const armorIdEnumString = generateZodEnumFromSet("ArmorIdEnum", allArmorIds);
+  const musicalInstrumentIdEnumString = generateZodEnumFromSet(
+    "MusicalInstrumentIdEnum",
+    allMusicalInstrumentIds,
   );
   const actionIdEnumString = generateZodEnumFromSet(
     "ActionIdEnum",
     allActionIds,
   );
   const spellIdEnumString = generateZodEnumFromSet("SpellIdEnum", allSpellIds);
+  const featIdEnumString = generateZodEnumFromSet("FeatIdEnum", allFeatIds);
   const tokenIdEnumString = generateZodEnumFromSet(
     "SummonedTokenIdEnum",
     allTokenIds,
   );
+  const monsterIdEnumString = generateZodEnumFromSet(
+    "MonsterIdEnum",
+    allMonsterIds,
+  );
 
   const parameterPaths = extractParameterPaths(allDataForPaths);
   const outcomePaths = extractOutcomePaths(allDataForPaths);
-  const parameterEnumString = generateZodEnumFromPaths(
+  const parameterEnumString = generateZodEnumFromSet(
+    "RootParameterPaths",
     parameterPaths,
-    "parameters",
   );
-  const outcomeEnumString = generateZodEnumFromPaths(outcomePaths, "outcomes");
+  const outcomeEnumString = generateZodEnumFromSet(
+    "OutcomeParameterPaths",
+    outcomePaths,
+  );
 
   const fileContent = `// Este arquivo é gerado automaticamente. Não edite manualmente.
 import { z } from 'zod';
 
-// --- Enums de ID ---
 ${weaponIdEnumString}
+
+${toolIdEnumString}
+
+${gearIdEnumString}
+
+${armorIdEnumString}
+
+${musicalInstrumentIdEnumString}
+
+export const AllItemsEnum = z.union([
+  WeaponIdEnum,
+  ToolIdEnum,
+  GearIdEnum,
+  ArmorIdEnum,
+  MusicalInstrumentIdEnum,
+]);
 
 ${actionIdEnumString}
 
 ${spellIdEnumString}
 
+${featIdEnumString}
+
 ${tokenIdEnumString}
 
-// --- Enums de Caminho de Propriedade ---
+${monsterIdEnumString}
+
 ${parameterEnumString}
 
 ${outcomeEnumString}
@@ -211,8 +266,9 @@ ${outcomeEnumString}
     "data-based-enums.ts",
   );
 
-  if (!fsSync.existsSync(path.dirname(outputPath)))
+  if (!fsSync.existsSync(path.dirname(outputPath))) {
     fsSync.mkdirSync(path.dirname(outputPath), { recursive: true });
+  }
   await fs.writeFile(outputPath, fileContent, "utf-8");
   console.log(chalk.bgGreen(`Arquivo de enums gerado em: ${outputPath}`));
 }

@@ -1,5 +1,4 @@
-
-export const feats= [
+export const feats = [
   {
     id: "feat-boon-of-combat-prowess",
     name: ["Benção da Proweza em Combate", "Boon of Combat Prowess"],

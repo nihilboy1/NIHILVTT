@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const SourceEnum = z.enum(["LDJ2024", "MM2024"]);
+export const TemplateType = z.enum(["areaOfEffect", "Token"]);
 
 export const CreatureTypeEnum = z.enum([
   "aberration",

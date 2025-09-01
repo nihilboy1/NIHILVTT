@@ -2,7 +2,7 @@ import { Item } from "../../domain/item/item.schema";
 
 export const itemsWeapon = [
   {
-    id: "item-machado-de-batalha",
+    id: "weapon-machado-de-batalha",
     name: ["Machado de Batalha", "Battleaxe"],
     source: "LDJ2024",
     page: 215,
@@ -19,7 +19,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["versatile"],
-        mastery: ["topple"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -36,7 +35,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-clava",
+    id: "weapon-clava",
     name: ["Clava", "Club"],
     source: "LDJ2024",
     page: 215,
@@ -53,7 +52,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["light"],
-        mastery: ["slow"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -65,7 +63,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-adaga",
+    id: "weapon-adaga",
     name: ["Adaga", "Dagger"],
     source: "LDJ2024",
     page: 215,
@@ -82,7 +80,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["light", "thrown"],
-        mastery: ["nick"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -95,7 +92,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-dardo",
+    id: "weapon-dardo",
     name: ["Dardo", "Dart"],
     source: "LDJ2024",
     page: 215,
@@ -111,7 +108,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "ranged",
         properties: ["finesse", "thrown"],
-        mastery: ["vex"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -124,7 +120,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-mangual",
+    id: "weapon-mangual",
     name: ["Mangual", "Flail"],
     source: "LDJ2024",
     page: 215,
@@ -140,7 +136,6 @@ export const itemsWeapon = [
         name: "Mangual",
         weaponType: "martial",
         weaponRange: "melee",
-        mastery: ["sap"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -152,7 +147,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-glaive",
+    id: "weapon-glaive",
     name: ["Glaive", "Glaive"],
     source: "LDJ2024",
     page: 215,
@@ -169,7 +164,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["heavy", "reach", "twoHanded"],
-        mastery: ["graze"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -181,7 +175,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-machado-grande",
+    id: "weapon-machado-grande",
     name: ["Machado Grande", "Greataxe"],
     source: "LDJ2024",
     page: 215,
@@ -198,7 +192,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["heavy", "twoHanded"],
-        mastery: ["cleave"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -210,7 +203,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-clava-grande",
+    id: "weapon-clava-grande",
     name: ["Clava Grande", "Greatclub"],
     source: "LDJ2024",
     page: 215,
@@ -227,7 +220,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["twoHanded"],
-        mastery: ["push"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -239,7 +231,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-espada-grande",
+    id: "weapon-espada-grande",
     name: ["Espada Grande", "Greatsword"],
     source: "LDJ2024",
     page: 215,
@@ -256,7 +248,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["heavy", "twoHanded"],
-        mastery: ["graze"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -268,7 +259,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-alabarda",
+    id: "weapon-alabarda",
     name: ["Alabarda", "Halberd"],
     source: "LDJ2024",
     page: 215,
@@ -285,7 +276,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["heavy", "reach", "twoHanded"],
-        mastery: ["cleave"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -297,7 +287,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-besta-de-mao",
+    id: "weapon-besta-de-mao",
     name: ["Besta de Mão", "Hand Crossbow"],
     source: "LDJ2024",
     page: 215,
@@ -314,7 +304,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "ranged",
         properties: ["ammunition", "light", "loading"],
-        mastery: ["vex"],
         range: { normal: 30, long: 120, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -327,7 +316,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-machadinha",
+    id: "weapon-machadinha",
     name: ["Machadinha", "Handaxe"],
     source: "LDJ2024",
     page: 215,
@@ -344,7 +333,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["light", "thrown"],
-        mastery: ["vex"],
         range: { normal: 20, long: 60, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -357,7 +345,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-besta-pesada",
+    id: "weapon-besta-pesada",
     name: ["Besta Pesada", "Heavy Crossbow"],
     source: "LDJ2024",
     page: 215,
@@ -374,7 +362,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "ranged",
         properties: ["ammunition", "heavy", "loading", "twoHanded"],
-        mastery: ["push"],
         range: { normal: 100, long: 400, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -387,7 +374,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-azagaia",
+    id: "weapon-azagaia",
     name: ["Azagaia", "Javelin"],
     source: "LDJ2024",
     page: 215,
@@ -404,7 +391,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["thrown"],
-        mastery: ["slow"],
         range: { normal: 30, long: 120, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -417,7 +403,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-besta-leve",
+    id: "weapon-besta-leve",
     name: ["Besta Leve", "Light Crossbow"],
     source: "LDJ2024",
     page: 215,
@@ -434,7 +420,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "ranged",
         properties: ["ammunition", "loading", "twoHanded"],
-        mastery: ["slow"],
         range: { normal: 80, long: 320, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -447,7 +432,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-martelo-leve",
+    id: "weapon-martelo-leve",
     name: ["Martelo Leve", "Light Hammer"],
     source: "LDJ2024",
     page: 215,
@@ -463,7 +448,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["light", "thrown"],
-        mastery: ["nick"],
         range: { normal: 20, long: 60, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -476,7 +460,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-arco-longo",
+    id: "weapon-arco-longo",
     name: ["Arco Longo", "Longbow"],
     source: "LDJ2024",
     page: 215,
@@ -493,7 +477,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "ranged",
         properties: ["ammunition", "heavy", "twoHanded"],
-        mastery: ["slow"],
         range: { normal: 150, long: 600, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -506,7 +489,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-espada-longa",
+    id: "weapon-espada-longa",
     name: ["Espada Longa", "Longsword"],
     source: "LDJ2024",
     page: 215,
@@ -523,7 +506,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["versatile"],
-        mastery: ["sap"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -540,7 +522,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-maca",
+    id: "weapon-maca",
     name: ["Maça", "Mace"],
     source: "LDJ2024",
     page: 215,
@@ -556,7 +538,6 @@ export const itemsWeapon = [
         name: "Maça",
         weaponType: "simple",
         weaponRange: "melee",
-        mastery: ["sap"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -568,7 +549,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-malho",
+    id: "weapon-malho",
     name: ["Malho", "Maul"],
     source: "LDJ2024",
     page: 215,
@@ -585,7 +566,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["heavy", "twoHanded"],
-        mastery: ["topple"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -597,7 +577,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-estrela-da-manha",
+    id: "weapon-estrela-da-manha",
     name: ["Estrela-d'alva", "Morningstar"],
     source: "LDJ2024",
     page: 215,
@@ -613,7 +593,6 @@ export const itemsWeapon = [
         name: "Estrela-d'alva",
         weaponType: "martial",
         weaponRange: "melee",
-        mastery: ["sap"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -625,7 +604,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-mosquete",
+    id: "weapon-mosquete",
     name: ["Mosquete", "Musket"],
     source: "LDJ2024",
     page: 215,
@@ -642,7 +621,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "ranged",
         properties: ["ammunition", "loading", "twoHanded"],
-        mastery: ["slow"],
         range: { normal: 40, long: 120, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -655,7 +633,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-pique",
+    id: "weapon-pique",
     name: ["Pique", "Pike"],
     source: "LDJ2024",
     page: 215,
@@ -672,7 +650,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["heavy", "reach", "twoHanded"],
-        mastery: ["push"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -684,7 +661,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-pistola",
+    id: "weapon-pistola",
     name: ["Pistola", "Pistol"],
     source: "LDJ2024",
     page: 215,
@@ -701,7 +678,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "ranged",
         properties: ["ammunition", "loading"],
-        mastery: ["vex"],
         range: { normal: 30, long: 90, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -714,7 +690,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-bordao",
+    id: "weapon-bordao",
     name: ["Bordão", "Quarterstaff"],
     source: "LDJ2024",
     page: 215,
@@ -731,7 +707,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["versatile"],
-        mastery: ["topple"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -748,7 +723,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-rapieira",
+    id: "weapon-rapieira",
     name: ["Rapieira", "Rapier"],
     source: "LDJ2024",
     page: 215,
@@ -765,7 +740,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["finesse"],
-        mastery: ["vex"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -777,7 +751,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-cimitarra",
+    id: "weapon-cimitarra",
     name: ["Cimitarra", "Scimitar"],
     source: "LDJ2024",
     page: 215,
@@ -793,7 +767,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["finesse", "light"],
-        mastery: ["nick"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -805,7 +778,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-arco-curto",
+    id: "weapon-arco-curto",
     name: ["Arco Curto", "Shortbow"],
     source: "LDJ2024",
     page: 215,
@@ -822,7 +795,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "ranged",
         properties: ["ammunition", "twoHanded"],
-        mastery: ["vex"],
         range: { normal: 80, long: 320, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -835,7 +807,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-espada-curta",
+    id: "weapon-espada-curta",
     name: ["Espada Curta", "Shortsword"],
     source: "LDJ2024",
     page: 215,
@@ -852,7 +824,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["finesse", "light"],
-        mastery: ["vex"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -864,7 +835,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-foice-curta",
+    id: "weapon-foice-curta",
     name: ["Foice Curta", "Sickle"],
     source: "LDJ2024",
     page: 215,
@@ -881,7 +852,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["light"],
-        mastery: ["nick"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -893,7 +863,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-funda",
+    id: "weapon-funda",
     name: ["Funda", "Sling"],
     source: "LDJ2024",
     page: 215,
@@ -910,7 +880,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "ranged",
         properties: ["ammunition"],
-        mastery: ["slow"],
         range: { normal: 30, long: 120, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -923,7 +892,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-lanca",
+    id: "weapon-lanca",
     name: ["Lança", "Spear"],
     source: "LDJ2024",
     page: 215,
@@ -940,7 +909,6 @@ export const itemsWeapon = [
         weaponType: "simple",
         weaponRange: "melee",
         properties: ["thrown", "versatile"],
-        mastery: ["sap"],
         range: { normal: 20, long: 60, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -958,7 +926,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-tridente",
+    id: "weapon-tridente",
     name: ["Tridente", "Trident"],
     source: "LDJ2024",
     page: 215,
@@ -975,7 +943,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["thrown", "versatile"],
-        mastery: ["topple"],
         range: { normal: 20, long: 60, unit: "ft" },
         damageFormulas: {
           primary: {
@@ -993,7 +960,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-picareta-de-guerra",
+    id: "weapon-picareta-de-guerra",
     name: ["Picareta de Guerra", "War Pick"],
     source: "LDJ2024",
     page: 215,
@@ -1010,7 +977,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["versatile"],
-        mastery: ["sap"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -1022,7 +988,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-martelo-de-guerra",
+    id: "weapon-martelo-de-guerra",
     name: ["Martelo de Guerra", "Warhammer"],
     source: "LDJ2024",
     page: 215,
@@ -1039,7 +1005,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["versatile"],
-        mastery: ["push"],
         damageFormulas: {
           primary: {
             type: "damage",
@@ -1056,7 +1021,7 @@ export const itemsWeapon = [
     ],
   },
   {
-    id: "item-chicote",
+    id: "weapon-chicote",
     name: ["Chicote", "Whip"],
     source: "LDJ2024",
     page: 215,
@@ -1073,7 +1038,6 @@ export const itemsWeapon = [
         weaponType: "martial",
         weaponRange: "melee",
         properties: ["finesse", "reach"],
-        mastery: ["slow"],
         damageFormulas: {
           primary: {
             type: "damage",

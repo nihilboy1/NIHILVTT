@@ -1,220 +1,241 @@
 import { z } from "zod";
 
-// Schema para validar a estrutura de cada objeto de ação.
+/**
+ * Define a estrutura de uma Ação.
+ * category:
+ *  - action   → Ações padrão (consomem sua ação do turno)
+ *  - bonus    → Ações bônus
+ *  - reaction → Reações
+ *  - free     → Ações livres (sem custo de ação)
+ */
 export const ActionSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
+  category: z.enum(["action", "bonus", "reaction", "free"]),
 });
 
-// Array contendo todas as ações do jogo.
-// O `as const` garante que o array seja somente leitura e infere os tipos literais.
-// O `satisfies` valida se o array corresponde ao schema definido, sem alargar o tipo.
-export const ACTIONS = [
-  // --- Ações Originais ---
+// Tipagem inferida
+export type Action = z.infer<typeof ActionSchema>;
+
+/**
+ * Lista oficial de Ações do D&D 5e + One D&D 2024 (5.5)
+ */
+export const ACTIONS: Action[] = [
+  // --- AÇÕES DE COMBATE CLÁSSICAS ---
   {
-    id: "action-attack",
+    id: "act-attack",
     name: "Atacar",
     description: "Realiza um ataque com uma arma ou corpo a corpo.",
+    category: "action",
   },
   {
-    id: "action-cast-spell",
-    name: "Conjurar Magia",
-    description: "Conjura uma magia de nivel 0 a 9.",
+    id: "act-apply-effect",
+    name: "Aplicar Efeito",
+    description: "Aplica um efeito a uma criatura ou objeto.",
+    category: "action",
   },
   {
-    id: "action-throw-item",
-    name: "Arremessar Item",
-    description: "Uma ação para arremessar um item em um alvo ou área.",
-  },
-  {
-    id: "action-consume-item",
-    name: "Consumir Item",
-    description: "Uma ação para beber uma poção ou usar um item consumível.",
-  },
-  {
-    id: "action-move-summoned-token",
-    name: "Mover Invocação",
-    description:
-      "Usa uma ação para mover uma criatura ou objeto invocado que você controla.",
-  },
-  {
-    id: "action-use-gear-area",
-    name: "Usar Item em Área",
-    description: "Espalha ou usa um item para cobrir uma área designada.",
-  },
-  {
-    id: "action-apply-poison",
-    name: "Aplicar Veneno",
-    description: "Aplica veneno em uma arma ou munição.",
-  },
-  {
-    id: "action-light-item",
-    name: "Acender Item",
-    description:
-      "Usa uma fonte de ignição para acender um item como uma tocha ou lampião.",
-  },
-  {
-    id: "action-create-area-of-effect",
-    name: "Criar Área de Efeito",
-    description: "Cria uma área de efeito em uma localização designada.",
-  },
-  {
-    id: "action-multiattack",
-    name: "Ataque Múltiplo",
-    description: "Realiza vários ataques em um único turno.",
-  },
-  {
-    id: "action-cover-lantern",
-    name: "Cobrir Lanterna",
-    description: "Abaixa a cobertura de uma lanterna para reduzir sua luz.",
-  },
-  {
-    id: "action-set-trap",
-    name: "Armar Armadilha",
-    description: "Prepara uma armadilha mecânica no chão.",
-  },
-  {
-    id: "action-disarm-trap",
+    id: "act-disarm-trap",
     name: "Desarmar Armadilha",
-    description: "Tenta desarmar uma armadilha.",
+    description: "Desarma uma armadilha em um objeto ou área.",
+    category: "action",
   },
   {
-    id: "action-pick-lock",
-    name: "Abrir Fechadura",
-    description: "Tenta abrir uma fechadura com ferramentas de ladrão.",
+    id: "act-pick-lock",
+    name: "Destrancar",
+    description: "Destranca um objeto trancado.",
+    category: "action",
   },
   {
-    id: "action-force-open",
-    name: "Abrir à Força",
-    description: "Tenta abrir alguma coisa à força.",
+    id: "act-create-area-of-effect",
+    name: "Criar Área de Efeito",
+    description: "Cria uma área de efeito em um ponto no espaço.",
+    category: "action",
   },
   {
-    id: "action-use-kit-charge",
-    name: "Usar Carga de Kit",
-    description: "Gasta um uso de um kit para um efeito específico.",
+    id: "act-throw",
+    name: "Arremessar",
+    description: "Arremessa um objeto ou uma criatura.",
+    category: "action",
   },
   {
-    id: "action-witch-bolt-channel",
-    name: "Canalizar Raio de Bruxa",
-    description:
-      "Canaliza a energia do Raio de Bruxa para causar dano contínuo.",
+    id: "act-multiattack",
+    name: "Ataque Múltiplo",
+    description: "Realiza dois ataques em um único turno.",
+    category: "action",
   },
-  // --- Ações de Combate Clássicas ---
   {
-    id: "action-disengage",
+    id: "act-cast-spell",
+    name: "Conjurar Magia",
+    description: "Conjura uma magia com tempo de conjuração de 1 ação.",
+    category: "action",
+  },
+  {
+    id: "act-dash",
+    name: "Correr (Dash)",
+    description: "Move-se uma distância adicional igual ao seu deslocamento.",
+    category: "action",
+  },
+  {
+    id: "act-disengage",
     name: "Desengajar",
     description:
-      "Move-se cuidadosamente para não provocar ataques de oportunidade de inimigos ao seu alcance.",
+      "Seus movimentos não provocam ataques de oportunidade neste turno.",
+    category: "action",
   },
   {
-    id: "action-dodge",
+    id: "act-dodge",
     name: "Esquivar",
     description:
-      "Foca totalmente em se defender. Ataques contra você têm desvantagem até o início do seu próximo turno.",
+      "Concentra-se em evitar ataques. Ataques contra você têm Desvantagem até seu próximo turno.",
+    category: "action",
   },
   {
-    id: "action-dash",
-    name: "Disparada",
-    description:
-      "Usa sua ação para ganhar movimento adicional igual ao seu deslocamento.",
-  },
-  {
-    id: "action-help",
+    id: "act-help",
     name: "Ajudar",
     description:
-      "Ajuda um aliado, concedendo-lhe vantagem no próximo teste de habilidade ou ataque que ele fizer.",
+      "Concede Vantagem em uma rolagem de ataque de um aliado ou teste de habilidade.",
+    category: "action",
   },
   {
-    id: "action-grapple",
-    name: "Agarrar",
+    id: "act-hide",
+    name: "Esconder-se",
+    description: "Faz um teste de Destreza (Furtividade) para se esconder.",
+    category: "action",
+  },
+  {
+    id: "act-ready",
+    name: "Preparar (Ready)",
     description:
-      "Tenta segurar e imobilizar uma criatura, limitando seu movimento.",
+      "Define uma ação e uma reação desencadeada por uma condição específica.",
+    category: "action",
   },
   {
-    id: "action-shove",
-    name: "Empurrar",
-    description:
-      "Tenta empurrar uma criatura para longe ou derrubá-la no chão (condição 'Caído').",
-  },
-  {
-    id: "action-ready",
-    name: "Preparar Ação",
-    description:
-      "Prepara uma ação para ser usada como reação a um gatilho específico que você definir.",
-  },
-  // --- Interação com Ambiente e Habilidades ---
-  {
-    id: "action-search",
+    id: "act-search",
     name: "Procurar",
     description:
-      "Dedica sua atenção para procurar ativamente por algo escondido, como portas secretas ou armadilhas.",
+      "Faz um teste de Sabedoria (Percepção) ou Inteligência (Investigação) para encontrar algo.",
+    category: "action",
   },
   {
-    id: "action-hide",
-    name: "Esconder-se",
-    description: "Tenta se esconder da vista de outras criaturas.",
-  },
-  {
-    id: "action-stabilize",
-    name: "Estabilizar Criatura",
-    description:
-      "Realiza um teste de Medicina para tentar estabilizar uma criatura que está morrendo.",
-  },
-  {
-    id: "action-use-object",
+    id: "act-use-object",
     name: "Usar Objeto",
     description:
-      "Interage com um objeto que requer atenção, como puxar uma alavanca, abrir um mapa ou usar um item mágico.",
+      "Interage com um objeto que requer uma ação dedicada (não mágico).",
+    category: "action",
   },
-  // --- Ações Sociais ---
+
   {
-    id: "action-intimidate",
+    id: "act-influence",
+    name: "Influenciar (Influence)",
+    description:
+      "Tenta influenciar uma criatura controlada pelo DM (persuasão, intimidação, engano etc.). Requer teste de Carisma; CD = maior entre 15 ou Inteligência da criatura.",
+    category: "action",
+  },
+  {
+    id: "act-set-trap",
+    name: "Armar Armadilha",
+    description: "Arma uma armadilha em um local específico.",
+    category: "action",
+  },
+  {
+    id: "act-light-item",
+    name: "Iluminar (Light)",
+    description: "Ilumina um objeto ou área.",
+    category: "action",
+  },
+  {
+    id: "act-consume",
+    name: "Consumir (Consume)",
+    description:
+      "Usa um item consumível, como poções ou outros recursos que são gastos ao serem usados.",
+    category: "action",
+  },
+  {
+    id: "act-magic",
+    name: "Ação Mágica (Magic)",
+    description:
+      "Substitui 'Conjurar Magia'. Inclui conjurar magias, usar itens mágicos ou habilidades mágicas que exigem a Magic Action.",
+    category: "action",
+  },
+  {
+    id: "act-study",
+    name: "Estudar (Study)",
+    description:
+      "Faz um teste de Inteligência para lembrar informação, identificar magia em curso ou ver através de ilusões.",
+    category: "action",
+  },
+  {
+    id: "act-utilize",
+    name: "Utilizar (Utilize)",
+    description:
+      "Usa um objeto não mágico que requer uma ação dedicada. Renomeação de 'Usar Objeto' no One D&D.",
+    category: "action",
+  },
+
+  // --- AÇÕES SOCIAIS ---
+  {
+    id: "act-intimidate",
     name: "Intimidar",
     description:
-      "Tenta influenciar alguém através de ameaças, postura hostil ou poder.",
+      "Tenta influenciar alguém através de ameaças ou postura hostil.",
+    category: "action",
   },
   {
-    id: "action-persuade",
+    id: "act-persuade",
     name: "Persuadir",
     description:
-      "Tenta convencer uma criatura usando de argumentação, bons modos ou apelo emocional.",
+      "Tenta convencer uma criatura usando argumentação ou apelo emocional.",
+    category: "action",
   },
   {
-    id: "action-deceive",
+    id: "act-deceive",
     name: "Enganar",
-    description:
-      "Tenta ludibriar uma criatura com mentiras, disfarces ou distrações.",
+    description: "Tenta ludibriar uma criatura com mentiras ou distrações.",
+    category: "action",
   },
-  // --- Ações Bônus e Reações ---
+
+  // --- AÇÕES BÔNUS ---
   {
     id: "bonus-offhand-attack",
     name: "Ataque com Arma Secundária",
-    description:
-      "Como uma ação bônus, realiza um ataque com a arma leve que está em sua outra mão.",
+    description: "Ataca com a arma leve que está na outra mão.",
+    category: "bonus",
   },
   {
     id: "bonus-cast-spell",
     name: "Conjurar Magia (Bônus)",
-    description:
-      "Conjura uma magia que tem um tempo de conjuração de Ação Bônus.",
+    description: "Conjura uma magia com tempo de conjuração de Ação Bônus.",
+    category: "bonus",
   },
+
+  // --- REAÇÕES ---
   {
-    id: "reaction-opportunity-attack",
+    id: "react-opportunity-attack",
     name: "Ataque de Oportunidade",
-    description:
-      "Realiza um ataque de oportunidade contra uma criatura que sai do seu alcance e não usa a ação de desengajar.",
+    description: "Ataca uma criatura que sai do seu alcance sem desengajar.",
+    category: "reaction",
   },
   {
-    id: "reaction-cast-shield",
-    name: "Reação: Magia Escudo",
-    description:
-      "Como uma reação ao ser atingido por um ataque, conjura a magia Escudo para aumentar sua Classe de Armadura.",
+    id: "react-cast-shield",
+    name: "Magia Escudo",
+    description: "Conjura a magia Escudo ao ser atingido por um ataque.",
+    category: "reaction",
   },
   {
-    id: "reaction-absorb-elements",
-    name: "Reação: Absorver Elementos",
-    description:
-      "Como uma reação ao sofrer dano elemental, usa a magia para ganhar resistência a esse dano.",
+    id: "react-absorb-elements",
+    name: "Absorver Elementos",
+    description: "Conjura a magia Absorver Elementos ao sofrer dano elemental.",
+    category: "reaction",
   },
-] as const satisfies z.infer<(typeof ActionSchema)[]>;
+
+  // --- AÇÕES LIVRES ---
+  {
+    id: "free-use-resource",
+    name: "Usar Recurso (Livre)",
+    description:
+      "Usa um recurso que não consome ação, como habilidade passiva ou item de uso livre.",
+    category: "free",
+  },
+];

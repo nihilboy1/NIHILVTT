@@ -40,9 +40,7 @@ export const ModifyTargetHPOutcomeSchema = z.object({
   type: z.literal("modifyTargetHP"),
   on: EffectOutcomeEnum,
   formula: HPFormulaSchema,
-  vitals: z
-    .array(HPTypesEnum)
-    .default(["currentHp"]),
+  vitals: z.array(HPTypesEnum).default(["currentHp"]),
   requirements: RequirementSchema.optional(),
 });
 
@@ -74,7 +72,11 @@ export const DealWeaponDamageOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("dealWeaponDamage"),
   on: EffectOutcomeEnum,
-  properties: z.object({ damageTypeOptions: DamageTypeEnum.array() }),
+  properties: z.object({
+    damageTypeOptions: z.array(
+      z.union([DamageTypeEnum, z.literal("weaponDefault")]),
+    ),
+  }),
 });
 
 export const MoveTargetOutcomeSchema = z.object({

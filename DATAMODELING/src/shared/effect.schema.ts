@@ -7,7 +7,13 @@ import {
   HPFormulaSchema,
   RechargeSchema,
 } from "./blocks.schema.js";
-import { ActionIdEnum, SpellIdEnum } from "../shared/data-based-enums.js";
+import {
+  ActionIdEnum,
+  FeatIdEnum,
+  MusicalInstrumentIdEnum,
+  SpellIdEnum,
+  ToolIdEnum,
+} from "../shared/data-based-enums.js";
 import { ActionOutcomesSchema } from "./outcome.schema.js";
 import { ActionParametersSchema } from "../domain/action/action.schema.js";
 import {
@@ -18,7 +24,6 @@ import {
 import {
   ArmorTypeEnum,
   ItemPropertyEnum,
-  WeaponMasteryEnum,
   WeaponPropertyEnum,
   WeaponRangeEnum,
   WeaponTypeEnum,
@@ -27,6 +32,7 @@ import {
 import {
   AbilityScoreEnum,
   ClassesIdEnum,
+  FeatCategoryEnum,
   SkillEnum,
   VisionTypeEnum,
 } from "./primitives/character.primitives.js";
@@ -57,69 +63,127 @@ const BaseEffectSchema = z.object({
   description: z.string().optional(),
 });
 
-export const PassiveGrantProficiencyEffectSchema = z.discriminatedUnion("on", [
-  // iniciativa
-  z.object({
-    ...BaseEffectSchema.shape,
-    type: z.literal("passive_grantProficiency"),
-    on: z.literal("initiative"),
-  }),
-
-  // savingThrow
-  z.object({
-    ...BaseEffectSchema.shape,
-    type: z.literal("passive_grantProficiency"),
-    on: z.literal("savingThrow"),
-    choose: z.object({
-      from: z.array(AbilityScoreEnum),
-      count: z.number().int().positive().default(1).or(z.literal("all")),
+export const PassiveProvidesProficiencyEffectSchema = z.discriminatedUnion(
+  "on",
+  [
+    // iniciativa
+    z.object({
+      ...BaseEffectSchema.shape,
+      type: z.literal("passive_grantProficiency"),
+      on: z.literal("initiative"),
     }),
-  }),
 
+    // savingThrow
+    z.object({
+      ...BaseEffectSchema.shape,
+      type: z.literal("passive_grantProficiency"),
+      on: z.literal("savingThrow"),
+      choose: z
+        .object({
+          from: z.array(AbilityScoreEnum),
+          count: z.number().int().positive().default(1).or(z.literal("all")),
+        })
+        .refine((data) => new Set(data.from).size === data.from.length, {
+          message: "Não pode ter itens repetidos em 'from'",
+        }),
+    }),
+
+    // skill
+    z.object({
+      ...BaseEffectSchema.shape,
+      type: z.literal("passive_grantProficiency"),
+      on: z.literal("skill"),
+      grantsExpertise: z.boolean().optional(),
+      choose: z
+        .object({
+          from: z.array(SkillEnum).or(z.literal("any")),
+          count: z.number().int().positive().default(1).or(z.literal("all")),
+        })
+        .refine(
+          (data) =>
+            Array.isArray(data.from)
+              ? new Set(data.from).size === data.from.length
+              : true,
+          { message: "Não pode ter itens repetidos em 'from'" },
+        ),
+    }),
+
+    // weaponType
+    z.object({
+      ...BaseEffectSchema.shape,
+      type: z.literal("passive_grantProficiency"),
+      on: z.literal("weaponType"),
+      choose: z
+        .object({
+          from: z.array(WeaponTypeEnum),
+          count: z.number().int().positive().default(1).or(z.literal("all")),
+        })
+        .refine((data) => new Set(data.from).size === data.from.length, {
+          message: "Não pode ter itens repetidos em 'from'",
+        }),
+    }),
+
+    // armorType
+    z.object({
+      ...BaseEffectSchema.shape,
+      type: z.literal("passive_grantProficiency"),
+      on: z.literal("armorType"),
+      choose: z
+        .object({
+          from: z.array(ArmorTypeEnum),
+          count: z.number().int().positive().default(1).or(z.literal("all")),
+        })
+        .refine((data) => new Set(data.from).size === data.from.length, {
+          message: "Não pode ter itens repetidos em 'from'",
+        }),
+    }),
+
+    // tool
+    z.object({
+      ...BaseEffectSchema.shape,
+      type: z.literal("passive_grantProficiency"),
+      on: z.literal("tool"),
+      choose: z
+        .object({
+          from: ToolIdEnum.array(),
+          count: z.number().int().positive().default(1).or(z.literal("all")),
+        })
+        .refine((data) => new Set(data.from).size === data.from.length, {
+          message: "Não pode ter itens repetidos em 'from'",
+        }),
+    }),
+
+    // musicalInstrument
+    z.object({
+      ...BaseEffectSchema.shape,
+      type: z.literal("passive_grantProficiency"),
+      on: z.literal("musicalInstrument"),
+      choose: z
+        .object({
+          from: MusicalInstrumentIdEnum.array(),
+          count: z.number().int().positive().default(1).or(z.literal("all")),
+        })
+        .refine((data) => new Set(data.from).size === data.from.length, {
+          message: "Não pode ter itens repetidos em 'from'",
+        }),
+    }),
+  ],
+);
+
+export const PassiveProvidesExpertiseEffectSchema = z.discriminatedUnion("on", [
   // skill
   z.object({
     ...BaseEffectSchema.shape,
-    type: z.literal("passive_grantProficiency"),
+    type: z.literal("passive_grantExpertise"),
     on: z.literal("skill"),
-    grantsExpertise: z.boolean().optional(),
     choose: z.object({
-      from: z.array(SkillEnum),
+      from: z
+        .array(SkillEnum)
+        .or(z.literal("any"))
+        .or(z.literal("anyProficient")),
       count: z.number().int().positive().default(1).or(z.literal("all")),
     }),
   }),
-
-  // weaponType
-  z.object({
-    ...BaseEffectSchema.shape,
-    type: z.literal("passive_grantProficiency"),
-    on: z.literal("weaponType"),
-    choose: z.object({
-      from: z.array(WeaponTypeEnum),
-      count: z.number().int().positive().default(1).or(z.literal("all")),
-    }),
-  }),
-
-  // armorType
-  z.object({
-    ...BaseEffectSchema.shape,
-    type: z.literal("passive_grantProficiency"),
-    on: z.literal("armorType"),
-    choose: z.object({
-      from: z.array(ArmorTypeEnum),
-      count: z.number().int().positive().default(1).or(z.literal("all")),
-    }),
-  }),
-
-  // tool (se existir)
-  // z.object({
-  //   ...BaseEffectSchema.shape,
-  //   type: z.literal("passive_grantProficiency"),
-  //   on: z.literal("tool"),
-  //   choose: z.object({
-  //     from: z.array(ToolEnum),
-  //     count: z.number().int().positive().default(1).or(z.literal("all")),
-  //   }),
-  // }),
 ]);
 
 const ModifyAbilityScoreEffectSchema = BaseEffectSchema.extend({
@@ -128,7 +192,7 @@ const ModifyAbilityScoreEffectSchema = BaseEffectSchema.extend({
     z.object({
       pick: z.object({
         from: z.array(AbilityScoreEnum),
-        amount: z.number().int().positive(),
+        amount: z.union([z.number().int().positive(), z.literal("any")]),
       }),
       operation: OperationsEnum,
       value: z.number().int().positive(),
@@ -197,12 +261,11 @@ const OnEquipProvidesContainerEffectSchema = BaseEffectSchema.extend({
   }),
 });
 
-const OnWieldGrantWeaponAttackEffectSchema = BaseEffectSchema.extend({
+const OnWieldProvideWeaponAttackEffectSchema = BaseEffectSchema.extend({
   type: z.literal("onWield_grantWeaponAttack"),
   weaponType: WeaponTypeEnum,
   weaponRange: WeaponRangeEnum,
   properties: WeaponPropertyEnum.array().optional(),
-  mastery: z.array(WeaponMasteryEnum),
   damageFormulas: z
     .object({
       primary: HPFormulaSchema,
@@ -220,7 +283,7 @@ const OnWieldGrantWeaponAttackEffectSchema = BaseEffectSchema.extend({
     .optional(),
 });
 
-const PassiveGrantAdvantageEffectSchema = BaseEffectSchema.extend({
+const PassiveProvidesAdvantageEffectSchema = BaseEffectSchema.extend({
   type: z.literal("passive_grantAdvantage"),
   on: z.enum(["abilityCheck", "skillCheck", "savingThrow", "attackRoll"]),
   ability: AbilityScoreEnum.optional(),
@@ -248,8 +311,8 @@ const PassivePropertyEffectSchema = BaseEffectSchema.extend({
   value: z.union([z.string(), z.number(), z.boolean()]),
 });
 
-const PassiveGrantBonusEffectSchema = BaseEffectSchema.extend({
-  type: z.literal("passive_grantBonus"),
+const PassiveProvidesBonusEffectSchema = BaseEffectSchema.extend({
+  type: z.literal("passive_providesBonus"),
   on: z.enum(["attackRoll", "damageRoll", "ac", "savingThrow", "action"]),
   appliesToActions: ActionIdEnum.array().optional(),
   appliesToArmor: ArmorTypeEnum.array().optional(),
@@ -263,14 +326,37 @@ const PassiveGrantBonusEffectSchema = BaseEffectSchema.extend({
   requirements: RequirementSchema.optional(),
 });
 
-const PassiveGrantSpellKnowledgeEffectSchema = z.discriminatedUnion("mode", [
-  // modo "filter"
+const SpecificFeatSelectionSchema = z.object({
+  mode: z.literal("specific"),
+  feats: FeatIdEnum.array().min(
+    1,
+    "A lista de feats específicos não pode estar vazia.",
+  ),
+});
+
+const CategoryFeatSelectionSchema = z.object({
+  mode: z.literal("category"),
+  source: FeatCategoryEnum.array(),
+  count: z.number().int().min(1).default(1),
+});
+
+const FeatProviderSchema = z.discriminatedUnion("selection", [
+  SpecificFeatSelectionSchema,
+  CategoryFeatSelectionSchema,
+]);
+
+export const PassiveProvidesFeatEffectSchema = BaseEffectSchema.extend({
+  type: z.literal("passive_providesFeat"),
+  selection: FeatProviderSchema,
+});
+
+const PassiveProvidesSpellKnowledgeEffectSchema = z.discriminatedUnion("mode", [
   BaseEffectSchema.extend({
-    type: z.literal("passive_grantSpellKnowledge"),
+    type: z.literal("passive_providesSpellKnowledge"),
     mode: z.literal("filter"),
-    amount: z.number().min(1), 
+    amount: z.number().min(1),
     filter: z.object({
-      level: z.number().min(1).optional(),
+      level: z.number().min(0).optional(),
       school: MagicSchoolEnum.array().optional(),
       class: ClassesIdEnum.optional(),
     }),
@@ -291,9 +377,9 @@ const PassiveGrantSpellKnowledgeEffectSchema = z.discriminatedUnion("mode", [
   }),
 
   BaseEffectSchema.extend({
-    type: z.literal("passive_grantSpellKnowledge"),
+    type: z.literal("passive_providesSpellKnowledge"),
     mode: z.literal("fixedSpells"),
-    spells: SpellIdEnum.array().min(1), 
+    spells: SpellIdEnum.array().min(1),
     canBeSwappedOn: z.enum(["levelUp", "shortRest", "longRest", "never"]),
     castingAbilityOptions: AbilityScoreEnum.exclude([
       "constitution",
@@ -323,8 +409,8 @@ const PreventsConditionEffectSchema = BaseEffectSchema.extend({
   duration: DurationSchema,
 });
 
-const GrantConditionalBonusEffectSchema = BaseEffectSchema.extend({
-  type: z.literal("grantConditionalBonus"),
+const ProvidesConditionalBonusEffectSchema = BaseEffectSchema.extend({
+  type: z.literal("providesConditionalBonus"),
   on: z.enum(["abilityCheck", "skillCheck"]),
   modifier: DiceRollSchema,
   requiresChoice: z.enum(["skill"]),
@@ -389,7 +475,7 @@ const ModifyActionParameterRuleSchema = z.object({
   type: z.literal("modifyActionParameter"),
   level: z.number().int(),
   propertyPath: RootParameterPaths,
-  newValue: z.any(),
+  newValue: z.number(),
 });
 
 const DescriptiveRuleSchema = z.object({
@@ -452,23 +538,25 @@ export const EffectSchema = z.discriminatedUnion("type", [
   OnEquipSetACEffectSchema,
   OnEquipImposeDisadvantageEffectSchema,
   OnEquipProvidesContainerEffectSchema,
-  OnWieldGrantWeaponAttackEffectSchema,
-  PassiveGrantAdvantageEffectSchema,
+  OnWieldProvideWeaponAttackEffectSchema,
+  PassiveProvidesAdvantageEffectSchema,
+  PassiveProvidesFeatEffectSchema,
   PassiveProvidesLightEffectSchema,
   PassivePropertyEffectSchema,
-  PassiveGrantBonusEffectSchema,
-  GrantConditionalBonusEffectSchema,
+  PassiveProvidesBonusEffectSchema,
+  ProvidesConditionalBonusEffectSchema,
   TriggeredModifierEffectSchema,
   PreventsHealingEffectSchema,
   ImposeDisadvantageEffectSchema,
   MultiAttackActionEffectSchema,
   PreventsReactionEffectSchema,
+  PassiveProvidesExpertiseEffectSchema,
   TriggeredEffectSchema,
   passiveSetACEffectSchema,
   PreventsConditionEffectSchema,
   ModifyAbilityScoreEffectSchema,
-  PassiveGrantProficiencyEffectSchema,
-  PassiveGrantSpellKnowledgeEffectSchema,
+  PassiveProvidesProficiencyEffectSchema,
+  PassiveProvidesSpellKnowledgeEffectSchema,
   PassiveProvidesVisionEffectSchema,
   PassiveModifyUserHPEffectSchema,
 ]);
@@ -476,11 +564,11 @@ export const EffectSchema = z.discriminatedUnion("type", [
 export const ApplicableEffectSchema = z.discriminatedUnion("type", [
   ReactionActionEffectSchema,
   ActivatableActionEffectSchema,
-  GrantConditionalBonusEffectSchema,
+  ProvidesConditionalBonusEffectSchema,
   ImposeDisadvantageEffectSchema,
-  PassiveGrantAdvantageEffectSchema,
+  PassiveProvidesAdvantageEffectSchema,
   PassiveProvidesLightEffectSchema,
-  PassiveGrantBonusEffectSchema,
+  PassiveProvidesBonusEffectSchema,
   PreventsHealingEffectSchema,
   PreventsReactionEffectSchema,
   TriggeredModifierEffectSchema,
