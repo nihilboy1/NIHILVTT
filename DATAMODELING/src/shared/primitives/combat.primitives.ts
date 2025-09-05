@@ -49,11 +49,8 @@ export const EffectOutcomeEnum = z.enum([
   "any",
 ]);
 
-export const ResourceCostIdEnum = z.enum([
-  "action",
-  "bonusAction",
-  "reaction",
-  "itemCharge",
+export const ResourceTypeEnum = z.enum([
+  "charge",
   "spellSlot",
 ]);
 

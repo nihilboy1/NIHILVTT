@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { calculateDistanceInMeters } from '../../../../entities/board/model/utils/boardUtils';
 import {
   GridSettings,
   Point,
@@ -7,7 +8,6 @@ import {
   RulerPlacementMode,
   RulerPointData,
 } from '../../../../shared/api/types';
-import { calculateDistanceInMeters } from '../../../../entities/board/model/utils/boardUtils';
 
 interface UseRulerProps {
   activeTool: string; // Tool.RULER

@@ -6,6 +6,14 @@ import { RequirementSchema } from "../../shared/game-events.schema";
 import { AbilityScoreEnum } from "../../shared/primitives/character.primitives";
 import { DiceRollSchema } from "../../shared/blocks.schema";
 import { ClassProgressionSchema } from "../../shared/class-progression.schema";
+import { FighterResourcesIdEnum } from "../../shared/primitives/class.primitives";
+
+export const ClassResourcesSchema = z.discriminatedUnion("class", [
+  z.object({
+    class: z.literal("fighter"),
+    classResourceIds: FighterResourcesIdEnum.array(),
+  }),
+]);
 
 export const ClassSchema = z.object({
   id: z.string().min(1),
@@ -21,6 +29,7 @@ export const ClassSchema = z.object({
   description: z.string(),
   multiclassingBenefits: z.array(EffectSchema),
   effects: z.array(EffectSchema),
+  classResources: ClassResourcesSchema,
   startingEquipment: StartingEquipmentSchema,
   multiclassingRequirements: RequirementSchema,
   classProgression: ClassProgressionSchema,

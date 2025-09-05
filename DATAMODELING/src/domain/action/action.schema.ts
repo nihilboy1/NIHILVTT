@@ -16,7 +16,7 @@ import {
   ActionTypeEnum,
   CoverEnum,
   RechargeEventEnum,
-  ResourceCostIdEnum,
+  ResourceTypeEnum,
 } from "../../shared/primitives/combat.primitives.js";
 import { AbilityScoreEnum } from "../../shared/primitives/character.primitives.js";
 import {
@@ -38,7 +38,8 @@ export const ActionParametersSchema = z.object({
         .object({
           amount: z.number().int(),
           source: z.enum(["item", "character"]),
-          resourceId: ResourceCostIdEnum,
+          resourceType: ResourceTypeEnum,
+          resourceId: z.enum(["secondWind"]),
         })
         .optional(),
       triggers: GameEventSchema.optional(),
@@ -74,7 +75,7 @@ export interface ActionParametersType {
     cost?: {
       amount: number;
       source: "item" | "character";
-      resourceId: z.infer<typeof ResourceCostIdEnum>;
+      resourceId: z.infer<typeof ResourceTypeEnum>;
     };
     trigger?: z.infer<typeof GameEventSchema>;
   };

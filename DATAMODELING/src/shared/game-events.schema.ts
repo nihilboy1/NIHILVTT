@@ -18,9 +18,15 @@ import {
   RangeSchema,
   TargetSchema,
 } from "./character-blocks.schema.js";
-import { ActionTypeEnum, DamageTypeEnum } from "./primitives/combat.primitives.js";
+import {
+  ActionTypeEnum,
+  DamageTypeEnum,
+} from "./primitives/combat.primitives.js";
 import { DurationUnitEnum } from "./primitives/world.primitives.js";
-import { ArmorTypeEnum, WeaponPropertyEnum } from "./primitives/item.primitives.js";
+import {
+  ArmorTypeEnum,
+  WeaponPropertyEnum,
+} from "./primitives/item.primitives.js";
 
 // ============================================================================
 // SEÇÃO 1: O ESQUEMA DE CONDIÇÕES BASE (NÃO-RECURSIVO)
@@ -86,7 +92,6 @@ const EventConditionSchema = z.discriminatedUnion("type", [
     attackType: AttackTypeSchema.optional(),
     weaponProperty: WeaponPropertyEnum.optional(),
     actionType: ActionTypeEnum.optional(),
-
   }),
   z.object({
     type: z.literal("attackHit"),
@@ -280,7 +285,11 @@ const EventConditionSchema = z.discriminatedUnion("type", [
     type: z.literal("isCreatureOfSize"),
     creatureSizes: CreatureSizeEnum.array().nonempty(),
   }),
-
+  z.object({
+    type: z.literal("hasActionEconomy"),
+    actionType: ActionTypeEnum,
+    isAvailable: z.boolean().default(true),
+  }),
 ]);
 
 // ============================================================================

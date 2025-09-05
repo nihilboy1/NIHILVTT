@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   AcSchema,
+  DiceRollSchema,
   DurationSchema,
   HPFormulaSchema,
 } from "../shared/blocks.schema.js";
@@ -13,6 +14,7 @@ import {
   SurfaceTypeEnum,
 } from "./primitives/world.primitives.js";
 import {
+  ActionTypeEnum,
   DamageTypeEnum,
   EffectOutcomeEnum,
   HPTypesEnum,
@@ -56,8 +58,18 @@ export const ApplyConditionOutcomeSchema = z.object({
 export const DescriptiveOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("descriptive"),
+  roll: DiceRollSchema,
   on: EffectOutcomeEnum,
   details: z.string(),
+});
+
+export const ProvidesNewActionOutcomeSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("providesNewAction"),
+  on: EffectOutcomeEnum,
+  actionTypes: z.array(ActionTypeEnum), // quais ações extras são dadas
+  requirements: RequirementSchema.optional(), // restrição de uso
+  duration: DurationSchema.optional(), // até quando essa ação extra fica disponível
 });
 
 export const SetAcOutcomeSchema = z.object({
@@ -308,6 +320,7 @@ export type ActionOutcomeType =
   | z.infer<typeof DamageOverTimeOutcomeSchema>
   | z.infer<typeof GrantAdvantageDisadvantageOutcomeSchema>
   | z.infer<typeof CreateItemOutcomeSchema>
+  | z.infer<typeof ProvidesNewActionOutcomeSchema>
   | CreateAreaEffectOutcomeType
   | ApplyEffectOutcomeType
   | SummonTokenOutcomeType
@@ -318,6 +331,7 @@ export const ActionOutcomesSchema: z.ZodType<ActionOutcomeType> =
   z.discriminatedUnion("type", [
     NoneOutcomeSchema,
     SetAcOutcomeSchema,
+    ProvidesNewActionOutcomeSchema,
     ModifyTargetHPOutcomeSchema,
     ApplyConditionOutcomeSchema,
     ChooseEffectOutcomeSchema,

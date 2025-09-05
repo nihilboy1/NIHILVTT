@@ -1,1 +1,3 @@
-export default function CampaignsPage() { return <div>CampaignsPage</div>; }
+export default function CampaignsPage() {
+  return <div>CampaignsPage</div>;
+}

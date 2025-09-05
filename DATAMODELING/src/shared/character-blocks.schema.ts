@@ -139,6 +139,7 @@ export const SensesSchema = z.object({
 
 export const TargetSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("self") }),
+  z.object({ type: z.literal("none") }),
   z.object({
     type: z.literal("selfArea"),
     selective: z.boolean().default(false).optional(),

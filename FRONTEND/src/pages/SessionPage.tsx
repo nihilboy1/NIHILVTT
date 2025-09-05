@@ -1,27 +1,22 @@
-import { useRef } from "react";
+import { useRef } from 'react';
 
-import { RightSidebar } from "@/widgets/rightSidebar/ui/RightSidebar";
-import { Toolbar } from "@/widgets/toolBar/ui/Toolbar";
+import { RightSidebar } from '@/widgets/rightSidebar/ui/RightSidebar';
+import { Toolbar } from '@/widgets/toolBar/ui/Toolbar';
 
-import { useUIStore } from "../features/layoutControls/model/store";
-import { useSessionModalStore } from "../features/modalManager/model/sessionModalStore";
-import { ToggleSidebarButton } from "../features/toggleSidebar/ui/ToggleSidebarButton";
-import { ChevronLeftIcon, ChevronRightIcon } from "../shared/ui/Icons";
-import { useGameBoardInteraction } from "../widgets/gameBoard/model/hooks/useGameBoardInteraction";
-import { GameBoard } from "../widgets/gameBoard/ui/GameBoard";
-import { SessionModalManager } from "../widgets/sessionModalManager/ui/SessionModalManager";
-
+import { useUIStore } from '../features/layoutControls/model/store';
+import { useSessionModalStore } from '../features/modalManager/model/sessionModalStore';
+import { ToggleSidebarButton } from '../features/toggleSidebar/ui/ToggleSidebarButton';
+import { ChevronLeftIcon, ChevronRightIcon } from '../shared/ui/Icons';
+import { useGameBoardInteraction } from '../widgets/gameBoard/model/hooks/useGameBoardInteraction';
+import { GameBoard } from '../widgets/gameBoard/ui/GameBoard';
+import { SessionModalManager } from '../widgets/sessionModalManager/ui/SessionModalManager';
 
 export default function SessionPage() {
   const { closeModal } = useSessionModalStore();
 
   const gameBoardRef = useRef<HTMLDivElement>(null);
-  const {
-    isToolbarVisible,
-    setIsToolbarVisible,
-    isRightSidebarVisible,
-    setIsRightSidebarVisible,
-  } = useUIStore();
+  const { isToolbarVisible, setIsToolbarVisible, isRightSidebarVisible, setIsRightSidebarVisible } =
+    useUIStore();
 
   const {
     draggingVisuals,
@@ -68,7 +63,7 @@ export default function SessionPage() {
         onClick={() => setIsToolbarVisible(true)}
         ariaLabel="Mostrar Barra de Ferramentas"
         title="Mostrar Barra de Ferramentas"
-        icon={<ChevronRightIcon className="w-6 h-6 text-text-1" />}
+        icon={<ChevronRightIcon className="text-text-1 h-6 w-6" />}
         position="left"
       />
 
@@ -77,7 +72,7 @@ export default function SessionPage() {
         onClick={() => setIsRightSidebarVisible(true)}
         ariaLabel="Mostrar Barra Lateral Direita"
         title="Mostrar Barra Lateral Direita"
-        icon={<ChevronLeftIcon className="w-6 h-6 text-text-1" />}
+        icon={<ChevronLeftIcon className="text-text-1 h-6 w-6" />}
         position="right"
       />
       {isRightSidebarVisible && <RightSidebar />}

@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Iceberg&display=swap");
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Iceberg&display=swap');
+@import 'tailwindcss';
 
 @layer base {
   * {
@@ -9,7 +9,7 @@
   html,
   body {
     @apply bg-surface-0;
-    font-family: "Work Sans", sans-serif;
+    font-family: 'Work Sans', sans-serif;
   }
 
   button {
@@ -48,14 +48,14 @@
   --color-feedback-negative-hover: #e04444; /* Vermelho mais escuro para hover */
 }
 
-.iceberg-regular { 
-  font-family: "Iceberg", sans-serif;
+.iceberg-regular {
+  font-family: 'Iceberg', sans-serif;
   font-weight: 400;
   font-style: normal;
 }
 
-.work-sans-base { 
-  font-family: "Work Sans", sans-serif;
+.work-sans-base {
+  font-family: 'Work Sans', sans-serif;
   font-optical-sizing: auto;
   font-weight: normal;
   font-style: normal;
@@ -68,7 +68,7 @@
     margin: 0;
   }
 
-  .hide-arrows[type="number"] {
+  .hide-arrows[type='number'] {
     -moz-appearance: textfield;
   }
 
@@ -77,21 +77,21 @@
       display: none;
     }
 
-    scrollbar-width: none; 
+    scrollbar-width: none;
   }
 }
 
 .resize-handle {
   position: absolute;
   background: transparent;
-  z-index: 1; 
+  z-index: 1;
 }
 
 .resize-s {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 0.5rem; 
+  height: 0.5rem;
   cursor: ns-resize;
 }
 
@@ -99,7 +99,7 @@
   top: 0;
   bottom: 0;
   right: 0;
-  width: 0.5rem; 
+  width: 0.5rem;
   cursor: ew-resize;
 }
 
@@ -107,7 +107,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 0.5rem; 
+  height: 0.5rem;
   cursor: ns-resize;
 }
 
@@ -115,38 +115,38 @@
   top: 0;
   bottom: 0;
   left: 0;
-  width: 0.5rem; 
+  width: 0.5rem;
   cursor: ew-resize;
 }
 
 .resize-se {
   bottom: 0;
   right: 0;
-  width: 1rem; 
-  height: 1rem; 
+  width: 1rem;
+  height: 1rem;
   cursor: se-resize;
 }
 
 .resize-sw {
   bottom: 0;
   left: 0;
-  width: 1rem; 
-  height: 1rem; 
+  width: 1rem;
+  height: 1rem;
   cursor: sw-resize;
 }
 
 .resize-ne {
   top: 0;
   right: 0;
-  width: 1rem; 
-  height: 1rem; 
+  width: 1rem;
+  height: 1rem;
   cursor: ne-resize;
 }
 
 .resize-nw {
   top: 0;
   left: 0;
-  width: 1rem; 
+  width: 1rem;
   height: 1rem;
   cursor: nw-resize;
 }

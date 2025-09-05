@@ -9,6 +9,7 @@ const FighterLevelSchema = z.object({
 
 const FighterProgressionSchema = z.array(FighterLevelSchema).length(20);
 
+
 const FighterSchema = z.object({
   class: z.literal('fighter'),
   progression: FighterProgressionSchema,

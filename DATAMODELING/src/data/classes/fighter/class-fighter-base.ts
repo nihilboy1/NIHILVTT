@@ -50,7 +50,10 @@ export const classes = [
         name: "Proficiência em Armas",
       },
     ],
-
+    classResources: {
+      class: "fighter",
+      classResourceIds: ["resource-secondWind"],
+    },
     startingEquipment: [
       {
         type: "choice",
@@ -130,6 +133,7 @@ export const classes = [
           level: 1,
           secondWind: 2,
           features: [
+            /* Estilo de Luta */
             {
               type: "passive_providesFeat",
               selection: {
@@ -140,13 +144,21 @@ export const classes = [
               name: "Estilo de Luta",
               description: "Escolha um estilo de luta para se especializar.",
             },
+            /* Retomar Fôlego */
             {
               type: "activatableAction",
               name: "Retomar Fôlego",
               actionId: "bonus-cast-spell",
-
               parameters: {
-                activation: { type: "bonus" },
+                activation: {
+                  type: "bonus",
+                  extraCost: {
+                    resourceType: "charge",
+                    amount: 1,
+                    resourceId: "secondWind",
+                    source: "character",
+                  },
+                },
                 target: { type: "self" },
                 charges: {
                   type: "event",
@@ -178,6 +190,7 @@ export const classes = [
           level: 2,
           secondWind: 2,
           features: [
+            /* Surto de Ação */
             {
               type: "activatableAction",
               name: "Surto de Ação",
@@ -186,6 +199,18 @@ export const classes = [
               actionId: "free-use-resource",
               parameters: {
                 activation: { type: "free" },
+                requirements: {
+                  user: {
+                    conditionMode: "all",
+                    events: [
+                      {
+                        type: "hasActionEconomy",
+                        actionType: "action",
+                        isAvailable: false,
+                      },
+                    ],
+                  },
+                },
                 target: { type: "self" },
                 charges: {
                   type: "event",
@@ -196,15 +221,48 @@ export const classes = [
                 outcomes: [
                   {
                     id: "actionSurge",
-                    type: "descriptive", // Usando um tipo válido
+                    type: "providesNewAction",
                     on: "any",
-                    details:
-                      "Você ganha uma ação adicional neste turno, que não pode ser usada para a ação Magia.",
+                    actionTypes: ["action"],
+                    duration: { unit: "turn" },
                   },
                 ],
               },
-              duration: {
-                unit: "instantaneous",
+            },
+            {
+              type: "activatableAction",
+              name: "Mente Tática",
+              actionId: "bonus-cast-spell",
+              parameters: {
+                activation: {
+                  type: "bonus",
+                  extraCost: {
+                    resourceType: "charge",
+                    amount: 1,
+                    resourceId: "secondWind",
+                    source: "character",
+                  },
+                },
+                target: { type: "none" },
+                charges: {
+                  type: "event",
+                  rechargeOn: "shortRest",
+                  maxCharges: 1,
+                  recoveryAmount: 1,
+                },
+                outcomes: [
+                  {
+                    id: "tacticalMind",
+                    type: "descriptive",
+                    on: "any",
+                    roll: {
+                      count: 2,
+                      faces: 8,
+                    },
+                    details:
+                      "Você tem uma mente para táticas dentro e fora do campo de batalha. Quando você falha em um teste de habilidade, pode gastar uma utilização de seu Retomar Fôlego para se esforçar em direção ao sucesso. Em vez de recuperar Pontos de Vida, você rola 2d8 e adiciona o número rolado ao teste de habilidade, potencialmente transformando-o em um sucesso.",
+                  },
+                ],
               },
             },
           ],
@@ -235,20 +293,32 @@ export const classes = [
               actionId: "free-use-resource",
               parameters: {
                 activation: { type: "free" },
+                requirements: {
+                  user: {
+                    conditionMode: "all",
+                    events: [
+                      {
+                        type: "hasActionEconomy",
+                        actionType: "action",
+                        isAvailable: false,
+                      },
+                    ],
+                  },
+                },
                 target: { type: "self" },
                 charges: {
                   type: "event",
                   rechargeOn: "shortRest",
                   maxCharges: 2,
-                  recoveryAmount: 1,
+                  recoveryAmount: 2,
                 },
                 outcomes: [
                   {
-                    id: "improvedActionSurge",
-                    type: "descriptive",
-                    on: "success",
-                    details:
-                      "Você ganha uma ação adicional neste turno, que não pode ser usada para a ação Magia.",
+                    id: "actionSurgeImproved",
+                    type: "providesNewAction",
+                    on: "any",
+                    actionTypes: ["action"],
+                    duration: { unit: "turn" },
                   },
                 ],
               },

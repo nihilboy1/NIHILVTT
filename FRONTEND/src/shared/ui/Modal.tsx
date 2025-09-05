@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 
 import ReactDOM from 'react-dom';
 
-import {useDismissable} from '../lib/hooks/useDismissable';
+import { useDismissable } from '../lib/hooks/useDismissable';
 
 import { XMarkIcon } from './Icons';
 
@@ -17,6 +17,7 @@ interface ModalProps {
   hideFooter?: boolean;
   zIndex?: number;
   modalClassName?: string;
+  fullscreen?: boolean;
 }
 
 export function Modal({
@@ -25,6 +26,7 @@ export function Modal({
   title,
   children,
   onConfirm,
+  fullscreen = false,
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   hideFooter = false,
@@ -51,7 +53,7 @@ export function Modal({
 
   return ReactDOM.createPortal(
     <div
-      className="fixed inset-0 bg-overlay flex items-center justify-center p-4"
+      className={`fixed inset-0 flex items-center justify-center ${fullscreen ? 'p-0' : 'p-4'}`}
       style={{ zIndex: zIndex ? zIndex - 1 : 99 }} // Overlay zIndex, slightly lower than modal content
       onClick={handleOverlayClick}
       onKeyDown={handleKeyDown}
@@ -60,7 +62,11 @@ export function Modal({
     >
       <div
         ref={modalContentRef}
-        className={`bg-surface-0 w-full max-w-md rounded-lg p-6 shadow-xl ${modalClassName}`}
+        className={`bg-surface-1 w-full ${
+          fullscreen
+            ? 'm-0 flex h-full max-h-screen max-w-full flex-col rounded-none'
+            : 'max-w-md rounded-lg'
+        } p-6 shadow-xl ${modalClassName}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -78,7 +84,9 @@ export function Modal({
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
-        {children} {/* Conteúdo do modal injetado aqui */}
+        <div className={`${fullscreen ? 'flex-1 overflow-auto' : ''}`}>
+          {children} {/* Conteúdo do modal injetado aqui */}
+        </div>
         {!hideFooter && (
           <div className="flex justify-end space-x-3 pt-4">
             <button

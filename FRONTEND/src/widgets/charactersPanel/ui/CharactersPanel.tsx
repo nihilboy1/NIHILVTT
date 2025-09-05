@@ -1,4 +1,4 @@
-import { GiAncientSword, GiNinjaHeroicStance } from 'react-icons/gi';
+import { GiAncientSword } from 'react-icons/gi';
 
 import { CharacterTypeEnum } from '@/entities/character/model/schemas/character.schema';
 import { useCharactersStore } from '@/entities/character/model/store';
@@ -40,7 +40,7 @@ export function CharactersPanel() {
       <div>
         <h3 className="mb-4 text-lg font-semibold">Criar Personagem</h3>
         <div className="space-y-3">
-          <button
+          {/* <button
             onClick={() =>
               openModal('simpleName', {
                 characterType: CharacterTypeEnum.enum.Player,
@@ -52,7 +52,7 @@ export function CharactersPanel() {
           >
             <GiNinjaHeroicStance className="h-6 w-6" />
             <span>Personagem Jogável</span>
-          </button>
+          </button> */}
           <button
             onClick={() =>
               openModal('simpleName', {
@@ -65,6 +65,13 @@ export function CharactersPanel() {
           >
             <GiAncientSword className="h-5 w-5" />
             <span>Monstro / NPC</span>
+          </button>
+          <button
+            onClick={() => openModal('characterbuilderModal')}
+            className="hover:bg-accent-primary-hover bg-accent-primary flex w-full cursor-pointer items-center justify-center space-x-2 rounded-md px-4 py-3 text-sm font-semibold"
+            aria-label="Criar Personagens (Avançado)"
+          >
+            <span>Criador de Personagens (Avançado)</span>
           </button>
         </div>
       </div>
