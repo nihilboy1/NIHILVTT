@@ -50,6 +50,7 @@ export const ToolIdEnum = z.enum([
   'tool-disguise-kit',
   'tool-forgery-kit',
   'tool-gaming-set',
+  'tool-healers-kit',
   'tool-herbalism-kit',
   'tool-musical-instrument',
   'tool-navigators-tools',
@@ -77,7 +78,6 @@ export const GearIdEnum = z.enum([
   'gear-holy-symbol',
   'gear-hooded-lantern',
   'gear-iron-pot',
-  'gear-kit-de-curandeiro',
   'gear-lampiao',
   'gear-lanterna-coberta',
   'gear-manacles',
@@ -439,7 +439,7 @@ export const MonsterIdEnum = z.enum([
 
 export const RootParameterPaths = z.enum([
   'activation.extraCost.amount',
-  'activation.extraCost.resourceId',
+  'activation.extraCost.resourceType',
   'activation.extraCost.source',
   'activation.triggers.conditionMode',
   'activation.triggers.events',

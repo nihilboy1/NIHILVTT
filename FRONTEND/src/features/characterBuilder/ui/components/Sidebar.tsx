@@ -1,6 +1,6 @@
-import { BACKGROUNDS } from '@/shared/constants/characterData/backgrounds';
 import { CLASSES } from '@/shared/constants/characterData/classes';
-import { SPECIES } from '@/shared/constants/characterData/species';
+import { CustomScrollbar } from '@/shared/ui/CustomScrollbar';
+import { PHB2024ORIGINS, PHB2024SPECIES } from '@nihilvtt/datamodeling';
 
 import { Selection, Step, STEPS } from '../../constants/steps';
 
@@ -11,6 +11,52 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps) {
+  // Usamos os dados fixos de origens e espécies diretamente
+  const origins = PHB2024ORIGINS;
+  const species = PHB2024SPECIES;
+  // Verifica se um passo específico está completo
+  const isStepComplete = (stepId: Step): boolean => {
+    switch (stepId) {
+      case 'species':
+        return !!selections[stepId] && String(selections[stepId]).length > 0;
+      case 'origin':
+        return !!selections[stepId] && String(selections[stepId]).length > 0;
+      case 'class':
+        return !!selections[stepId] && String(selections[stepId]).length > 0;
+      case 'attributes':
+        // Para atributos, verifica se todos os 27 pontos foram distribuídos
+        if (!selections[stepId]) return false;
+
+        // Calculando o custo total dos atributos
+        const points = Object.values(selections[stepId] as Record<string, number>).reduce(
+          (total, value) => {
+            const cost =
+              {
+                8: 0,
+                9: 1,
+                10: 2,
+                11: 3,
+                12: 4,
+                13: 5,
+                14: 7,
+                15: 9,
+              }[value] || 0;
+            return total + cost;
+          },
+          0,
+        );
+
+        return points === 27; // Deve usar exatamente todos os pontos
+      case 'personal-info':
+        return !!selections[stepId]?.name && String(selections[stepId]?.name).length > 0;
+      default:
+        return false;
+    }
+  };
+
+  // Conta quantos passos estão completos
+  const completedStepsCount = STEPS.filter((step) => isStepComplete(step.id)).length;
+
   const getSelectionName = (step: Step) => {
     const selectedId = selections[step];
     if (!selectedId) return null;
@@ -18,23 +64,31 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
     let options;
     switch (step) {
       case 'species':
-        options = SPECIES;
+        options = species.map((specie) => ({
+          id: specie.id,
+          name: Array.isArray(specie.name) ? specie.name[0] : specie.name,
+        }));
         break;
-      case 'background':
-        options = BACKGROUNDS;
+      case 'origin':
+        options = origins.map((origin) => ({
+          id: origin.id,
+          name: Array.isArray(origin.name) ? origin.name[0] : origin.name,
+        }));
         break;
       case 'class':
         options = CLASSES;
         break;
       case 'attributes':
         return 'Pontos distribuídos';
+      case 'personal-info':
+        return selections['personal-info']?.name || 'Sem nome definido';
     }
 
     return options?.find((opt) => opt.id === selectedId)?.name;
   };
 
   return (
-    <div
+    <CustomScrollbar
       className="bg-surface-1 border-surface-2 flex h-full w-80 flex-col border-r p-6"
       style={{
         backgroundColor: 'var(--color-surface-1)',
@@ -56,8 +110,10 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
       <nav className="flex-1 space-y-3">
         {STEPS.map((step, index) => {
           const isActive = currentStep === step.id;
-          const isCompleted = !!selections[step.id];
           const selectionName = getSelectionName(step.id);
+
+          // Verifica se o passo está completo usando a função isStepComplete
+          const stepCompleted = isStepComplete(step.id);
 
           return (
             <button
@@ -75,26 +131,26 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
                 <div className="flex items-center space-x-3">
                   <span
                     className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
-                      isCompleted
+                      stepCompleted
                         ? 'bg-positive text-surface-0'
                         : isActive
                           ? 'text-accent-primary bg-white'
                           : 'bg-surface-2 text-text-secondary'
                     }`}
                     style={{
-                      backgroundColor: isCompleted
+                      backgroundColor: stepCompleted
                         ? 'var(--color-feedback-positive)'
                         : isActive
                           ? 'white'
                           : 'var(--color-surface-2)',
-                      color: isCompleted
+                      color: stepCompleted
                         ? 'var(--color-surface-0)'
                         : isActive
                           ? 'var(--color-accent-primary)'
                           : 'var(--color-text-secondary)',
                     }}
                   >
-                    {isCompleted ? '✓' : index + 1}
+                    {stepCompleted ? '✓' : index + 1}
                   </span>
                   <span className="font-medium">{step.name}</span>
                 </div>
@@ -133,7 +189,7 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
           <div
             className="h-2 rounded-full transition-all duration-300"
             style={{
-              width: `${(Object.values(selections).filter(Boolean).length / 4) * 100}%`,
+              width: `${(STEPS.filter((step) => isStepComplete(step.id)).length / 5) * 100}%`,
               backgroundColor: 'var(--color-accent-primary)',
             }}
           />
@@ -142,9 +198,9 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
           className="text-secondary mt-1 text-xs"
           style={{ color: 'var(--color-text-secondary)' }}
         >
-          {Object.values(selections).filter(Boolean).length} de 4 concluídos
+          {completedStepsCount} de 5 concluídos
         </div>
       </div>
-    </div>
+    </CustomScrollbar>
   );
 }

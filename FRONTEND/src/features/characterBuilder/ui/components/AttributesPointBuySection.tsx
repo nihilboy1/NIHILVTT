@@ -1,8 +1,7 @@
-import { FaQuestionCircle } from 'react-icons/fa';
-
 import { ATTRIBUTE_LIST } from '@/shared/constants/characterData/attributes';
 import { BuilderButton } from '@/shared/ui/BuilderButton';
 import { XMarkIcon } from '@/shared/ui/Icons';
+import { Tooltip } from '@/shared/ui/Tooltip';
 
 import { usePointBuy } from '../../model/hooks/usePointBuy';
 
@@ -41,19 +40,25 @@ export function AttributesPointBuySection({
             className="inline-flex items-center gap-2 rounded-sm px-4 py-2 font-medium"
             style={{
               backgroundColor:
-                remainingPoints >= 0
-                  ? 'var(--color-feedback-positive)'
-                  : 'var(--color-feedback-negative)',
+                remainingPoints < 0
+                  ? 'var(--color-feedback-negative)'
+                  : remainingPoints === 0
+                    ? 'var(--color-feedback-positive)'
+                    : 'var(--color-accent-primary)',
               color: 'var(--color-surface-0)',
             }}
           >
             <span className="text-surface-0 text-sm">
-              {remainingPoints >= 0
-                ? `${remainingPoints} pontos restantes`
-                : `${Math.abs(remainingPoints)} pontos excedidos`}
+              {remainingPoints < 0
+                ? `${Math.abs(remainingPoints)} pontos excedidos`
+                : remainingPoints === 0
+                  ? `Todos os pontos usados!`
+                  : `${remainingPoints} pontos restantes`}
             </span>
-            {remainingPoints >= 0 ? (
+            {remainingPoints === 0 ? (
               <span className="text-surface-0">✓</span>
+            ) : remainingPoints > 0 ? (
+              <span className="text-surface-0">!</span>
             ) : (
               <XMarkIcon className="text-surface-0" size={1.5} />
             )}
@@ -62,39 +67,28 @@ export function AttributesPointBuySection({
 
         <div className="mb-4 flex items-center gap-2">
           <p style={{ color: 'var(--color-text-secondary)' }}>
-            Distribua 27 pontos entre seus atributos. Os valores começam em 8 (sem custo) e podem ir
-            até 15.
+            <span className="font-bold">Você deve usar todos os 27 pontos</span> para distribuir
+            entre seus atributos. Os valores começam em 8 (sem custo) e podem ir até 15.
           </p>
-          <div className="group relative">
-            <FaQuestionCircle
-              style={{ color: 'var(--color-accent-primary)', cursor: 'help' }}
-              size={16}
-            />
-            <div
-              className="absolute bottom-full left-1/2 mb-2 w-60 -translate-x-1/2 transform opacity-0 transition-opacity group-hover:opacity-100"
-              style={{
-                backgroundColor: 'var(--color-surface-2)',
-                color: 'var(--color-text-secondary)',
-                padding: '0.75rem',
-                borderRadius: '0.5rem',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                width: '200px',
-                zIndex: 50,
-              }}
-            >
-              <p className="mb-2 text-xs font-medium">
-                No sistema Point Buy, cada valor de atributo tem um custo específico em pontos:
-              </p>
-              <p className="text-xs">Valor 8 (mod -1): 0 pontos</p>
-              <p className="text-xs">Valor 9 (mod -1): 1 ponto</p>
-              <p className="text-xs">Valor 10 (mod +0): 2 pontos</p>
-              <p className="text-xs">Valor 11 (mod +0): 3 pontos</p>
-              <p className="text-xs">Valor 12 (mod +1): 4 pontos</p>
-              <p className="text-xs">Valor 13 (mod +1): 5 pontos</p>
-              <p className="text-xs">Valor 14 (mod +2): 7 pontos</p>
-              <p className="text-xs">Valor 15 (mod +2): 9 pontos</p>
-            </div>
-          </div>
+          <Tooltip
+            content={
+              <>
+                <p className="mb-2 text-xs font-medium">
+                  No sistema Point Buy, cada valor de atributo tem um custo específico em pontos:
+                </p>
+                <p className="text-xs">Valor 8 (mod -1): 0 pontos</p>
+                <p className="text-xs">Valor 9 (mod -1): 1 ponto</p>
+                <p className="text-xs">Valor 10 (mod +0): 2 pontos</p>
+                <p className="text-xs">Valor 11 (mod +0): 3 pontos</p>
+                <p className="text-xs">Valor 12 (mod +1): 4 pontos</p>
+                <p className="text-xs">Valor 13 (mod +1): 5 pontos</p>
+                <p className="text-xs">Valor 14 (mod +2): 7 pontos</p>
+                <p className="text-xs">Valor 15 (mod +2): 9 pontos</p>
+              </>
+            }
+            width="200px"
+            position="top"
+          />
         </div>
       </div>
 

@@ -84,7 +84,7 @@ export function Modal({
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
-        <div className={`${fullscreen ? 'flex-1 overflow-auto' : ''}`}>
+        <div className={`${fullscreen ? 'flex-1 overflow-auto hide-scrollbar' : ''}`}>
           {children} {/* Conteúdo do modal injetado aqui */}
         </div>
         {!hideFooter && (

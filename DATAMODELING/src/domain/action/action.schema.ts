@@ -39,7 +39,7 @@ export const ActionParametersSchema = z.object({
           amount: z.number().int(),
           source: z.enum(["item", "character"]),
           resourceType: ResourceTypeEnum,
-          resourceId: z.enum(["secondWind"]),
+          resourceId: z.enum(["secondWind"]).optional(),
         })
         .optional(),
       triggers: GameEventSchema.optional(),

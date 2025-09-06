@@ -1,4 +1,4 @@
-import { Origin } from "../../domain/origin/origin.schema";
+import { Origin } from "../../domain/origin/origin.schema.js";
 
 export const origins: Origin[] = [
   {
@@ -6,7 +6,7 @@ export const origins: Origin[] = [
     name: ["Acólito", "Acolyte"],
     source: "LDJ2024",
     description:
-      "Um acólito é um devoto que serve como assistente em rituais religiosos e cerimônias. Além de ajudar em rituais, eles também podem ter acesso a magias divinas.",
+      "Um acólito é um devoto que serve como assistente em rituais religiosos e cerimônias sagradas. Além de ajudar em rituais, eles estudam textos sagrados, aprendem os preceitos de sua fé e podem oferecer orientação espiritual a outros.",
     effects: [
       {
         type: "passive_modifyAbilityScore",

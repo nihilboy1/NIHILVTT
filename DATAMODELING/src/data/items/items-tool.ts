@@ -297,7 +297,7 @@ export const itemsTool = [
     ],
   },
   {
-    id: "gear-kit-de-curandeiro",
+    id: "tool-healers-kit",
     name: ["Kit de Curandeiro", "Healer's Kit"],
     source: "LDJ2024",
     page: 225,
@@ -325,7 +325,7 @@ export const itemsTool = [
             extraCost: {
               amount: 1,
               source: "item",
-              resourceId: "itemCharge",
+              resourceType: "charge",
             },
           },
           target: {

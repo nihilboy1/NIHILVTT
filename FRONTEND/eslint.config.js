@@ -26,7 +26,10 @@ export default [
       'jsx-a11y': pluginA11y,
     },
     languageOptions: {
-      parserOptions: { ecmaFeatures: { jsx: true } },
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        tsconfigRootDir: __dirname,
+      },
       globals: { ...globals.browser },
     },
     settings: {

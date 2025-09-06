@@ -1,8 +1,9 @@
 {
-  "name": "datamodeling",
+  "name": "@nihilvtt/datamodeling",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Data modeling and validation for NihilVTT",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "scripts": {
     "validate:data": "npx tsx src/tooling/validate.ts",
     "enums": "npx tsx src/tooling/generate-enums.ts",

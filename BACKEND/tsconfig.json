@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Versão do JavaScript que será gerada
+    "module": "NodeNext", // Sistema de módulos moderno do Node.js
+    "moduleResolution": "NodeNext",
+    "baseUrl": "./src", // Define a base para importações absolutas
+    "outDir": "./dist", // Onde o código compilado (JavaScript puro) ficará
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true, // Habilita checagens rigorosas de tipo
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ] // Onde está seu código-fonte TypeScript
+}

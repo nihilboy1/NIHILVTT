@@ -11,7 +11,7 @@ export const species: Specie[] = [
     senses: { vision: { darkvision: 60 }, passivePerception: 10 },
     defenses: { resistances: ["necrotic", "radiant"] },
     description:
-      "Aasimars são descendentes celestiais com poderes divinos e habilidades de cura e luz.",
+      "Aasimars são descendentes celestiais com poderes divinos, manifestando habilidades de cura e luz. Sua herança angelical lhes confere resistência a energias sagradas e sombrias, além de um vínculo natural com o plano celestial.",
     effects: [],
     traits: [
       {
@@ -144,7 +144,7 @@ export const species: Specie[] = [
     senses: { vision: { darkvision: 120 }, passivePerception: 10 },
     defenses: { resistances: ["poison"] },
     description:
-      "Anões são conhecidos por sua resistência e habilidades em combate.",
+      "Anões são conhecidos por sua extraordinária resistência física e habilidades em combate. Naturalmente resistentes a venenos e com uma conexão inata com a pedra, estes seres robustos vivem longamente e preservam tradições milenares de artesanato e mineração.",
     effects: [],
     traits: [
       {
@@ -178,7 +178,7 @@ export const species: Specie[] = [
     speed: { unit: "ft", walk: 30 },
     senses: { vision: { darkvision: 60 }, passivePerception: 10 },
     description:
-      "Elfos são criaturas ágeis e místicas com forte conexão com a magia.",
+      "Elfos são criaturas ágeis e místicas com forte conexão com a magia e o mundo natural. Vivendo por séculos, desenvolveram resistência a encantos mágicos e sentidos aguçados, além de precisarem apenas de breves transes meditativos no lugar de sono completo.",
     effects: [],
     traits: [
       {
@@ -232,7 +232,7 @@ export const species: Specie[] = [
     speed: { unit: "ft", walk: 30 },
     senses: { vision: { darkvision: 60 }, passivePerception: 10 },
     description:
-      "Gnomos são criaturas pequenas e engenhosas conhecidas por sua curiosidade e talentos mágicos.",
+      "Gnomos são criaturas pequenas e engenhosas conhecidas por sua curiosidade insaciável e talentos mágicos naturais. Com intelecto aguçado e resistência inata a influências mágicas mentais, dividem-se em linhagens distintas que favorecem ilusões ou engenhocas mecânicas.",
     effects: [],
     traits: [
       {
@@ -271,7 +271,7 @@ export const species: Specie[] = [
     speed: { unit: "ft", walk: 35 },
     senses: { passivePerception: 10 },
     description:
-      "Golias são seres de grande porte descendentes de gigantes, com habilidades sobrenaturais baseadas em sua ancestralidade.",
+      "Golias são seres de grande porte descendentes de gigantes, com habilidades sobrenaturais baseadas em sua ancestralidade específica. Dotados de estrutura física imponente, podem temporariamente aumentar seu tamanho e manifestar poderes elementais ou físicos relacionados ao tipo de gigante de sua linhagem.",
     effects: [],
     traits: [
       {
@@ -330,7 +330,7 @@ export const species: Specie[] = [
     speed: { unit: "ft", walk: 30 },
     senses: { passivePerception: 10 },
     description:
-      "Halflings são criaturas pequenas e ágeis, conhecidas por sua sorte extraordinária e habilidade para passar despercebidas.",
+      "Halflings são criaturas pequenas e ágeis, conhecidas por sua sorte extraordinária e habilidade para passar despercebidas. Naturalmente corajosos apesar de seu tamanho diminuto, possuem destreza notável para se esconder e uma capacidade inata de superar situações adversas através de sua sorte lendária.",
     effects: [],
     traits: [
       {
@@ -364,7 +364,7 @@ export const species: Specie[] = [
     speed: { unit: "ft", walk: 30 },
     senses: { passivePerception: 10 },
     description:
-      "Humanos são conhecidos por sua versatilidade e adaptabilidade, capazes de aprender diversas habilidades.",
+      "Humanos são conhecidos por sua extraordinária versatilidade e adaptabilidade, capazes de aprender diversas habilidades com facilidade notável. Sua engenhosidade natural e ambição os levam a dominar muitas áreas de conhecimento, tornando-os extremamente versáteis e habilidosos em qualquer caminho que escolham seguir.",
     effects: [],
     traits: [
       {
@@ -391,7 +391,7 @@ export const species: Specie[] = [
     speed: { unit: "ft", walk: 30 },
     senses: { vision: { darkvision: 120 }, passivePerception: 10 },
     description:
-      "Orcs são guerreiros poderosos com força incomum e grande resistência. São conhecidos por sua ferocidade em combate e capacidade de absorver golpes severos.",
+      "Orcs são guerreiros poderosos com força incomum e grande resistência física. São conhecidos por sua ferocidade em combate, visão excepcional na escuridão e uma tenacidade que os permite continuar lutando mesmo quando gravemente feridos, manifestando surtos de adrenalina em situações críticas.",
     effects: [],
     traits: [
       {
@@ -420,7 +420,7 @@ export const species: Specie[] = [
     speed: { unit: "ft", walk: 30 },
     senses: { vision: { darkvision: 60 }, passivePerception: 10 },
     description:
-      "Tieflings são humanoides com ancestralidade infernal, manifestando diversos traços demoníacos e poderes sobrenaturais baseados em seu legado.",
+      "Tieflings são humanoides com ancestralidade infernal, manifestando diversos traços demoníacos e poderes sobrenaturais baseados em seu legado. Dependendo de sua linhagem específica, podem demonstrar afinidade com venenos, necromancia ou fogo, sempre carregando uma presença sobrenatural que os distingue de outras espécies.",
     effects: [],
     traits: [
       {

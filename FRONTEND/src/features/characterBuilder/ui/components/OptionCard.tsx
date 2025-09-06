@@ -5,11 +5,12 @@ export interface OptionCardProps {
   id: string;
   name: string;
   description: string;
+  source?: string; // Fonte opcional (mostrado apenas quando disponível)
   isSelected: boolean;
   onSelect: () => void;
 }
 
-export function OptionCard({ name, description, isSelected, onSelect }: OptionCardProps) {
+export function OptionCard({ name, description, source, isSelected, onSelect }: OptionCardProps) {
   return (
     <BuilderCard
       className={`cursor-pointer p-6 transition-all duration-200 hover:scale-[1.02] ${
@@ -42,6 +43,12 @@ export function OptionCard({ name, description, isSelected, onSelect }: OptionCa
       <p className="text-secondary text-sm" style={{ color: 'var(--color-text-secondary)' }}>
         {description}
       </p>
+      {source && (
+        <div className="mt-3 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+          <span className="font-medium">Fonte: </span>
+          {source}
+        </div>
+      )}
     </BuilderCard>
   );
 }

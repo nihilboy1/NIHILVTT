@@ -16,22 +16,25 @@ export function AttributeSelector({
   onChange,
   isDisabled = false,
 }: AttributeSelectorProps) {
+  // Garantir que value é um número válido
+  const safeValue = typeof value === 'number' && !isNaN(value) ? value : 8;
+
   const handleIncrease = () => {
-    if (value < 15 && !isDisabled) {
-      onChange(value + 1);
+    if (safeValue < 15 && !isDisabled) {
+      onChange(safeValue + 1);
     }
   };
 
   const handleDecrease = () => {
-    if (value > 8 && !isDisabled) {
-      onChange(value - 1);
+    if (safeValue > 8 && !isDisabled) {
+      onChange(safeValue - 1);
     }
   };
 
-  const cost = ATTRIBUTE_COST[value as keyof typeof ATTRIBUTE_COST];
+  const cost = ATTRIBUTE_COST[safeValue as keyof typeof ATTRIBUTE_COST] || 0;
 
   // Calcular o modificador
-  const modifier = Math.floor((value - 10) / 2);
+  const modifier = Math.floor((safeValue - 10) / 2);
   const modifierDisplay = modifier >= 0 ? `+${modifier}` : `${modifier}`;
 
   return (
@@ -74,7 +77,7 @@ export function AttributeSelector({
               color: 'var(--color-text-primary)',
             }}
           >
-            {value}
+            {safeValue}
           </div>
           <div
             className="mt-0.5 text-sm font-medium"
@@ -89,16 +92,18 @@ export function AttributeSelector({
       <div className="mt-2 flex gap-2">
         <button
           onClick={handleDecrease}
-          disabled={value <= 8 || isDisabled}
+          disabled={safeValue <= 8 || isDisabled}
           className="flex h-8 flex-1 items-center justify-center rounded-md text-sm font-bold"
           style={{
             backgroundColor:
-              value > 8 && !isDisabled ? 'var(--color-accent-primary)' : 'var(--color-surface-2)',
+              safeValue > 8 && !isDisabled
+                ? 'var(--color-accent-primary)'
+                : 'var(--color-surface-2)',
             color:
-              value > 8 && !isDisabled
+              safeValue > 8 && !isDisabled
                 ? 'var(--color-text-primary)'
                 : 'var(--color-text-secondary)',
-            cursor: value > 8 && !isDisabled ? 'pointer' : 'not-allowed',
+            cursor: safeValue > 8 && !isDisabled ? 'pointer' : 'not-allowed',
             border: 'none',
             outline: 'none',
           }}
@@ -108,16 +113,18 @@ export function AttributeSelector({
 
         <button
           onClick={handleIncrease}
-          disabled={value >= 15 || isDisabled}
+          disabled={safeValue >= 15 || isDisabled}
           className="flex h-8 flex-1 items-center justify-center rounded-md text-sm font-bold"
           style={{
             backgroundColor:
-              value < 15 && !isDisabled ? 'var(--color-accent-primary)' : 'var(--color-surface-2)',
+              safeValue < 15 && !isDisabled
+                ? 'var(--color-accent-primary)'
+                : 'var(--color-surface-2)',
             color:
-              value < 15 && !isDisabled
+              safeValue < 15 && !isDisabled
                 ? 'var(--color-text-primary)'
                 : 'var(--color-text-secondary)',
-            cursor: value < 15 && !isDisabled ? 'pointer' : 'not-allowed',
+            cursor: safeValue < 15 && !isDisabled ? 'pointer' : 'not-allowed',
             border: 'none',
             outline: 'none',
           }}
