@@ -1,4 +1,4 @@
-import { Item } from "../../domain/item/item.schema";
+import { ItemType } from "../../domain/item/item.schema";
 
 export const itemsMusicalInstruments = [
   {
@@ -105,4 +105,4 @@ export const itemsMusicalInstruments = [
       "Um instrumento musical de cordas tocado com um arco, precursor do violoncelo moderno.",
     effects: [],
   },
-] as const satisfies Item[];
+] as const satisfies ItemType[];

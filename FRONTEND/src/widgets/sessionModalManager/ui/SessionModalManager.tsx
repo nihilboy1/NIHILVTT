@@ -1,7 +1,7 @@
 // src/widgets/sessionModalManager/ui/SessionModalManager.tsx
 
 import { useCharactersStore } from '@/entities/character/model/store';
-import { CharacterBuilderModal } from '@/features/characterBuilder/ui/CharacterBuilderModal';
+
 import { ModalEntry } from '@/features/modalManager/model/baseModalConfig';
 import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
 import { type Token } from '@/shared/api/types';
@@ -12,6 +12,7 @@ import { ActionEditModal } from '../../../features/characterEditAction/ui/Action
 import { HPControlModal } from '../../../features/characterUpdateHp/ui/HPControlModal';
 import { ConfirmationModal } from '../../../shared/ui/ConfirmationModal';
 import { SheetModal } from '../../sheetModal/ui/SheetModal';
+import { CharacterBuilderModal } from '@/features/characterBuilder/components/ui/CharacterBuilderModal';
 
 // 1. Novas Importações: Trocamos os tipos manuais pelo CharacterSchema do Zod.
 

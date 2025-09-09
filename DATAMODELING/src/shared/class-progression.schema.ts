@@ -19,4 +19,4 @@ export const ClassProgressionSchema = z.discriminatedUnion('class', [
   FighterSchema,
 ]);
 
-export type ClassProgression = z.infer<typeof ClassProgressionSchema>;
+export type ClassProgressionType = z.infer<typeof ClassProgressionSchema>;

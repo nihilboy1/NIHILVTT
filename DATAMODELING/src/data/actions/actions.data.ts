@@ -1,28 +1,7 @@
 import { z } from "zod";
+import { ActionType } from "../../domain/action/action.schema";
 
-/**
- * Define a estrutura de uma Ação.
- * category:
- *  - action   → Ações padrão (consomem sua ação do turno)
- *  - bonus    → Ações bônus
- *  - reaction → Reações
- *  - free     → Ações livres (sem custo de ação)
- */
-export const ActionSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  category: z.enum(["action", "bonus", "reaction", "free"]),
-});
-
-// Tipagem inferida
-export type Action = z.infer<typeof ActionSchema>;
-
-/**
- * Lista oficial de Ações do D&D 5e + One D&D 2024 (5.5)
- */
-export const ACTIONS: Action[] = [
-  // --- AÇÕES DE COMBATE CLÁSSICAS ---
+export const PHB2024ACTIONS: ActionType[] = [
   {
     id: "act-attack",
     name: "Atacar",
@@ -174,7 +153,6 @@ export const ACTIONS: Action[] = [
     category: "action",
   },
 
-  // --- AÇÕES SOCIAIS ---
   {
     id: "act-intimidate",
     name: "Intimidar",
@@ -196,7 +174,6 @@ export const ACTIONS: Action[] = [
     category: "action",
   },
 
-  // --- AÇÕES BÔNUS ---
   {
     id: "bonus-offhand-attack",
     name: "Ataque com Arma Secundária",
@@ -210,7 +187,6 @@ export const ACTIONS: Action[] = [
     category: "bonus",
   },
 
-  // --- REAÇÕES ---
   {
     id: "react-opportunity-attack",
     name: "Ataque de Oportunidade",
@@ -230,7 +206,6 @@ export const ACTIONS: Action[] = [
     category: "reaction",
   },
 
-  // --- AÇÕES LIVRES ---
   {
     id: "free-use-resource",
     name: "Usar Recurso (Livre)",

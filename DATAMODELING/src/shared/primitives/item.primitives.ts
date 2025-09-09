@@ -1,8 +1,3 @@
-// ============================================================================
-// PRIMITIVOS DE ITEM E EQUIPAMENTO
-// Proposta: Mover para 'item.primitives.ts'
-// ============================================================================
-
 import z from "zod";
 
 export const RarityEnum = z.enum([

@@ -10,6 +10,7 @@ import {
   RollModeEnum,
 } from "./primitives/combat.primitives.js";
 import { GameEventSchema } from "./game-events.schema.js";
+import { DiceRollSchema } from "./character-blocks.schema.js";
 
 interface ConditionalHPFormulaType {
   type: "conditional";
@@ -29,30 +30,13 @@ export const BaseRollModifierSchema = z.object({
   mode: RollModeEnum,
 });
 
-export const BonusSchema = z.object({
-  value: z.number().int().optional(),
-  variable: z
-    .enum(["spellcastingModifier", "proficiencyBonus", "level"])
-    .optional(),
-});
-
 export const DurationSchema = z.object({
   unit: DurationUnitEnum,
   value: z.number().int().optional(),
   isConcentration: z.boolean().default(false).optional(),
 });
-export const DiceRollSchema = z.object({
-  count: z.number().int().min(1, "A quantidade de dados deve ser no mínimo 1."),
-  faces: z
-    .number()
-    .int()
-    .min(1, "O número de faces do dado deve ser no mínimo 1."),
-  bonus: BonusSchema.optional(),
-  explodesOn: z.number().optional(),
-  explodeLimit: z
-    .union([z.number().int(), z.literal("spellcastingModifier")])
-    .optional(),
-});
+
+
 
 export const RechargeSchema = z.discriminatedUnion("type", [
   z.object({

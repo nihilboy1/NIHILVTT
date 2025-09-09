@@ -1,14 +1,14 @@
 import { z } from "zod";
 import {
   AlignmentEnum,
-  EnvironmentEnum,
+  CreatureSizeEnum,
+  CreatureTypeEnum,
   LanguageEnum,
 } from "../../shared/primitives/character.primitives";
+import { EnvironmentEnum } from "../../shared/primitives/world.primitives";
 import { EffectSchema } from "../../shared/effect.schema";
 import {
   ChallengeRatingEnum,
-  CreatureSizeEnum,
-  CreatureTypeEnum,
   SourceEnum,
 } from "../../shared/primitives/system.primitives";
 import {
@@ -49,5 +49,5 @@ export const MonsterSchema = z.object({
   effects: z.array(EffectSchema),
 });
 
-export type Monster = z.infer<typeof MonsterSchema>;
-export const FinalMonsterDataSchema = z.array(MonsterSchema);
+export type MonsterType = z.infer<typeof MonsterSchema>;
+export const MonsterSchemaArray = z.array(MonsterSchema);

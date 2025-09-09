@@ -6,5 +6,12 @@
     "frontend",
     "datamodeling",
     "backend"
-  ]
+  ],
+  "scripts": {
+    "dev:front": "cd FRONTEND && pnpm dev",
+    "dev:back": "cd BACKEND && pnpm dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }

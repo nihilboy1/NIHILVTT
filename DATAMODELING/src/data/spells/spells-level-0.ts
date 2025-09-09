@@ -1,4 +1,4 @@
-import type { Spell } from "../../domain/spell/spell.schema.js";
+import type { SpellType } from "../../domain/spell/spell.schema.js";
 
 export const spellsLevel0 = [
   {
@@ -2689,4 +2689,4 @@ export const spellsLevel0 = [
       },
     ],
   },
-] as const satisfies Spell[];
+] as const satisfies SpellType[];

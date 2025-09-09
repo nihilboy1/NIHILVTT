@@ -1,9 +1,9 @@
 import z from "zod";
+import { SourceEnum } from "../../shared/primitives/system.primitives";
 import {
   CreatureSizeEnum,
   CreatureTypeEnum,
-  SourceEnum,
-} from "../../shared/primitives/system.primitives";
+} from "../../shared/primitives/character.primitives";
 import {
   DefensesSchema,
   SensesSchema,
@@ -30,4 +30,5 @@ export const SpecieSchema = z.object({
   effects: EffectSchema.array(),
 });
 
-export type Specie = z.infer<typeof SpecieSchema>;
+export type SpecieType = z.infer<typeof SpecieSchema>;
+export const SpecieSchemaArray = z.array(SpecieSchema);

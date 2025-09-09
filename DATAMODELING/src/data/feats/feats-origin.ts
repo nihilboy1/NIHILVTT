@@ -1,6 +1,6 @@
-import { Feat } from "../../domain/feat/feat.schema.js";
+import { FeatType } from "../../domain/feat/feat.schema.js";
 
-export const featsOrigin: Feat[] = [
+export const featsOrigin: FeatType[] = [
   {
     name: ["Alerta", "Alert"],
     id: "feat-alert",

@@ -3,23 +3,6 @@ import z from "zod";
 export const SourceEnum = z.enum(["LDJ2024", "MM2024"]);
 export const TemplateType = z.enum(["areaOfEffect", "Token"]);
 
-export const CreatureTypeEnum = z.enum([
-  "aberration",
-  "beast",
-  "celestial",
-  "construct",
-  "dragon",
-  "elemental",
-  "fey",
-  "fiend",
-  "giant",
-  "humanoid",
-  "monstrosity",
-  "ooze",
-  "plant",
-  "undead",
-]);
-
 export const ChallengeRatingEnum = z.enum([
   "0",
   "1/8",
@@ -57,15 +40,6 @@ export const ChallengeRatingEnum = z.enum([
   "30",
 ]);
 
-export const CreatureSizeEnum = z.enum([
-  "tiny",
-  "small",
-  "medium",
-  "large",
-  "huge",
-  "gargantuan",
-]);
-
 export const BaseConditionEnum = z.enum([
   "blinded",
   "charmed",
@@ -95,8 +69,13 @@ export const SystemStatusEnum = z.enum([
 
 export const OperationsEnum = z.enum(["add", "subtract", "multiply", "divide"]);
 
-export const ComparisonEnum = z.enum(["equal", "greaterThan", "lessThan", "greaterOrEqual", "lessOrEqual"]);
-
+export const ComparisonEnum = z.enum([
+  "equal",
+  "greaterThan",
+  "lessThan",
+  "greaterOrEqual",
+  "lessOrEqual",
+]);
 
 // União de condições e status do sistema.
 export const ConditionStatusEnum = z.union([

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
   AcSchema,
-  DiceRollSchema,
   DurationSchema,
   HPFormulaSchema,
 } from "../shared/blocks.schema.js";
@@ -20,16 +19,22 @@ import {
   HPTypesEnum,
   RollModeEnum,
 } from "./primitives/combat.primitives.js";
-import { AbilityScoreEnum } from "./primitives/character.primitives.js";
+import {
+  AbilityScoreEnum,
+  CreatureSizeEnum,
+} from "./primitives/character.primitives.js";
 import {
   ConditionStatusEnum,
-  CreatureSizeEnum,
   OperationsEnum,
   SystemStatusEnum,
 } from "./primitives/system.primitives.js";
 import { SummonedTokenIdEnum } from "./data-based-enums.js";
 import { GameEventSchema, RequirementSchema } from "./game-events.schema.js";
-import { DcSchema, TargetSchema } from "./character-blocks.schema.js";
+import {
+  DcSchema,
+  DiceRollSchema,
+  TargetSchema,
+} from "./character-blocks.schema.js";
 
 export const NoneOutcomeSchema = z.object({
   id: z.string().optional(),
@@ -58,7 +63,7 @@ export const ApplyConditionOutcomeSchema = z.object({
 export const DescriptiveOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("descriptive"),
-  roll: DiceRollSchema,
+  roll: DiceRollSchema.optional(),
   on: EffectOutcomeEnum,
   details: z.string(),
 });
@@ -191,22 +196,26 @@ export const SurfaceRuleSchema = z.object({
   outcomes: z.array(z.lazy(() => ActionOutcomesSchema)).optional(),
 });
 
-export const TransformRuleSchema = z.object({
-  triggers: z.lazy(() => GameEventSchema),
-  newSurface: z.lazy(() => CreateAreaEffectOutcomeSchema),
-});
+export const TransformRuleSchema = z.lazy(() =>
+  z.object({
+    triggers: z.lazy(() => GameEventSchema),
+    newSurface: CreateAreaEffectOutcomeSchema,
+  }),
+);
 
-export const CreateAreaEffectOutcomeSchema = z.object({
-  id: z.string().optional(),
-  type: z.literal("createAreaEffect"),
-  on: EffectOutcomeEnum,
-  surfaceType: SurfaceTypeEnum,
-  isDifficultTerrain: z.boolean().optional(),
-  rules: z.array(z.lazy(() => SurfaceRuleSchema)).optional(),
-  duration: DurationSchema,
-  status: SystemStatusEnum.optional(),
-  transformRules: z.array(z.lazy(() => TransformRuleSchema)).optional(),
-});
+export const CreateAreaEffectOutcomeSchema = z.lazy(() =>
+  z.object({
+    id: z.string().optional(),
+    type: z.literal("createAreaEffect"),
+    on: EffectOutcomeEnum,
+    surfaceType: SurfaceTypeEnum,
+    isDifficultTerrain: z.boolean().optional(),
+    rules: z.array(z.lazy(() => SurfaceRuleSchema)).optional(),
+    duration: DurationSchema,
+    status: SystemStatusEnum.optional(),
+    // transformRules: z.array(TransformRuleSchema).optional(),
+  }),
+);
 
 const ApplyEffectOutcomeSchema = z.object({
   id: z.string().optional(),
@@ -280,19 +289,17 @@ export type CreateAreaEffectOutcomeType = {
   rules?: SurfaceRuleType[];
   duration: z.infer<typeof DurationSchema>;
   status?: z.infer<typeof SystemStatusEnum>;
-  transformRules?: TransformRuleType[];
+  // transformRules?: TransformRuleType[];
 };
 
-export type ApplyEffectOutcomeType = {
+type ApplyEffectOutcomeType = {
   id?: string;
   type: "applyEffect";
   on: z.infer<typeof EffectOutcomeEnum>;
   effect: ApplicableEffectType;
 };
 
-export type SummonTokenOutcomeType = z.infer<typeof SummonTokenOutcomeSchema>;
-
-export type ModifyWeaponPropertiesOutcomeType = {
+type ModifyWeaponPropertiesOutcomeType = {
   id?: string;
   type: "modifyWeaponProperties";
   on: z.infer<typeof EffectOutcomeEnum>;
@@ -307,25 +314,6 @@ export type ModifyWeaponPropertiesOutcomeType = {
     outcomes: ActionOutcomeType[];
   };
 };
-
-export type ActionOutcomeType =
-  | z.infer<typeof NoneOutcomeSchema>
-  | z.infer<typeof SetAcOutcomeSchema>
-  | z.infer<typeof ModifyTargetHPOutcomeSchema>
-  | z.infer<typeof ApplyConditionOutcomeSchema>
-  | z.infer<typeof DescriptiveOutcomeSchema>
-  | z.infer<typeof DealWeaponDamageOutcomeSchema>
-  | z.infer<typeof ModifyAttributeOutcomeSchema>
-  | z.infer<typeof MoveTargetOutcomeSchema>
-  | z.infer<typeof DamageOverTimeOutcomeSchema>
-  | z.infer<typeof GrantAdvantageDisadvantageOutcomeSchema>
-  | z.infer<typeof CreateItemOutcomeSchema>
-  | z.infer<typeof ProvidesNewActionOutcomeSchema>
-  | CreateAreaEffectOutcomeType
-  | ApplyEffectOutcomeType
-  | SummonTokenOutcomeType
-  | ChooseEffectOutcomeType
-  | ModifyWeaponPropertiesOutcomeType;
 
 export const ActionOutcomesSchema: z.ZodType<ActionOutcomeType> =
   z.discriminatedUnion("type", [
@@ -348,4 +336,21 @@ export const ActionOutcomesSchema: z.ZodType<ActionOutcomeType> =
     ModifyWeaponPropertiesOutcomeSchema,
   ]);
 
-export type ActionOutcome = z.infer<typeof ActionOutcomesSchema>;
+export type ActionOutcomeType =
+  | z.infer<typeof NoneOutcomeSchema>
+  | z.infer<typeof SetAcOutcomeSchema>
+  | z.infer<typeof ModifyTargetHPOutcomeSchema>
+  | z.infer<typeof ApplyConditionOutcomeSchema>
+  | z.infer<typeof DescriptiveOutcomeSchema>
+  | z.infer<typeof DealWeaponDamageOutcomeSchema>
+  | z.infer<typeof ModifyAttributeOutcomeSchema>
+  | z.infer<typeof MoveTargetOutcomeSchema>
+  | z.infer<typeof DamageOverTimeOutcomeSchema>
+  | z.infer<typeof GrantAdvantageDisadvantageOutcomeSchema>
+  | z.infer<typeof CreateItemOutcomeSchema>
+  | z.infer<typeof ProvidesNewActionOutcomeSchema>
+  | z.infer<typeof SummonTokenOutcomeSchema>
+  | CreateAreaEffectOutcomeType
+  | ApplyEffectOutcomeType
+  | ChooseEffectOutcomeType
+  | ModifyWeaponPropertiesOutcomeType;

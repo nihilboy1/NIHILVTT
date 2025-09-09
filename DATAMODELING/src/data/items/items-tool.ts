@@ -1,4 +1,4 @@
-import { Item } from "../../domain/item/item.schema";
+import { ItemType } from "../../domain/item/item.schema";
 
 export const itemsTool = [
   {
@@ -350,4 +350,4 @@ export const itemsTool = [
       },
     ],
   },
-] as const satisfies Item[];
+] as const satisfies ItemType[];

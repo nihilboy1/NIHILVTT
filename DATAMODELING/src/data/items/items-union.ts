@@ -1,4 +1,4 @@
-import type { Item } from "../../domain/item/item.schema";
+import type { ItemType } from "../../domain/item/item.schema";
 import { itemsArmor } from "./items-armor";
 import { itemsGear } from "./items-gear";
 import { itemsTool } from "./items-tool";
@@ -9,4 +9,4 @@ export const PHB2024ITEMS = [
   ...itemsGear,
   ...itemsTool,
   ...itemsWeapon,
-] as const satisfies Item[];
+] as const satisfies ItemType[];

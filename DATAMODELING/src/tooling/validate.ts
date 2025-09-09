@@ -2,10 +2,10 @@ import readline from "readline";
 import chalk from "chalk";
 import { z } from "zod";
 
-import { FinalSpellDataSchema } from "../domain/spell/spell.schema.js";
-import { FinalItemDataSchema } from "../domain/item/item.schema.js";
-import { FinalMonsterDataSchema } from "../domain/monster/monster.schema.js";
-import { FinalFeatDataSchema } from "../domain/feat/feat.schema.js";
+import { SpellSchemaArray } from "../domain/spell/spell.schema.js";
+import { ItemSchemaArray } from "../domain/item/item.schema.js";
+import { MonsterSchemaArray } from "../domain/monster/monster.schema.js";
+import { FeatSchemaArray } from "../domain/feat/feat.schema.js";
 
 process.on("uncaughtException", (err) => {
   console.error(chalk.bgRed.white(" Uncaught Exception "), err);
@@ -120,7 +120,7 @@ async function main() {
 
     const { PHB2024SPELLS } = await import("../data/spells/spells-union.js");
 
-    validateData(PHB2024SPELLS, FinalSpellDataSchema, "Magias");
+    validateData(PHB2024SPELLS, SpellSchemaArray, "Magias");
   }
 
   if (choice === "1" || choice === "3") {
@@ -128,17 +128,17 @@ async function main() {
 
     const { PHB2024ITEMS } = await import("../data/items/items-union.js");
 
-    validateData(PHB2024ITEMS, FinalItemDataSchema, "Itens");
+    validateData(PHB2024ITEMS, ItemSchemaArray, "Itens");
   }
 
   if (choice === "1" || choice === "4") {
     console.log(chalk.blue("Carregando dados de monstros..."));
 
     const { PHB2024MONSTERS } = await import(
-      "../data/monsters/monsters.union.js"
+      "../data/monsters/monsters-union.js"
     );
 
-    validateData(PHB2024MONSTERS, FinalMonsterDataSchema, "Monstros");
+    validateData(PHB2024MONSTERS, MonsterSchemaArray, "Monstros");
   }
 
   if (choice === "1" || choice === "5") {
@@ -146,7 +146,7 @@ async function main() {
 
     const { PHB2024FEATS } = await import("../data/feats/feats-union.js");
 
-    validateData(PHB2024FEATS, FinalFeatDataSchema, "Feats");
+    validateData(PHB2024FEATS, FeatSchemaArray, "Feats");
   }
 
   rl.close();

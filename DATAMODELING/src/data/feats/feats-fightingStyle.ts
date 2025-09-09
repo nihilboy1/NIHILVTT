@@ -1,6 +1,6 @@
-import { Feat } from "../../domain/feat/feat.schema.js";
+import { FeatType } from "../../domain/feat/feat.schema.js";
 
-export const featsFightingStyle: Feat[] = [
+export const featsFightingStyle: FeatType[] = [
   {
     name: ["Arquearia", "Archery"],
     source: "LDJ2024",

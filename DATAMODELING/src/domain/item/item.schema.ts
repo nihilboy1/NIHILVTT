@@ -52,6 +52,6 @@ export const ItemSchema = z.discriminatedUnion("type", [
   ArmorItemSchema,
 ]);
 
-export type Item = z.infer<typeof ItemSchema>;
+export type ItemType = z.infer<typeof ItemSchema>;
 
-export const FinalItemDataSchema = z.array(ItemSchema);
+export const ItemSchemaArray = z.array(ItemSchema);

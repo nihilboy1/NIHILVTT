@@ -2,16 +2,16 @@ import { z } from "zod";
 import {
   ComparisonEnum,
   ConditionStatusEnum,
-  CreatureSizeEnum,
-  CreatureTypeEnum,
 } from "./primitives/system.primitives.js";
 import { SpellIdEnum, WeaponIdEnum } from "./data-based-enums.js";
 import {
   AbilityScoreEnum,
   AncestryNameEnum,
-  ClassesIdEnum,
+  CreatureSizeEnum,
+  CreatureTypeEnum,
   SkillEnum,
 } from "./primitives/character.primitives.js";
+import { ClassesIdEnum } from "./primitives/class.primitives.js";
 import {
   AttackTypeSchema,
   DcSchema,
@@ -28,10 +28,6 @@ import {
   WeaponPropertyEnum,
 } from "./primitives/item.primitives.js";
 
-// ============================================================================
-// SEÇÃO 1: O ESQUEMA DE CONDIÇÕES BASE (NÃO-RECURSIVO)
-// Este é o pilar da nossa lógica de eventos.
-// ============================================================================
 
 const EventConditionSchema = z.discriminatedUnion("type", [
   z.object({
@@ -292,11 +288,6 @@ const EventConditionSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
-// ============================================================================
-// SEÇÃO 2: DEFINIÇÃO DOS TIPOS E ESQUEMAS RECURSIVOS
-// ============================================================================
-
-// PASSO A: Definir os tipos TypeScript manualmente para guiar o compilador.
 
 export type GameEventType =
   | z.infer<typeof EventConditionSchema>
@@ -315,7 +306,7 @@ type ConditionGroupType = {
   events?: EventOrGroupType[];
 };
 
-// PASSO B: Criar os schemas Zod, usando os tipos que acabamos de definir.
+
 const ConditionGroupSchema: z.ZodType<ConditionGroupType> = z.object({
   type: z.literal("group"),
   conditionMode: z.enum(["any", "all"]).default("all"),
@@ -326,7 +317,6 @@ const EventOrGroupOrConditionSchema: z.ZodType<EventOrGroupType> = z.lazy(() =>
   z.union([EventConditionSchema, ConditionGroupSchema]),
 );
 
-// PASSO C: Definir o schema de topo que usa a nossa estrutura recursiva.
 export const GameEventSchema: z.ZodType<GameEventType> = z.lazy(() =>
   z.union([
     EventConditionSchema,

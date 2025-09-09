@@ -23,5 +23,5 @@ export const FeatSchema = z.object({
   effects: z.array(EffectSchema),
 });
 
-export type Feat = z.infer<typeof FeatSchema>;
-export const FinalFeatDataSchema = z.array(FeatSchema);
+export type FeatType = z.infer<typeof FeatSchema>;
+export const FeatSchemaArray = z.array(FeatSchema);

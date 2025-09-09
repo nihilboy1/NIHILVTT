@@ -13,9 +13,31 @@ export const AncestryNameEnum = z.enum([
   "orc",
 ]);
 
+export const CreatureTypeEnum = z.enum([
+  "aberration",
+  "beast",
+  "celestial",
+  "construct",
+  "dragon",
+  "elemental",
+  "fey",
+  "fiend",
+  "giant",
+  "humanoid",
+  "monstrosity",
+  "ooze",
+  "plant",
+  "undead",
+]);
 
-
-export const ClassesIdEnum = z.enum(["paladin", "rogue", "wizard", "fighter", "barbarian", "monk", "cleric", "druid", "ranger", "sorcerer", "warlock", "bard"]);
+export const CreatureSizeEnum = z.enum([
+  "tiny",
+  "small",
+  "medium",
+  "large",
+  "huge",
+  "gargantuan",
+]);
 
 export const LanguageEnum = z.enum([
   "common",
@@ -110,70 +132,6 @@ export const SkillEnum = z.enum([
   "survival",
 ]);
 
-export const EnvironmentEnum = z.enum([
-  "arctic",
-  "coast",
-  "desert",
-  "forest",
-  "grassland",
-  "hill",
-  "mountain",
-  "swamp",
-  "underdark",
-  "underwater",
-  "urban",
-  "planar",
-  "any",
-  "feywild",
-  "avernus",
-  "theShadowfell",
-  "theNineHells",
-  "sigil",
-  "mechanus",
-  "theAbyss",
-  "elysium",
-  "pandemonium",
-  "carceri",
-  "arcadia",
-  "theFeyCourt",
-  "acheron",
-  "theAstralSea",
-  "jungle",
-  "ruins",
-  "volcano",
-  "cavern",
-  "wasteland",
-  "savanna",
-  "tundra",
-  "steppe",
-  "marsh",
-  "reef",
-  "island",
-  "temple",
-  "graveyard",
-  "castle",
-  "labyrinth",
-  "mine",
-  "ship",
-  "sky",
-  "dreamscape",
-  "etherealPlane",
-  "shadowPlane",
-  "elementalPlaneFire",
-  "elementalPlaneWater",
-  "elementalPlaneEarth",
-  "elementalPlaneAir",
-  "limbo",
-  "mountCelestia",
-  "baator",
-  "gehenna",
-  "ysgard",
-  "beastlands",
-  "bytopia",
-  "outlands",
-  "primeMaterial",
-]);
-
 export const AlignmentEnum = z.enum([
   "lawfulGood",
   "neutralGood",
@@ -194,6 +152,11 @@ export const VisionTypeEnum = z.enum([
   "truesight",
 ]);
 
-export const FeatCategoryEnum = z.enum(["general", "fightingStyle", "origin", "epicBoon"]);
+export const FeatCategoryEnum = z.enum([
+  "general",
+  "fightingStyle",
+  "origin",
+  "epicBoon",
+]);
 
 export const DispositionEnum = z.enum(["friendly", "neutral", "hostile"]);

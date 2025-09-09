@@ -17,4 +17,5 @@ export const OriginSchema = z.object({
   startingEquipment: StartingEquipmentSchema,
 });
 
-export type Origin = z.infer<typeof OriginSchema>;
+export type OriginType = z.infer<typeof OriginSchema>;
+export const OriginSchemaArray = z.array(OriginSchema);

@@ -103,6 +103,5 @@ export const SpellSchema = baseSpellSchema.check((ctx) => {
   });
 });
 
-export const FinalSpellDataSchema = z.array(SpellSchema);
-
-export type Spell = z.infer<typeof SpellSchema>;
+export type SpellType = z.infer<typeof SpellSchema>;
+export const SpellSchemaArray = z.array(SpellSchema);

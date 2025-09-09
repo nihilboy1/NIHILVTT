@@ -2,7 +2,6 @@ import { z } from "zod";
 import {
   AcSchema,
   AreaSchema,
-  DiceRollSchema,
   DurationSchema,
   HPFormulaSchema,
   RechargeSchema,
@@ -15,7 +14,6 @@ import {
   ToolIdEnum,
 } from "../shared/data-based-enums.js";
 import { ActionOutcomesSchema } from "./outcome.schema.js";
-import { ActionParametersSchema } from "../domain/action/action.schema.js";
 import {
   OutcomeParameterPaths,
   RootParameterPaths,
@@ -31,11 +29,11 @@ import {
 } from "./primitives/item.primitives.js";
 import {
   AbilityScoreEnum,
-  ClassesIdEnum,
   FeatCategoryEnum,
   SkillEnum,
   VisionTypeEnum,
 } from "./primitives/character.primitives.js";
+import { ClassesIdEnum } from "./primitives/class.primitives.js";
 import {
   ConditionStatusEnum,
   OperationsEnum,
@@ -44,10 +42,12 @@ import { GameEventSchema, RequirementSchema } from "./game-events.schema.js";
 import {
   AttackTypeSchema,
   DcSchema,
+  DiceRollSchema,
   RangeSchema,
 } from "./character-blocks.schema.js";
 import { MagicSchoolEnum } from "./primitives/spell.primitives.js";
 import { HPTypesEnum } from "./primitives/combat.primitives.js";
+import { ActionParametersSchema } from "../domain/actionParameter/actionParameter.schema.js";
 
 const ChainedEffectSchema = z.object({
   triggers: GameEventSchema,

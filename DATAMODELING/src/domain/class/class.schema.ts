@@ -1,10 +1,9 @@
 import z from "zod";
 import { SourceEnum } from "../../shared/primitives/system.primitives";
 import { EffectSchema } from "../../shared/effect.schema";
-import { StartingEquipmentSchema } from "../../shared/character-blocks.schema";
+import { DiceRollSchema, StartingEquipmentSchema } from "../../shared/character-blocks.schema";
 import { RequirementSchema } from "../../shared/game-events.schema";
 import { AbilityScoreEnum } from "../../shared/primitives/character.primitives";
-import { DiceRollSchema } from "../../shared/blocks.schema";
 import { ClassProgressionSchema } from "../../shared/class-progression.schema";
 import { FighterResourcesIdEnum } from "../../shared/primitives/class.primitives";
 
@@ -35,4 +34,5 @@ export const ClassSchema = z.object({
   classProgression: ClassProgressionSchema,
 });
 
-export type Class = z.infer<typeof ClassSchema>;
+export type ClassType = z.infer<typeof ClassSchema>;
+export const ClassSchemaArray = z.array(ClassSchema);

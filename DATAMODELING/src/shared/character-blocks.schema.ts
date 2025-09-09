@@ -5,14 +5,36 @@ import {
   CoverEnum,
   DamageTypeEnum,
 } from "./primitives/combat.primitives";
+import { ConditionStatusEnum } from "./primitives/system.primitives";
 import {
-  ConditionStatusEnum,
+  AbilityScoreEnum,
   CreatureTypeEnum,
-} from "./primitives/system.primitives";
-import { AbilityScoreEnum, SkillEnum } from "./primitives/character.primitives";
-import { BonusSchema, DiceRollSchema } from "./blocks.schema";
+  SkillEnum,
+} from "./primitives/character.primitives";
 import { CostUnitEnum } from "./primitives/item.primitives";
 import { AllItemsEnum } from "./data-based-enums";
+
+
+export const BonusSchema = z.object({
+  value: z.number().int().optional(),
+  variable: z
+    .enum(["spellcastingModifier", "proficiencyBonus", "level"])
+    .optional(),
+});
+
+
+export const DiceRollSchema = z.object({
+  count: z.number().int().min(1, "A quantidade de dados deve ser no mínimo 1."),
+  faces: z
+    .number()
+    .int()
+    .min(1, "O número de faces do dado deve ser no mínimo 1."),
+  bonus: BonusSchema.optional(),
+  explodesOn: z.number().optional(),
+  explodeLimit: z
+    .union([z.number().int(), z.literal("spellcastingModifier")])
+    .optional(),
+});
 
 export const RangeSchema = z.object({
   normal: z.number().int().optional(),

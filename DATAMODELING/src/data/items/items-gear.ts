@@ -1,4 +1,4 @@
-import { Item } from "../../domain/item/item.schema";
+import { ItemType } from "../../domain/item/item.schema";
 
 export const itemsGear = [
   {
@@ -619,41 +619,6 @@ export const itemsGear = [
                   ],
                 },
               ],
-              transformRules: [
-                {
-                  triggers: {
-                    events: [{ type: "tookDamage", damageTypes: ["fire"] }],
-                  },
-                  newSurface: {
-                    on: "any",
-                    type: "createAreaEffect",
-                    surfaceType: "fire",
-                    duration: { unit: "round", value: 2 },
-                    rules: [
-                      {
-                        trigger: {
-                          events: [
-                            { type: "enteredArea" },
-                            { type: "endedTurnInArea" },
-                          ],
-                        },
-                        outcomes: [
-                          {
-                            on: "any",
-                            type: "modifyTargetHP",
-                            vitals: ["currentHp"],
-                            formula: {
-                              type: "damage",
-                              fixed: 5,
-                              damageTypeOptions: ["fire"],
-                            },
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                },
-              ],
             },
           ],
         },
@@ -1058,4 +1023,4 @@ export const itemsGear = [
       "Um pequeno espelho de metal polido com moldura, útil para observar ao redor de cantos ou verificar sua aparência.",
     effects: [],
   },
-] as const satisfies Item[];
+] as const satisfies ItemType[];

@@ -1,6 +1,6 @@
-import { Monster } from "../../domain/monster/monster.schema.js";
+import { MonsterType } from "../../domain/monster/monster.schema.js";
 
-export const monsters_cr_0: Monster[] = [
+export const monstersCR0 = [
   {
     id: "monster-awakened-shrub",
     name: ["Arbusto Desperto", "Awakened Shrub"],
@@ -2455,4 +2455,4 @@ export const monsters_cr_0: Monster[] = [
       },
     ],
   },
-];
+] as const satisfies MonsterType[];

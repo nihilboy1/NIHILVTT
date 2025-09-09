@@ -1,4 +1,4 @@
-import { Item } from "../../domain/item/item.schema";
+import {  ItemType } from "../../domain/item/item.schema";
 
 export const itemsWeapon = [
   {
@@ -1048,4 +1048,4 @@ export const itemsWeapon = [
       },
     ],
   },
-] as const satisfies Item[];
+] as const satisfies ItemType[];
