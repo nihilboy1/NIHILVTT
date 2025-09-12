@@ -34,7 +34,7 @@ export const PHB2024ORIGINS = [
         choose: { from: ["insight", "religion"], count: 2 },
         name: "Proficiência em Perícias",
         description:
-          "Você ganha proficiência em duas perícias. Insight e Religião.",
+          "Você ganha proficiência em duas perícias. Intuição e Religião.",
       },
       {
         type: "passive_grantProficiency",

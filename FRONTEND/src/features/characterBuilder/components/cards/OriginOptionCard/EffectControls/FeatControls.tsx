@@ -1,4 +1,5 @@
 import { ProcessedEffect } from '../../../../types/effectTypes';
+import { getFeatById } from '../../../../schemas/characterBuilderSchema';
 import { cn } from '@/shared/lib/utils/cn';
 import { Button } from '../../../ui/Button';
 import { selectionButtonVariants } from '@/features/characterBuilder/styles';
@@ -21,8 +22,18 @@ interface FeatControlsProps {
 export function FeatControls({ effect }: FeatControlsProps) {
   const { selection, selected } = effect;
 
+  // Função helper para obter o nome do talento
+  const getFeatName = (featId: string): string => {
+    const feat = getFeatById(featId);
+    if (feat) {
+      return Array.isArray(feat.name) ? feat.name[0] : feat.name;
+    }
+    return featId; // Fallback para o ID se não encontrar
+  };
+
   if (selection.mode === 'specific') {
-    return <p className="text-text-secondary text-sm">Talento: {selection.feats[0]}</p>;
+    const featName = getFeatName(selection.feats[0]);
+    return <p className="text-text-secondary text-sm">Talento: {featName}</p>;
   }
 
   return (
@@ -33,21 +44,24 @@ export function FeatControls({ effect }: FeatControlsProps) {
       </p>
       {Array.isArray(selection.feats) && selection.feats.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {selection.feats.map((feat: string) => (
-            <Button
-              key={feat}
-              variant={selected === feat ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => effect.onSelect && effect.onSelect(feat)}
-              className={cn(
-                selectionButtonVariants({
-                  state: selected === feat ? 'selected' : 'available',
-                }),
-              )}
-            >
-              {feat}
-            </Button>
-          ))}
+          {selection.feats.map((feat: string) => {
+            const featName = getFeatName(feat);
+            return (
+              <Button
+                key={feat}
+                variant={selected === feat ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => effect.onSelect && effect.onSelect(feat)}
+                className={cn(
+                  selectionButtonVariants({
+                    state: selected === feat ? 'selected' : 'available',
+                  }),
+                )}
+              >
+                {featName}
+              </Button>
+            );
+          })}
         </div>
       )}
     </div>

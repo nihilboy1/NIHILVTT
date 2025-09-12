@@ -53,8 +53,8 @@ export const proficiencyTagVariants = cva(
   {
     variants: {
       state: {
-        granted: 'bg-accent-primary text-surface-1 hover:scale-105 hover:shadow-md',
-        selected: 'bg-feedback-positive text-surface-1',
+        granted: 'bg-feedback-positive text-surface-0 hover:scale-105 hover:shadow-md',
+        selected: 'bg-feedback-positive text-surface-0',
         available: 'bg-surface-2 text-text-secondary',
       },
     },

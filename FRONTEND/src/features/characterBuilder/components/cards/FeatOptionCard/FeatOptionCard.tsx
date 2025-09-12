@@ -1,16 +1,16 @@
 import { useEffect } from 'react';
-import { CharacterOption, getOriginById } from '../../../schemas/characterBuilderSchema';
+import { CharacterOption, getFeatById } from '../../../schemas/characterBuilderSchema';
 import { ProcessedEffect } from '../../../types/effectTypes';
 import { cn } from '@/shared/lib/utils/cn';
 import { characterCardVariants, selectionBadgeVariants } from '@/features/characterBuilder/styles';
 import { Badge } from '../../ui/Badge';
 import { useEffectsProcessor } from '@/features/characterBuilder/model/hooks/useEffectsProcessor';
-import { EffectSection } from './components/EffectSection';
-import { AbilityScoreControls } from './EffectControls/AbilityScoreControls';
-import { FeatControls } from './EffectControls/FeatControls';
-import { ProficiencyControlsOrigin } from './EffectControls/ProficiencyControlsOrigin';
+import { EffectSection } from '../OriginOptionCard/components/EffectSection';
+import { AbilityScoreControls } from '../OriginOptionCard/EffectControls/AbilityScoreControls';
+import { FeatControls } from '../OriginOptionCard/EffectControls/FeatControls';
+import { ProficiencyControlsFeat } from './EffectControls/ProficiencyControlsFeat.tsx';
 
-type OriginOptionCardProps = {
+type FeatOptionCardProps = {
   option: CharacterOption;
   isSelected: boolean;
   onSelect: () => void;
@@ -18,22 +18,22 @@ type OriginOptionCardProps = {
 };
 
 /**
- * Card para seleção de origens de personagem
- * Refatorado para melhor separação de responsabilidades
+ * Card para seleção de talentos de personagem
+ * Baseado no OriginOptionCard, mas adaptado para talentos
  */
-export function OriginOptionCard({
+export function FeatOptionCard({
   option,
   isSelected,
   onSelect,
   onEffectsProcessed,
-}: OriginOptionCardProps) {
+}: FeatOptionCardProps) {
   const { name, description, id } = option;
-  const { processOriginEffects, areAllEffectsSelected } = useEffectsProcessor();
+  const { processFeatEffects, areAllEffectsSelected } = useEffectsProcessor();
 
-  // Busca dados da origem e processa efeitos
-  const originData = getOriginById(id);
-  const processedEffects = originData ? processOriginEffects(originData) : [];
-  const allEffectsSelected = originData ? areAllEffectsSelected(processedEffects) : true;
+  // Busca dados do talento e processa efeitos
+  const featData = getFeatById(id);
+  const processedEffects = featData ? processFeatEffects(featData) : [];
+  const allEffectsSelected = featData ? areAllEffectsSelected(processedEffects) : true;
 
   // Notifica componente pai sobre status dos efeitos
   useEffect(() => {
@@ -89,7 +89,7 @@ export function OriginOptionCard({
 
       case 'passive_grantProficiency':
         return (
-          <ProficiencyControlsOrigin
+          <ProficiencyControlsFeat
             effect={
               effect as ProcessedEffect & {
                 proficiencyType: string;
@@ -105,6 +105,19 @@ export function OriginOptionCard({
           />
         );
 
+      case 'passive_providesSpellKnowledge':
+      case 'passive_providesBonus':
+      case 'passive_providesVision':
+      case 'passive_modifyUserHP':
+        // Efeitos que não requerem controles de usuário - apenas exibem informação
+        return (
+          <div className="bg-transparent">
+            <div className="text-text-secondary text-sm">
+              {effect.description || `Efeito ${effect.type} aplicado automaticamente.`}
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -112,7 +125,7 @@ export function OriginOptionCard({
 
   return (
     <div
-      id={`origin-card-${id}`}
+      id={`feat-card-${id}`}
       className={cn(
         characterCardVariants({
           state: isSelected ? 'selected' : 'default',
@@ -137,7 +150,7 @@ export function OriginOptionCard({
       <p className="text-text-secondary mb-5 text-sm transition-colors">{description}</p>
 
       {/* Seção de efeitos (apenas quando selecionado) */}
-      {isSelected && originData && (
+      {isSelected && featData && (
         <div className="border-surface-2 mb-6 border-t pt-6">
           <div className="mb-4">
             <h4 className="text-text-primary text-lg">Benefícios de {name}</h4>

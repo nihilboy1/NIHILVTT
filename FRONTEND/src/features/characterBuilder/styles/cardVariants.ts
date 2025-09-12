@@ -9,7 +9,8 @@ export const characterCardVariants = cva(
   {
     variants: {
       state: {
-        default: 'bg-surface-1 hover:bg-surface-2 border-surface-2 cursor-pointer',
+        default:
+          'bg-surface-1 hover:bg-surface-0 border-surface-2 hover:border-accent-primary cursor-pointer',
         selected: 'bg-accent-primary border-accent-primary shadow-accent-primary/20 shadow-lg',
         disabled: 'bg-surface-1 border-surface-2 opacity-50 cursor-not-allowed',
       },

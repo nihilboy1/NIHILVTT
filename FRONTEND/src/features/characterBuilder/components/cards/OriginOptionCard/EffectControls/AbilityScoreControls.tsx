@@ -5,6 +5,7 @@ import { cn } from '@/shared/lib/utils/cn';
 import { Button } from '../../../ui/Button';
 import { controlButtonVariants, statusIndicatorVariants } from '@/features/characterBuilder/styles';
 import { useEffectsProcessor } from '@/features/characterBuilder/model/hooks/useEffectsProcessor';
+import { getAttributeNameTranslation } from '../../../../lib/translationHelpers';
 
 interface AbilityScoreControlsProps {
   effect: ProcessedEffect & {
@@ -27,15 +28,6 @@ export function AbilityScoreControls({ effect }: AbilityScoreControlsProps) {
   const { distributeAbilityPoints, removeAbilityPoints, getAttributePointCount, effectChoices } =
     useEffectsProcessor();
   const [, forceUpdate] = useState({});
-
-  const abilityNames: Record<string, string> = {
-    strength: 'Força',
-    dexterity: 'Destreza',
-    constitution: 'Constituição',
-    intelligence: 'Inteligência',
-    wisdom: 'Sabedoria',
-    charisma: 'Carisma',
-  };
 
   const choice = effect.choices[0];
   const { pick, operation, value } = choice;
@@ -93,7 +85,7 @@ export function AbilityScoreControls({ effect }: AbilityScoreControlsProps) {
               )}
             >
               <span className="text-text-primary font-medium">
-                {abilityNames[ability] || ability}
+                {getAttributeNameTranslation(ability)}
                 {hasPoints && (
                   <span
                     className={cn(
@@ -117,7 +109,7 @@ export function AbilityScoreControls({ effect }: AbilityScoreControlsProps) {
                       size: 'sm',
                     }),
                   )}
-                  aria-label={`Remover ponto de ${abilityNames[ability]}`}
+                  aria-label={`Remover ponto de ${getAttributeNameTranslation(ability)}`}
                 >
                   <MinimizeIcon size={1.2} />
                 </Button>
@@ -132,7 +124,7 @@ export function AbilityScoreControls({ effect }: AbilityScoreControlsProps) {
                       size: 'sm',
                     }),
                   )}
-                  aria-label={`Adicionar ponto em ${abilityNames[ability]}`}
+                  aria-label={`Adicionar ponto em ${getAttributeNameTranslation(ability)}`}
                 >
                   <PlusCircleIcon size={1.2} />
                 </Button>

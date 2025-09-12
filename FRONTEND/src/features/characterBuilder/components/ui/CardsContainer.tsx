@@ -2,6 +2,7 @@ import { CharacterOption } from '../../schemas/characterBuilderSchema';
 import { Step } from '../../constants/steps';
 import { OptionCard } from '../cards/OptionCard';
 import { OriginOptionCard } from '../cards/OriginOptionCard/OriginOptionCard';
+import { FeatOptionCard } from '../cards/FeatOptionCard/FeatOptionCard';
 
 interface CardsContainerProps {
   options: CharacterOption[];
@@ -42,6 +43,16 @@ export function CardsContainer({
           onEffectsProcessed={onEffectsProcessed}
         />
       );
+    } else if (currentStep === 'feat') {
+      return (
+        <FeatOptionCard
+          key={option.id}
+          option={option}
+          isSelected={isSelected}
+          onSelect={() => handleSelect(option.id)}
+          onEffectsProcessed={onEffectsProcessed}
+        />
+      );
     } else {
       return (
         <OptionCard
@@ -64,6 +75,8 @@ export function CardsContainer({
         return 'Outras origens';
       case 'species':
         return 'Outras espécies';
+      case 'feat':
+        return 'Outros talentos';
       case 'class':
         return 'Outras classes';
       default:

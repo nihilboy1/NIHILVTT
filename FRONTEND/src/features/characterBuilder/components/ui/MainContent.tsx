@@ -9,6 +9,7 @@ import {
   CharacterOption,
   specieToCharacterOption,
   originToCharacterOption,
+  getRequiredFeats,
 } from '../../schemas/characterBuilderSchema';
 import { animateScroll as scroll } from 'react-scroll';
 
@@ -61,6 +62,10 @@ export function MainContent({
     case 'origin':
       // Usamos a função de conversão de origens para CharacterOption
       options = PHB2024ORIGINS.map(originToCharacterOption);
+      break;
+    case 'feat':
+      // Extrai talentos baseado nas seleções atuais
+      options = getRequiredFeats(selections);
       break;
     case 'class':
       options = CLASSES;

@@ -22,6 +22,7 @@ export function useCharacterBuilder() {
     defaultValues: {
       species: '',
       origin: '',
+      feat: {},
       class: '',
       attributes: DEFAULT_ATTRIBUTES as unknown as Record<string, number>,
       'personal-info': {
@@ -47,13 +48,20 @@ export function useCharacterBuilder() {
   // Verifica se o passo atual é válido de acordo com os requisitos específicos
   const isCurrentStepValid = () => {
     // Verifica se existem erros no passo atual
-    if (errors[currentStep]) {
+    if (currentStep in errors && errors[currentStep as keyof typeof errors]) {
       return false;
     }
 
     if (currentStep === 'species' || currentStep === 'origin' || currentStep === 'class') {
       // Para espécie, origem e classe, deve haver uma seleção válida
-      return !!getValues()[currentStep] && getValues()[currentStep].length > 0;
+      const value = getValues()[currentStep];
+      return !!value && value.length > 0;
+    }
+
+    if (currentStep === 'feat') {
+      // Para talentos, validamos se todas as escolhas obrigatórias foram feitas
+      // Por enquanto, permitimos que seja válido mesmo vazio (implementação futura)
+      return true;
     }
 
     if (currentStep === 'attributes') {
@@ -93,10 +101,11 @@ export function useCharacterBuilder() {
     value:
       | string
       | Attributes
-      | { name: string; tokenUrl?: string; splashartUrl?: string; lore: string },
+      | { name: string; tokenUrl?: string; splashartUrl?: string; lore: string }
+      | Record<string, any>,
   ) => {
     // Evita validação desnecessária se o valor for igual ao anterior
-    const currentValue = getValues()[step];
+    const currentValue = step in getValues() ? getValues()[step as keyof CharacterBuilderFormData] : undefined;
 
     // Tenta fazer o parse se o valor for uma string e o step for 'attributes'
     let parsedValue = value;
@@ -133,6 +142,12 @@ export function useCharacterBuilder() {
           // Ignoramos erros de validação aqui
         });
       }, 100);
+    } else if (step === 'feat') {
+      // Para talentos, tratamos como um objeto de seleções
+      setValue(step, value as Record<string, any>, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     } else if (step === 'personal-info') {
       setValue(
         step,
@@ -160,7 +175,17 @@ export function useCharacterBuilder() {
 
   const handleNext = async () => {
     // Validar o passo atual antes de avançar
-    const isValid = await trigger(currentStep);
+    // Para steps que existem no schema, fazemos a validação
+    const validSteps: Array<keyof CharacterBuilderFormData> = ['species', 'origin', 'feat', 'class', 'attributes', 'personal-info'];
+    const isValidStep = validSteps.includes(currentStep as keyof CharacterBuilderFormData);
+    
+    let isValid = true;
+    if (isValidStep) {
+      isValid = await trigger(currentStep as keyof CharacterBuilderFormData);
+    } else {
+      // Para steps customizados, usamos nossa validação customizada
+      isValid = isCurrentStepValid();
+    }
 
     if (isValid) {
       const currentIndex = getCurrentStepIndex();

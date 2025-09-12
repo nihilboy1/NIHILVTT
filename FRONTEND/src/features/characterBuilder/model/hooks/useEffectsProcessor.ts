@@ -1,50 +1,32 @@
 import { useState, useCallback } from 'react';
 import {
-  processOriginEffects as processEffects,
+  processOriginEffects as processOriginEffectsUtil,
+  processFeatEffects as processFeatEffectsUtil,
   areAllEffectsSelected as checkEffectsSelected,
   getTotalAllowedPoints,
 } from '@/utils/effectProcessor';
-import { OriginType } from '@nihilvtt/datamodeling/domain';
-import { PHB2024ORIGINS } from '@nihilvtt/datamodeling/data';
+import { OriginType, FeatType } from '@nihilvtt/datamodeling/domain';
+import { PHB2024ORIGINS, PHB2024FEATS } from '@nihilvtt/datamodeling/data';
 import { EffectChoices, ProcessedEffect } from '../../types/effectTypes';
 
 export function useEffectsProcessor() {
   // Estado para armazenar as escolhas do usuário para os efeitos
   const [effectChoices, setEffectChoices] = useState<EffectChoices>({});
 
-  // Função para processar os efeitos de uma origem
-  const processOriginEffects = useCallback(
-    (origin: OriginType): ProcessedEffect[] => {
-      // Pré-processa os efeitos de proficiência fixa, adicionando-os ao effectChoices
+  // Função genérica para pré-processar efeitos automáticos
+  const preProcessEffects = useCallback(
+    (entity: { id: string; effects: any[] }, entityPrefix: string) => {
       const updatedEffectChoices = { ...effectChoices };
 
-      // Proficiências fixas para cada origem
-      const fixedOriginProficiencies: Record<string, string[]> = {
-        // Adicione aqui as proficiências fixas para cada origem
-        acolyte: ['insight', 'religion'],
-        charlatan: ['deception', 'sleightOfHand'],
-        criminal: ['deception', 'stealth'],
-        entertainer: ['acrobatics', 'performance'],
-        folkhero: ['animalHandling', 'survival'],
-        gladiator: ['acrobatics', 'performance'],
-        guildartisan: ['insight', 'persuasion'],
-        hermit: ['medicine', 'religion'],
-        knight: ['history', 'persuasion'],
-        noble: ['history', 'persuasion'],
-        outlander: ['athletics', 'survival'],
-        pirate: ['athletics', 'perception'],
-        sage: ['arcana', 'history'],
-        sailor: ['athletics', 'perception'],
-        soldier: ['athletics', 'intimidation'],
-        urchin: ['sleightOfHand', 'stealth'],
-        // Adicione outras origens conforme necessário
-      };
+      entity.effects.forEach((effect, index) => {
+        const effectId = `${entity.id}-${entityPrefix}-effect-${index}`;
 
-      origin.effects.forEach((effect, index) => {
-        const effectId = `${origin.id}-effect-${index}`;
+        // Verifica se este efeito já foi processado
+        if (updatedEffectChoices[effectId]) {
+          return;
+        }
 
-        // Para origens, SEMPRE tratar proficiências como fixas, sem necessidade de escolha
-        // Este é um componente especial para origens, então vamos pré-selecionar as proficiências automaticamente
+        // Para efeitos de proficiência, verifica se há escolha real
         if (effect.type === 'passive_grantProficiency') {
           // Conversão segura para acessar as propriedades
           const profEffect = effect as unknown as {
@@ -54,36 +36,55 @@ export function useEffectsProcessor() {
             on?: string;
           };
 
-          // Caso 1: Se temos proficiências fixas pré-definidas para esta origem específica
-          if (fixedOriginProficiencies[origin.id] && !updatedEffectChoices[effectId]) {
-            updatedEffectChoices[effectId] = [...fixedOriginProficiencies[origin.id]];
-          }
-          // Caso 2: Proficiências fixas diretamente especificadas no efeito
-          else if (
-            profEffect.proficiencies &&
-            Array.isArray(profEffect.proficiencies) &&
-            !updatedEffectChoices[effectId]
-          ) {
+          // Caso 1: Proficiências fixas diretamente especificadas no efeito
+          if (profEffect.proficiencies && Array.isArray(profEffect.proficiencies)) {
             updatedEffectChoices[effectId] = [...profEffect.proficiencies];
           }
-          // Caso 3: Proficiências 'choose' - em origens, sempre vamos pré-selecionar
-          else if (
-            profEffect.choose &&
-            Array.isArray(profEffect.choose.from) &&
-            !updatedEffectChoices[effectId]
-          ) {
-            if (profEffect.choose.count === 'all') {
-              // Seleciona todas
-              updatedEffectChoices[effectId] = [...profEffect.choose.from];
-            } else if (typeof profEffect.choose.count === 'number') {
-              // Seleciona as primeiras N proficiências da lista (pré-seleção automática)
-              updatedEffectChoices[effectId] = [
-                ...profEffect.choose.from.slice(0, profEffect.choose.count),
-              ];
+          // Caso 2: Verifica se há escolha real em 'choose'
+          else if (profEffect.choose && Array.isArray(profEffect.choose.from)) {
+            const { count, from } = profEffect.choose;
+
+            // Se count === 'all' ou count === from.length, não há escolha real
+            if (count === 'all' || (typeof count === 'number' && count >= from.length)) {
+              // Automaticamente seleciona todas as opções disponíveis
+              updatedEffectChoices[effectId] = [...from];
             }
+            // Se count < from.length, há escolha real - deixa para o usuário decidir
+            // Não pré-seleciona nada neste caso
           }
         }
       });
+
+      return updatedEffectChoices;
+    },
+    [effectChoices],
+  );
+
+  // Função genérica para adicionar onSelect aos efeitos processados
+  const addSelectHandlers = useCallback((processedEffects: any[]): ProcessedEffect[] => {
+    return processedEffects.map((effect) => ({
+      ...effect,
+      onSelect: (choice: any) => {
+        // Para efeitos de atributos, valida a distribuição de pontos antes de atualizar
+        if (effect.type === 'passive_modifyAbilityScore') {
+          const totalPoints = getTotalAllowedPoints(effect);
+
+          // Se a nova escolha excede os pontos disponíveis, valida conforme regras de atributos
+          if (Array.isArray(choice) && choice.length > totalPoints) {
+            // Não permite mais pontos que o disponível
+            return;
+          }
+        }
+
+        setEffectChoices((prev) => ({ ...prev, [effect.id]: choice }));
+      },
+    })) as ProcessedEffect[];
+  }, []);
+
+  // Função para processar os efeitos de uma origem
+  const processOriginEffects = useCallback(
+    (origin: OriginType): ProcessedEffect[] => {
+      const updatedEffectChoices = preProcessEffects(origin, 'origin');
 
       // Se houver novas escolhas automáticas, atualiza o estado
       if (Object.keys(updatedEffectChoices).length > Object.keys(effectChoices).length) {
@@ -91,28 +92,31 @@ export function useEffectsProcessor() {
       }
 
       // Usa a função base do effectProcessor.ts para processar os efeitos
-      const processedEffects = processEffects(origin, updatedEffectChoices);
+      const processedEffects = processOriginEffectsUtil(origin, updatedEffectChoices);
 
       // Adiciona a função onSelect a cada efeito
-      return processedEffects.map((effect) => ({
-        ...effect,
-        onSelect: (choice: any) => {
-          // Para efeitos de atributos, valida a distribuição de pontos antes de atualizar
-          if (effect.type === 'passive_modifyAbilityScore') {
-            const totalPoints = getTotalAllowedPoints(effect);
-
-            // Se a nova escolha excede os pontos disponíveis, valida conforme regras de atributos
-            if (Array.isArray(choice) && choice.length > totalPoints) {
-              // Não permite mais pontos que o disponível
-              return;
-            }
-          }
-
-          setEffectChoices((prev) => ({ ...prev, [effect.id]: choice }));
-        },
-      })) as ProcessedEffect[];
+      return addSelectHandlers(processedEffects);
     },
-    [effectChoices],
+    [effectChoices, preProcessEffects, addSelectHandlers],
+  );
+
+  // Função para processar os efeitos de um talento
+  const processFeatEffects = useCallback(
+    (feat: FeatType): ProcessedEffect[] => {
+      const updatedEffectChoices = preProcessEffects(feat, 'feat');
+
+      // Se houver novas escolhas automáticas, atualiza o estado
+      if (Object.keys(updatedEffectChoices).length > Object.keys(effectChoices).length) {
+        setEffectChoices(updatedEffectChoices);
+      }
+
+      // Usa a função base do effectProcessor.ts para processar os efeitos
+      const processedEffects = processFeatEffectsUtil(feat, updatedEffectChoices);
+
+      // Adiciona a função onSelect a cada efeito
+      return addSelectHandlers(processedEffects);
+    },
+    [effectChoices, preProcessEffects, addSelectHandlers],
   );
 
   // Verifica se todos os efeitos que requerem escolha foram selecionados
@@ -134,13 +138,21 @@ export function useEffectsProcessor() {
 
       // Busca o efeito correspondente para obter o total de pontos permitidos
       const origin = PHB2024ORIGINS.find((o) =>
-        o.effects.some((_effect: any, index: number) => `${o.id}-effect-${index}` === effectId),
+        o.effects.some(
+          (_effect: any, index: number) => `${o.id}-origin-effect-${index}` === effectId,
+        ),
+      );
+      const feat = PHB2024FEATS.find((f) =>
+        f.effects.some(
+          (_effect: any, index: number) => `${f.id}-feat-effect-${index}` === effectId,
+        ),
       );
 
-      if (!origin) return;
+      const entity = origin || feat;
+      if (!entity) return;
 
-      const effectIndex = parseInt(effectId.split('-').pop() || '0');
-      const effect = origin.effects[effectIndex];
+      const effectIndex = parseInt(effectId.split('-effect-')[1] || '0');
+      const effect = entity.effects[effectIndex];
 
       if (!effect || effect.type !== 'passive_modifyAbilityScore') return;
 
@@ -257,6 +269,7 @@ export function useEffectsProcessor() {
   // Retorna o objeto com todas as funções e estados
   return {
     processOriginEffects,
+    processFeatEffects,
     effectChoices,
     setEffectChoices,
     areAllEffectsSelected,

@@ -1,11 +1,11 @@
 import { ProcessedEffect } from '../../../../types/effectTypes';
-import { ProficiencyTag } from '../components/ProficiencyTag';
+import { ProficiencyTag } from '../../OriginOptionCard/components/ProficiencyTag';
 import {
   getSkillNameTranslation,
   getToolNameTranslation,
 } from '../../../../lib/translationHelpers';
 
-interface ProficiencyControlsOriginProps {
+interface ProficiencyControlsFeatProps {
   effect: ProcessedEffect & {
     proficiencyType: string;
     choose?: {
@@ -19,10 +19,11 @@ interface ProficiencyControlsOriginProps {
 }
 
 /**
- * Controles para proficiências específicos do OriginOptionCard
+ * Controles para proficiências específicos do FeatOptionCard
  * Versão data-driven que usa apenas os dados dos efeitos processados
+ * Similar ao ProficiencyControlsOrigin, mas adaptado para talentos
  */
-export function ProficiencyControlsOrigin({ effect }: ProficiencyControlsOriginProps) {
+export function ProficiencyControlsFeat({ effect }: ProficiencyControlsFeatProps) {
   const { choose, proficiencyType, selected, on, proficiencies } = effect;
 
   const getDisplayName = (id: string) => {
@@ -52,6 +53,7 @@ export function ProficiencyControlsOrigin({ effect }: ProficiencyControlsOriginP
       grantedProficiencies = from;
     }
     // Se há escolha real, será tratado pela UI de seleção (não implementada aqui)
+    // Talentos tipicamente requerem mais escolhas do usuário do que origens
   }
 
   // Se não há proficiências para exibir, retorna null

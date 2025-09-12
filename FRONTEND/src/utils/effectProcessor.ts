@@ -1,8 +1,8 @@
-import { OriginType } from '@nihilvtt/datamodeling/domain';
+import { OriginType, FeatType } from '@nihilvtt/datamodeling/domain';
 import { EffectChoices } from '../features/characterBuilder/types/effectTypes';
 
-// Interface ampliada para o efeito de uma origem, com tipagem genérica
-interface OriginEffect {
+// Interface ampliada para o efeito de uma origem ou talento, com tipagem genérica
+interface EntityEffect {
   type: string;
   name: string;
   description?: string;
@@ -22,17 +22,19 @@ type ProcessedEffectBase = {
 };
 
 /**
- * Processa os efeitos de uma origem e retorna os efeitos processados
- * @param origin - Origem a ser processada
+ * Função genérica para processar efeitos de qualquer entidade (origin ou feat)
+ * @param entity - Entidade com efeitos (OriginType ou FeatType)
  * @param effectChoices - Escolhas atuais dos efeitos
+ * @param entityPrefix - Prefixo para identificar a entidade (ex: 'origin', 'feat')
  * @returns Array de efeitos processados
  */
-export function processOriginEffects(
-  origin: OriginType,
+function processEntityEffects(
+  entity: { id: string; effects: EntityEffect[] },
   effectChoices: EffectChoices,
+  entityPrefix: string,
 ): ProcessedEffectBase[] {
-  return origin.effects.map((effect: OriginEffect, index) => {
-    const effectId = `${origin.id}-effect-${index}`;
+  return entity.effects.map((effect: EntityEffect, index) => {
+    const effectId = `${entity.id}-${entityPrefix}-effect-${index}`;
 
     // Base comum para todos os efeitos processados
     const baseProcessedEffect = {
@@ -74,7 +76,7 @@ export function processOriginEffects(
 
         // Verifica se este é um efeito de uma origem (baseado no ID do efeito)
         const isOriginEffect =
-          effectId.includes('-effect-') && effectId.split('-effect-')[0].length > 0;
+          effectId.includes('-origin-effect-') && effectId.split('-origin-effect-')[0].length > 0;
 
         if (profEffect.on === 'initiative') {
           return {
@@ -134,6 +136,32 @@ export function processOriginEffects(
         } as ProcessedEffectBase;
     }
   });
+}
+
+/**
+ * Processa os efeitos de uma origem e retorna os efeitos processados
+ * @param origin - Origem a ser processada
+ * @param effectChoices - Escolhas atuais dos efeitos
+ * @returns Array de efeitos processados
+ */
+export function processOriginEffects(
+  origin: OriginType,
+  effectChoices: EffectChoices,
+): ProcessedEffectBase[] {
+  return processEntityEffects(origin, effectChoices, 'origin');
+}
+
+/**
+ * Processa os efeitos de um talento e retorna os efeitos processados
+ * @param feat - Talento a ser processado
+ * @param effectChoices - Escolhas atuais dos efeitos
+ * @returns Array de efeitos processados
+ */
+export function processFeatEffects(
+  feat: FeatType,
+  effectChoices: EffectChoices,
+): ProcessedEffectBase[] {
+  return processEntityEffects(feat, effectChoices, 'feat');
 }
 
 /**

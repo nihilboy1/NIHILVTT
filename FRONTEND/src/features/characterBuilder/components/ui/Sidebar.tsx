@@ -21,6 +21,14 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
         return !!selections[stepId] && String(selections[stepId]).length > 0;
       case 'origin':
         return !!selections[stepId] && String(selections[stepId]).length > 0;
+      case 'feat':
+        // Para talentos, verifica se há pelo menos um talento configurado
+        // TODO: Melhorar esta validação para verificar se todos os talentos requeridos foram configurados
+        return (
+          !!selections[stepId] &&
+          typeof selections[stepId] === 'object' &&
+          Object.keys(selections[stepId] as Record<string, any>).length > 0
+        );
       case 'class':
         return !!selections[stepId] && String(selections[stepId]).length > 0;
       case 'attributes':
@@ -75,6 +83,15 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
           name: Array.isArray(origin.name) ? origin.name[0] : origin.name,
         }));
         break;
+      case 'feat':
+        // Para talentos, vamos mostrar quantos foram configurados
+        if (typeof selectedId === 'object' && selectedId !== null) {
+          const featCount = Object.keys(selectedId).length;
+          return featCount > 0
+            ? `${featCount} talento${featCount > 1 ? 's' : ''} configurado${featCount > 1 ? 's' : ''}`
+            : null;
+        }
+        return null;
       case 'class':
         options = CLASSES;
         break;

@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 import { ATTRIBUTE_LIST } from '@/shared/constants/characterData/attributes';
 // Importações do datamodeling
-import { PHB2024SPECIES, PHB2024ORIGINS } from '@nihilvtt/datamodeling/data';
-import { OriginType, SpecieType } from '@nihilvtt/datamodeling/domain';
+import { PHB2024SPECIES, PHB2024ORIGINS, PHB2024FEATS } from '@nihilvtt/datamodeling/data';
+import { OriginType, SpecieType, FeatType } from '@nihilvtt/datamodeling/domain';
 // Mantemos a importação local para compatibilidade com o código existente
 import { CLASSES } from '@/shared/constants/characterData/classes';
 
@@ -124,6 +124,9 @@ export const getSpecieById = (id: string): SpecieType | undefined =>
 export const getOriginById = (id: string): OriginType | undefined =>
   PHB2024ORIGINS.find((origin) => origin.id === id);
 
+export const getFeatById = (id: string): FeatType | undefined =>
+  PHB2024FEATS.find((feat) => feat.id === id);
+
 // Função para converter dados do formulário para modelo completo
 export const formDataToExpandedData = (
   formData: CharacterBuilderFormData,
@@ -150,10 +153,17 @@ export const getAllSpeciesOptions = (): CharacterOption[] =>
 export const getAllOriginOptions = (): CharacterOption[] =>
   PHB2024ORIGINS.map(originToCharacterOption);
 
+// Esquema para talentos - validação flexível para diferentes tipos de seleções
+export const featSchema = z
+  .record(z.string(), z.any())
+  .transform((val) => val || {})
+  .pipe(z.record(z.string(), z.any()));
+
 // Esquema completo para o formulário do CharacterBuilder
 export const characterBuilderSchema = z.object({
   species: speciesSchema,
   origin: originSchema,
+  feat: featSchema,
   class: classSchema,
   attributes: attributesSchema,
   'personal-info': personalInfoSchema,
@@ -167,3 +177,59 @@ export type CharacterBuilderExpandedData = Omit<CharacterBuilderFormData, 'speci
   species: SpecieType;
   origin: OriginType;
 };
+
+/**
+ * Extrai todos os talentos que devem ser processados baseado nas seleções atuais
+ * @param selections - Seleções atuais do character builder
+ * @returns Array de CharacterOption para talentos
+ */
+export function getRequiredFeats(selections: any): CharacterOption[] {
+  const feats: CharacterOption[] = [];
+
+  // Extrai talentos das origens selecionadas
+  if (selections.origin) {
+    const origin = getOriginById(selections.origin);
+    if (origin) {
+      origin.effects.forEach((effect) => {
+        if (effect.type === 'passive_providesFeat') {
+          const featEffect = effect as any;
+          if (featEffect.selection) {
+            // Para talentos específicos, adiciona diretamente
+            if (featEffect.selection.mode === 'specific') {
+              featEffect.selection.feats.forEach((featId: string) => {
+                const feat = getFeatById(featId);
+                if (feat) {
+                  feats.push(featToCharacterOption(feat));
+                }
+              });
+            }
+            // Para talentos de escolha, adiciona as opções disponíveis
+            else if (featEffect.selection.mode === 'choose') {
+              featEffect.selection.feats.forEach((featId: string) => {
+                const feat = getFeatById(featId);
+                if (feat) {
+                  feats.push(featToCharacterOption(feat));
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // TODO: Adicionar talentos de outras fontes (classes, etc.) quando implementadas
+
+  return feats;
+}
+
+/**
+ * Converte um FeatType para CharacterOption
+ */
+function featToCharacterOption(feat: FeatType): CharacterOption {
+  return {
+    id: feat.id,
+    name: Array.isArray(feat.name) ? feat.name[0] : feat.name,
+    description: feat.description,
+  };
+}
