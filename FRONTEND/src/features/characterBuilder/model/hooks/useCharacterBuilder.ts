@@ -6,14 +6,20 @@ import { useForm } from 'react-hook-form';
 import { Attributes } from '@/shared/constants/characterData/attributes';
 import { DEFAULT_ATTRIBUTES } from '@/shared/constants/characterData/attributes';
 
+import { useEffectsProcessor } from './useEffectsProcessor';
 import { Step, STEPS } from '../../constants/steps';
 import {
   CharacterBuilderFormData,
   characterBuilderSchema,
+  getOriginById,
+  getFeatById,
 } from '../../schemas/characterBuilderSchema';
 
 export function useCharacterBuilder() {
   const [currentStep, setCurrentStep] = useState<Step>('species');
+
+  // Hook para processar efeitos das origens e talentos
+  const effectsProcessor = useEffectsProcessor();
 
   // Configuramos o React Hook Form com o resolver do Zod
   const methods = useForm<CharacterBuilderFormData>({
@@ -60,8 +66,25 @@ export function useCharacterBuilder() {
 
     if (currentStep === 'feat') {
       // Para talentos, validamos se todas as escolhas obrigatórias foram feitas
-      // Por enquanto, permitimos que seja válido mesmo vazio (implementação futura)
-      return true;
+      const selections = getValues();
+      const origin = selections.origin ? getOriginById(selections.origin) : null;
+
+      if (!origin) {
+        return true; // Se não há origem, consideramos válido
+      }
+
+      // Processa os efeitos da origem para verificar talentos obrigatórios
+      const processedEffects = effectsProcessor.processOriginEffects(origin);
+      const featEffects = processedEffects.filter(
+        (effect) => effect.type === 'passive_providesFeat',
+      );
+
+      if (featEffects.length === 0) {
+        return true; // Se não há talentos obrigatórios, é válido
+      }
+
+      // Verifica se todos os efeitos de talentos foram processados/selecionados
+      return effectsProcessor.areAllEffectsSelected(featEffects);
     }
 
     if (currentStep === 'attributes') {
@@ -105,7 +128,8 @@ export function useCharacterBuilder() {
       | Record<string, any>,
   ) => {
     // Evita validação desnecessária se o valor for igual ao anterior
-    const currentValue = step in getValues() ? getValues()[step as keyof CharacterBuilderFormData] : undefined;
+    const currentValue =
+      step in getValues() ? getValues()[step as keyof CharacterBuilderFormData] : undefined;
 
     // Tenta fazer o parse se o valor for uma string e o step for 'attributes'
     let parsedValue = value;
@@ -176,9 +200,16 @@ export function useCharacterBuilder() {
   const handleNext = async () => {
     // Validar o passo atual antes de avançar
     // Para steps que existem no schema, fazemos a validação
-    const validSteps: Array<keyof CharacterBuilderFormData> = ['species', 'origin', 'feat', 'class', 'attributes', 'personal-info'];
+    const validSteps: Array<keyof CharacterBuilderFormData> = [
+      'species',
+      'origin',
+      'feat',
+      'class',
+      'attributes',
+      'personal-info',
+    ];
     const isValidStep = validSteps.includes(currentStep as keyof CharacterBuilderFormData);
-    
+
     let isValid = true;
     if (isValidStep) {
       isValid = await trigger(currentStep as keyof CharacterBuilderFormData);
@@ -214,6 +245,57 @@ export function useCharacterBuilder() {
   const canGoNext = isCurrentStepValid();
   const canGoPrevious = getCurrentStepIndex() > 0;
 
+  // Função para obter talentos baseados nas seleções atuais
+  const getAvailableFeats = () => {
+    const selections = getValues();
+    if (!selections.origin) return [];
+
+    // Usa o effectsProcessor para obter os efeitos processados da origem
+    const origin = getOriginById(selections.origin);
+    if (!origin) return [];
+
+    const processedEffects = effectsProcessor.processOriginEffects(origin);
+
+    // Filtra apenas efeitos que fornecem talentos
+    return processedEffects
+      .filter((effect) => effect.type === 'passive_providesFeat')
+      .flatMap((effect) => {
+        // Para efeitos específicos, retorna os talentos automaticamente
+        if (effect.selection?.mode === 'specific') {
+          return effect.selection.feats
+            .map((featId: string) => {
+              const feat = getFeatById(featId);
+              return feat
+                ? {
+                    id: feat.id,
+                    name: Array.isArray(feat.name) ? feat.name[0] : feat.name,
+                    description: feat.description,
+                    effect,
+                  }
+                : null;
+            })
+            .filter(Boolean);
+        }
+        // Para efeitos de escolha, retorna as opções disponíveis
+        if (effect.selection?.mode === 'choose') {
+          return effect.selection.feats
+            .map((featId: string) => {
+              const feat = getFeatById(featId);
+              return feat
+                ? {
+                    id: feat.id,
+                    name: Array.isArray(feat.name) ? feat.name[0] : feat.name,
+                    description: feat.description,
+                    effect,
+                  }
+                : null;
+            })
+            .filter(Boolean);
+        }
+        return [];
+      });
+  };
+
   return {
     currentStep,
     selections,
@@ -225,6 +307,8 @@ export function useCharacterBuilder() {
     handleFinish,
     canGoNext,
     canGoPrevious,
+    getAvailableFeats,
+    effectsProcessor,
     errors,
   };
 }

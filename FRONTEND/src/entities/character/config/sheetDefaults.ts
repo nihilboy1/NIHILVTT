@@ -7,7 +7,7 @@ import {
 } from '@/entities/character/model/schemas/character.schema';
 import { generateUniqueId } from '@/shared/lib/utils/id/idUtils';
 
-import defaultTokenImage from "../../../shared/assets/defaultToken.png"
+import defaultTokenImage from '../../../shared/assets/defaultToken.png';
 const defaultAttributes = {
   strength: 10,
   dexterity: 10,
@@ -55,7 +55,7 @@ export const DEFAULT_TOKEN_IMAGE = defaultTokenImage;
 export const DEFAULT_PLAYER_DATA: Omit<PlayerCharacter, 'id' | 'type'> = {
   name: 'Novo Jogador',
   image: DEFAULT_TOKEN_IMAGE,
-  size: 'Medium',
+  size: 'medium',
   notes: '',
   attributes: defaultAttributes,
   proficiencies: defaultProficiencies,
@@ -86,7 +86,7 @@ export const DEFAULT_PLAYER_DATA: Omit<PlayerCharacter, 'id' | 'type'> = {
 export const DEFAULT_MONSTER_DATA: Omit<MonsterNpcCharacter, 'id' | 'type'> = {
   name: 'Novo Monstro',
   image: DEFAULT_TOKEN_IMAGE,
-  size: 'Medium',
+  size: 'medium',
   notes: '',
   attributes: defaultAttributes,
   proficiencies: defaultProficiencies,

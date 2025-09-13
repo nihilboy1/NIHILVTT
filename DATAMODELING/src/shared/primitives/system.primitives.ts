@@ -77,6 +77,9 @@ export const ComparisonEnum = z.enum([
   "lessOrEqual",
 ]);
 
+export const DiceTypeEnum = z.enum(['d4', 'd6', 'd8', 'd10', 'd12', 'd20']);
+
+
 // União de condições e status do sistema.
 export const ConditionStatusEnum = z.union([
   BaseConditionEnum,

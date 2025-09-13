@@ -9,10 +9,10 @@ import { DEFAULT_MONSTER_DATA, DEFAULT_PLAYER_DATA } from '../config/sheetDefaul
 import {
   Character,
   characterSchema,
-  CharacterTypeEnum,
   PlayerCharacter,
   MonsterNpcCharacter,
 } from './schemas/character.schema';
+import { CharacterTypeEnum } from 'node_modules/@nihilvtt/datamodeling/src/shared/primitives/character.primitives';
 
 export interface CharactersState {
   characters: Character[];
@@ -34,7 +34,7 @@ const createNewCharacter = (characterData: Partial<Omit<Character, 'id'>>): Char
     baseData = {
       ...DEFAULT_MONSTER_DATA,
       id: newId,
-      type: CharacterTypeEnum.enum['Monster/NPC'],
+      type: CharacterTypeEnum.enum['NPC'],
     };
   }
 

@@ -30,6 +30,12 @@ export const CreatureTypeEnum = z.enum([
   "undead",
 ]);
 
+export const CharacterTypeEnum = z.enum(['Player', 'NPC', 'Object']);
+
+
+export const ProficiencyLevelEnum = z.enum(['none', 'proficient', 'expertise']);
+
+
 export const CreatureSizeEnum = z.enum([
   "tiny",
   "small",

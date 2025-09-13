@@ -53,6 +53,26 @@ export function useEffectsProcessor() {
             // Não pré-seleciona nada neste caso
           }
         }
+
+        // Para efeitos que fornecem talentos
+        if (effect.type === 'passive_providesFeat') {
+          const featEffect = effect as unknown as {
+            type: string;
+            selection?: {
+              mode: 'specific' | 'choose';
+              feats: string[];
+            };
+          };
+
+          if (featEffect.selection) {
+            if (featEffect.selection.mode === 'specific') {
+              // Talentos específicos são automaticamente selecionados
+              updatedEffectChoices[effectId] = [...featEffect.selection.feats];
+            }
+            // Para modo 'choose', deixa para o usuário decidir
+            // Não pré-seleciona nada neste caso
+          }
+        }
       });
 
       return updatedEffectChoices;
@@ -98,6 +118,61 @@ export function useEffectsProcessor() {
       return addSelectHandlers(processedEffects);
     },
     [effectChoices, preProcessEffects, addSelectHandlers],
+  );
+
+  // Função para processar os efeitos de talentos fornecidos por uma origem
+  const processFeatEffectsFromOrigin = useCallback(
+    (origin: OriginType): ProcessedEffect[] => {
+      const allProcessedEffects: ProcessedEffect[] = [];
+
+      // Processa os efeitos da origem para encontrar talentos
+      const originEffects = processOriginEffectsUtil(origin, effectChoices);
+      const featProvideEffects = originEffects.filter(
+        (effect) => effect.type === 'passive_providesFeat',
+      );
+
+      // Para cada efeito que fornece talentos, processa os efeitos dos talentos
+      featProvideEffects.forEach((featProvideEffect) => {
+        if (featProvideEffect.selection?.mode === 'specific') {
+          // Para talentos específicos, processa automaticamente
+          featProvideEffect.selection.feats.forEach((featId: string) => {
+            const feat = PHB2024FEATS.find((f) => f.id === featId);
+            if (feat) {
+              const featEffects = processFeatEffectsUtil(feat, effectChoices);
+              // Adiciona um prefixo especial para identificar que são efeitos de talentos da origem
+              const prefixedFeatEffects = featEffects.map((effect) => ({
+                ...effect,
+                id: `${origin.id}-originFeat-${featId}-${effect.id}`,
+                parentFeatId: featId,
+                parentFeatName: Array.isArray(feat.name) ? feat.name[0] : feat.name,
+                fromOriginFeat: true,
+              }));
+              allProcessedEffects.push(...addSelectHandlers(prefixedFeatEffects));
+            }
+          });
+        } else if (featProvideEffect.selection?.mode === 'choose') {
+          // Para talentos de escolha, processa apenas os selecionados
+          const selectedFeats = (effectChoices[featProvideEffect.id] as string[]) || [];
+          selectedFeats.forEach((featId: string) => {
+            const feat = PHB2024FEATS.find((f) => f.id === featId);
+            if (feat) {
+              const featEffects = processFeatEffectsUtil(feat, effectChoices);
+              const prefixedFeatEffects = featEffects.map((effect) => ({
+                ...effect,
+                id: `${origin.id}-originFeat-${featId}-${effect.id}`,
+                parentFeatId: featId,
+                parentFeatName: Array.isArray(feat.name) ? feat.name[0] : feat.name,
+                fromOriginFeat: true,
+              }));
+              allProcessedEffects.push(...addSelectHandlers(prefixedFeatEffects));
+            }
+          });
+        }
+      });
+
+      return allProcessedEffects;
+    },
+    [effectChoices, addSelectHandlers],
   );
 
   // Função para processar os efeitos de um talento
@@ -266,10 +341,50 @@ export function useEffectsProcessor() {
     [effectChoices],
   );
 
+  // Adiciona talento selecionado
+  const chooseFeat = useCallback(
+    (effectId: string, featId: string) => {
+      const currentFeats = (effectChoices[effectId] as string[]) || [];
+
+      if (!currentFeats.includes(featId)) {
+        const updatedFeats = [...currentFeats, featId];
+        setEffectChoices((prev) => ({
+          ...prev,
+          [effectId]: updatedFeats,
+        }));
+      }
+    },
+    [effectChoices],
+  );
+
+  // Remove talento selecionado
+  const removeFeat = useCallback(
+    (effectId: string, featId: string) => {
+      const currentFeats = (effectChoices[effectId] as string[]) || [];
+      const updatedFeats = currentFeats.filter((f) => f !== featId);
+
+      setEffectChoices((prev) => ({
+        ...prev,
+        [effectId]: updatedFeats,
+      }));
+    },
+    [effectChoices],
+  );
+
+  // Verifica se já selecionou todos os talentos necessários para um efeito
+  const areAllFeatsSelected = useCallback(
+    (effectId: string, totalRequired: number) => {
+      const selectedFeats = (effectChoices[effectId] as string[]) || [];
+      return selectedFeats.length >= totalRequired;
+    },
+    [effectChoices],
+  );
+
   // Retorna o objeto com todas as funções e estados
   return {
     processOriginEffects,
     processFeatEffects,
+    processFeatEffectsFromOrigin,
     effectChoices,
     setEffectChoices,
     areAllEffectsSelected,
@@ -280,6 +395,9 @@ export function useEffectsProcessor() {
     chooseProficiency,
     removeProficiency,
     areAllProficienciesSelected,
+    chooseFeat,
+    removeFeat,
+    areAllFeatsSelected,
     selectedChoices: effectChoices,
   };
 }

@@ -1,14 +1,15 @@
 import { z } from 'zod';
+import { CreatureSizeEnum } from 'node_modules/@nihilvtt/datamodeling/src/shared/primitives/character.primitives';
+import { DiceTypeEnum } from 'node_modules/@nihilvtt/datamodeling/src/shared/primitives/system.primitives';
+import {
+  ProficiencyLevelEnum,
+  CharacterTypeEnum,
+} from 'node_modules/@nihilvtt/datamodeling/src/shared/primitives/character.primitives';
 
 // =================================================================
 // --- 1. ENUMS E TIPOS CONSTANTES ---
 // Usados para garantir que apenas valores permitidos sejam usados.
 // =================================================================
-
-export const CharacterTypeEnum = z.enum(['Player', 'Monster/NPC', 'Object']);
-export const TokenSizeEnum = z.enum(['Tiny', 'Small', 'Medium', 'Large', 'Huge', 'Gargantuan']);
-export const HitDiceTypeEnum = z.enum(['d4', 'd6', 'd8', 'd10', 'd12', 'd20']);
-export const ProficiencyLevelEnum = z.enum(['none', 'proficient', 'expertise']);
 
 // =================================================================
 // --- 2. SCHEMAS MODULAREs E REUTILIZÁVEIS ---
@@ -108,7 +109,7 @@ const featureOrTraitSchema = z.object({
 
 const hitDiceEntrySchema = z.object({
   id: z.uuid(),
-  type: HitDiceTypeEnum,
+  type: DiceTypeEnum,
   quantity: z.number().int().min(1),
 });
 
@@ -121,7 +122,7 @@ const baseCharacterSchema = z.object({
   id: z.uuid(),
   name: z.string().min(1, 'O nome é obrigatório.'),
   image: z.string(),
-  size: TokenSizeEnum,
+  size: CreatureSizeEnum,
   notes: z.string().optional(),
 });
 
@@ -157,7 +158,7 @@ export const playerCharacterSchema = z.object({
 // Schema para Monstros/NPCs
 export const monsterNpcCharacterSchema = z.object({
   ...baseDndCharacterSchema.shape,
-  type: z.literal(CharacterTypeEnum.enum['Monster/NPC']),
+  type: z.literal(CharacterTypeEnum.enum['NPC']),
   challengeRating: z.number(),
 });
 
@@ -200,7 +201,7 @@ export type CharacterType = z.infer<typeof CharacterTypeEnum>;
 
 export const characterTypeTranslations: Record<CharacterType, string> = {
   Player: 'Jogador',
-  'Monster/NPC': 'Monstro/NPC',
+  NPC: 'NPC',
   Object: 'Objeto',
 };
 // Esta constante pode ser usada para gerar opções em selects se necessário.
