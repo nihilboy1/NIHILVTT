@@ -12,7 +12,7 @@ import {
   PlayerCharacter,
   MonsterNpcCharacter,
 } from './schemas/character.schema';
-import { CharacterTypeEnum } from 'node_modules/@nihilvtt/datamodeling/src/shared/primitives/character.primitives';
+import { CharacterTypeEnum } from '@nihilvtt/datamodeling/primitives';
 
 export interface CharactersState {
   characters: Character[];

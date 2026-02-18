@@ -28,7 +28,7 @@ export function useCharacterCreation() {
     (name: string) => {
       addCharacter({
         ...DEFAULT_MONSTER_DATA,
-        type: CharacterTypeEnum.enum['Monster/NPC'],
+        type: CharacterTypeEnum.enum.NPC,
         name, // Usa o nome fornecido pelo modal
       });
     },

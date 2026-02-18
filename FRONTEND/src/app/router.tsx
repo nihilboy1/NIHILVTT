@@ -6,6 +6,7 @@ import { useAuthStore } from '@/features/auth/model/authStore';
 import ProtectedRoute from '@/features/auth/ui/ProtectedRoute';
 import { Spinner } from '@/shared/ui/Spinner';
 
+// essas linhas fazem o carregamento dinâmico do componente HomePage e outros, permitindo que eles só sejam baixados quando necessário, o que melhora a performance da aplicação.
 const HomePage = lazy(() => import('../pages/HomePage'));
 const LoginPage = lazy(() => import('../pages/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/RegisterPage'));

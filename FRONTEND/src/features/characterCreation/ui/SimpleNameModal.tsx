@@ -59,7 +59,7 @@ export function SimpleNameModal({
     if (characterType === CharacterTypeEnum.enum.Player) {
       createPlayerCharacter(data.name.trim());
       onClose();
-    } else if (characterType === CharacterTypeEnum.enum["Monster/NPC"]) {
+    } else if (characterType === CharacterTypeEnum.enum.NPC) {
       createMonsterNpc(data.name.trim());
       onClose();
     } else {

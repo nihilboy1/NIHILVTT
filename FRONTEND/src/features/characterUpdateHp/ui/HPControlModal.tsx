@@ -48,7 +48,7 @@ export function HPControlModal({
     if (isOpen && character) {
       if (
         character.type === CharacterTypeEnum.enum.Player ||
-        character.type === CharacterTypeEnum.enum['Monster/NPC']
+        character.type === CharacterTypeEnum.enum.NPC
       ) {
         setEditableHP(String(character.combatStats.currentHp));
       } else {
@@ -82,7 +82,7 @@ export function HPControlModal({
 
     if (
       character.type === CharacterTypeEnum.enum.Player ||
-      character.type === CharacterTypeEnum.enum['Monster/NPC']
+      character.type === CharacterTypeEnum.enum.NPC
     ) {
       maxHp = character.combatStats.maxHp;
       currentActualHp = parseInt(editableHP, 10); // currentActualHp é o valor digitado no input
@@ -186,7 +186,7 @@ export function HPControlModal({
         className="min-w-[1.25rem] text-center text-sm font-medium select-none"
       >
         {character.type === CharacterTypeEnum.enum.Player ||
-        character.type === CharacterTypeEnum.enum['Monster/NPC']
+        character.type === CharacterTypeEnum.enum.NPC
           ? character.combatStats.maxHp
           : 'N/A'}
       </span>

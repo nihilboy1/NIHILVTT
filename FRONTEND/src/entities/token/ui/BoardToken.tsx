@@ -164,7 +164,7 @@ export function BoardToken({
     >
       {/* Renderiza HealthBar apenas para PlayerCharacter ou MonsterNPCCharacter */}
       {(character.type === CharacterTypeEnum.enum.Player ||
-        character.type === CharacterTypeEnum.enum['Monster/NPC']) && (
+        character.type === CharacterTypeEnum.enum.NPC) && (
         <>
           {console.log(
             "BoardToken: Renderizando HealthBar para Character ID:",

@@ -1,10 +1,11 @@
 import { z } from 'zod';
-import { CreatureSizeEnum } from 'node_modules/@nihilvtt/datamodeling/src/shared/primitives/character.primitives';
-import { DiceTypeEnum } from 'node_modules/@nihilvtt/datamodeling/src/shared/primitives/system.primitives';
 import {
+  CreatureSizeEnum,
+  DiceTypeEnum,
   ProficiencyLevelEnum,
   CharacterTypeEnum,
-} from 'node_modules/@nihilvtt/datamodeling/src/shared/primitives/character.primitives';
+} from '@nihilvtt/datamodeling/primitives';
+export { CharacterTypeEnum };
 
 // =================================================================
 // --- 1. ENUMS E TIPOS CONSTANTES ---

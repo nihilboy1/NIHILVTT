@@ -9,6 +9,11 @@ const defaultUser: User & { password: string } = {
 
 const mockUsers: (User & { password: string })[] = [defaultUser];
 
+// Fluxo de registro:
+// 1) Simula latência de API.
+// 2) Verifica se já existe usuário com o mesmo email.
+// 3) Se não existir, cria o usuário e salva no "banco" em memória.
+// 4) Retorna apenas os dados públicos (sem senha).
 export async function registerUser(userData: Omit<User, 'id'> & { password: string }) {
   return new Promise<User>((resolve, reject) => {
     setTimeout(() => {
@@ -28,6 +33,11 @@ export async function registerUser(userData: Omit<User, 'id'> & { password: stri
   });
 }
 
+// Fluxo de login:
+// 1) Simula latência de API.
+// 2) Procura usuário por email + senha.
+// 3) Se encontrar, retorna os dados públicos para sessão.
+// 4) Se não encontrar, rejeita com erro de credenciais inválidas.
 export async function loginUser(credentials: Pick<User, 'email'> & { password: string }) {
   return new Promise<User>((resolve, reject) => {
     setTimeout(() => {
@@ -47,61 +57,66 @@ export async function loginUser(credentials: Pick<User, 'email'> & { password: s
     }, 1000);
   });
 }
-// Em features/auth/model/authSlice.ts
 
+// Fluxo de atualização de usuário:
+// 1) Simula latência de API.
+// 2) Valida se o usuário existe.
+// 3) Exige e valida a senha atual antes de qualquer mudança.
+// 4) Aplica updates de nome e/ou senha.
+// 5) Se não houver campos para atualizar, retorna erro.
+// 6) Persiste no "banco" em memória e retorna os dados atualizados.
 export async function updateUser(
   userId: string,
   updates: { name?: string; password?: string; currentPassword?: string },
 ) {
   return new Promise<User>((resolve, reject) => {
     setTimeout(() => {
-      // 1. Encontrar o usuário
+      // 1) Encontrar o usuário.
       const userIndex = mockUsers.findIndex((user) => user.id === userId);
       if (userIndex === -1) {
         return reject(new Error('User not found.'));
       }
 
-      // 2. Verificar a senha atual PRIMEIRO (para QUALQUER alteração)
+      // 2) Verificar a senha atual primeiro (para qualquer alteração).
       if (!updates.currentPassword) {
         return reject(new Error('A senha atual é obrigatória.'));
       }
 
       const user = mockUsers[userIndex];
       if (user.password !== updates.currentPassword) {
-        // ESTA É A VERIFICAÇÃO QUE ESTAVA FALHANDO
         return reject(new Error('Senha atual inválida.'));
       }
 
-      // 3. Se a senha atual for válida, APLICAR as atualizações
+      // 3) Aplicar as atualizações solicitadas.
       let userWasUpdated = false;
 
-      // Atualizar o nome, se fornecido
       if (updates.name) {
         user.name = updates.name;
         userWasUpdated = true;
       }
 
-      // Atualizar a senha, se fornecida
       if (updates.password) {
         user.password = updates.password;
         userWasUpdated = true;
       }
 
-      // Se nenhuma atualização foi pedida, retorne um erro (caso de segurança)
       if (!userWasUpdated) {
         return reject(new Error('Nenhuma informação para atualizar foi fornecida.'));
       }
 
-      // 4. Salvar o usuário atualizado e resolver a promessa
+      // 4) Persistir no array em memória e responder.
       mockUsers[userIndex] = user;
-
-      // Retorna o usuário sem a senha, como uma API real faria
       const { ...userToReturn } = user;
       resolve(userToReturn);
     }, 1000);
   });
 }
 
+// Fluxo de exclusão de usuário:
+// 1) Simula latência de API.
+// 2) Remove o usuário alvo da lista em memória.
+// 3) Se nenhum usuário for removido, retorna erro de não encontrado.
+// 4) Se remover, resolve sem payload.
 export async function deleteUser(userId: string) {
   return new Promise<void>((resolve, reject) => {
     setTimeout(() => {

@@ -4,12 +4,10 @@
   "version": "1.0.0",
   "workspaces": [
     "frontend",
-    "datamodeling",
-    "backend"
+    "datamodeling"
   ],
   "scripts": {
-    "dev:front": "cd FRONTEND && pnpm dev",
-    "dev:back": "cd BACKEND && pnpm dev"
+    "dev:front": "cd FRONTEND && pnpm dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

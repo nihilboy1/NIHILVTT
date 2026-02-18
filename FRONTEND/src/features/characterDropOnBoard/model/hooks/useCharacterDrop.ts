@@ -59,7 +59,7 @@ export function useCharacterDrop({
 
         const initialHp =
           character.type === CharacterTypeEnum.enum.Player ||
-          character.type === CharacterTypeEnum.enum['Monster/NPC']
+          character.type === CharacterTypeEnum.enum.NPC
             ? character.combatStats.maxHp
             : undefined;
 

@@ -54,7 +54,7 @@ export function CharactersPanel() {
           <button
             onClick={() =>
               openModal('simpleName', {
-                characterType: CharacterTypeEnum.enum['Monster/NPC'],
+                characterType: CharacterTypeEnum.enum.NPC,
                 title: 'Nome do Novo Monstro/NPC',
               })
             }

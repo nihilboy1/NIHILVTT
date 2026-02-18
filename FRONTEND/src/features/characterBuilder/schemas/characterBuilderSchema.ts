@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 import { ATTRIBUTE_LIST } from '@/shared/constants/characterData/attributes';
 // Importações do datamodeling
-import { PHB2024SPECIES, PHB2024ORIGINS } from '@nihilvtt/datamodeling/data';
-import { OriginType, SpecieType } from '@nihilvtt/datamodeling/domain';
+import { PHB2024SPECIES, PHB2024ORIGINS, PHB2024FEATS } from '@nihilvtt/datamodeling/data';
+import { FeatType, OriginType, SpecieType } from '@nihilvtt/datamodeling/domain';
 import { CLASSES } from '@/shared/constants/characterData/classes';
 
 export type CharacterOption = {
@@ -11,6 +11,59 @@ export type CharacterOption = {
   name: string;
   description: string;
   source?: string;
+};
+
+const normalizeName = (value: string | string[]): string =>
+  Array.isArray(value) ? value[0] ?? '' : value;
+
+export const specieToCharacterOption = (specie: SpecieType): CharacterOption => ({
+  id: specie.id,
+  name: normalizeName(specie.name),
+  description: specie.description,
+  source: specie.source,
+});
+
+export const originToCharacterOption = (origin: OriginType): CharacterOption => ({
+  id: origin.id,
+  name: normalizeName(origin.name),
+  description: origin.description,
+  source: origin.source,
+});
+
+const featToCharacterOption = (feat: FeatType): CharacterOption => ({
+  id: feat.id,
+  name: normalizeName(feat.name),
+  description: feat.description,
+  source: feat.source,
+});
+
+export const getOriginById = (originId: string): OriginType | undefined =>
+  PHB2024ORIGINS.find((origin) => origin.id === originId);
+
+export const getFeatById = (featId: string): FeatType | undefined =>
+  PHB2024FEATS.find((feat) => feat.id === featId);
+
+export const getRequiredFeats = (selections: { origin?: string }): CharacterOption[] => {
+  if (!selections.origin) {
+    return [];
+  }
+
+  const origin = getOriginById(selections.origin);
+  if (!origin) {
+    return [];
+  }
+
+  const requiredFeatIds = new Set<string>();
+  origin.effects.forEach((effect) => {
+    if (effect.type === 'passive_providesFeat' && effect.selection?.feats) {
+      effect.selection.feats.forEach((featId) => requiredFeatIds.add(featId));
+    }
+  });
+
+  return Array.from(requiredFeatIds)
+    .map((featId) => getFeatById(featId))
+    .filter((feat): feat is FeatType => !!feat)
+    .map(featToCharacterOption);
 };
 
 // Esquemas para cada seção - utilizando os schemas do datamodeling
