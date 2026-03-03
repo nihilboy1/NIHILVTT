@@ -1,0 +1,20 @@
+ALTER TABLE game_session_members
+  ADD COLUMN color_hex VARCHAR(7);
+
+UPDATE game_session_members
+SET color_hex = CASE MOD(id, 10)
+  WHEN 0 THEN '#FF6B6B'
+  WHEN 1 THEN '#4ECDC4'
+  WHEN 2 THEN '#FFD166'
+  WHEN 3 THEN '#06D6A0'
+  WHEN 4 THEN '#118AB2'
+  WHEN 5 THEN '#F78C6B'
+  WHEN 6 THEN '#C77DFF'
+  WHEN 7 THEN '#95E06C'
+  WHEN 8 THEN '#7FDBFF'
+  ELSE '#FF9F1C'
+END
+WHERE color_hex IS NULL;
+
+ALTER TABLE game_session_members
+  ALTER COLUMN color_hex SET NOT NULL;

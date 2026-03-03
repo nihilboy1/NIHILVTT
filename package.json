@@ -7,7 +7,11 @@
     "datamodeling"
   ],
   "scripts": {
-    "dev:front": "cd FRONTEND && pnpm dev"
+    "dev:front": "cd FRONTEND && pnpm dev",
+    "dev:back": "cd BACKEND-JAVA; mvn spring-boot:run",
+    "test:front": "cd FRONTEND && pnpm run test",
+    "test:e2e:front": "cd FRONTEND && pnpm run e2e",
+    "test:front:all": "cd FRONTEND && pnpm run test && pnpm run e2e"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

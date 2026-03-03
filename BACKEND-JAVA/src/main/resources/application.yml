@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/nihilvtt;MODE=PostgreSQL;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: sa
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+app:
+  security:
+    cors:
+      allowed-origin: "http://localhost:5173"
+    cookies:
+      secure: false
+    jwt:
+      access-secret: "change-this-in-production-at-least-32-chars-access-key"
+      reauth-secret: "change-this-in-production-at-least-32-chars-reauth-key"
+      access-expiration-seconds: 28800
+      refresh-expiration-seconds: 2592000
+      reauth-expiration-seconds: 300
+    login-protection:
+      enabled: true
+      max-failed-attempts: 5
+      max-failed-attempts-email: 5
+      max-failed-attempts-ip: 25
+      max-failed-attempts-email-ip: 7
+      window-seconds: 900
+      lockout-seconds: 900
+  avatar:
+    storage-dir: "./data/avatars"
+    public-base-url: "http://localhost:8080/media/avatars"
+  game-cover:
+    storage-dir: "./data/game-covers"
+    public-base-url: "http://localhost:8080/media/game-covers"

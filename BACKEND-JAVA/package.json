@@ -1,0 +1,9 @@
+{
+  "name": "@nihilvtt/backend-java",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Backend Java do NIHILVTT",
+  "scripts": {
+    "dev": "mvn spring-boot:run"
+  }
+}

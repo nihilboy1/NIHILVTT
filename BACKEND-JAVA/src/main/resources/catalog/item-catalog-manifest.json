@@ -1,0 +1,1114 @@
+{
+  "items": [
+    {
+      "id": "armor-armadura-acolchoada",
+      "type": "armor",
+      "armorType": "light",
+      "acCalculationType": "formula",
+      "acValue": null,
+      "acBase": 11,
+      "acAttribute": "dexterity",
+      "acMaxBonus": null
+    },
+    {
+      "id": "armor-armadura-de-aneis",
+      "type": "armor",
+      "armorType": "heavy",
+      "acCalculationType": "base",
+      "acValue": 14,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "armor-armadura-de-couro",
+      "type": "armor",
+      "armorType": "light",
+      "acCalculationType": "formula",
+      "acValue": null,
+      "acBase": 11,
+      "acAttribute": "dexterity",
+      "acMaxBonus": null
+    },
+    {
+      "id": "armor-armadura-de-couro-batido",
+      "type": "armor",
+      "armorType": "light",
+      "acCalculationType": "formula",
+      "acValue": null,
+      "acBase": 12,
+      "acAttribute": "dexterity",
+      "acMaxBonus": null
+    },
+    {
+      "id": "armor-armadura-de-escamas",
+      "type": "armor",
+      "armorType": "medium",
+      "acCalculationType": "formula",
+      "acValue": null,
+      "acBase": 14,
+      "acAttribute": "dexterity",
+      "acMaxBonus": 2
+    },
+    {
+      "id": "armor-armadura-de-peles",
+      "type": "armor",
+      "armorType": "medium",
+      "acCalculationType": "formula",
+      "acValue": null,
+      "acBase": 12,
+      "acAttribute": "dexterity",
+      "acMaxBonus": 2
+    },
+    {
+      "id": "armor-armadura-de-placas",
+      "type": "armor",
+      "armorType": "heavy",
+      "acCalculationType": "base",
+      "acValue": 18,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "armor-armadura-de-talas",
+      "type": "armor",
+      "armorType": "heavy",
+      "acCalculationType": "base",
+      "acValue": 17,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "armor-camisao-de-malha",
+      "type": "armor",
+      "armorType": "medium",
+      "acCalculationType": "formula",
+      "acValue": null,
+      "acBase": 13,
+      "acAttribute": "dexterity",
+      "acMaxBonus": 2
+    },
+    {
+      "id": "armor-cota-de-malha",
+      "type": "armor",
+      "armorType": "heavy",
+      "acCalculationType": "base",
+      "acValue": 16,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "armor-escudo",
+      "type": "armor",
+      "armorType": "shield",
+      "acCalculationType": "bonus",
+      "acValue": 2,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "armor-meia-armadura-de-placas",
+      "type": "armor",
+      "armorType": "medium",
+      "acCalculationType": "formula",
+      "acValue": null,
+      "acBase": 15,
+      "acAttribute": "dexterity",
+      "acMaxBonus": 2
+    },
+    {
+      "id": "armor-peitoral-de-aco",
+      "type": "armor",
+      "armorType": "medium",
+      "acCalculationType": "formula",
+      "acValue": null,
+      "acBase": 14,
+      "acAttribute": "dexterity",
+      "acMaxBonus": 2
+    },
+    {
+      "id": "gear-acido",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-agua-benta",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-antidoto",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-armadilha-de-caca",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-bedroll",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-book",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-cadeado",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-corda",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-corrente",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-costume",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-dice-set",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-esferas-metalicas",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-estrepes",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-fine-clothes",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-fogo-alquimico",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-frasco",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-holy-symbol",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-hooded-lantern",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-iron-pot",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-lampiao",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-lanterna-coberta",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-manacles",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-mirror",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-mochila",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-odre",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-oleo",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-parchment",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-pe-de-cabra",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-pederneira",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-perfume",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-pouch",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-robe",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-rope",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-shovel",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-tent",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-tocha",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-travelers-clothes",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-vela",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "gear-veneno-basico",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "musical-instrument-bagpipes",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "musical-instrument-drum",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "musical-instrument-flute",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "musical-instrument-horn",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "musical-instrument-lyre",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "musical-instrument-pan-flute",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "musical-instrument-shawm",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "musical-instrument-viol",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-alchemists-supplies",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-artisans-tools",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-calligraphers-supplies",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-carpenters-tools",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-cartographers-tools",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-cooks-utensils",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-disguise-kit",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-forgery-kit",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-gaming-set",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-healers-kit",
+      "type": "gear",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-herbalism-kit",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-musical-instrument",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-navigators-tools",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-poisoners-kit",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "tool-thieves-tools",
+      "type": "tool",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-adaga",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-alabarda",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-arco-curto",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-arco-longo",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-azagaia",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-besta-de-mao",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-besta-leve",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-besta-pesada",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-bordao",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-chicote",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-cimitarra",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-clava",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-clava-grande",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-dardo",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-espada-curta",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-espada-grande",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-espada-longa",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-estrela-da-manha",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-foice-curta",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-funda",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-glaive",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-lanca",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-maca",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-machadinha",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-machado-de-batalha",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-machado-grande",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-malho",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-mangual",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-martelo-de-guerra",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-martelo-leve",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-mosquete",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-picareta-de-guerra",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-pique",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-pistola",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-rapieira",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    },
+    {
+      "id": "weapon-tridente",
+      "type": "weapon",
+      "armorType": null,
+      "acCalculationType": null,
+      "acValue": null,
+      "acBase": null,
+      "acAttribute": null,
+      "acMaxBonus": null
+    }
+  ]
+}
