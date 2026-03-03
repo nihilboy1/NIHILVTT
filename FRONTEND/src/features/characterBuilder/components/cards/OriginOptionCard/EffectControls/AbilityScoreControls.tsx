@@ -4,7 +4,7 @@ import { PlusCircleIcon, MinimizeIcon } from '@/shared/ui/Icons';
 import { cn } from '@/shared/lib/utils/cn';
 import { Button } from '../../../ui/Button';
 import { controlButtonVariants, statusIndicatorVariants } from '@/features/characterBuilder/styles';
-import { useEffectsProcessor } from '@/features/characterBuilder/model/hooks/useEffectsProcessor';
+import { useCharacterBuilderEffectsProcessor } from '@/features/characterBuilder/model/context/effectsProcessorContext';
 import { getAttributeNameTranslation } from '../../../../lib/translationHelpers';
 
 interface AbilityScoreControlsProps {
@@ -26,7 +26,7 @@ interface AbilityScoreControlsProps {
  */
 export function AbilityScoreControls({ effect }: AbilityScoreControlsProps) {
   const { distributeAbilityPoints, removeAbilityPoints, getAttributePointCount, effectChoices } =
-    useEffectsProcessor();
+    useCharacterBuilderEffectsProcessor();
   const [, forceUpdate] = useState({});
 
   const choice = effect.choices[0];

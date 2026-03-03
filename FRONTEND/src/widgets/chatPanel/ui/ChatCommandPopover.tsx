@@ -5,7 +5,7 @@ import { getAllCommands } from "../lib/chatCommands";
 interface ChatCommandPopoverProps {
   isOpen: boolean;
   onClose: () => void;
-  targetInputRef: React.RefObject<HTMLInputElement | null>;
+  targetInputRef: React.RefObject<HTMLInputElement | HTMLTextAreaElement | null>;
   onCommandSelect: (command: string) => void;
   inputValue: string;
 }

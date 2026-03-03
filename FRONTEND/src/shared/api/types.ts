@@ -18,6 +18,8 @@ export type DiceFormula = string | number;
 interface BaseMessage {
   id: string;
   sender: string;
+  senderUserId?: number | null;
+  senderColor?: string | null;
   timestamp: Date;
   text: string;
 }
@@ -44,6 +46,8 @@ export type Tool = (typeof Tool)[keyof typeof Tool];
 export const SidebarTab = {
   CHAT: 'CHAT',
   CHARACTERS: 'CHARACTERS',
+  COMPENDIUM: 'COMPENDIUM',
+  SETTINGS: 'SETTINGS',
 } as const;
 export type SidebarTab = (typeof SidebarTab)[keyof typeof SidebarTab];
 
@@ -91,6 +95,42 @@ export interface RulerPathState {
 export interface HPControlModalState {
   tokenId: string | null;
   anchorPoint: Point | null;
+}
+
+export type AttackSourceType = 'unarmed' | 'weapon' | 'legacy';
+export type AttackSourceSlot = 'mainHandWeaponId' | 'offHandWeaponId' | null;
+
+export interface AttackEntry {
+  id: string;
+  label: string;
+  attackBonus: number;
+  damageFormula: string;
+  rangeMeters: number;
+  sourceType: AttackSourceType;
+  sourceItemId?: string | null;
+  sourceSlot?: AttackSourceSlot;
+}
+
+export interface PendingAttackSelection {
+  attackerTokenId: string;
+  attack: AttackEntry;
+  targetTokenId: string | null;
+}
+
+export interface CombatParticipant {
+  tokenId: string;
+  characterId: string;
+  initiativeRoll: number;
+  initiativeTotal: number;
+  dexterityScore: number;
+  status: 'active';
+}
+
+export interface CombatState {
+  active: true;
+  round: number;
+  turnIndex: number;
+  participants: CombatParticipant[];
 }
 
 export interface DraggingVisuals {

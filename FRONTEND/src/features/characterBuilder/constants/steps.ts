@@ -18,7 +18,7 @@ export const STEPS: StepData[] = [
 export interface Selection {
   species?: string;
   origin?: string;
-  feat?: Record<string, any>; // Pode conter múltiplos talentos e suas escolhas
+  feat?: string | Record<string, any>; // Pode conter o talento selecionado ou múltiplas escolhas
   class?: string;
   attributes?:
     | Record<string, number>

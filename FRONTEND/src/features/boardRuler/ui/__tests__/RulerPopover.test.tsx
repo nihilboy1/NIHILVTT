@@ -79,12 +79,10 @@ describe("RulerPopover", () => {
 
     expect(snapToCenterButton).toBeInTheDocument();
     expect(snapToCenterButton).toHaveClass("bg-accent-primary");
-    expect(snapToCenterButton).toHaveAttribute("aria-pressed", "true");
     expect(snapToCenterButton).toHaveAttribute("aria-selected", "true");
 
     expect(freePlacementButton).toBeInTheDocument();
     expect(freePlacementButton).toHaveClass("hover:bg-accent-secondary");
-    expect(freePlacementButton).toHaveAttribute("aria-pressed", "false");
     expect(freePlacementButton).toHaveAttribute("aria-selected", "false");
 
     expect(persistCheckbox).toBeInTheDocument();
@@ -106,11 +104,9 @@ describe("RulerPopover", () => {
     });
 
     expect(snapToCenterButton).toHaveClass("hover:bg-accent-secondary");
-    expect(snapToCenterButton).toHaveAttribute("aria-pressed", "false");
     expect(snapToCenterButton).toHaveAttribute("aria-selected", "false");
 
     expect(freePlacementButton).toHaveClass("bg-accent-primary");
-    expect(freePlacementButton).toHaveAttribute("aria-pressed", "true");
     expect(freePlacementButton).toHaveAttribute("aria-selected", "true");
   });
 

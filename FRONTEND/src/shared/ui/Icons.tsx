@@ -10,12 +10,14 @@ import {
   FaTrash,
 } from 'react-icons/fa';
 
-import BrowsersIconComponent from '../assets/browsers.svg?react';
-import ChatIconComponent from '../assets/chat.svg?react';
+import BookBookmarkBoldIconComponent from '../assets/book-bookmark-bold.svg?react';
+import DotsSixBoldIconComponent from '../assets/dots-six-bold.svg?react';
+import GearSixBoldIconComponent from '../assets/gear-six-bold.svg?react';
+import chatWhite from '../assets/chat-white.svg';
 import d20 from '../assets/d20.png';
 import DetatchIconComponent from '../assets/detach-svgrepo-com.svg?react';
+import folderUserFillWhite from '../assets/folder-user-fill-white.svg';
 import HandIconComponent from '../assets/hand.svg?react';
-import IdentificationCardIconComponent from '../assets/identification-card.svg?react';
 import NavigationArrowIconComponent from '../assets/navigation-arrow.svg?react';
 import RulerIconComponent from '../assets/ruler.svg?react';
 
@@ -46,7 +48,17 @@ export function PanIcon(props: SpecificIconProps) {
   return <Icon component={HandIconComponent} alt="Ícone de mão para arrastar" {...props} />;
 }
 export function ChatBubbleIcon(props: SpecificIconProps) {
-  return <Icon component={ChatIconComponent} alt="Ícone de balão de chat" {...props} />;
+  return <Icon src={chatWhite} alt="Ícone de balão de chat" invert={false} {...props} />;
+}
+export function BookIcon(props: SpecificIconProps) {
+  return (
+    <Icon
+      component={BookBookmarkBoldIconComponent}
+      alt="Ícone de biblioteca"
+      invert={false}
+      {...props}
+    />
+  );
 }
 export function RulerIcon(props: SpecificIconProps) {
   return <Icon component={RulerIconComponent} alt="Ícone de régua" {...props} />;
@@ -63,8 +75,9 @@ export function ChevronRightIcon(props: SpecificIconProps) {
 export function IdentificationCardIcon(props: SpecificIconProps) {
   return (
     <Icon
-      component={IdentificationCardIconComponent}
-      alt="Ícone de cartão de identificação"
+      src={folderUserFillWhite}
+      alt="Ícone de personagens"
+      invert={false}
       {...props}
     />
   );
@@ -72,9 +85,12 @@ export function IdentificationCardIcon(props: SpecificIconProps) {
 export function DotsThreeVerticalIcon(props: SpecificIconProps) {
   return <FaEllipsisV {...props} />;
 }
+export function DragHandleIcon(props: SpecificIconProps) {
+  return <Icon component={DotsSixBoldIconComponent} alt="Ícone de arrastar" size={3} {...props} />;
+}
 export function PageConfigIcon(props: SpecificIconProps) {
   return (
-    <Icon component={BrowsersIconComponent} alt="Ícone de configurações de página" {...props} />
+    <Icon component={GearSixBoldIconComponent} alt="Ícone de configurações" {...props} />
   );
 }
 export function MinimizeIcon(props: SpecificIconProps) {

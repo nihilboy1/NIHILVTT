@@ -1,7 +1,9 @@
-import { useFormContext, Path } from "react-hook-form";
+import { useMemo } from "react";
 
+import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
 import { ATTRIBUTES_CONFIG } from "@/entities/character/constants";
-import { getModifier } from "@/entities/character/lib/utils/characterUtils";
+import { useCharactersStore } from "@/entities/character/model/store";
+import { buildPlayerCharacterSkillsViewModel } from "@/entities/character/model/view-models/playerCharacterSkillsViewModel";
 import { PlayerCharacter } from "@/entities/character/model/schemas/character.schema";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
 
@@ -10,7 +12,51 @@ import { SkillProficiencyItem } from "./SkillProficiencyItem";
 
 type AttributeName = keyof typeof ATTRIBUTES_CONFIG;
 
+type DefaultAttributes = PlayerCharacter["attributes"];
+type DefaultProficiencies = PlayerCharacter["proficiencies"];
+
+const DEFAULT_ATTRIBUTES: DefaultAttributes = {
+  strength: 10,
+  dexterity: 10,
+  constitution: 10,
+  intelligence: 10,
+  wisdom: 10,
+  charisma: 10,
+};
+
+const DEFAULT_PROFICIENCIES: DefaultProficiencies = {
+  savingThrows: {
+    strength: "none",
+    dexterity: "none",
+    constitution: "none",
+    intelligence: "none",
+    wisdom: "none",
+    charisma: "none",
+  },
+  skills: {
+    acrobatics: "none",
+    animalHandling: "none",
+    arcana: "none",
+    athletics: "none",
+    deception: "none",
+    history: "none",
+    insight: "none",
+    intimidation: "none",
+    investigation: "none",
+    medicine: "none",
+    nature: "none",
+    perception: "none",
+    performance: "none",
+    persuasion: "none",
+    religion: "none",
+    sleightOfHand: "none",
+    stealth: "none",
+    survival: "none",
+  },
+};
+
 interface AttributesAndSkillsListProps {
+  characterId: string;
   className?: string;
   onRollDice: (
     formula: DiceFormula,
@@ -21,12 +67,29 @@ interface AttributesAndSkillsListProps {
 }
 
 export function AttributesAndSkillsList({
+  characterId,
   className,
   onRollDice,
 }: AttributesAndSkillsListProps) {
-  const { watch } = useFormContext<PlayerCharacter>();
+  const character = usePlayerCharacter(characterId);
+  const runtimeCharacter = useCharactersStore(
+    (state) => state.runtimeCharactersById[characterId] ?? null
+  );
 
-  const characterName = watch("name");
+  const characterName = runtimeCharacter?.name ?? character?.name ?? "";
+  const level = runtimeCharacter?.progression.currentLevel ?? character?.level ?? 1;
+  const attributes = runtimeCharacter?.attributes.base ?? character?.attributes ?? DEFAULT_ATTRIBUTES;
+  const proficiencies = character?.proficiencies ?? DEFAULT_PROFICIENCIES;
+
+  const skillsViewModel = useMemo(
+    () =>
+      buildPlayerCharacterSkillsViewModel({
+        level,
+        attributes,
+        proficiencies,
+      }),
+    [level, attributes, proficiencies]
+  );
 
   const handleSkillRoll = (
     formula: DiceFormula,
@@ -37,12 +100,14 @@ export function AttributesAndSkillsList({
   };
 
   return (
-    <div className={`flex flex-col space-y-2 rounded-md ${className}`}>
+    <div className={`grid grid-cols-1 gap-2 md:grid-cols-3 ${className}`}>
+      <div className="md:col-span-3 rounded-lg bg-surface-0/22 px-3 py-1.5 text-[0.66rem] font-medium tracking-[0.04em] text-text-secondary">
+        Atributos e proficiências são definidos pela construção, progressão e efeitos ativos.
+      </div>
       {(Object.keys(ATTRIBUTES_CONFIG) as AttributeName[]).map((attrName) => {
         const { label, skills } = ATTRIBUTES_CONFIG[attrName];
-
-        const attrValue = watch(`attributes.${attrName}`);
-        const attributeModifier = getModifier(attrValue);
+        const attributeValue = skillsViewModel.attributeValues[attrName];
+        const attributeModifier = skillsViewModel.attributeModifiers[attrName];
 
         const handleAttributeRoll = () => {
           const formula: DiceFormula = `1d20${
@@ -51,41 +116,39 @@ export function AttributesAndSkillsList({
           onRollDice(formula, label, "Attribute", characterName);
         };
 
-        const savingThrowInfo = {
-          key: attrName,
-          label: `Salva-guarda de ${label}`,
-          isSavingThrow: true,
-        };
-
-        const allSkills = [
-          savingThrowInfo,
-          ...skills.map((s) => ({ ...s, isSavingThrow: false })),
-        ];
-
         return (
           <div
             key={attrName}
-            className="flex flex-col space-y-2 p-3 rounded bg-surface-1 w-[14rem]"
+            className="flex w-full flex-col gap-1.5 rounded-xl bg-surface-1/55 px-2 py-2"
             aria-label="bloco de atributo externo"
           >
             <AttributeBlock
-              name={`attributes.${attrName}` as Path<PlayerCharacter>}
+              value={attributeValue}
               label={label}
               modifier={attributeModifier}
               onRoll={handleAttributeRoll}
             />
 
-            <div className="mt-1.5 space-y-0.5">
-              {allSkills.map((skillInfo) => {
-                const fieldName = skillInfo.isSavingThrow
-                  ? `proficiencies.savingThrows.${skillInfo.key}`
-                  : `proficiencies.skills.${skillInfo.key}`;
+            <div className="space-y-0.5 px-0.5">
+              <SkillProficiencyItem
+                key={`${attrName}-save`}
+                skillLabel={`Salva-guarda de ${label}`}
+                isSavingThrow
+                proficiencyLevel={skillsViewModel.savingThrowBonuses[attrName].proficiencyLevel}
+                totalBonus={skillsViewModel.savingThrowBonuses[attrName].totalBonus}
+                characterName={characterName}
+                onRoll={handleSkillRoll}
+              />
+              {skills.map((skillInfo) => {
+                const skillBonus = skillsViewModel.skillBonuses[skillInfo.key];
 
                 return (
                   <SkillProficiencyItem
                     key={skillInfo.key}
                     skillLabel={skillInfo.label}
-                    name={fieldName as Path<PlayerCharacter>}
+                    isSavingThrow={false}
+                    proficiencyLevel={skillBonus.proficiencyLevel}
+                    totalBonus={skillBonus.totalBonus}
                     characterName={characterName}
                     onRoll={handleSkillRoll}
                   />

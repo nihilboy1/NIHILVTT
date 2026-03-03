@@ -11,15 +11,7 @@ interface ProtectedRouteProps {
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, isLoading, initializeAuth } = useAuthStore();
-
-  // Initialize auth state if not already done (e.g., on direct access)
-  React.useEffect(() => {
-    if (user === null && isLoading === true) {
-      // Only initialize if user is null and still loading
-      initializeAuth();
-    }
-  }, [user, isLoading, initializeAuth]);
+  const { user, isLoading } = useAuthStore();
 
   if (isLoading) {
     return <div>Carregando autenticação...</div>; // Or a proper loading spinner

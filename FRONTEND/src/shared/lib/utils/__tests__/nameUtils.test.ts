@@ -1,4 +1,4 @@
-import { getFirstName } from "../nameUtils";
+import { formatUserTag, getFirstName } from "../nameUtils";
 
 describe("getFirstName", () => {
   test("deve retornar o primeiro nome de um nome completo", () => {
@@ -33,5 +33,19 @@ describe("getFirstName", () => {
 
   test("deve retornar o primeiro nome mesmo com caracteres especiais", () => {
     expect(getFirstName("João Silva")).toBe("João");
+  });
+});
+
+describe("formatUserTag", () => {
+  test("deve formatar nome e id como nome#id", () => {
+    expect(formatUserTag("John Doe", 42)).toBe("John Doe#42");
+  });
+
+  test("deve trimar espaços do nome", () => {
+    expect(formatUserTag("  Alice  ", 7)).toBe("Alice#7");
+  });
+
+  test("deve retornar #id quando nome vier vazio", () => {
+    expect(formatUserTag("", 99)).toBe("#99");
   });
 });

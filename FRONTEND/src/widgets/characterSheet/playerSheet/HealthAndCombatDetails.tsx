@@ -1,24 +1,24 @@
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { useMemo } from "react";
 
 import { useCharacterCalculations } from "@/entities/character/lib/hooks/useCharacterCalculations";
+import { usePlayerCharacterCombatViewModel } from "@/entities/character/lib/hooks/usePlayerCharacterCombatViewModel";
+import { useCharactersStore } from "@/entities/character/model/store";
 import {
-  Action,
-  PlayerCharacter,
-} from "@/entities/character/model/schemas/character.schema";
+  getAbilityModifier,
+  getPlayerProficiencyBonusFromLevel,
+} from "@/entities/character/model/rules/characterDerivedRules";
+import { buildWeaponAttackAction } from "@/entities/character/model/rules/weaponAttackDerivedRules";
+import { Action } from "@/entities/character/model/schemas/character.schema";
+import { buildPlayerCharacterCalculationsViewModel } from "@/entities/character/model/view-models/playerCharacterCalculationsViewModel";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
-import {
-  EditIcon,
-  PlusCircleIcon,
-  DeleteIcon,
-} from "@/shared/ui/Icons";
-
+import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
 import { CombatStats } from "./CombatStats";
 import { HealthSection } from "./HealthSection";
 
 
 interface HealthAndCombatDetailsProps {
+  characterId: string;
   className?: string;
-  onEditAction: (actionId: string) => void;
   onRollDice: (
     formula: DiceFormula,
     rollName: string,
@@ -28,29 +28,109 @@ interface HealthAndCombatDetailsProps {
 }
 
 export function HealthAndCombatDetails({
+  characterId,
   className,
-  onEditAction,
   onRollDice,
 }: HealthAndCombatDetailsProps) {
-  const { watch, control } = useFormContext<PlayerCharacter>();
-  const {
-    fields: actions,
-    append: appendAction,
-    remove: removeAction,
-  } = useFieldArray({
-    control,
-    name: "actions",
-  });
+  const combatViewModel = usePlayerCharacterCombatViewModel(characterId);
+  const character = usePlayerCharacter(characterId);
+  const runtimeCharacter = useCharactersStore(
+    (state) => state.runtimeCharactersById[characterId] ?? null,
+  );
+  const legacyActions = runtimeCharacter ? [] : (character?.actions ?? []);
 
-  const character = watch();
-  const characterName = watch("name");
+  const characterName = runtimeCharacter?.name ?? character?.name ?? '-';
+
+  const calculationsViewModel = useMemo(
+    () =>
+      buildPlayerCharacterCalculationsViewModel({
+        level: combatViewModel?.level ?? 1,
+        attributes: {
+          dexterity: combatViewModel?.dexterity ?? 10,
+          wisdom: combatViewModel?.wisdom ?? 10,
+        },
+        proficiencies: {
+          skills: {
+            perception: combatViewModel?.perceptionProficiencyLevel ?? "none",
+          },
+        },
+        combatStats: {
+          speed: combatViewModel?.speed ?? 0,
+        },
+      }),
+    [combatViewModel],
+  );
 
   const {
     calculatedInitiative,
     calculatedPassivePerception,
     speedInMeters,
     speedInSquares,
-  } = useCharacterCalculations(character);
+  } = useCharacterCalculations(calculationsViewModel);
+
+  const strengthScore = combatViewModel?.strength ?? 10;
+  const strengthModifier = getAbilityModifier(strengthScore);
+  const unarmedAttackBonus =
+    getPlayerProficiencyBonusFromLevel(combatViewModel?.level ?? 1) + strengthModifier;
+  const unarmedDamage = Math.max(1, 1 + strengthModifier);
+
+  const displayActions = useMemo<Action[]>(() => {
+    const derivedActions: Action[] = [
+      {
+        id: 'builtin-unarmed-strike',
+        name: 'Ataque desarmado',
+        bonus: unarmedAttackBonus >= 0 ? `+${unarmedAttackBonus}` : `${unarmedAttackBonus}`,
+        damage: `${unarmedDamage}`,
+      },
+    ];
+
+    if (runtimeCharacter) {
+      const mainHandAction = buildWeaponAttackAction(
+        runtimeCharacter.equipment.mainHandWeaponId,
+        {
+          classId: runtimeCharacter.build.classId,
+          strength: strengthScore,
+          dexterity: combatViewModel?.dexterity ?? 10,
+          proficiencyBonus: getPlayerProficiencyBonusFromLevel(combatViewModel?.level ?? 1),
+        },
+      );
+      const offHandAction = buildWeaponAttackAction(
+        runtimeCharacter.equipment.offHandWeaponId,
+        {
+          classId: runtimeCharacter.build.classId,
+          strength: strengthScore,
+          dexterity: combatViewModel?.dexterity ?? 10,
+          proficiencyBonus: getPlayerProficiencyBonusFromLevel(combatViewModel?.level ?? 1),
+        },
+      );
+
+      if (mainHandAction) {
+        derivedActions.push(mainHandAction);
+      }
+      if (offHandAction) {
+        const offHandIdAlreadyPresent = derivedActions.some(
+          (action) => action.id === offHandAction.id,
+        );
+        if (!offHandIdAlreadyPresent) {
+          derivedActions.push({
+            ...offHandAction,
+            id: `${offHandAction.id}-offhand`,
+            name: `${offHandAction.name} (Mão Sec.)`,
+          });
+        }
+      }
+    }
+
+    return [...derivedActions, ...legacyActions];
+  }, [
+    legacyActions,
+    combatViewModel?.dexterity,
+    combatViewModel?.level,
+    runtimeCharacter,
+    strengthScore,
+    unarmedAttackBonus,
+    unarmedDamage,
+  ]);
 
   const handleRollAction = (action: Action) => {
     if (action.bonus)
@@ -64,78 +144,63 @@ export function HealthAndCombatDetails({
       );
   };
 
-  const handleOpenEditModal = (actionId: string) => {
-    onEditAction(actionId);
-  };
-
   return (
-    <section className={`flex flex-col space-y-2.5 w-[16rem] ${className}`}>
+    <section className={`flex w-full flex-col gap-2.5 ${className}`}>
       <h2 className="sr-only">Dados de Saúde e Combate do Personagem</h2>
-      <div>
+      <div className="grid grid-cols-1 gap-2 xl:grid-cols-3">
         <CombatStats
           calculatedInitiative={calculatedInitiative}
           calculatedPassivePerception={calculatedPassivePerception}
           speedInMeters={speedInMeters}
           speedInSquares={speedInSquares}
+          armorClass={combatViewModel?.armorClass ?? 0}
+          speed={combatViewModel?.speed ?? 0}
+          shieldEquipped={combatViewModel?.shieldEquipped ?? false}
         />
-        <HealthSection />
+        <HealthSection combatViewModel={combatViewModel} />
 
         <fieldset
           id="Ações"
-          className="relative flex flex-col space-y-1.5 mt-4 p-2 rounded-md bg-surface-1 pb-5"
+          className="relative flex flex-col gap-2 rounded-xl bg-surface-1/70 px-2.5 py-2.5"
         >
-          <legend className="bg-surface-1 p-1 pl-2 pr-3 rounded text-sm font-bold">
+          <legend className="px-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-text-secondary">
             AÇÕES
           </legend>
-          {actions.map((action, index) => (
-            <div key={action.id} className="relative group">
+          <div className="flex items-center justify-between px-1 text-[0.52rem] font-semibold uppercase tracking-[0.12em] text-text-secondary/80">
+            <span>Nome</span>
+            <div className="flex items-center gap-3 text-right">
+              <span>Bônus</span>
+              <span>Dano</span>
+            </div>
+          </div>
+          {displayActions.length === 0 && (
+            <div className="rounded-lg bg-surface-0/35 px-2.5 py-2 text-[0.72rem] text-text-secondary">
+              Nenhuma ação disponível no momento.
+            </div>
+          )}
+          {displayActions.map((action) => (
+            <div
+              key={action.id}
+              className="group flex items-center gap-1.5 rounded-lg bg-surface-0/40 px-2 py-1.5 hover:bg-surface-0/55"
+            >
               <button
                 type="button"
                 title="Realizar ação"
-                className="w-full grid grid-cols-6 gap-2 text-[0.70rem] rounded bg-accent-primary hover:bg-surface-4 text-start hover:bg-accent-primary-hover hover:shadow-md"
+                className="flex min-w-0 flex-1 items-center gap-1.5 text-left text-[0.68rem]"
                 onClick={() => handleRollAction(action)}
               >
-                <span className="border col-span-3 border-surface-2 rounded-md p-1 my-1 ml-1">
+                <span className="min-w-0 flex-1 truncate font-medium text-text-primary">
                   {action.name || "-"}
                 </span>
-                <span className="border border-surface-2 rounded-md p-1 my-1">
+                <span className="min-w-[3.25rem] rounded-md bg-surface-1/75 px-1.5 py-1 text-center font-semibold text-text-secondary">
                   {action.bonus || "-"}
                 </span>
-                <span className="border col-span-2 border-surface-2 rounded-md p-1 my-1 mr-1">
+                <span className="min-w-[4.5rem] rounded-md bg-surface-1/75 px-1.5 py-1 text-center font-semibold text-text-secondary">
                   {action.damage || "-"}
                 </span>
               </button>
-              <div className="absolute -top-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  type="button"
-                  onClick={() => handleOpenEditModal(action.id)}
-                >
-                  <EditIcon size={4} />
-                </button>
-                <button
-                  type="button"
-                  title="Remover ação"
-                  onClick={() => removeAction(index)}
-                  className="p-2 hover:text-surface-0 bg-feedback-negative rounded-md hover:bg-feedback-negative-hover flex items-center justify-center text-sm font-bold"
-                >
-                  <DeleteIcon className="w-10 h-5" />
-                </button>
-              </div>
             </div>
           ))}
-          <button
-            type="button"
-            onClick={() =>
-              appendAction({
-                id: crypto.randomUUID(),
-                name: "Nova Ação",
-                bonus: "",
-                damage: "",
-              })
-            }
-          >
-            <PlusCircleIcon />
-          </button>
         </fieldset>
       </div>
     </section>

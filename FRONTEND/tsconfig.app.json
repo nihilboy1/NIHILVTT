@@ -3,10 +3,13 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -15,11 +18,11 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "esModuleInterop": true, // Adicionado para resolver problemas de importação de módulos
-    "baseUrl": ".", // Necessário para 'paths'
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }, // Adicionado vírgula aqui
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
@@ -28,5 +31,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "src/tests"]
+  "include": [
+    "src",
+    "src/tests"
+  ]
 }

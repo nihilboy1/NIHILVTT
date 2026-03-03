@@ -4,7 +4,6 @@ import {
   Character,
   characterTypeTranslations,
 } from '@/entities/character/model/schemas/character.schema';
-import { useCharactersStore } from '@/entities/character/model/store';
 import { DotsThreeVerticalIcon } from '@/shared/ui/Icons';
 import { OptionsPopover } from '@/shared/ui/OptionsPopover';
 
@@ -12,6 +11,7 @@ interface CharacterCardProps {
   character: Character;
   instanceCount: number;
   openSheetModal: (characterId: string) => void;
+  onDuplicate: (characterId: string) => void | Promise<void>;
   onDelete: (characterId: string) => void;
 }
 
@@ -19,12 +19,12 @@ export function CharacterCard({
   character,
   instanceCount,
   openSheetModal,
+  onDuplicate,
   onDelete,
 }: CharacterCardProps) {
-  const { duplicateCharacter } = useCharactersStore();
-
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
-  const popoverAnchorRef = useRef<HTMLButtonElement>(null);
+  const cardAnchorRef = useRef<HTMLLIElement>(null);
+  const optionsButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleDragStart = (event: React.DragEvent<HTMLLIElement>, characterId: string) => {
     event.dataTransfer.setData('application/vtt-character-id', characterId);
@@ -46,7 +46,7 @@ export function CharacterCard({
   };
 
   const handleDuplicate = () => {
-    duplicateCharacter(character.id);
+    void onDuplicate(character.id);
     handleClosePopover();
   };
 
@@ -57,6 +57,7 @@ export function CharacterCard({
 
   return (
     <li
+      ref={cardAnchorRef}
       className="bg-surface-3 flex items-center justify-between rounded-md p-3 shadow duration-150"
       title={`Arraste '${character.name}' para o tabuleiro para criar uma instância, ou clique para abrir a ficha.`}
       draggable={true}
@@ -95,7 +96,7 @@ export function CharacterCard({
         </div>
       </div>
       <button
-        ref={popoverAnchorRef}
+        ref={optionsButtonRef}
         onClick={handleOpenPopover}
         className="hover:bg-accent-primary focus:ring-accent-primary ml-2 flex-shrink-0 rounded-full p-1 focus:ring-1 focus:ring-offset-1 focus:outline-none"
         aria-label={`Mais opções para o modelo de personagem ${character.name}`}
@@ -107,7 +108,7 @@ export function CharacterCard({
       <OptionsPopover
         isOpen={isPopoverOpen}
         onClose={handleClosePopover}
-        targetRef={popoverAnchorRef}
+        targetRef={optionsButtonRef}
       >
         <ul className="min-w-[150px]">
           <li>
@@ -115,6 +116,7 @@ export function CharacterCard({
               onClick={handleDuplicate}
               className="hover:bg-accent-secondary block w-full rounded-md px-3 py-2 text-left text-sm"
               role="menuitem"
+              title="Duplicar personagem"
             >
               Duplicar Personagem
             </button>

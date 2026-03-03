@@ -1,133 +1,326 @@
-import { User } from './authSchemas';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 
-const defaultUser: User & { password: string } = {
-  id: 'user-default',
-  name: 'Samuel',
-  email: 'samuelseve1@gmail.com',
-  password: 'accacc2',
+import { AuthError, AuthErrorCode, buildAuthError } from './authErrors';
+import { User } from './authSchemas';
+import {
+  loadAccessTokenFromStorage,
+  removeAccessTokenFromStorage,
+  saveAccessTokenToStorage,
+} from './authTokenStorage';
+
+const AUTH_API_BASE_URL = import.meta.env.VITE_AUTH_API_BASE_URL || 'http://localhost:8080';
+
+export const AUTH_SESSION_EXPIRED_EVENT = 'nihilvtt:auth-session-expired';
+
+export const authApi = axios.create({
+  baseURL: AUTH_API_BASE_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const refreshApi = axios.create({
+  baseURL: AUTH_API_BASE_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+type RetryableRequestConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean;
 };
 
-const mockUsers: (User & { password: string })[] = [defaultUser];
+let refreshTokenInFlight: Promise<string> | null = null;
 
-// Fluxo de registro:
-// 1) Simula latência de API.
-// 2) Verifica se já existe usuário com o mesmo email.
-// 3) Se não existir, cria o usuário e salva no "banco" em memória.
-// 4) Retorna apenas os dados públicos (sem senha).
-export async function registerUser(userData: Omit<User, 'id'> & { password: string }) {
-  return new Promise<User>((resolve, reject) => {
-    setTimeout(() => {
-      if (mockUsers.some((user) => user.email === userData.email)) {
-        reject(new Error('Email already registered.'));
-      } else {
-        const newUser: User & { password: string } = {
-          id: `user-${Date.now()}`,
-          name: userData.name,
-          email: userData.email,
-          password: userData.password,
-        };
-        mockUsers.push(newUser);
-        resolve({ id: newUser.id, name: newUser.name, email: newUser.email });
-      }
-    }, 1000);
-  });
+const notifySessionExpired = () => {
+  window.dispatchEvent(new CustomEvent(AUTH_SESSION_EXPIRED_EVENT));
+};
+
+const isAuthBypassEndpoint = (url?: string) => {
+  if (!url) return false;
+  return ['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout'].some((path) =>
+    url.includes(path),
+  );
+};
+
+const runRefreshAccessToken = async (): Promise<string> => {
+  const response = await refreshApi.post<AuthResponse>('/auth/refresh');
+  saveAccessTokenToStorage(response.data.accessToken);
+  return response.data.accessToken;
+};
+
+const ensureRefreshedAccessToken = async (): Promise<string> => {
+  if (!refreshTokenInFlight) {
+    refreshTokenInFlight = runRefreshAccessToken().finally(() => {
+      refreshTokenInFlight = null;
+    });
+  }
+
+  return refreshTokenInFlight;
+};
+
+authApi.interceptors.request.use((config) => {
+  const accessToken = loadAccessTokenFromStorage();
+  if (accessToken && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
+
+authApi.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (!axios.isAxiosError(error)) {
+      return Promise.reject(error);
+    }
+
+    const originalRequest = error.config as RetryableRequestConfig | undefined;
+    const status = error.response?.status;
+
+    if (!originalRequest || status !== 401 || originalRequest._retry || isAuthBypassEndpoint(originalRequest.url)) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    try {
+      const newAccessToken = await ensureRefreshedAccessToken();
+      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      return authApi(originalRequest);
+    } catch (refreshError) {
+      removeAccessTokenFromStorage();
+      notifySessionExpired();
+      return Promise.reject(refreshError);
+    }
+  },
+);
+
+type AuthResponse = {
+  accessToken: string;
+  user: User;
+};
+
+type ReauthResponse = {
+  reauthToken: string;
+};
+
+type BackendErrorPayload = {
+  code?: string;
+  message?: string;
+  error?: string;
+  fieldErrors?: Record<string, string>;
+};
+
+const AUTH_ERROR_CODES: AuthErrorCode[] = [
+  'VALIDATION_ERROR',
+  'UNAUTHORIZED',
+  'FORBIDDEN',
+  'CONFLICT',
+  'NOT_IMPLEMENTED',
+  'NETWORK_ERROR',
+  'UNKNOWN_ERROR',
+];
+
+const toKnownCode = (value: string | undefined, fallback: AuthErrorCode): AuthErrorCode => {
+  if (value && AUTH_ERROR_CODES.includes(value as AuthErrorCode)) {
+    return value as AuthErrorCode;
+  }
+  return fallback;
+};
+
+const toAuthError = (error: unknown, fallback: string): AuthError => {
+  if (axios.isAxiosError(error)) {
+    const payload = error.response?.data as BackendErrorPayload | undefined;
+    const message = payload?.message || payload?.error || fallback;
+    const fieldErrors = payload?.fieldErrors ?? {};
+    const status = error.response?.status;
+
+    if (status === 400) {
+      return buildAuthError({
+        code: toKnownCode(payload?.code, 'VALIDATION_ERROR'),
+        formError: message || 'Dados inválidos.',
+        fieldErrors,
+      });
+    }
+    if (status === 401) {
+      return buildAuthError({
+        code: toKnownCode(payload?.code, 'UNAUTHORIZED'),
+        formError: message,
+        fieldErrors,
+      });
+    }
+    if (status === 403) {
+      return buildAuthError({
+        code: toKnownCode(payload?.code, 'FORBIDDEN'),
+        formError: message,
+        fieldErrors,
+      });
+    }
+    if (status === 409) {
+      return buildAuthError({
+        code: toKnownCode(payload?.code, 'CONFLICT'),
+        formError: message,
+        fieldErrors,
+      });
+    }
+    if (status === 429) {
+      return buildAuthError({
+        code: toKnownCode(payload?.code, 'UNKNOWN_ERROR'),
+        formError: message,
+        fieldErrors,
+      });
+    }
+    if (status == null) {
+      return buildAuthError({
+        code: 'NETWORK_ERROR',
+        formError: 'Não foi possível conectar ao servidor.',
+        fieldErrors: {},
+      });
+    }
+    return buildAuthError({
+      code: toKnownCode(payload?.code, 'UNKNOWN_ERROR'),
+      formError: message,
+      fieldErrors,
+    });
+  }
+
+  if (error instanceof AuthError) return error;
+  if (error instanceof Error && error.message) {
+    return buildAuthError({ code: 'UNKNOWN_ERROR', formError: error.message, fieldErrors: {} });
+  }
+  return buildAuthError({ code: 'UNKNOWN_ERROR', formError: fallback, fieldErrors: {} });
+};
+
+const persistAuthSession = (response: AuthResponse): User => {
+  saveAccessTokenToStorage(response.accessToken);
+  return response.user;
+};
+
+export async function registerUser(userData: { name: string; email: string; password: string }) {
+  try {
+    const response = await authApi.post<AuthResponse>('/auth/register', userData);
+    return persistAuthSession(response.data);
+  } catch (error) {
+    throw toAuthError(error, 'Falha ao registrar usuário.');
+  }
 }
 
-// Fluxo de login:
-// 1) Simula latência de API.
-// 2) Procura usuário por email + senha.
-// 3) Se encontrar, retorna os dados públicos para sessão.
-// 4) Se não encontrar, rejeita com erro de credenciais inválidas.
-export async function loginUser(credentials: Pick<User, 'email'> & { password: string }) {
-  return new Promise<User>((resolve, reject) => {
-    setTimeout(() => {
-      const userFound = mockUsers.find(
-        (user) => user.email === credentials.email && user.password === credentials.password,
-      );
-
-      if (userFound) {
-        resolve({
-          id: userFound.id,
-          name: userFound.name,
-          email: userFound.email,
-        });
-      } else {
-        reject(new Error('Invalid credentials.'));
-      }
-    }, 1000);
-  });
+export async function loginUser(credentials: { email: string; password: string }) {
+  try {
+    const response = await authApi.post<AuthResponse>('/auth/login', credentials);
+    return persistAuthSession(response.data);
+  } catch (error) {
+    throw toAuthError(error, 'Falha no login.');
+  }
 }
 
-// Fluxo de atualização de usuário:
-// 1) Simula latência de API.
-// 2) Valida se o usuário existe.
-// 3) Exige e valida a senha atual antes de qualquer mudança.
-// 4) Aplica updates de nome e/ou senha.
-// 5) Se não houver campos para atualizar, retorna erro.
-// 6) Persiste no "banco" em memória e retorna os dados atualizados.
-export async function updateUser(
-  userId: string,
-  updates: { name?: string; password?: string; currentPassword?: string },
-) {
-  return new Promise<User>((resolve, reject) => {
-    setTimeout(() => {
-      // 1) Encontrar o usuário.
-      const userIndex = mockUsers.findIndex((user) => user.id === userId);
-      if (userIndex === -1) {
-        return reject(new Error('User not found.'));
-      }
-
-      // 2) Verificar a senha atual primeiro (para qualquer alteração).
-      if (!updates.currentPassword) {
-        return reject(new Error('A senha atual é obrigatória.'));
-      }
-
-      const user = mockUsers[userIndex];
-      if (user.password !== updates.currentPassword) {
-        return reject(new Error('Senha atual inválida.'));
-      }
-
-      // 3) Aplicar as atualizações solicitadas.
-      let userWasUpdated = false;
-
-      if (updates.name) {
-        user.name = updates.name;
-        userWasUpdated = true;
-      }
-
-      if (updates.password) {
-        user.password = updates.password;
-        userWasUpdated = true;
-      }
-
-      if (!userWasUpdated) {
-        return reject(new Error('Nenhuma informação para atualizar foi fornecida.'));
-      }
-
-      // 4) Persistir no array em memória e responder.
-      mockUsers[userIndex] = user;
-      const { ...userToReturn } = user;
-      resolve(userToReturn);
-    }, 1000);
-  });
+export async function reauthenticateUser(currentPassword: string): Promise<string> {
+  try {
+    const response = await authApi.post<ReauthResponse>('/auth/reauth', { currentPassword });
+    return response.data.reauthToken;
+  } catch (error) {
+    throw toAuthError(error, 'Falha na reautenticação.');
+  }
 }
 
-// Fluxo de exclusão de usuário:
-// 1) Simula latência de API.
-// 2) Remove o usuário alvo da lista em memória.
-// 3) Se nenhum usuário for removido, retorna erro de não encontrado.
-// 4) Se remover, resolve sem payload.
-export async function deleteUser(userId: string) {
-  return new Promise<void>((resolve, reject) => {
-    setTimeout(() => {
-      const initialLength = mockUsers.length;
-      const updatedUsers = mockUsers.filter((user) => user.id !== userId);
-      if (updatedUsers.length === initialLength) {
-        reject(new Error('User not found.'));
-      } else {
-        mockUsers.splice(0, mockUsers.length, ...updatedUsers);
-        resolve();
-      }
-    }, 1000);
-  });
+export async function getCurrentUser(token?: string): Promise<User> {
+  try {
+    const response = await authApi.get<User>('/auth/me', token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
+    return response.data;
+  } catch (error) {
+    throw toAuthError(error, 'Falha ao carregar usuário autenticado.');
+  }
+}
+
+export async function refreshAccessToken(): Promise<User> {
+  try {
+    const response = await authApi.post<AuthResponse>('/auth/refresh');
+    return persistAuthSession(response.data);
+  } catch (error) {
+    removeAccessTokenFromStorage();
+    notifySessionExpired();
+    throw toAuthError(error, 'Sessão expirada.');
+  }
+}
+
+export async function updateUserProfile(
+  updates: {
+    name?: string;
+    password?: string;
+    avatarUrl?: string;
+    currentPassword: string;
+  },
+  reauthToken?: string,
+): Promise<User> {
+  try {
+    const response = await authApi.patch<User>(
+      '/auth/profile',
+      {
+        name: updates.name,
+        newPassword: updates.password,
+        currentPassword: updates.currentPassword,
+        avatarUrl: updates.avatarUrl,
+      },
+      {
+        headers: reauthToken ? { 'X-Reauth-Token': reauthToken } : undefined,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    throw toAuthError(error, 'Falha ao atualizar perfil.');
+  }
+}
+
+export async function uploadUserAvatar(file: File, currentPassword: string): Promise<User> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('currentPassword', currentPassword);
+
+    const response = await authApi.post<User>('/auth/profile/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw toAuthError(error, 'Falha ao enviar avatar.');
+  }
+}
+
+export async function logoutUser() {
+  try {
+    await authApi.post('/auth/logout');
+  } catch {
+    // Mesmo se o backend falhar, limpamos o cliente local.
+  } finally {
+    removeAccessTokenFromStorage();
+  }
+}
+
+export async function deleteAccountUser(currentPassword: string, reauthToken?: string) {
+  try {
+    await authApi.post(
+      '/auth/account/delete',
+      { currentPassword },
+      {
+        headers: reauthToken ? { 'X-Reauth-Token': reauthToken } : undefined,
+      },
+    );
+  } catch (error) {
+    throw toAuthError(error, 'Falha ao excluir conta.');
+  } finally {
+    removeAccessTokenFromStorage();
+  }
+}
+
+export function getStoredAccessToken() {
+  return loadAccessTokenFromStorage();
+}
+
+export function clearStoredAccessToken() {
+  removeAccessTokenFromStorage();
 }

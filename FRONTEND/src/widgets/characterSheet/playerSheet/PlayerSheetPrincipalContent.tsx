@@ -7,12 +7,10 @@ import { HealthAndCombatDetails } from "./HealthAndCombatDetails";
 
 interface PlayerSheetPrincipalContentProps {
   characterId: string;
-  onEditAction: (actionId: string) => void;
 }
 
 export function PlayerSheetPrincipalContent({
   characterId,
-  onEditAction,
 }: PlayerSheetPrincipalContentProps) {
   const character = usePlayerCharacter(characterId);
   const { rollDice } = useDiceRollingStore();
@@ -31,14 +29,15 @@ export function PlayerSheetPrincipalContent({
   };
 
   return (
-    <div className="flex flex-wrap gap-2 w-full">
+    <div className="grid w-full min-w-0 grid-cols-1 gap-2.5 2xl:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)]">
       <AttributesAndSkillsList
-        className="flex-1 min-w-[300px]"
+        characterId={characterId}
+        className="min-w-0"
         onRollDice={handleRollDice}
       />
       <HealthAndCombatDetails
-        className="flex-1 min-w-[300px]"
-        onEditAction={onEditAction}
+        characterId={characterId}
+        className="min-w-0"
         onRollDice={handleRollDice}
       />
     </div>

@@ -37,6 +37,22 @@ export const useSessionModalStore = create<ModalState>((set) => ({
     }));
   },
 
+  closeModalByName: (modalName) => {
+    set((prevState) => {
+      const targetIndex = [...prevState.modalStack]
+        .map((modal) => modal.name)
+        .lastIndexOf(modalName);
+
+      if (targetIndex === -1) {
+        return prevState;
+      }
+
+      return {
+        modalStack: prevState.modalStack.filter((_, index) => index !== targetIndex),
+      };
+    });
+  },
+
   updateModalProps: (partialProps) => {
     set((prevState) => {
       const newModalStack = [...prevState.modalStack];

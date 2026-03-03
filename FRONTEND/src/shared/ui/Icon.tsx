@@ -9,6 +9,7 @@ export interface IconProps {
   className?: string;
   'aria-hidden'?: boolean;
   size?: number | string;
+  invert?: boolean;
 }
 
 export function Icon({
@@ -17,9 +18,10 @@ export function Icon({
   alt,
   className,
   size = 5,
+  invert = true,
   'aria-hidden': ariaHidden = true,
 }: IconProps) {
-  const iconClassName = cn(`w-${size} h-${size}`, 'invert', className);
+  const iconClassName = cn(`w-${size} h-${size}`, invert && 'invert', className);
 
   if (typeof Component === 'function' || (typeof Component === 'object' && Component !== null)) {
     return <Component className={iconClassName} aria-hidden={ariaHidden} />;

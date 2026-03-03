@@ -23,9 +23,9 @@ export function ChatInput({
   resetHistoryNavigation,
   navigateHistory,
 }:ChatInputProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setInputText(text);
 
@@ -59,11 +59,11 @@ export function ChatInput({
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (isCommandPopoverOpen) {
       if (e.key === "Enter") {
+        e.preventDefault();
         setIsCommandPopoverOpen(false);
-        return;
       } else if (["ArrowUp", "ArrowDown", "Escape"].includes(e.key)) {
         return;
       }
@@ -84,6 +84,9 @@ export function ChatInput({
           0
         );
       }
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      e.currentTarget.form?.requestSubmit();
     } else if (e.key === "Escape") {
       if (isCommandPopoverOpen) {
         setIsCommandPopoverOpen(false);
@@ -102,15 +105,15 @@ export function ChatInput({
       />
 
       <form onSubmit={handleSubmit} className="p-4">
-        <div className="flex space-x-2 ">
-          <input
+        <div className="flex items-stretch space-x-2 ">
+          <textarea
             ref={inputRef}
-            type="text"
             value={inputText}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Digite uma mensagem ou /comando..."
-            className="flex-grow p-2 border border-text-secondary rounded-md "
+            rows={3}
+            className="min-h-[4.5rem] max-h-28 flex-grow resize-none overflow-y-auto rounded-md border border-text-secondary p-2 text-sm"
             aria-label="Entrada de mensagem do chat"
             aria-autocomplete="list"
             aria-haspopup="listbox"
@@ -121,7 +124,7 @@ export function ChatInput({
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-accent-primary cursor-pointer hover:bg-accent-primary-hover font-semibold rounded-md "
+            className="min-h-[4.5rem] self-stretch rounded-md bg-accent-primary px-4 py-2 font-semibold hover:bg-accent-primary-hover cursor-pointer"
           >
             Enviar
           </button>

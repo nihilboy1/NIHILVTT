@@ -22,13 +22,11 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
       case 'origin':
         return !!selections[stepId] && String(selections[stepId]).length > 0;
       case 'feat':
-        // Para talentos, verifica se há pelo menos um talento configurado
-        // TODO: Melhorar esta validação para verificar se todos os talentos requeridos foram configurados
-        return (
-          !!selections[stepId] &&
-          typeof selections[stepId] === 'object' &&
-          Object.keys(selections[stepId] as Record<string, any>).length > 0
-        );
+        if (!selections[stepId]) return false;
+        if (typeof selections[stepId] === 'string') {
+          return selections[stepId].length > 0;
+        }
+        return Object.keys(selections[stepId] as Record<string, any>).length > 0;
       case 'class':
         return !!selections[stepId] && String(selections[stepId]).length > 0;
       case 'attributes':
@@ -161,12 +159,12 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
           <div
             className="bg-accent-primary h-2 rounded-full transition-all duration-300"
             style={{
-              width: `${(completedStepsCount / 5) * 100}%`,
+              width: `${(completedStepsCount / STEPS.length) * 100}%`,
             }}
           />
         </div>
         <div className="text-text-secondary mt-1 text-xs">
-          {completedStepsCount} de 5 concluídos
+          {completedStepsCount} de {STEPS.length} concluídos
         </div>
       </div>
     </CustomScrollbar>

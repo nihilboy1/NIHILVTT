@@ -3,7 +3,7 @@ import { ProcessedEffect } from '../../types/effectTypes';
 import { Badge } from './Badge';
 import { cn } from '@/shared/lib/utils/cn';
 import { proficiencyTagVariants } from '../../styles';
-import { useEffectsProcessor } from '../../model/hooks/useEffectsProcessor';
+import { useCharacterBuilderEffectsProcessor } from '../../model/context/effectsProcessorContext';
 import { getFeatById } from '../../schemas/characterBuilderSchema';
 
 interface FeatEffectControlsProps {
@@ -16,7 +16,7 @@ interface FeatEffectControlsProps {
 }
 
 export const FeatEffectControls: React.FC<FeatEffectControlsProps> = ({ effect }) => {
-  const { chooseFeat, removeFeat, selectedChoices } = useEffectsProcessor();
+  const { chooseFeat, removeFeat, selectedChoices } = useCharacterBuilderEffectsProcessor();
 
   // Se é um talento específico (automaticamente concedido)
   if (effect.selection?.mode === 'specific') {

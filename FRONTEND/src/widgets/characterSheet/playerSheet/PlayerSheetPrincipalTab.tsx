@@ -1,19 +1,21 @@
+import { PlayerCharacterViewModel } from "@/entities/character/model/view-models/playerCharacterViewModel";
+
 import { PlayerSheetPrincipalContent } from "./PlayerSheetPrincipalContent";
 import { PrincipalHeader } from "./PrincipalHeader";
 
 interface PlayerSheetPrincipalTabProps {
   characterId: string;
-  onEditAction: (actionId: string) => void;
+  viewModel: PlayerCharacterViewModel | null;
 }
 
-export function PlayerSheetPrincipalTab({ characterId, onEditAction }: PlayerSheetPrincipalTabProps) {
+export function PlayerSheetPrincipalTab({
+  characterId,
+  viewModel,
+}: PlayerSheetPrincipalTabProps) {
   return (
-    <div className="flex flex-col p-0.5 overflow-y-auto max-h-[calc(100vh-12rem)] hide-scrollbar">
-      <PrincipalHeader />
-      <PlayerSheetPrincipalContent
-        characterId={characterId}
-        onEditAction={onEditAction}
-      />
+    <div className="hide-scrollbar flex h-full min-h-0 flex-col overflow-y-auto rounded-lg bg-surface-0/40 p-1.5">
+      <PrincipalHeader viewModel={viewModel} />
+      <PlayerSheetPrincipalContent characterId={characterId} />
     </div>
   );
 }

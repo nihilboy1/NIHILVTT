@@ -1,72 +1,44 @@
-// src/entities/character/ui/playerSheet/configTab/PlayerSheetConfigTab.tsx
-
-import { useFormContext } from "react-hook-form"; // 1. Importar
-
+import { usePlayerCharacter } from '@/entities/character/lib/hooks/usePlayerCharacter';
 import {
   CharacterTypeEnum,
   characterTypeTranslations,
-  PlayerCharacter,
-} from "../../../../entities/character/model/schemas/character.schema";
-import { cn } from "../../../../shared/lib/utils/cn";
+} from '@/entities/character/model/schemas/character.schema';
+import { PlayerCharacterViewModel } from '@/entities/character/model/view-models/playerCharacterViewModel';
 
-export function PlayerSheetConfigTab() {
-  // 3. Pegamos o 'register' do contexto
-  const { register } = useFormContext<PlayerCharacter>();
+interface PlayerSheetConfigTabProps {
+  characterId: string;
+  viewModel: PlayerCharacterViewModel | null;
+}
+
+export function PlayerSheetConfigTab({ characterId, viewModel }: PlayerSheetConfigTabProps) {
+  const character = usePlayerCharacter(characterId);
+  const imageValue = viewModel?.image?.trim() ? viewModel.image : 'Sem imagem configurada.';
 
   return (
-    <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100vh-12.5rem)]">
-      <div>
-        <label
-          htmlFor="characterImage"
-          className="block text-[0.6875rem] font-medium text-accent-primary mb-px"
-        >
+    <div className="hide-scrollbar flex h-full min-h-0 flex-col space-y-3 overflow-y-auto rounded-lg bg-surface-1/75 p-2.5">
+      <div className="rounded-lg bg-surface-0/30 p-2.5">
+        <p className="mb-1 block text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-text-secondary">
           URL da Imagem do Personagem
-        </label>
-        {/* 4. Campo registrado com o nome 'image' do nosso schema */}
-        <input
-          id="characterImage"
-          type="text"
-          placeholder="Cole a URL da imagem aqui"
-          {...register("image")}
-          className={cn(
-            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
-          )}
-        />
+        </p>
+        <div className="rounded-md bg-surface-1 px-2.5 py-2 text-sm text-text-primary break-all">
+          {imageValue}
+        </div>
       </div>
-      <div>
-        <label
-          htmlFor="characterSize"
-          className="block text-[0.6875rem] font-medium text-accent-primary mb-px"
-        >
+      <div className="rounded-lg bg-surface-0/30 p-2.5">
+        <p className="mb-1 block text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-text-secondary">
           Tamanho do Personagem (Tabuleiro)
-        </label>
-        {/* 5. Campo registrado com o nome 'size' do nosso schema */}
-        <select
-          id="characterSize"
-          {...register("size")}
-          className="w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary"
-        >
-          <option value="1x1">1x1 (Padrão)</option>
-          <option value="2x2">2x2 (Grande)</option>
-          <option value="3x3">3x3 (Enorme)</option>
-          <option value="0.5x0.5">0.5x0.5 (Minúsculo)</option>
-        </select>
+        </p>
+        <div className="rounded-md bg-surface-1 px-2.5 py-2 text-sm text-text-primary">
+          {character?.size ?? '1x1'}
+        </div>
       </div>
-      <div>
-        <p className="block text-[0.6875rem] font-medium text-accent-primary mb-px">
+      <div className="rounded-lg bg-surface-0/30 p-2.5">
+        <p className="mb-1 block text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-text-secondary">
           Tipo do Personagem
         </p>
-        {/* Este campo é apenas de exibição, não precisa ser registrado no formulário */}
-        <input
-          type="text"
-          value={characterTypeTranslations[CharacterTypeEnum.enum.Player]}
-          className={cn(
-            "w-full p-2 bg-surface-1 border border-surface-2 rounded-md focus:ring-1 focus:ring-accent-primary focus:border-accent-primary text-text-primary placeholder-text-secondary",
-            "bg-surface-1 opacity-70 cursor-not-allowed"
-          )}
-          readOnly
-          disabled
-        />
+        <div className="rounded-md bg-surface-1 px-2.5 py-2 text-sm text-text-primary opacity-80">
+          {characterTypeTranslations[CharacterTypeEnum.enum.Player]}
+        </div>
       </div>
     </div>
   );

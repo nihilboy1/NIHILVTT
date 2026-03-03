@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 
-import { type Character } from '@/entities/character/model/schemas/character.schema';
 import { useCharactersStore } from '@/entities/character/model/store';
 
 import { type Point, type Token } from '../../../../shared/api/types';
@@ -10,10 +9,14 @@ export interface TokenState {
   tokensOnBoard: Token[];
   tokenInstanceCounts: Map<string, number>;
   addToken: (characterId: string, position: Point) => Token;
+  addTokenFromSession: (token: Token) => void;
   removeToken: (tokenId: string) => void;
+  removeTokenFromSession: (tokenId: string) => void;
+  removeTokensByCharacterIdFromSession: (characterId: string) => void;
   updateTokenPosition: (tokenId: string, newPosition: Point) => void;
   updateTokenHp: (tokenId: string, newHp: number) => void;
-  makeTokenIndependent: (tokenId: string) => Character | null;
+  replaceTokens: (tokens: Token[]) => void;
+  resetTokens: () => void;
 }
 
 export const useTokenStore = create<TokenState>((set, get) => ({
@@ -46,6 +49,20 @@ export const useTokenStore = create<TokenState>((set, get) => ({
     return newTokenInstance;
   },
 
+  addTokenFromSession: (token) => {
+    set((state) => {
+      if (state.tokensOnBoard.some((existing) => existing.id === token.id)) {
+        return state;
+      }
+      const tokenInstanceCounts = new Map(state.tokenInstanceCounts);
+      tokenInstanceCounts.set(token.characterId, (tokenInstanceCounts.get(token.characterId) || 0) + 1);
+      return {
+        tokensOnBoard: [...state.tokensOnBoard, token],
+        tokenInstanceCounts,
+      };
+    });
+  },
+
   removeToken: (tokenId) => {
     const { tokensOnBoard, tokenInstanceCounts } = get(); // Read tokenInstanceCounts here
     const { characters, deleteCharacter } = useCharactersStore.getState();
@@ -72,6 +89,41 @@ export const useTokenStore = create<TokenState>((set, get) => ({
       tokensOnBoard: state.tokensOnBoard.filter((token) => token.id !== tokenId),
       tokenInstanceCounts: newCounts, // Set the pre-calculated newCounts
     }));
+  },
+
+  removeTokenFromSession: (tokenId) => {
+    set((state) => {
+      const instanceToRemove = state.tokensOnBoard.find((inst) => inst.id === tokenId);
+      if (!instanceToRemove) {
+        return state;
+      }
+      const tokenInstanceCounts = new Map(state.tokenInstanceCounts);
+      const currentCount = tokenInstanceCounts.get(instanceToRemove.characterId) || 0;
+      if (currentCount <= 1) {
+        tokenInstanceCounts.delete(instanceToRemove.characterId);
+      } else {
+        tokenInstanceCounts.set(instanceToRemove.characterId, currentCount - 1);
+      }
+      return {
+        tokensOnBoard: state.tokensOnBoard.filter((token) => token.id !== tokenId),
+        tokenInstanceCounts,
+      };
+    });
+  },
+
+  removeTokensByCharacterIdFromSession: (characterId) => {
+    set((state) => {
+      const filteredTokens = state.tokensOnBoard.filter((token) => token.characterId !== characterId);
+      const tokenInstanceCounts = filteredTokens.reduce((counts, token) => {
+        counts.set(token.characterId, (counts.get(token.characterId) || 0) + 1);
+        return counts;
+      }, new Map<string, number>());
+
+      return {
+        tokensOnBoard: filteredTokens,
+        tokenInstanceCounts,
+      };
+    });
   },
 
   updateTokenPosition: (tokenId, newPosition) => {
@@ -107,45 +159,16 @@ export const useTokenStore = create<TokenState>((set, get) => ({
     }
   },
 
-  makeTokenIndependent: (tokenId) => {
-    const { tokensOnBoard, tokenInstanceCounts } = get(); // Read tokenInstanceCounts here
-    const { characters, addCharacter } = useCharactersStore.getState();
+  replaceTokens: (tokens) => {
+    const tokenInstanceCounts = tokens.reduce((counts, token) => {
+      counts.set(token.characterId, (counts.get(token.characterId) || 0) + 1);
+      return counts;
+    }, new Map<string, number>());
 
-    const targetToken = tokensOnBoard.find((inst) => inst.id === tokenId);
-    if (!targetToken) return null;
+    set({ tokensOnBoard: tokens, tokenInstanceCounts });
+  },
 
-    const originalCharacter = characters.find((char) => char.id === targetToken.characterId);
-    if (!originalCharacter) return null;
-
-    const copiedCharacterData: Character = JSON.parse(JSON.stringify(originalCharacter));
-
-    const newIndependentCharacterData: Omit<Character, 'id'> = {
-      ...copiedCharacterData,
-      name: `${originalCharacter.name} (Cópia)`,
-    };
-
-    const addedCharacter = addCharacter(newIndependentCharacterData);
-
-    const newCounts = new Map(tokenInstanceCounts); // Create new map from the one obtained via get()
-    const originalCharacterId = originalCharacter.id;
-    const newIndependentCharacterId = addedCharacter.id;
-
-    const originalCount = newCounts.get(originalCharacterId) || 0;
-    if (originalCount <= 1) {
-      newCounts.delete(originalCharacterId);
-    } else {
-      newCounts.set(originalCharacterId, originalCount - 1);
-    }
-
-    newCounts.set(newIndependentCharacterId, (newCounts.get(newIndependentCharacterId) || 0) + 1);
-
-    set((state) => ({
-      tokensOnBoard: state.tokensOnBoard.map((token) =>
-        token.id === tokenId ? { ...token, characterId: addedCharacter.id } : token,
-      ),
-      tokenInstanceCounts: newCounts, // Set the pre-calculated newCounts
-    }));
-
-    return addedCharacter;
+  resetTokens: () => {
+    set({ tokensOnBoard: [], tokenInstanceCounts: new Map() });
   },
 }));

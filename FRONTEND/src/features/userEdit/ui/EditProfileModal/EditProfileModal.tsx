@@ -6,9 +6,9 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { useAuthStore } from '@/features/auth/model/authStore';
+import { AppButton } from '@/shared/ui/AppButton';
 import { FormInput } from '@/shared/ui/FormInput';
 import { Modal } from '@/shared/ui/Modal';
-import { Spinner } from '@/shared/ui/Spinner';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ interface EditProfileModalProps {
 type EditOption = 'name' | 'password' | null;
 
 function EditProfileModal({ isOpen, onClose, zIndex }: EditProfileModalProps) {
-  const { updateProfile } = useAuthStore();
+  const { authError, clearAuthError, updateProfile } = useAuthStore();
   const [editOption, setEditOption] = useState<EditOption>(null);
   const [localError, setLocalError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,17 +72,15 @@ function EditProfileModal({ isOpen, onClose, zIndex }: EditProfileModalProps) {
       setEditOption(null);
       setLocalError(null);
       clearErrors();
+      clearAuthError();
     }
-  }, [isOpen, reset, clearErrors]);
+  }, [isOpen, reset, clearErrors, clearAuthError]);
 
   const onSubmit = async (data: EditProfileFormInputs) => {
     setLocalError(null);
     setIsSubmitting(true);
 
     try {
-      setIsSubmitting(true);
-      setLocalError(null);
-
       let successMessage = '';
 
       if (editOption === 'name' && 'newName' in data) {
@@ -107,13 +105,13 @@ function EditProfileModal({ isOpen, onClose, zIndex }: EditProfileModalProps) {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ocorreu um erro desconhecido.';
 
-      if (errorMessage.includes('Senha atual inválida')) {
+      if (authError?.fieldErrors.currentPassword) {
         setError('currentPassword', {
-          type: 'manual',
-          message: 'Senha atual incorreta.',
+          type: 'server',
+          message: authError.fieldErrors.currentPassword,
         });
       } else {
-        setLocalError(errorMessage);
+        setLocalError(authError?.formError || errorMessage);
       }
     } finally {
       setIsSubmitting(false);
@@ -138,20 +136,24 @@ function EditProfileModal({ isOpen, onClose, zIndex }: EditProfileModalProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {!editOption && (
             <div className="flex flex-col space-y-4">
-              <button
+              <AppButton
                 type="button"
                 onClick={() => setEditOption('name')}
-                className="bg-surface-3 text-text-primary border-text-primary iceberg-regular w-full rounded-lg border-b-3 px-8 py-3 text-xl font-bold shadow-lg transition-all hover:scale-105"
+                variant="secondary"
+                fullWidth
+                className="iceberg-regular border-b-3 border-text-primary px-8 py-3 text-xl font-bold shadow-lg hover:scale-105"
               >
                 ALTERAR NOME
-              </button>
-              <button
+              </AppButton>
+              <AppButton
                 type="button"
                 onClick={() => setEditOption('password')}
-                className="bg-surface-3 text-text-primary border-text-primary iceberg-regular w-full rounded-lg border-b-3 px-8 py-3 text-xl font-bold shadow-lg transition-all hover:scale-105"
+                variant="secondary"
+                fullWidth
+                className="iceberg-regular border-b-3 border-text-primary px-8 py-3 text-xl font-bold shadow-lg hover:scale-105"
               >
                 ALTERAR SENHA
-              </button>
+              </AppButton>
             </div>
           )}
 
@@ -209,32 +211,28 @@ function EditProfileModal({ isOpen, onClose, zIndex }: EditProfileModalProps) {
               )}
 
               <div className="flex justify-end space-x-3 pt-4">
-                <button
+                <AppButton
                   type="button"
                   onClick={onClose}
-                  className="text-surface-0 bg-surface-2 border-surface-0 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-feedback-negative-hover hover:text-text-primary hover:bg-feedback-negative-hover cursor-pointer rounded-md border px-4 py-2 font-semibold transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                  variant="secondary"
                   disabled={isSubmitting}
                 >
                   Cancelar
-                </button>
-                <button
+                </AppButton>
+                <AppButton
                   type="submit"
-                  className="bg-accent-secondary text-text-primary text-md border-text-primary iceberg-regular flex w-[10rem] items-center justify-center gap-2 rounded-lg border-b-3 px-4 py-2 font-bold shadow-lg transition-all hover:scale-105"
+                  variant="primary"
+                  className="text-md iceberg-regular w-[10rem] border-b-3 border-text-primary font-bold shadow-lg hover:scale-105"
                   disabled={
-                    isSubmitting ||
                     (editOption === 'name' && !watch('newName')) ||
                     (editOption === 'password' &&
                       (!watch('newPassword') || !watch('confirmNewPassword')))
                   }
+                  isLoading={isSubmitting}
+                  loadingText="SALVANDO..."
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Spinner variant="mini" /> SALVANDO...
-                    </>
-                  ) : (
-                    'SALVAR'
-                  )}
-                </button>
+                  SALVAR
+                </AppButton>
               </div>
             </>
           )}
@@ -245,3 +243,4 @@ function EditProfileModal({ isOpen, onClose, zIndex }: EditProfileModalProps) {
 }
 
 export { EditProfileModal };
+

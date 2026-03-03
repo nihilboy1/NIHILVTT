@@ -4,7 +4,7 @@ import { ProcessedEffect } from '../../../types/effectTypes';
 import { cn } from '@/shared/lib/utils/cn';
 import { characterCardVariants, selectionBadgeVariants } from '@/features/characterBuilder/styles';
 import { Badge } from '../../ui/Badge';
-import { useEffectsProcessor } from '@/features/characterBuilder/model/hooks/useEffectsProcessor';
+import { useCharacterBuilderEffectsProcessor } from '@/features/characterBuilder/model/context/effectsProcessorContext';
 import { EffectSection } from '../OriginOptionCard/components/EffectSection';
 import { AbilityScoreControls } from '../OriginOptionCard/EffectControls/AbilityScoreControls';
 import { FeatControls } from '../OriginOptionCard/EffectControls/FeatControls';
@@ -28,7 +28,7 @@ export function FeatOptionCard({
   onEffectsProcessed,
 }: FeatOptionCardProps) {
   const { name, description, id } = option;
-  const { processFeatEffects, areAllEffectsSelected } = useEffectsProcessor();
+  const { processFeatEffects, areAllEffectsSelected } = useCharacterBuilderEffectsProcessor();
 
   // Busca dados do talento e processa efeitos
   const featData = getFeatById(id);

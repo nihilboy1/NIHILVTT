@@ -6,11 +6,13 @@ import { cn } from "../../../shared/lib/utils/cn";
 interface GameBoardSideOptionProps {
   isRightSidebarVisible: boolean;
   setIsPageAndGridSettingsModalOpen: (open: boolean) => void;
+  canManageBoardSettings: boolean;
 }
 
 export function GameBoardSideOption({
   isRightSidebarVisible,
   setIsPageAndGridSettingsModalOpen,
+  canManageBoardSettings,
 }: GameBoardSideOptionProps) {
   return (
     <div
@@ -20,9 +22,11 @@ export function GameBoardSideOption({
         isRightSidebarVisible ? "right-[21rem] md:right-[25rem]" : "right-2"
       )}
     >
-      <PageSettingsButton
-        onClick={() => setIsPageAndGridSettingsModalOpen(true)}
-      />
+      {canManageBoardSettings ? (
+        <PageSettingsButton
+          onClick={() => setIsPageAndGridSettingsModalOpen(true)}
+        />
+      ) : null}
       <ZoomControls />
     </div>
   );

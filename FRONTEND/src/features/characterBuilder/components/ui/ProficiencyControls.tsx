@@ -4,7 +4,7 @@ import { Badge } from './Badge';
 import { getSkillNameTranslation } from '../../lib/translationHelpers';
 import { cn } from '@/shared/lib/utils/cn';
 import { proficiencyTagVariants, selectionButtonVariants } from '../../styles';
-import { useEffectsProcessor } from '../../model/hooks/useEffectsProcessor';
+import { useCharacterBuilderEffectsProcessor } from '../../model/context/effectsProcessorContext';
 
 interface ProficiencyControlsProps {
   effect: ProcessedEffect & {
@@ -19,7 +19,8 @@ interface ProficiencyControlsProps {
 }
 
 export const ProficiencyControls: React.FC<ProficiencyControlsProps> = ({ effect }) => {
-  const { chooseProficiency, removeProficiency, selectedChoices } = useEffectsProcessor();
+  const { chooseProficiency, removeProficiency, selectedChoices } =
+    useCharacterBuilderEffectsProcessor();
 
   // Verifica se é uma proficiência em iniciativa (caso especial)
   if (effect.proficiencyType === 'skill' && effect.on === 'initiative') {

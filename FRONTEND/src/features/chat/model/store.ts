@@ -5,16 +5,15 @@ import { DiceRollDetails, DiceRollMessage, Message, TextMessage } from '@/shared
 import { DEFAULTS } from '@/shared/config/constants';
 import { generateUniqueId } from '@/shared/lib/utils/id/idUtils';
 
-import { parseAndValidateChatCommand } from './chatCommandParser';
-import { ChatCommand } from './chatCommands.schema';
-
 export interface ChatState {
   messages: Message[];
   sendMessage: (content: string | DiceRollDetails, sender?: string) => void;
+  addIncomingMessage: (message: Message) => void;
   rollAndSendMessage: (formula: string, sender?: string) => void;
   clearMessages: () => void;
+  clearAllMessages: () => void;
+  replaceMessages: (messages: Message[]) => void;
   handleChatInput: (input: string, sender?: string) => void;
-  processChatCommand: (command: ChatCommand, sender: string) => void; // Adicionado
 }
 
 const initialWelcomeMessage: TextMessage = {
@@ -53,49 +52,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  handleChatInput: (input: string, sender: string = DEFAULTS.PLAYER_NAME) => {
-    const command = parseAndValidateChatCommand(input);
-    const { processChatCommand, sendMessage: currentSendMessage } = get();
+  addIncomingMessage: (message) => {
+    set((state) => {
+      if (state.messages.some((existing) => existing.id === message.id)) {
+        return state;
+      }
+      return { messages: [...state.messages, message] };
+    });
+  },
 
-    if (command) {
-      processChatCommand(command, sender);
-    } else {
-      currentSendMessage(input, sender);
-    }
+  handleChatInput: (input: string, sender: string = DEFAULTS.PLAYER_NAME) => {
+    get().sendMessage(input, sender);
   },
 
   clearMessages: () => {
     set({ messages: [initialWelcomeMessage] });
   },
 
-  processChatCommand: (command: ChatCommand, sender: string) => {
-    const { clearMessages: currentClearMessages, sendMessage: currentSendMessage } = get();
-    switch (command.type) {
-      case 'simpleCommand':
-        switch (command.command) {
-          case 'clear':
-            currentClearMessages();
-            currentSendMessage('Chat limpo.', 'Sistema');
-            break;
-          case 'help':
-            currentSendMessage(
-              'Comandos disponíveis: /clear, /help, /whisper <alvo> <mensagem>',
-              'Sistema',
-            );
-            break;
-        }
-        break;
-      case 'textArgumentCommand':
-        const whisperCommand = command;
-        currentSendMessage(
-          `[Sussurro para ${whisperCommand.target}]: ${whisperCommand.message}`,
-          sender,
-        );
-        break;
-      default:
-        currentSendMessage(`Comando desconhecido ou tipo de comando inválido.`, 'Sistema');
-        break;
-    }
+  clearAllMessages: () => {
+    set({ messages: [] });
+  },
+
+  replaceMessages: (messages) => {
+    set({ messages: messages.length > 0 ? messages : [initialWelcomeMessage] });
   },
 
   rollAndSendMessage: (formula: string, sender: string = DEFAULTS.PLAYER_NAME) => {

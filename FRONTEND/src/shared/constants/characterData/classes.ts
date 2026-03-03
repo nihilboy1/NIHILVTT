@@ -1,38 +1,20 @@
+import { PHB2024CLASSES } from '@nihilvtt/datamodeling/data';
+
 export interface CharacterClass {
   id: string;
   name: string;
   description: string;
 }
 
-export const CLASSES: CharacterClass[] = [
-  {
-    id: 'warrior',
-    name: 'Guerreiro',
-    description: 'Especialista em combate corpo a corpo e defesa.',
-  },
-  {
-    id: 'mage',
-    name: 'Mago',
-    description: 'Manipulador das artes arcanas e magias poderosas.',
-  },
-  {
-    id: 'rogue',
-    name: 'Ladino',
-    description: 'Mestre da furtividade e ataques precisos.',
-  },
-  {
-    id: 'cleric',
-    name: 'Clérigo',
-    description: 'Curandeiro divino com poderes sagrados.',
-  },
-  {
-    id: 'ranger',
-    name: 'Patrulheiro',
-    description: 'Explorador especializado em combate à distância.',
-  },
-  {
-    id: 'bard',
-    name: 'Bardo',
-    description: 'Artista versátil com magias de apoio.',
-  },
-];
+const resolveClassName = (name: string[]): string => {
+  if (name.length > 1 && name[1]) {
+    return name[1];
+  }
+  return name[0] ?? 'Classe';
+};
+
+export const CLASSES: CharacterClass[] = PHB2024CLASSES.map((characterClass) => ({
+  id: characterClass.id,
+  name: resolveClassName(characterClass.name),
+  description: characterClass.description,
+}));

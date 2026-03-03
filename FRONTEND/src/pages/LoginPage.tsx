@@ -1,19 +1,17 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
-import { useForm, FormProvider } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FormProvider, useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
-import {
-  LoginFormInputs,
-  loginSchema,
-} from "@/features/auth/model/authSchemas";
-import { useAuthStore } from "@/features/auth/model/authStore";
-import { fadeInAndSlideUp } from "@/shared/config/MotionAnimations";
-import { FormInput } from "@/shared/ui/FormInput";
-import { MotionLink } from "@/shared/ui/MotionLink";
-import { Squares } from "@/shared/ui/SquaresBackground";
+import { useAuthFormServerErrors } from '@/features/auth/model/hooks/useAuthFormServerErrors';
+import { LoginFormInputs, loginSchema } from '@/features/auth/model/authSchemas';
+import { useAuthStore } from '@/features/auth/model/authStore';
+import { AuthPageLayout } from '@/widgets/authPageLayout/ui/AuthPageLayout';
+import { AppButton } from '@/shared/ui/AppButton';
+import { FormInput } from '@/shared/ui/FormInput';
+import { MotionLink } from '@/shared/ui/MotionLink';
+import { StatusAlert } from '@/shared/ui/StatusAlert';
 
 export default function LoginPage() {
   const methods = useForm<LoginFormInputs>({
@@ -27,11 +25,18 @@ export default function LoginPage() {
   const {
     register: registerField, // Renamed to avoid conflict with auth store's register
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors },
   } = methods;
 
-  const { login, user, isLoading, error } = useAuthStore();
+  const { login, user, isLoading, authError, clearAuthError } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    clearAuthError();
+    clearErrors();
+  }, [clearAuthError, clearErrors]);
 
   useEffect(() => {
     if (user) {
@@ -39,80 +44,69 @@ export default function LoginPage() {
     }
   }, [user, navigate]);
 
+  useAuthFormServerErrors<LoginFormInputs>({
+    authError,
+    setError,
+    allowedFields: ['email', 'password'],
+  });
+
   const onSubmit = async (data: LoginFormInputs) => {
+    clearAuthError();
+    clearErrors();
     await login(data);
   };
 
   return (
-    <div className="relative bg-surface-0 text-text-primary min-h-screen w-full flex flex-col items-center p-4 sm:p-8 overflow-x-hidden">
-      <div className="absolute top-0 left-0 w-full h-full">
-        <Squares direction="left" />
-      </div>
+    <AuthPageLayout title="FAZER LOGIN" subtitle="Bem-vindo de volta" squareDirection="left">
+      <FormProvider {...methods}>
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <FormInput<LoginFormInputs>
+            label="Email"
+            id="email"
+            type="email"
+            placeholder="seu-email@dominio.com"
+            register={registerField}
+            error={errors.email}
+          />
 
-      <motion.div
-        className="bg-surface-1/80 backdrop-blur-md p-8 rounded-lg shadow-xl w-full max-w-md pointer-events-auto"
-        variants={fadeInAndSlideUp}
-        initial="hidden"
-        animate="show"
-      >
-        <div className="text-center mb-8">
-          <h1 className="text-5xl iceberg-regular text-text-primary">
-            FAZER LOGIN
-          </h1>
-          <p className="text-text-secondary mt-2">Bem-vindo de volta</p>
-        </div>
+          <FormInput<LoginFormInputs>
+            label="Senha"
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            register={registerField}
+            error={errors.password}
+          />
 
-        <FormProvider {...methods}>
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {/* Campo Email */}
-            <FormInput<LoginFormInputs>
-              label="Email"
-              id="email"
-              type="email"
-              placeholder="seu-email@dominio.com"
-              register={registerField}
-              error={errors.email}
-            />
+          <div className="pt-4">
+            <AppButton
+              type="submit"
+              fullWidth
+              variant="primary"
+              className="iceberg-regular border-b-3 border-text-primary px-8 py-3 text-2xl font-bold shadow-lg hover:scale-105"
+              isLoading={isLoading}
+              loadingText="ENTRANDO..."
+            >
+              ENTRAR
+            </AppButton>
+          </div>
+          {authError?.formError && (
+            <StatusAlert tone="error" className="mt-4 text-center">
+              {authError.formError}
+            </StatusAlert>
+          )}
+        </form>
+      </FormProvider>
 
-            {/* Campo Senha */}
-            <FormInput<LoginFormInputs>
-              label="Senha"
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              register={registerField}
-              error={errors.password}
-            />
-
-            {/* Botão de Login */}
-            <div className="pt-4">
-              <button
-                type="submit"
-                className="w-full hover:bg-accent-primary flex justify-center items-center gap-3 bg-surface-3 text-text-primary text-2xl font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-105 transition-all border-b-3 border-text-primary iceberg-regular"
-                disabled={isLoading}
-              >
-                {isLoading ? "ENTRANDO..." : "ENTRAR"}
-              </button>
-            </div>
-            {error && (
-              <p className="text-feedback-negative text-center text-sm mt-4">
-                {error}
-              </p>
-            )}
-          </form>
-        </FormProvider>
-
-        {/* Link para Registro */}
-        <p className="text-center text-sm text-text-secondary mt-8">
-          Não tem uma conta?{" "}
-          <MotionLink
-            to="/register"
-            className="font-semibold text-accent-secondary hover:underline"
-          >
-            Crie uma conta
-          </MotionLink>
-        </p>
-      </motion.div>
-    </div>
+      <p className="mt-8 text-center text-sm text-text-secondary">
+        Não tem uma conta?{' '}
+        <MotionLink
+          to="/register"
+          className="font-semibold text-accent-secondary hover:underline"
+        >
+          Crie uma conta
+        </MotionLink>
+      </p>
+    </AuthPageLayout>
   );
 }

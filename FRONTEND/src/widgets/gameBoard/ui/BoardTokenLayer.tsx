@@ -19,6 +19,7 @@ interface BoardTokenLayerProps {
   pageSettings: PageSettings;
   getSVGPoint: (clientX: number, clientY: number) => Point;
   onTokenDragStart: (tokenId: string) => void;
+  copiedTokenId: string | null;
   onTokenDragMove: (tokenId: string, visualSVGPoint: Point) => void;
   onTokenDragEnd: (tokenId: string) => void;
   multiSelectedTokenIds: string[];
@@ -36,6 +37,7 @@ export function BoardTokenLayer({
   pageSettings,
   getSVGPoint,
   onTokenDragStart,
+  copiedTokenId,
   onTokenDragMove,
   onTokenDragEnd,
   multiSelectedTokenIds,
@@ -85,6 +87,7 @@ export function BoardTokenLayer({
             pageSettings={pageSettings}
             getSVGPoint={getSVGPoint}
             onTokenDragStart={onTokenDragStart}
+            isCopied={copiedTokenId === token.id}
             onTokenDragMove={onTokenDragMove}
             onTokenDragEnd={onTokenDragEnd}
             isMultiSelected={multiSelectedTokenIds.includes(token.id)}

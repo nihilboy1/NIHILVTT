@@ -13,5 +13,6 @@ export interface ModalState {
     dismissible?: boolean
   ) => void;
   closeModal: () => void;
-    updateModalProps: (partialProps: Record<string, unknown>) => void;
+  closeModalByName: (modalName: string) => void;
+  updateModalProps: (partialProps: Record<string, unknown>) => void;
 }

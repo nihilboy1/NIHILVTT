@@ -65,26 +65,30 @@ describe("chatCommands", () => {
       expect(rollCommand.validateArgs?.(["1d6"])).toBeNull();
       expect(rollCommand.validateArgs?.(["2d10+5"])).toBeNull();
       expect(rollCommand.validateArgs?.(["100d100-100"])).toBeNull();
+      expect(rollCommand.validateArgs?.(["2d6", "+", "3"])).toBeNull();
+      expect(rollCommand.validateArgs?.(["1D20"])).toBeNull();
+      expect(rollCommand.validateArgs?.(["2d6+1d4-3"])).toBeNull();
+      expect(rollCommand.validateArgs?.(["2d6", "+", "1d4", "-", "3"])).toBeNull();
     });
 
     test("validateArgs deve retornar mensagem de erro para notação inválida", () => {
       expect(rollCommand.validateArgs?.([])).toBe(
-        "Falta a notação dos dados. Uso: /roll <XdY>[+/-Z]"
+        "Falta a notação dos dados. Uso: /roll <XdY>[+/-NdM][+/-Z]"
       );
       expect(rollCommand.validateArgs?.(["d6"])).toBe(
-        "Notação de dados inválida. Use XdY ou XdY+/-Z (X, Y entre 1-100). Ex: 2d6+3"
+        "Notação de dados inválida. Use XdY, XdY+/-Z ou expressões como 2d6+1d4-3 (X e Y entre 1-100)."
       );
       expect(rollCommand.validateArgs?.(["1d"])).toBe(
-        "Notação de dados inválida. Use XdY ou XdY+/-Z (X, Y entre 1-100). Ex: 2d6+3"
+        "Notação de dados inválida. Use XdY, XdY+/-Z ou expressões como 2d6+1d4-3 (X e Y entre 1-100)."
       );
       expect(rollCommand.validateArgs?.(["abc"])).toBe(
-        "Notação de dados inválida. Use XdY ou XdY+/-Z (X, Y entre 1-100). Ex: 2d6+3"
+        "Notação de dados inválida. Use XdY, XdY+/-Z ou expressões como 2d6+1d4-3 (X e Y entre 1-100)."
       );
       expect(rollCommand.validateArgs?.(["1d6x"])).toBe(
-        "Notação de dados inválida. Use XdY ou XdY+/-Z (X, Y entre 1-100). Ex: 2d6+3"
+        "Notação de dados inválida. Use XdY, XdY+/-Z ou expressões como 2d6+1d4-3 (X e Y entre 1-100)."
       );
       expect(rollCommand.validateArgs?.(["1d6+"])).toBe(
-        "Notação de dados inválida. Use XdY ou XdY+/-Z (X, Y entre 1-100). Ex: 2d6+3"
+        "Notação de dados inválida. Use XdY, XdY+/-Z ou expressões como 2d6+1d4-3 (X e Y entre 1-100)."
       );
       expect(rollCommand.validateArgs?.(["0d6"])).toBe(
         "Dados inválidos. Número de dados (X) e lados (Y) devem ser entre 1 e 100."
@@ -98,12 +102,27 @@ describe("chatCommands", () => {
       expect(rollCommand.validateArgs?.(["1d101"])).toBe(
         "Dados inválidos. Número de dados (X) e lados (Y) devem ser entre 1 e 100."
       );
+      expect(rollCommand.validateArgs?.(["2d6*2"])).toBe(
+        "Notação de dados inválida. Use XdY, XdY+/-Z ou expressões como 2d6+1d4-3 (X e Y entre 1-100)."
+      );
     });
 
-    test("execute deve chamar rollAndSendMessage com a notação correta", () => {
+    test("execute deve enviar mensagem com o resultado da rolagem", () => {
       rollCommand.execute(["1d20"], mockCommandContext);
-      expect(mockRollAndSendMessage).toHaveBeenCalledTimes(1);
-      expect(mockRollAndSendMessage).toHaveBeenCalledWith("1d20");
+      expect(mockSendMessage).toHaveBeenCalledTimes(1);
+      expect(mockSendMessage.mock.calls[0][0]).toMatchObject({
+        rollName: "1d20",
+        category: "Generic",
+      });
+    });
+
+    test("execute deve normalizar notação com espaços", () => {
+      rollCommand.execute(["2d6", "+", "3"], mockCommandContext);
+      expect(mockSendMessage).toHaveBeenCalledTimes(1);
+      expect(mockSendMessage.mock.calls[0][0]).toMatchObject({
+        rollName: "2d6+3",
+        category: "Generic",
+      });
     });
   });
 
@@ -120,7 +139,7 @@ describe("chatCommands", () => {
       const message = mockSendMessage.mock.calls[0][0];
       expect(message).toContain("Comandos disponíveis:");
       expect(message).toContain(
-        "/roll - <XdY>[+/-Z] - Rola dados com a notação especificada."
+        "/roll - <XdY>[+/-NdM][+/-Z] - Rola dados com a notação especificada."
       );
       expect(message).toContain(
         "/help - [nome-do-comando] - Mostra informações sobre os comandos disponíveis."
@@ -138,7 +157,7 @@ describe("chatCommands", () => {
       expect(message).toContain(
         "Descrição: Rola dados com a notação especificada."
       );
-      expect(message).toContain("Uso: /roll <XdY>[+/-Z]");
+      expect(message).toContain("Uso: /roll <XdY>[+/-NdM][+/-Z]");
     });
 
     test("execute deve mostrar ajuda para um comando específico usando alias", () => {

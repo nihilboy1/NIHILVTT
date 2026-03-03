@@ -4,7 +4,7 @@ import { ProcessedEffect } from '../../../types/effectTypes';
 import { cn } from '@/shared/lib/utils/cn';
 import { characterCardVariants, selectionBadgeVariants } from '@/features/characterBuilder/styles';
 import { Badge } from '../../ui/Badge';
-import { useEffectsProcessor } from '@/features/characterBuilder/model/hooks/useEffectsProcessor';
+import { useCharacterBuilderEffectsProcessor } from '@/features/characterBuilder/model/context/effectsProcessorContext';
 import { EffectSection } from './components/EffectSection';
 import { AbilityScoreControls } from './EffectControls/AbilityScoreControls';
 import { FeatControls } from './EffectControls/FeatControls';
@@ -28,7 +28,7 @@ export function OriginOptionCard({
   onEffectsProcessed,
 }: OriginOptionCardProps) {
   const { name, description, id } = option;
-  const { processOriginEffects, areAllEffectsSelected } = useEffectsProcessor();
+  const { processOriginEffects, areAllEffectsSelected } = useCharacterBuilderEffectsProcessor();
 
   // Busca dados da origem e processa efeitos
   const originData = getOriginById(id);

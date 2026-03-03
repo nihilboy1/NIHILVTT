@@ -1,18 +1,41 @@
 import { GiAncientSword } from 'react-icons/gi';
+import { useParams } from 'react-router-dom';
 import { useCharactersStore } from '@/entities/character/model/store';
 import { CharacterCard } from '@/entities/character/ui/CharacterCard';
+import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
+import { sendGameDuplicateCharacter, sendGameRemoveCharacter } from '@/features/game/model/gameSessionApi';
 import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
 
 import { useTokenStore } from '../../../entities/token/model/store/tokenStore';
 
 export function CharactersPanel() {
-  const { characters, deleteCharacter } = useCharactersStore();
+  const { gameId } = useParams<{ gameId: string }>();
+  const { characters, deleteCharacter, duplicateCharacter } = useCharactersStore();
   const { tokenInstanceCounts } = useTokenStore();
   const { openModal, closeModal } = useSessionModalStore();
+
+  const handleDuplicateCharacter = async (characterId: string) => {
+    const parsedGameId = Number(gameId);
+    const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
+
+    if (!isValidGameId) {
+      duplicateCharacter(characterId);
+      return;
+    }
+
+    try {
+      const event = await sendGameDuplicateCharacter(parsedGameId, characterId);
+      applyGameSessionEvent(event);
+    } catch {
+      console.warn('Falha ao duplicar personagem da sessão.');
+    }
+  };
 
   const handleDeleteCharacter = (characterId: string) => {
     const characterToDelete = characters.find((char) => char.id === characterId);
     if (!characterToDelete) return;
+    const parsedGameId = Number(gameId);
+    const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
 
     openModal('confirmationModal', {
       title: 'Confirmar Exclusão',
@@ -23,9 +46,20 @@ export function CharactersPanel() {
       } instâncias no tabuleiro? Esta ação não pode ser desfeita.`,
       confirmText: 'Confirmar',
       cancelText: 'Cancelar',
-      onConfirm: () => {
-        deleteCharacter(characterId);
-        closeModal();
+      onConfirm: async () => {
+        if (!isValidGameId) {
+          deleteCharacter(characterId);
+          closeModal();
+          return;
+        }
+
+        try {
+          const event = await sendGameRemoveCharacter(parsedGameId, characterId);
+          applyGameSessionEvent(event);
+          closeModal();
+        } catch {
+          console.warn('Falha ao remover personagem da sessão.');
+        }
       },
       onCancel: () => {
         closeModal();
@@ -89,6 +123,7 @@ export function CharactersPanel() {
                 character={character}
                 instanceCount={tokenInstanceCounts.get(character.id) || 0}
                 openSheetModal={() => openModal('sheet', { characterId: character.id })}
+                onDuplicate={handleDuplicateCharacter}
                 onDelete={handleDeleteCharacter}
               />
             ))}

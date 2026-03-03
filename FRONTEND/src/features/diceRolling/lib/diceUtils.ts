@@ -1,11 +1,15 @@
 import { DiceFormula, Roll, DiceRollDetails, RollCategory } from "@/shared/api/types";
 
+const MAX_DICE_COUNT = 100;
+const MAX_DICE_SIDES = 100;
+const MAX_TOTAL_DICE_ROLLS = 500;
+
 /**
  * Parses a dice formula string (e.g., "1d20+5", "2d6-1") into its components.
  * Returns an object with dice parts and a modifier.
  */
 interface ParsedDiceFormula {
-  diceParts: { count: number; sides: number }[];
+  diceParts: { count: number; sides: number; sign: 1 | -1 }[];
   modifier: number;
 }
 
@@ -14,28 +18,65 @@ export function parseDiceFormula(formula: DiceFormula): ParsedDiceFormula {
     return { diceParts: [], modifier: formula };
   }
 
-  const diceParts: { count: number; sides: number }[] = [];
-  let modifier = 0;
+  const normalizedFormula = formula.replace(/\s+/g, '').toLowerCase();
+  if (!normalizedFormula) {
+    throw new Error(`Invalid dice formula: ${formula}`);
+  }
 
-  // Regex para encontrar partes de dados (ex: 1d20, 2d6) e modificadores (+5, -3)
-  const parts = formula.match(/(\d+d\d+)|([+-]?\d+)/g);
+  const diceParts: { count: number; sides: number; sign: 1 | -1 }[] = [];
+  let modifier = 0;
+  let totalDiceRolls = 0;
+
+  // Expressao aditiva: termos separados apenas por +/-, cada termo sendo NdM ou inteiro.
+  const parts = normalizedFormula.match(/[+-]?[^+-]+/g);
 
   if (!parts) {
     throw new Error(`Invalid dice formula: ${formula}`);
   }
+  if (parts.join('') !== normalizedFormula) {
+    throw new Error(`Invalid dice formula: ${formula}`);
+  }
 
   parts.forEach(part => {
-    if (part.includes('d')) {
-      const [countStr, sidesStr] = part.split('d');
-      const count = parseInt(countStr, 10);
-      const sides = parseInt(sidesStr, 10);
-      if (isNaN(count) || isNaN(sides) || count <= 0 || sides <= 0) {
+    const sign: 1 | -1 = part.startsWith('-') ? -1 : 1;
+    const unsignedPart = part.startsWith('+') || part.startsWith('-') ? part.slice(1) : part;
+
+    if (!unsignedPart) {
+      throw new Error(`Invalid dice formula: ${formula}`);
+    }
+
+    if (unsignedPart.includes('d')) {
+      const dicePartPattern = /^\d+d\d+$/;
+      if (!dicePartPattern.test(unsignedPart)) {
         throw new Error(`Invalid dice part in formula: ${part}`);
       }
-      diceParts.push({ count, sides });
+
+      const [countStr, sidesStr] = unsignedPart.split('d');
+      const count = parseInt(countStr, 10);
+      const sides = parseInt(sidesStr, 10);
+      if (
+        isNaN(count) ||
+        isNaN(sides) ||
+        count < 1 ||
+        count > MAX_DICE_COUNT ||
+        sides < 1 ||
+        sides > MAX_DICE_SIDES
+      ) {
+        throw new Error(`Invalid dice part in formula: ${part}`);
+      }
+      totalDiceRolls += count;
+      if (totalDiceRolls > MAX_TOTAL_DICE_ROLLS) {
+        throw new Error(
+          `Dice formula exceeds the maximum total rolls (${MAX_TOTAL_DICE_ROLLS}): ${formula}`,
+        );
+      }
+      diceParts.push({ count, sides, sign });
     } else {
-      // É um modificador
-      modifier += parseInt(part, 10);
+      const modifierPattern = /^\d+$/;
+      if (!modifierPattern.test(unsignedPart)) {
+        throw new Error(`Invalid dice formula: ${formula}`);
+      }
+      modifier += sign * parseInt(unsignedPart, 10);
     }
   });
 
@@ -68,14 +109,15 @@ export function performDiceRoll(
   let totalDiceResult = 0;
   let naturalRollResult: number | undefined;
 
-  diceParts.forEach(({ count, sides }) => {
+  diceParts.forEach(({ count, sides, sign }) => {
     for (let i = 0; i < count; i++) {
       const result = rollSingleDie(sides);
-      rolls.push({ dice: `d${sides}`, result });
-      totalDiceResult += result;
+      const signedResult = sign * result;
+      rolls.push({ dice: `d${sides}`, result: signedResult });
+      totalDiceResult += signedResult;
 
       // Captura o resultado natural do primeiro d20 rolado
-      if (sides === 20 && naturalRollResult === undefined) {
+      if (sides === 20 && naturalRollResult === undefined && sign > 0) {
         naturalRollResult = result;
       }
     }

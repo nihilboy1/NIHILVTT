@@ -23,7 +23,7 @@ describe("TabButton", () => {
     render(<TabButton {...defaultProps} />);
     expect(screen.getByRole("tab", { name: "Chat" })).toBeInTheDocument();
     expect(screen.getByText("Chat")).toBeInTheDocument();
-    expect(screen.getByTestId("dice-icon")).toBeInTheDocument(); // Assumindo que DiceIcon tem data-testid="dice-icon"
+    expect(screen.getByAltText("Dado de vinte lados")).toBeInTheDocument();
   });
 
   test("deve ter os atributos ARIA corretos", () => {
@@ -45,7 +45,7 @@ describe("TabButton", () => {
     render(<TabButton {...defaultProps} isActive={true} />);
     const button = screen.getByRole("tab", { name: "Chat" });
     expect(button).toHaveClass("border-accent-primary");
-    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(button).toHaveAttribute("aria-selected", "true");
   });
 
   // Estado Inativo (isActive={false})
@@ -54,7 +54,7 @@ describe("TabButton", () => {
     const button = screen.getByRole("tab", { name: "Chat" });
     expect(button).toHaveClass("bg-surface-0");
     expect(button).toHaveClass("hover:bg-surface-3");
-    expect(button).toHaveAttribute("aria-pressed", "false");
+    expect(button).toHaveAttribute("aria-selected", "false");
   });
 
   // Interação de Clique

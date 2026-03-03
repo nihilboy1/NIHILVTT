@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-
-import { type Character } from "@/entities/character/model/schemas/character.schema";
+import { useParams } from "react-router-dom";
 import { useBoardZoomStore } from "@/features/boardZoom/model/store"; // Import the new zoom store
 import { useSessionModalStore } from "@/features/modalManager/model/sessionModalStore";
+import { applyGameSessionEvent } from "@/features/game/model/gameSessionEventHandlers";
+import { sendGameCreateToken, sendGameMoveToken } from "@/features/game/model/gameSessionApi";
+import { useGameStore } from "@/features/game/model/gameStore";
+import { useAuthStore } from "@/features/auth/model/authStore";
 
 import { useBoardStore } from "../../../entities/board/model/store";
 import { parseCharacterSize } from "../../../entities/character/lib/utils/characterUtils";
@@ -13,11 +16,10 @@ import { useRuler } from "../../../features/boardRuler/model/hooks/useRuler";
 import { useBoardSettingsStore } from "../../../features/boardSettings/model/store";
 import { useCharacterDrop } from "../../../features/characterDropOnBoard/model/hooks/useCharacterDrop";
 import { useUIStore } from "../../../features/layoutControls/model/store";
-import { DraggingVisuals, Point, Token } from "../../../shared/api/types";
+import { PendingAttackSelection, Point, Token } from "../../../shared/api/types";
 import { useGameBoardEvents } from "../model/hooks/useGameBoardEvents";
 
 import { GameBoardContent } from "./GameBoardContent";
-import { HPModalRenderer } from "./HPModalRenderer";
 
 
 
@@ -25,56 +27,87 @@ import { HPModalRenderer } from "./HPModalRenderer";
 
 interface GameBoardProps {
   onBackgroundClick?: () => void;
-  draggingVisuals: DraggingVisuals;
+  copiedTokenId: string | null;
+  pasteTargetCell: Point | null;
+  pendingAttack: PendingAttackSelection | null;
   onTokenDragStart: (tokenId: string) => void;
   onTokenDragMove: (tokenId: string, visualSVGPoint: Point) => void;
   onTokenDragEnd: (tokenId: string) => void;
   multiSelectedTokenIds: string[];
   onSetMultiSelectedTokenIds: (ids: string[]) => void;
   onClearMultiSelection: () => void;
-  onHPChange: (tokenId: string, newHP: number) => void;
-  onRemoveFromBoard: (tokenId: string) => void;
-  onMakeIndependent: (tokenId: string) => void;
+  onBoardPointerMove: (svgPoint: Point) => void;
+  onBoardPointerLeave: () => void;
 }
 
 export function GameBoard({
   onBackgroundClick,
-  draggingVisuals,
+  copiedTokenId,
+  pasteTargetCell,
+  pendingAttack,
   onTokenDragStart,
   onTokenDragMove,
   onTokenDragEnd,
   multiSelectedTokenIds,
   onSetMultiSelectedTokenIds,
   onClearMultiSelection,
-  onHPChange,
-  onRemoveFromBoard,
-  onMakeIndependent,
+  onBoardPointerMove,
+  onBoardPointerLeave,
 }: GameBoardProps) {
+  const { gameId } = useParams<{ gameId: string }>();
   const { characters } = useCharactersStore();
-  const { tokensOnBoard, addToken, updateTokenPosition } = useTokenStore();
+  const { tokensOnBoard, updateTokenPosition } = useTokenStore();
   const { gridSettings, pageSettings, rulerPlacementMode, rulerPersists } =
     useBoardSettingsStore();
   const { activeTool } = useUIStore();
   const { openModal } = useSessionModalStore();
+  const currentGame = useGameStore((state) => state.currentGame);
+  const currentUserId = useAuthStore((state) => state.user?.id ?? null);
+
+  const handleTokenMove = useCallback(
+    (tokenId: string, newPosition: Point) => {
+      const parsedGameId = Number(gameId);
+      const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
+      if (!isValidGameId) {
+        return;
+      }
+
+      updateTokenPosition(tokenId, newPosition);
+      void sendGameMoveToken(parsedGameId, tokenId, newPosition.x, newPosition.y)
+        .then((event) => {
+          applyGameSessionEvent(event);
+        })
+        .catch(() => {
+          console.warn('Falha ao sincronizar movimento de token com o servidor.');
+        });
+    },
+    [gameId, updateTokenPosition],
+  );
+
+  const handleTokenCreate = useCallback(
+    (characterId: string, position: Point) => {
+      const parsedGameId = Number(gameId);
+      const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
+      if (!isValidGameId) {
+        return;
+      }
+
+      void sendGameCreateToken(parsedGameId, characterId, 'default-scene', position.x, position.y)
+        .then((event) => {
+          applyGameSessionEvent(event);
+        })
+        .catch(() => {
+          console.warn('Falha ao criar token no servidor.');
+        });
+    },
+    [gameId],
+  );
 
   const svgRef = useRef<SVGSVGElement>(null);
   const [isPageAndGridSettingsModalOpen, setIsPageAndGridSettingsModalOpen] =
     useState(false);
-
-  // Estado para controlar o HPModal
-  const [activeHPModalTokenId, setActiveHPModalTokenId] = useState<
-    string | null
-  >(null);
-  const hpModalAnchorRectRef = useRef<DOMRect | null>(null);
-
-  const onHPModalAnchorShouldUpdate = useCallback(
-    (tokenId: string | null, newScreenRect: DOMRect | null) => {
-      if (activeHPModalTokenId === tokenId) {
-        hpModalAnchorRectRef.current = newScreenRect;
-      }
-    },
-    [activeHPModalTokenId]
-  );
+  const canManageBoardSettings =
+    currentGame != null && currentUserId != null && currentGame.owner.id === currentUserId;
 
   const {
     viewBox,
@@ -131,19 +164,12 @@ export function GameBoard({
   const handleSetMultiSelectedTokenIds = useCallback(
     (ids: string[]) => {
       onSetMultiSelectedTokenIds(ids);
-
-      if (ids.length === 1) {
-        setActiveHPModalTokenId(ids[0]);
-      } else {
-        setActiveHPModalTokenId(null);
-      }
     },
     [onSetMultiSelectedTokenIds]
   );
 
   const handleClearMultiSelection = useCallback(() => {
     onClearMultiSelection();
-    setActiveHPModalTokenId(null);
   }, [onClearMultiSelection]);
 
   const {
@@ -166,7 +192,7 @@ export function GameBoard({
     characters,
     gridSettings,
     pageSettings,
-    addToken,
+    addToken: handleTokenCreate,
   });
 
   const handlePanMoveWithZoom = useCallback(
@@ -207,87 +233,6 @@ export function GameBoard({
     },
     [openModal, tokensOnBoard]
   );
-
-  const getTokenScreenRect = useCallback(
-    (
-      token: Token,
-      character: Character | undefined,
-      liveSVGPoint?: Point
-    ): DOMRect | null => {
-      if (!svgRef.current || !character) return null;
-
-      const svgGlobalRect = svgRef.current.getBoundingClientRect();
-      const [sizeMultiplierX, sizeMultiplierY] = parseCharacterSize(
-        character.size
-      );
-
-      let tokenWorldX, tokenWorldY;
-      if (liveSVGPoint) {
-        tokenWorldX = liveSVGPoint.x;
-        tokenWorldY = liveSVGPoint.y;
-      } else {
-        tokenWorldX = token.position.x * gridSettings.visualCellSize;
-        tokenWorldY = token.position.y * gridSettings.visualCellSize;
-      }
-
-      const tokenWorldWidth = sizeMultiplierX * gridSettings.visualCellSize;
-      const tokenWorldHeight = sizeMultiplierY * gridSettings.visualCellSize;
-
-      const screenX =
-        (tokenWorldX - viewBox.x) * zoomLevel + svgGlobalRect.left;
-      const screenY = (tokenWorldY - viewBox.y) * zoomLevel + svgGlobalRect.top;
-      const screenWidth = tokenWorldWidth * zoomLevel;
-      const screenHeight = tokenWorldHeight * zoomLevel;
-
-      return {
-        x: screenX,
-        y: screenY,
-        width: screenWidth,
-        height: screenHeight,
-        top: screenY,
-        right: screenX + screenWidth,
-        bottom: screenY + screenHeight,
-        left: screenX,
-        toJSON: () => ({}),
-      } as DOMRect;
-    },
-    [viewBox, zoomLevel, gridSettings.visualCellSize, svgRef]
-  );
-
-  useEffect(() => {
-    if (activeHPModalTokenId && onHPModalAnchorShouldUpdate) {
-      const tokenToUpdate = tokensOnBoard.find(
-        (t: Token) => t.id === activeHPModalTokenId
-      );
-      if (tokenToUpdate) {
-        const character = characters.find(
-          (c) => c.id === tokenToUpdate.characterId
-        );
-        let livePointForCalc: Point | undefined = undefined;
-        if (
-          draggingVisuals.tokenId === activeHPModalTokenId &&
-          draggingVisuals.visualSVGPoint
-        ) {
-          livePointForCalc = draggingVisuals.visualSVGPoint;
-        }
-        const newScreenRect = getTokenScreenRect(
-          tokenToUpdate,
-          character,
-          livePointForCalc
-        );
-        onHPModalAnchorShouldUpdate(activeHPModalTokenId, newScreenRect);
-      }
-    }
-  }, [
-    viewBox,
-    zoomLevel,
-    activeHPModalTokenId,
-    tokensOnBoard,
-    characters,
-    draggingVisuals,
-    onHPModalAnchorShouldUpdate,
-    getTokenScreenRect,
-  ]);
 
   let multiSelectBoundingBox = null;
   if (multiSelectedTokenIds.length > 0) {
@@ -344,33 +289,26 @@ export function GameBoard({
         handleBoardTokenDoubleClick={handleBoardTokenDoubleClick}
         isPageAndGridSettingsModalOpen={isPageAndGridSettingsModalOpen}
         setIsPageAndGridSettingsModalOpen={setIsPageAndGridSettingsModalOpen}
+        canManageBoardSettings={canManageBoardSettings}
         multiSelectBoundingBox={multiSelectBoundingBox}
         onTokenDragStart={onTokenDragStart}
+        copiedTokenId={copiedTokenId}
+        pasteTargetCell={pasteTargetCell}
+        pendingAttack={pendingAttack}
         onTokenDragMove={onTokenDragMove}
         onTokenDragEnd={onTokenDragEnd}
         multiSelectedTokenIds={multiSelectedTokenIds}
         onSetMultiSelectedTokenIds={handleSetMultiSelectedTokenIds}
+        onBoardPointerMove={onBoardPointerMove}
+        onBoardPointerLeave={onBoardPointerLeave}
         characters={characters}
         tokensOnBoard={tokensOnBoard}
         gridSettings={gridSettings}
         pageSettings={pageSettings}
         activeTool={activeTool}
-        updateTokenPosition={updateTokenPosition}
+        updateTokenPosition={handleTokenMove}
         marqueeSelection={marqueeSelection}
         rulerPath={rulerPath}
-      />
-      <HPModalRenderer
-        activeHPModalTokenId={activeHPModalTokenId}
-        onHPModalAnchorShouldUpdate={onHPModalAnchorShouldUpdate}
-        onHPChange={onHPChange}
-        onRemoveFromBoard={onRemoveFromBoard}
-        onMakeIndependent={onMakeIndependent}
-        tokensOnBoard={tokensOnBoard}
-        characters={characters}
-        getTokenScreenRect={getTokenScreenRect}
-        zoomLevel={zoomLevel}
-        viewBox={viewBox}
-        gridSettings={gridSettings}
       />
     </>
   );

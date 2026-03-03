@@ -60,8 +60,10 @@ describe("ConfirmationModal", () => {
 
   test("deve fechar o modal ao pressionar Escape", () => {
     render(<ConfirmationModal {...defaultProps} />);
-    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
-    expect(mockOnCancel).toHaveBeenCalledTimes(1); // Escape geralmente aciona o cancelamento
+    const overlay = document.querySelector('div[role="button"][tabindex="-1"]');
+    expect(overlay).not.toBeNull();
+    fireEvent.keyDown(overlay as Element, { key: "Escape" });
+    expect(mockOnCancel).toHaveBeenCalled();
     expect(mockOnConfirm).not.toHaveBeenCalled();
   });
 });

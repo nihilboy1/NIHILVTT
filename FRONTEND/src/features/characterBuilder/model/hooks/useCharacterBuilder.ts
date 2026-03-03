@@ -3,10 +3,14 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
+import { PlayerCharacter } from '@/entities/character/model/schemas/character.schema';
+import { useCharactersStore } from '@/entities/character/model/store';
 import { Attributes } from '@/shared/constants/characterData/attributes';
 import { DEFAULT_ATTRIBUTES } from '@/shared/constants/characterData/attributes';
+import { CharacterTypeEnum } from '@nihilvtt/datamodeling/primitives';
 
 import { useEffectsProcessor } from './useEffectsProcessor';
+import { buildPlayerCharacterFromBuilder } from '../../lib/buildPlayerCharacterFromBuilder';
 import { Step, STEPS } from '../../constants/steps';
 import {
   CharacterBuilderFormData,
@@ -17,6 +21,7 @@ import {
 
 export function useCharacterBuilder() {
   const [currentStep, setCurrentStep] = useState<Step>('species');
+  const { addCharacter } = useCharactersStore();
 
   // Hook para processar efeitos das origens e talentos
   const effectsProcessor = useEffectsProcessor();
@@ -41,15 +46,16 @@ export function useCharacterBuilder() {
   });
 
   const {
-    handleSubmit,
+    watch,
     trigger,
     getValues,
     setValue,
+    reset,
     formState: { errors },
   } = methods;
 
-  // Obtém todas as seleções atuais do formulário
-  const selections = getValues();
+  // Obtém seleções reativas do formulário (evita reset visual ao trocar de etapa)
+  const selections = watch();
 
   // Verifica se o passo atual é válido de acordo com os requisitos específicos
   const isCurrentStepValid = () => {
@@ -236,11 +242,60 @@ export function useCharacterBuilder() {
     }
   };
 
-  const handleFinish = handleSubmit((data) => {
-    // Aqui você pode fazer algo com os dados finais do formulário
-    console.log('Character data completo:', data);
-    return data;
-  });
+  const handleFinish = async (
+    persistCharacter?: (character: Omit<PlayerCharacter, 'id' | 'type'>) => Promise<boolean> | boolean,
+  ): Promise<boolean> => {
+    const isValid = await trigger();
+    if (!isValid) {
+      console.warn('[CharacterBuilder] Finalização bloqueada por validação.', {
+        errors: methods.formState.errors,
+      });
+      return false;
+    }
+
+    const data = getValues();
+    console.info('[CharacterBuilder] Dados válidos para finalização.', {
+      step: currentStep,
+      formData: data,
+      effectChoices: effectsProcessor.effectChoices,
+    });
+    const playerCharacterData = buildPlayerCharacterFromBuilder(data, effectsProcessor.effectChoices);
+    console.info('[CharacterBuilder] Personagem mapeado para persistência.', {
+      characterPreview: playerCharacterData,
+    });
+    if (persistCharacter) {
+      const persisted = await persistCharacter(playerCharacterData);
+      if (!persisted) {
+        console.error('[CharacterBuilder] Falha ao persistir personagem por pipeline externo.');
+        return false;
+      }
+      console.info('[CharacterBuilder] Personagem persistido por pipeline externo.');
+    } else {
+      addCharacter({
+        ...playerCharacterData,
+        type: CharacterTypeEnum.enum.Player,
+      });
+      console.info('[CharacterBuilder] Personagem persistido localmente no store.');
+    }
+
+    effectsProcessor.resetEffectChoices();
+    reset({
+      species: '',
+      origin: '',
+      feat: {},
+      class: '',
+      attributes: DEFAULT_ATTRIBUTES as unknown as Record<string, number>,
+      'personal-info': {
+        name: '',
+        lore: '',
+        tokenUrl: '',
+        splashartUrl: '',
+      },
+    });
+    setCurrentStep('species');
+
+    return true;
+  };
 
   const canGoNext = isCurrentStepValid();
   const canGoPrevious = getCurrentStepIndex() > 0;

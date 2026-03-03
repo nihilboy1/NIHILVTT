@@ -23,9 +23,11 @@ export const registerSchema = z
 export type RegisterFormInputs = z.infer<typeof registerSchema>;
 
 export const userSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   name: z.string(),
-  email: z.email(),
+  email: z.string().email(),
+  role: z.string().optional(),
+  avatarUrl: z.string().nullable().optional(),
   password: z.string().optional(),
 });
 

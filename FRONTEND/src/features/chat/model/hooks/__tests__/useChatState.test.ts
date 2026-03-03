@@ -6,12 +6,12 @@ import { DEFAULTS } from '@/shared/config/constants';
 import { useChatStore } from '../../store';
 
 // Mock para generateUniqueId para garantir IDs consistentes nos testes
-jest.mock('../../../../shared/lib/utils/id/idUtils', () => ({
+jest.mock('@/shared/lib/utils/id/idUtils', () => ({
   generateUniqueId: jest.fn(() => 'mock-id'),
 }));
 
 // Mock para performDiceRoll para controlar o resultado das rolagens
-jest.mock('@/utils/dice/diceUtils', () => ({
+jest.mock('@/features/diceRolling/lib/diceUtils', () => ({
   performDiceRoll: jest.fn((formula: string, rollName: string, category: RollCategory) => {
     if (formula === '1d6') {
       return { rollName, category, parts: [{ dice: 'd6', result: 3 }], finalResult: 3 };
@@ -26,6 +26,7 @@ jest.mock('@/utils/dice/diceUtils', () => ({
 describe('useChatStore', () => {
   // Limpa os mocks antes de cada teste
   beforeEach(() => {
+    useChatStore.setState(useChatStore.getInitialState(), true);
     jest.clearAllMocks();
   });
 

@@ -1,13 +1,14 @@
 import { SidebarTab } from '../../../shared/api/types';
-import { ChatBubbleIcon, IdentificationCardIcon } from '../../../shared/ui/Icons';
+import { BookIcon, ChatBubbleIcon, IdentificationCardIcon, PageConfigIcon } from '../../../shared/ui/Icons';
 import { TabButton } from '../../../shared/ui/TabButton';
 
 interface SidebarTabsProps {
   activeSidebarTab: SidebarTab;
+  isGameMaster: boolean;
   setActiveSidebarTab: (tab: SidebarTab) => void;
 }
 
-export function SidebarTabs({ activeSidebarTab, setActiveSidebarTab }: SidebarTabsProps) {
+export function SidebarTabs({ activeSidebarTab, isGameMaster, setActiveSidebarTab }: SidebarTabsProps) {
   return (
     <>
       <TabButton
@@ -23,6 +24,22 @@ export function SidebarTabs({ activeSidebarTab, setActiveSidebarTab }: SidebarTa
         icon={<IdentificationCardIcon />}
         isActive={activeSidebarTab === SidebarTab.CHARACTERS}
         onClick={() => setActiveSidebarTab(SidebarTab.CHARACTERS)}
+      />
+      {isGameMaster ? (
+        <TabButton
+          tab={SidebarTab.COMPENDIUM}
+          label="Biblioteca"
+          icon={<BookIcon />}
+          isActive={activeSidebarTab === SidebarTab.COMPENDIUM}
+          onClick={() => setActiveSidebarTab(SidebarTab.COMPENDIUM)}
+        />
+      ) : null}
+      <TabButton
+        tab={SidebarTab.SETTINGS}
+        label="Configs"
+        icon={<PageConfigIcon />}
+        isActive={activeSidebarTab === SidebarTab.SETTINGS}
+        onClick={() => setActiveSidebarTab(SidebarTab.SETTINGS)}
       />
     </>
   );

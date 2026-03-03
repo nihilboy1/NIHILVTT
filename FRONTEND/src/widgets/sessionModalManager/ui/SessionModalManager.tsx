@@ -1,6 +1,11 @@
 // src/widgets/sessionModalManager/ui/SessionModalManager.tsx
 
+import { Suspense, lazy } from 'react';
+
 import { useCharactersStore } from '@/entities/character/model/store';
+import { useAuthStore } from '@/features/auth/model/authStore';
+import { useGameStore } from '@/features/game/model/gameStore';
+import { useUIStore } from '@/features/layoutControls/model/store';
 
 import { ModalEntry } from '@/features/modalManager/model/baseModalConfig';
 import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
@@ -11,29 +16,38 @@ import { SimpleNameModal } from '../../../features/characterCreation/ui/SimpleNa
 import { ActionEditModal } from '../../../features/characterEditAction/ui/ActionEditModal';
 import { HPControlModal } from '../../../features/characterUpdateHp/ui/HPControlModal';
 import { ConfirmationModal } from '../../../shared/ui/ConfirmationModal';
-import { SheetModal } from '../../sheetModal/ui/SheetModal';
-import { CharacterBuilderModal } from '@/features/characterBuilder/components/ui/CharacterBuilderModal';
+import { Spinner } from '../../../shared/ui/Spinner';
+
+const SheetModal = lazy(async () => import('../../sheetModal/ui/SheetModal').then((module) => ({
+  default: module.SheetModal,
+})));
+const CharacterBuilderModal = lazy(async () =>
+  import('@/features/characterBuilder/components/ui/CharacterBuilderModal').then((module) => ({
+    default: module.CharacterBuilderModal,
+  })));
 
 // 1. Novas Importações: Trocamos os tipos manuais pelo CharacterSchema do Zod.
 
 interface SessionModalManagerProps {
-  handleHPChangeFromModal: (tokenId: string, newHP: number) => void;
-  handleRemoveInstanceFromBoard: (tokenId: string) => void;
-  handleMakeInstanceIndependent: (tokenId: string) => void;
+  handleHPChangeFromModal: (tokenId: string, mode: 'damage' | 'heal', amount: number) => void;
+  handleTempHpChangeFromModal: (tokenId: string, amount: number) => void;
 }
 
 export function SessionModalManager({
   handleHPChangeFromModal,
-  handleRemoveInstanceFromBoard,
-  handleMakeInstanceIndependent,
+  handleTempHpChangeFromModal,
 }: SessionModalManagerProps) {
   const { modalStack, closeModal } = useSessionModalStore();
-  // `characters` agora é do tipo `CharacterSchema[]`
   const { characters } = useCharactersStore();
   const { tokensOnBoard } = useTokenStore();
+  const currentGame = useGameStore((state) => state.currentGame);
+  const user = useAuthStore((state) => state.user);
+  const isRightSidebarVisible = useUIStore((state) => state.isRightSidebarVisible);
+  const canModifyHp = currentGame?.owner.id === user?.id;
 
   const topModal = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
-  const shouldRenderOverlay = topModal && topModal.name !== 'hpControl';
+  const shouldRenderOverlay =
+    topModal && topModal.name !== 'hpControl' && topModal.name !== 'sheet';
 
   return (
     <>
@@ -75,13 +89,24 @@ export function SessionModalManager({
 
           case 'sheet':
             return (
-              <SheetModal
+              <Suspense
                 key={props.characterId as string}
-                characterId={props.characterId as string}
-                isOpen={true}
-                onClose={closeModal}
-                zIndex={1000 + index} // Character sheet zIndex (higher than overlay)
-              />
+                fallback={(
+                  <div
+                    className="fixed inset-0 flex items-center justify-center"
+                    style={{ zIndex: 1000 + index }}
+                  >
+                    <Spinner variant="mini" />
+                  </div>
+                )}
+              >
+                <SheetModal
+                  characterId={props.characterId as string}
+                  isOpen={true}
+                  onClose={closeModal}
+                  zIndex={1000 + index} // Character sheet zIndex (higher than overlay)
+                />
+              </Suspense>
             );
 
           case 'actionEdit': {
@@ -98,12 +123,23 @@ export function SessionModalManager({
 
           case 'characterbuilderModal': {
             return (
-              <CharacterBuilderModal
+              <Suspense
                 key={modalEntry.id}
-                isOpen={true}
-                onClose={closeModal}
-                zIndex={1500 + index}
-              />
+                fallback={(
+                  <div
+                    className="fixed inset-0 flex items-center justify-center"
+                    style={{ zIndex: 1500 + index }}
+                  >
+                    <Spinner variant="mini" />
+                  </div>
+                )}
+              >
+                <CharacterBuilderModal
+                  isOpen={true}
+                  onClose={closeModal}
+                  zIndex={1500 + index}
+                />
+              </Suspense>
             );
           }
 
@@ -115,19 +151,17 @@ export function SessionModalManager({
 
             return (
               props.tokenId &&
-              characterForHPModal &&
-              props.anchorPoint && (
+              characterForHPModal && (
                 <HPControlModal
                   key={modalEntry.id}
                   tokenId={props.tokenId as string}
-                  token={selectedTokenForHP || null}
                   character={characterForHPModal}
-                  anchorPoint={props.anchorPoint as { x: number; y: number }}
                   isOpen={isTopModal}
                   onClose={closeModal}
                   onHPChange={handleHPChangeFromModal}
-                  onRemoveFromBoard={handleRemoveInstanceFromBoard}
-                  onMakeIndependent={handleMakeInstanceIndependent}
+                  onTempHpChange={handleTempHpChangeFromModal}
+                  canModifyHp={canModifyHp}
+                  rightSidebarVisible={isRightSidebarVisible}
                   zIndex={100 + index} // Default modal zIndex
                 />
               )

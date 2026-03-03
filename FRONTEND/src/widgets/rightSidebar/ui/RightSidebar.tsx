@@ -1,13 +1,35 @@
+import { useEffect } from 'react';
+
+import type { Game } from '@/entities/game/model/schemas/game.schema';
+import { useAuthStore } from '@/features/auth/model/authStore';
 import { useUIStore } from '@/features/layoutControls/model/store';
+import { SidebarTab } from '@/shared/api/types';
 
 import { ChevronRightIcon } from '../../../shared/ui/Icons';
 
 import { RightSidebarContent } from './RightSidebarContent';
 import { SidebarTabs } from './SidebarTabs';
 
-// a barra lateral direita como um todo. botões de abas e as condicionais para exibir os painéis de chat e tokens
-export function RightSidebar() {
+type RightSidebarProps = {
+  currentGame: Game | null;
+  isLeavingGame: boolean;
+  onLeaveGame: () => void;
+};
+
+export function RightSidebar({
+  currentGame,
+  isLeavingGame,
+  onLeaveGame,
+}: RightSidebarProps) {
+  const user = useAuthStore((state) => state.user);
   const { activeSidebarTab, setActiveSidebarTab, setIsRightSidebarVisible } = useUIStore();
+  const isGameMaster = Boolean(currentGame && user && currentGame.owner.id === user.id);
+
+  useEffect(() => {
+    if (!isGameMaster && activeSidebarTab === SidebarTab.COMPENDIUM) {
+      setActiveSidebarTab(SidebarTab.CHAT);
+    }
+  }, [activeSidebarTab, isGameMaster, setActiveSidebarTab]);
 
   return (
     <div
@@ -26,11 +48,18 @@ export function RightSidebar() {
         </button>
         <SidebarTabs
           activeSidebarTab={activeSidebarTab}
+          isGameMaster={isGameMaster}
           setActiveSidebarTab={setActiveSidebarTab}
         />
       </header>
 
-      <RightSidebarContent activeSidebarTab={activeSidebarTab} />
+      <RightSidebarContent
+        activeSidebarTab={activeSidebarTab}
+        currentGame={currentGame}
+        isGameMaster={isGameMaster}
+        isLeavingGame={isLeavingGame}
+        onLeaveGame={onLeaveGame}
+      />
     </div>
   );
 }

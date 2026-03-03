@@ -5,9 +5,9 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useAuthStore } from '@/features/auth/model/authStore';
+import { AppButton } from '@/shared/ui/AppButton';
 import { FormInput } from '@/shared/ui/FormInput';
 import { Modal } from '@/shared/ui/Modal';
-import { Spinner } from '@/shared/ui/Spinner';
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -29,11 +29,10 @@ const changePasswordSchema = z
 type ChangePasswordFormInputs = z.infer<typeof changePasswordSchema>;
 
 function ChangePasswordModal({ isOpen, onClose, zIndex }: ChangePasswordModalProps) {
-  const { error: authError, updateProfile } = useAuthStore();
+  const { authError, clearAuthError, updateProfile } = useAuthStore();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSpinnerForced, setShowSpinnerForced] = useState(false);
 
   const methods = useForm<ChangePasswordFormInputs>({
     resolver: zodResolver(changePasswordSchema),
@@ -47,6 +46,7 @@ function ChangePasswordModal({ isOpen, onClose, zIndex }: ChangePasswordModalPro
   const {
     register: registerField,
     handleSubmit,
+    setError,
     formState: { errors },
     reset,
   } = methods;
@@ -56,16 +56,14 @@ function ChangePasswordModal({ isOpen, onClose, zIndex }: ChangePasswordModalPro
       reset();
       setSuccessMessage(null);
       setLocalError(null);
+      clearAuthError();
     }
-  }, [isOpen, reset]);
+  }, [isOpen, reset, clearAuthError]);
 
   const onSubmit = async (data: ChangePasswordFormInputs) => {
     setSuccessMessage(null);
     setLocalError(null);
     setIsSubmitting(true);
-    setShowSpinnerForced(true);
-
-    const startTime = Date.now();
 
     try {
       await updateProfile({
@@ -74,22 +72,18 @@ function ChangePasswordModal({ isOpen, onClose, zIndex }: ChangePasswordModalPro
       });
       setSuccessMessage('Senha alterada com sucesso!');
       reset();
-    } catch {
-      setLocalError(authError || 'Falha ao alterar senha.');
-    } finally {
-      const endTime = Date.now();
-      const elapsedTime = endTime - startTime;
-      const remainingTime = 2000 - elapsedTime; // Ensure at least 2 seconds loading
-
-      if (remainingTime > 0) {
-        setTimeout(() => {
-          setIsSubmitting(false);
-          setShowSpinnerForced(false);
-        }, remainingTime);
+    } catch (err) {
+      const serverMessage = err instanceof Error ? err.message : 'Falha ao alterar senha.';
+      if (authError?.fieldErrors.currentPassword) {
+        setError('currentPassword', {
+          type: 'server',
+          message: authError.fieldErrors.currentPassword,
+        });
       } else {
-        setIsSubmitting(false);
-        setShowSpinnerForced(false);
+        setLocalError(authError?.formError || serverMessage);
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -136,34 +130,30 @@ function ChangePasswordModal({ isOpen, onClose, zIndex }: ChangePasswordModalPro
           {successMessage && (
             <p className="text-feedback-positive mt-4 text-center text-sm">{successMessage}</p>
           )}
-          {(localError || authError) && (
+          {(localError || authError?.formError) && (
             <p className="text-feedback-negative mt-4 text-center text-sm">
-              {localError || authError}
+              {localError || authError?.formError}
             </p>
           )}
 
           <div className="flex justify-end space-x-3 pt-4">
-            <button
+            <AppButton
               type="button"
               onClick={onClose}
-              className="text-surface-0 bg-surface-2 border-surface-0 focus:ring-offset-surface-1 focus:ring-accent-primary hover:border-feedback-negative-hover hover:text-text-primary hover:bg-feedback-negative-hover cursor-pointer rounded-md border px-4 py-2 font-semibold transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+              variant="secondary"
               disabled={isSubmitting}
             >
               Cancelar
-            </button>
-            <button
+            </AppButton>
+            <AppButton
               type="submit"
-              className="bg-accent-secondary text-text-primary text-md border-text-primary iceberg-regular flex items-center justify-center gap-2 rounded-lg border-b-3 px-4 py-2 font-bold shadow-lg transition-all hover:scale-105"
-              disabled={isSubmitting}
+              variant="primary"
+              className="text-md iceberg-regular border-b-3 border-text-primary font-bold shadow-lg hover:scale-105"
+              isLoading={isSubmitting}
+              loadingText="SALVANDO..."
             >
-              {showSpinnerForced ? (
-                <>
-                  <Spinner /> SALVANDO...
-                </>
-              ) : (
-                'SALVAR SENHA'
-              )}
-            </button>
+              SALVAR SENHA
+            </AppButton>
           </div>
         </form>
       </FormProvider>

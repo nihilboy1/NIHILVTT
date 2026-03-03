@@ -401,3 +401,5 @@ export function useEffectsProcessor() {
     selectedChoices: effectChoices,
   };
 }
+
+export type EffectsProcessor = ReturnType<typeof useEffectsProcessor>;

@@ -31,6 +31,10 @@ export interface Command {
   execute: (args: string[], context: CommandContext) => void;
 }
 
+function normalizeRollNotation(args: string[]): string {
+  return args.join('').replace(/\s+/g, '').toLowerCase();
+}
+
 /**
  * @constant commandsRegistry
  * @description Um registro de todos os comandos de chat disponíveis.
@@ -40,26 +44,30 @@ const commandsRegistry: Command[] = [
   {
     name: "/roll",
     description: "Rola dados com a notação especificada.",
-    usage: "/roll <XdY>[+/-Z]",
+    usage: "/roll <XdY>[+/-NdM][+/-Z]",
     validateArgs: (args: string[]): string | null => {
       if (args.length === 0) {
-        return "Falta a notação dos dados. Uso: /roll <XdY>[+/-Z]";
+        return "Falta a notação dos dados. Uso: /roll <XdY>[+/-NdM][+/-Z]";
       }
-      const notation = args.join(' ');
-      const diceNotationRegex = /^(\d{1,3})d(\d{1,3})(([+-])(\d+))?$/i;
-      const match = notation.match(diceNotationRegex);
-      if (!match) {
-        return "Notação de dados inválida. Use XdY ou XdY+/-Z (X, Y entre 1-100). Ex: 2d6+3";
+      const notation = normalizeRollNotation(args);
+      const additiveExpressionRegex = /^([+-]?(\d{1,3}d\d{1,3}|\d+))([+-](\d{1,3}d\d{1,3}|\d+))*$/i;
+      if (!additiveExpressionRegex.test(notation)) {
+        return "Notação de dados inválida. Use XdY, XdY+/-Z ou expressões como 2d6+1d4-3 (X e Y entre 1-100).";
       }
-      const numDice = parseInt(match[1]);
-      const diceSides = parseInt(match[2]);
-      if (numDice < 1 || numDice > 100 || diceSides < 1 || diceSides > 100) {
-        return "Dados inválidos. Número de dados (X) e lados (Y) devem ser entre 1 e 100.";
+
+      const diceTermRegex = /[+-]?(\d{1,3})d(\d{1,3})/gi;
+      const diceTerms = notation.matchAll(diceTermRegex);
+      for (const [, countRaw, sidesRaw] of diceTerms) {
+        const numDice = parseInt(countRaw, 10);
+        const diceSides = parseInt(sidesRaw, 10);
+        if (numDice < 1 || numDice > 100 || diceSides < 1 || diceSides > 100) {
+          return "Dados inválidos. Número de dados (X) e lados (Y) devem ser entre 1 e 100.";
+        }
       }
       return null; // Valid
     },
     execute: (_args: string[], context: CommandContext) => {
-      const notation = _args.join(' ');
+      const notation = normalizeRollNotation(_args);
       try {
         const diceRollDetails = performDiceRoll(notation, notation, "Generic");
         context.sendMessage(diceRollDetails);

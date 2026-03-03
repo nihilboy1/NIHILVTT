@@ -55,8 +55,20 @@ export const getRequiredFeats = (selections: { origin?: string }): CharacterOpti
 
   const requiredFeatIds = new Set<string>();
   origin.effects.forEach((effect) => {
-    if (effect.type === 'passive_providesFeat' && effect.selection?.feats) {
-      effect.selection.feats.forEach((featId) => requiredFeatIds.add(featId));
+    if (effect.type !== 'passive_providesFeat') {
+      return;
+    }
+
+    if (effect.selection.mode === 'specific') {
+      effect.selection.feats.forEach((featId: string) => requiredFeatIds.add(featId));
+      return;
+    }
+
+    if (effect.selection.mode === 'category' && 'source' in effect.selection) {
+      const categories = effect.selection.source;
+      PHB2024FEATS.filter((feat) => categories.includes(feat.category)).forEach((feat) => {
+        requiredFeatIds.add(feat.id);
+      });
     }
   });
 
@@ -83,6 +95,9 @@ export const originSchema = z
 export const classSchema = z.string().refine((value) => CLASSES.some((cls) => cls.id === value), {
   message: 'Selecione uma classe válida',
 });
+
+export const featSchema = z
+  .union([z.string(), z.record(z.string(), z.unknown())]);
 
 // Esquema para validar cada atributo individualmente
 export const singleAttributeSchema = z.number().int().min(8).max(15);
@@ -156,6 +171,7 @@ export const personalInfoSchema = z.object({
 export const characterBuilderSchema = z.object({
   species: speciesSchema,
   origin: originSchema,
+  feat: featSchema,
   class: classSchema,
   attributes: attributesSchema,
   'personal-info': personalInfoSchema,

@@ -21,6 +21,7 @@ interface BoardTokenProps {
   pageSettings: PageSettings;
   getSVGPoint: (clientX: number, clientY: number) => Point;
   onTokenDragStart: (tokenId: string) => void;
+  isCopied: boolean;
   onTokenDragMove: (tokenId: string, visualSVGPoint: Point) => void;
   onTokenDragEnd: (tokenId: string) => void;
   isMultiSelected: boolean;
@@ -47,6 +48,7 @@ export function BoardToken({
   pageSettings,
   getSVGPoint,
   onTokenDragStart,
+  isCopied,
   onTokenDragMove,
   onTokenDragEnd,
   isMultiSelected,
@@ -206,6 +208,31 @@ export function BoardToken({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
+      )}
+      {isCopied && (
+        <g pointerEvents="none">
+          <rect
+            x={tokenRenderWidth - 14 / zoomLevel}
+            y={-16 / zoomLevel}
+            width={14 / zoomLevel}
+            height={14 / zoomLevel}
+            rx={2 / zoomLevel}
+            fill="var(--color-accent-primary)"
+            stroke="var(--color-surface-0)"
+            strokeWidth={1 / zoomLevel}
+          />
+          <text
+            x={tokenRenderWidth - 7 / zoomLevel}
+            y={-6 / zoomLevel}
+            fontSize={8 / zoomLevel}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontWeight="bold"
+            fill="var(--color-text-1)"
+          >
+            C
+          </text>
+        </g>
       )}
     </g>
   );

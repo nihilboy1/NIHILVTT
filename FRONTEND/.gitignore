@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Test and analysis artifacts
+.artifacts/
+coverage/
+playwright-report/
+test-results/
+dependency-graph.json
