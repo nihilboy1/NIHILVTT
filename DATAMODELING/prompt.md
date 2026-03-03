@@ -1,5 +1,0 @@
-Estou desenvolvendo um VTT (Virtual Tabletop) com foco em automação de combate, inspirado em Baldur’s Gate 3 e utilizando as regras do D&D 5.5 (2024). Já modelei alguns itens, magias, monstros e feats. Estou estruturando os dados para facilitar a automação no motor de dados que ainda irei criar no futuro..
-
-Vou compartilhar arquivos e informações do projeto, incluindo meu package.json e a estrutura de pastas atual. Preciso que você faça um code review detalhado comigo, analisando cada schema, para garantir que a modelagem de dados está adequada e pronta para expandirmos com novos recursos para o VTT.
-
-Seu objetivo: analisar, sugerir melhorias e apontar inconsistências nos schemas, para que possamos evoluir juntos a modelagem dos dados do sistema, mas principalmente, queremos fazer a aplicação começar a andar, então não devemos tentar automatizar coisas impossiveis

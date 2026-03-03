@@ -18,11 +18,16 @@
     "./primitives": {
       "import": "./src/shared/primitives/index.ts",
       "types": "./src/shared/primitives/index.ts"
+    },
+    "./runtime": {
+      "import": "./src/runtime/index.ts",
+      "types": "./src/runtime/index.ts"
     }
   },
   "scripts": {
     "validate:data": "npx tsx src/tooling/validate.ts",
     "enums": "npx tsx src/tooling/generate-enums.ts",
+    "export:backend-item-manifest": "npx tsx src/tooling/export-backend-item-manifest.ts",
     "monsters": "npx tsx src/tooling/generate-monsters.ts",
     "lint": "eslint \"src/**/*.ts\" --fix"
   },

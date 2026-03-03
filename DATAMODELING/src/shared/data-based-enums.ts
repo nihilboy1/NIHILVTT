@@ -588,7 +588,6 @@ export const OutcomeParameterPaths = z.enum([
   'target.type',
   'targetRoll',
   'tokenId',
-  'transformRules',
   'triggers.events',
   'type',
   'usesReaction',

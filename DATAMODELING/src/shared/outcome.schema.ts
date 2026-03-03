@@ -228,7 +228,10 @@ const SummonTokenOutcomeSchema = z.object({
   id: z.string().optional(),
   type: z.literal("summonToken"),
   on: EffectOutcomeEnum,
-  tokenId: SummonedTokenIdEnum,
+  tokenId: z.custom<z.infer<typeof SummonedTokenIdEnum>>(
+    (value) => SummonedTokenIdEnum.safeParse(value).success,
+    { message: "Token invocado inválido." },
+  ),
   quantity: z.number().int().min(1),
   duration: DurationSchema.optional(),
 });

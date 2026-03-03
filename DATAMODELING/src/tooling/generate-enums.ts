@@ -105,7 +105,7 @@ async function main() {
       .join(projectRoot, "src", "data", "feats", "**", "*.ts")
       .replace(/\\/g, "/"),
     path
-      .join(projectRoot, "src", "data", "tokens", "**", "*.ts")
+      .join(projectRoot, "src", "data", "summonedTokens", "**", "*.{ts,js}")
       .replace(/\\/g, "/"),
     path
       .join(projectRoot, "src", "data", "monsters", "**", "*.ts")
@@ -132,8 +132,25 @@ async function main() {
   let allDataForPaths: DataObject[] = [];
 
   for (const absolutePath of dataFiles) {
+    const normalizedAbsolutePath = absolutePath.replace(/\\/g, "/");
     const relativeImportPath =
       "./" + path.relative(__dirname, absolutePath).replace(/\\/g, "/");
+
+    let itemBucket:
+      | "weapon"
+      | "tool"
+      | "gear"
+      | "armor"
+      | "musicalInstrument"
+      | null = null;
+
+    if (normalizedAbsolutePath.includes("/src/data/items/")) {
+      if (normalizedAbsolutePath.endsWith("/items-weapon.ts")) itemBucket = "weapon";
+      else if (normalizedAbsolutePath.endsWith("/items-tool.ts")) itemBucket = "tool";
+      else if (normalizedAbsolutePath.endsWith("/items-gear.ts")) itemBucket = "gear";
+      else if (normalizedAbsolutePath.endsWith("/items-armor.ts")) itemBucket = "armor";
+      else if (normalizedAbsolutePath.endsWith("/items-musical-instruments.ts")) itemBucket = "musicalInstrument";
+    }
 
     try {
       const module = await import(relativeImportPath);
@@ -146,16 +163,29 @@ async function main() {
             exportedValue as DataObject[],
           );
 
-          // Captura de itens com base no prefixo do ID
-          exportedValue.forEach((i: { id?: string }) => {
-            if (!i.id) return;
-            if (i.id.startsWith("weapon-")) allWeaponIds.add(i.id);
-            else if (i.id.startsWith("tool-")) allToolIds.add(i.id);
-            else if (i.id.startsWith("gear-")) allGearIds.add(i.id);
-            else if (i.id.startsWith("armor-")) allArmorIds.add(i.id);
-            else if (i.id.startsWith("musical-instrument-"))
-              allMusicalInstrumentIds.add(i.id);
-          });
+          if (itemBucket) {
+            exportedValue.forEach((item: { id?: string }) => {
+              if (!item.id) return;
+
+              switch (itemBucket) {
+                case "weapon":
+                  allWeaponIds.add(item.id);
+                  break;
+                case "tool":
+                  allToolIds.add(item.id);
+                  break;
+                case "gear":
+                  allGearIds.add(item.id);
+                  break;
+                case "armor":
+                  allArmorIds.add(item.id);
+                  break;
+                case "musicalInstrument":
+                  allMusicalInstrumentIds.add(item.id);
+                  break;
+              }
+            });
+          }
 
           // Captura de IDs por módulo
           if (absolutePath.includes("actions"))
@@ -170,7 +200,7 @@ async function main() {
             exportedValue.forEach(
               (i: { id?: string }) => i.id && allFeatIds.add(i.id),
             );
-          if (absolutePath.includes("tokens"))
+          if (absolutePath.includes("summonedTokens"))
             exportedValue.forEach(
               (i: { id?: string }) => i.id && allTokenIds.add(i.id),
             );
