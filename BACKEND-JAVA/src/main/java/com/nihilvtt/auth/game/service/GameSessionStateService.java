@@ -43,7 +43,10 @@ public class GameSessionStateService {
     GameSessionStateEntity sessionState = gameSessionStateRepository.findByGameId(gameId)
         .orElseGet(() -> initializeSessionState(game));
 
-    JsonNode stateNode = parseStateJson(sessionState, gameId);
+    ObjectNode stateNode = parseStateJson(sessionState, gameId);
+    requireExplicitSnapshotArray(stateNode, "characters");
+    requireExplicitSnapshotArray(stateNode, "tokens");
+    requireExplicitSnapshotArray(stateNode, "messages");
     validatePersistedCharacters(stateNode, gameId, sessionState.getId());
 
     return new GameSessionSnapshotResponse(
@@ -75,12 +78,8 @@ public class GameSessionStateService {
     }
   }
 
-  private void validatePersistedCharacters(JsonNode stateNode, Long gameId, Long stateId) {
-    if (!(stateNode instanceof ObjectNode stateObject)) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Estado da sessão inválido.");
-    }
-
-    JsonNode charactersNode = stateObject.path("characters");
+  private void validatePersistedCharacters(ObjectNode stateNode, Long gameId, Long stateId) {
+    JsonNode charactersNode = stateNode.get("characters");
     if (!(charactersNode instanceof ArrayNode charactersArray)) {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Estado da sessão sem characters válido.");
     }
@@ -108,10 +107,10 @@ public class GameSessionStateService {
     }
   }
 
-  private JsonNode parseStateJson(GameSessionStateEntity sessionState, Long gameId) {
+  private ObjectNode parseStateJson(GameSessionStateEntity sessionState, Long gameId) {
     try {
       JsonNode parsedState = objectMapper.readTree(sessionState.getStateJson());
-      if (!parsedState.isObject()) {
+      if (!(parsedState instanceof ObjectNode stateObject)) {
         logger.error(
             "event=game_session_state_invalid_root gameId={} stateId={}",
             gameId,
@@ -122,12 +121,22 @@ public class GameSessionStateService {
             "Estado da sessão persistido está corrompido."
         );
       }
-      return parsedState;
+      return stateObject;
     } catch (JsonProcessingException e) {
       logger.error("event=game_session_state_corrupted gameId={} stateId={}", gameId, sessionState.getId(), e);
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR,
           "Estado da sessão persistido está corrompido."
+      );
+    }
+  }
+
+  private void requireExplicitSnapshotArray(ObjectNode stateNode, String fieldName) {
+    JsonNode value = stateNode.get(fieldName);
+    if (!(value instanceof ArrayNode)) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Estado da sessão sem " + fieldName + " válido."
       );
     }
   }

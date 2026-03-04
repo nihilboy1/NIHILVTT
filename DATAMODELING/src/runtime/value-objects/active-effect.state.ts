@@ -44,12 +44,12 @@ export const ActiveEffectEntryStateSchema = z.object({
   appliedByCharacterId: z.string().min(1).optional(),
   linkedCondition: ConditionStatusEnum.optional(),
   remainingDuration: ActiveEffectDurationStateSchema.optional(),
-  stackCount: z.number().int().min(1).default(1),
-  isSuppressed: z.boolean().default(false),
+  stackCount: z.number().int().min(1),
+  isSuppressed: z.boolean(),
 });
 
 export const ActiveEffectStateSchema = z.object({
-  effects: z.array(ActiveEffectEntryStateSchema).default([]),
+  effects: z.array(ActiveEffectEntryStateSchema),
 });
 
 export type ActiveEffectSourceType = z.infer<typeof ActiveEffectSourceSchema>;

@@ -28,6 +28,7 @@
     "validate:data": "npx tsx src/tooling/validate.ts",
     "enums": "npx tsx src/tooling/generate-enums.ts",
     "export:backend-item-manifest": "npx tsx src/tooling/export-backend-item-manifest.ts",
+    "export:backend-monster-manifest": "npx tsx src/tooling/export-backend-monster-manifest.ts",
     "monsters": "npx tsx src/tooling/generate-monsters.ts",
     "lint": "eslint \"src/**/*.ts\" --fix"
   },

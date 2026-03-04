@@ -12,6 +12,8 @@ import com.nihilvtt.auth.game.entity.GameSessionStateEntity;
 import com.nihilvtt.auth.game.repository.GameMemberRepository;
 import com.nihilvtt.auth.game.repository.GameSessionStateRepository;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -31,6 +33,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class GameSessionCommandService {
   private static final Logger logger = LoggerFactory.getLogger(GameSessionCommandService.class);
   private static final int MAX_MESSAGES = 300;
+  private static final int DEFAULT_MOVEMENT_CELLS = 6;
   private static final int MAX_DICE_COUNT = 100;
   private static final int MAX_DICE_SIDES = 100;
   private static final int MAX_TOTAL_DICE_ROLLS = 500;
@@ -52,6 +55,7 @@ public class GameSessionCommandService {
   private final ObjectMapper objectMapper;
   private final SimpMessagingTemplate messagingTemplate;
   private final ItemCatalogManifestService itemCatalogManifestService;
+  private final MonsterCatalogManifestService monsterCatalogManifestService;
 
   public GameSessionCommandService(
       GameAccessService gameAccessService,
@@ -59,7 +63,8 @@ public class GameSessionCommandService {
       GameSessionStateRepository gameSessionStateRepository,
       ObjectMapper objectMapper,
       SimpMessagingTemplate messagingTemplate,
-      ItemCatalogManifestService itemCatalogManifestService
+      ItemCatalogManifestService itemCatalogManifestService,
+      MonsterCatalogManifestService monsterCatalogManifestService
   ) {
     this.gameAccessService = gameAccessService;
     this.gameMemberRepository = gameMemberRepository;
@@ -67,6 +72,7 @@ public class GameSessionCommandService {
     this.objectMapper = objectMapper;
     this.messagingTemplate = messagingTemplate;
     this.itemCatalogManifestService = itemCatalogManifestService;
+    this.monsterCatalogManifestService = monsterCatalogManifestService;
   }
 
   @Transactional
@@ -178,10 +184,20 @@ public class GameSessionCommandService {
         .orElseGet(() -> initializeSessionState(game));
     ObjectNode rootNode = parseStateAsObject(sessionState, gameId);
     ArrayNode tokensNode = ensureArray(rootNode, "tokens");
+    ArrayNode charactersNode = ensureArray(rootNode, "characters");
 
     ObjectNode movedToken = findTokenById(tokensNode, tokenId);
     if (movedToken == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token não encontrado na sessão.");
+    }
+
+    ensureUserCanControlToken(game, userId, tokensNode, charactersNode, tokenId);
+
+    ensureCombatMovementAllowed(rootNode, tokenId);
+
+    ObjectNode combatState = getActiveCombatState(rootNode);
+    if (combatState != null) {
+      consumeMovementForActiveParticipant(combatState, movedToken, x, y);
     }
 
     ObjectNode positionNode = objectMapper.createObjectNode();
@@ -197,6 +213,12 @@ public class GameSessionCommandService {
     ObjectNode payloadNode = objectMapper.createObjectNode();
     payloadNode.put("tokenId", tokenId);
     payloadNode.set("position", positionNode);
+    payloadNode.put("combatChanged", combatState != null);
+    if (combatState == null) {
+      payloadNode.putNull("combat");
+    } else {
+      payloadNode.set("combat", combatState.deepCopy());
+    }
 
     GameSessionEventResponse event = new GameSessionEventResponse(
         UUID.randomUUID().toString(),
@@ -241,9 +263,11 @@ public class GameSessionCommandService {
     ArrayNode charactersNode = ensureArray(rootNode, "characters");
     ArrayNode tokensNode = ensureArray(rootNode, "tokens");
 
-    if (findCharacterById(charactersNode, characterId) == null) {
+    ObjectNode characterNode = findCharacterById(charactersNode, characterId);
+    if (characterNode == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado na sessão.");
     }
+    ensureUserCanInstantiateCharacterToken(game, userId, characterNode);
 
     ObjectNode tokenNode = objectMapper.createObjectNode();
     tokenNode.put("id", UUID.randomUUID().toString());
@@ -262,6 +286,7 @@ public class GameSessionCommandService {
 
     ObjectNode payloadNode = objectMapper.createObjectNode();
     payloadNode.set("token", tokenNode);
+    payloadNode.putNull("character");
 
     GameSessionEventResponse event = new GameSessionEventResponse(
         UUID.randomUUID().toString(),
@@ -325,11 +350,16 @@ public class GameSessionCommandService {
 
     ObjectNode payloadNode = objectMapper.createObjectNode();
     payloadNode.put("tokenId", tokenId);
-    if (removedCloneCharacterId != null) {
+    if (removedCloneCharacterId == null) {
+      payloadNode.putNull("removedCharacterId");
+    } else {
       payloadNode.put("removedCharacterId", removedCloneCharacterId);
     }
+    payloadNode.put("combatChanged", combatSync.touched());
     if (combatSync.touched()) {
       payloadNode.set("combat", combatSync.combatNode());
+    } else {
+      payloadNode.putNull("combat");
     }
 
     GameSessionEventResponse event = new GameSessionEventResponse(
@@ -337,6 +367,81 @@ public class GameSessionCommandService {
         gameId,
         sessionState.getVersion(),
         "TOKEN_REMOVED",
+        userId,
+        payloadNode,
+        createdAt
+    );
+
+    messagingTemplate.convertAndSend(gameTopic(gameId), event);
+    return event;
+  }
+
+  @Transactional
+  public GameSessionEventResponse removeTokens(Long userId, Long gameId, List<String> tokenIdsRaw) {
+    GameEntity game = gameAccessService.requireGameWithAccess(gameId, userId);
+    if (!game.getOwner().getId().equals(userId)) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Apenas o mestre pode remover tokens da mesa.");
+    }
+
+    List<String> tokenIds = normalizeRequiredTokenIds(tokenIdsRaw);
+
+    GameSessionStateEntity sessionState = gameSessionStateRepository.findByGameId(gameId)
+        .orElseGet(() -> initializeSessionState(game));
+    ObjectNode rootNode = parseStateAsObject(sessionState, gameId);
+    ArrayNode tokensNode = ensureArray(rootNode, "tokens");
+    ArrayNode charactersNode = ensureArray(rootNode, "characters");
+
+    ArrayNode removedTokenIdsNode = objectMapper.createArrayNode();
+    ArrayNode removedCharacterIdsNode = objectMapper.createArrayNode();
+    List<String> removedTokenIds = new ArrayList<>();
+
+    for (String tokenId : tokenIds) {
+      int tokenIndex = findTokenIndexById(tokensNode, tokenId);
+      if (tokenIndex < 0) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token não encontrado na sessão.");
+      }
+
+      JsonNode removedTokenNode = tokensNode.get(tokenIndex);
+      String removedCharacterId = removedTokenNode == null ? "" : removedTokenNode.path("characterId").asText("").trim();
+      tokensNode.remove(tokenIndex);
+      removedTokenIds.add(tokenId);
+      removedTokenIdsNode.add(tokenId);
+
+      if (!removedCharacterId.isBlank() && !hasAnyTokenForCharacter(tokensNode, removedCharacterId)) {
+        int characterIndex = findCharacterIndexById(charactersNode, removedCharacterId);
+        if (characterIndex >= 0) {
+          JsonNode characterNode = charactersNode.get(characterIndex);
+          if (characterNode instanceof ObjectNode characterObject
+              && characterObject.path("isSessionClone").asBoolean(false)) {
+            charactersNode.remove(characterIndex);
+            removedCharacterIdsNode.add(removedCharacterId);
+          }
+        }
+      }
+    }
+
+    CombatSyncResult combatSync = syncCombatStateAfterRemovedTokenIds(rootNode, removedTokenIds);
+
+    Instant createdAt = Instant.now();
+    sessionState.setVersion(sessionState.getVersion() + 1);
+    sessionState.setStateJson(toJson(rootNode));
+    gameSessionStateRepository.save(sessionState);
+
+    ObjectNode payloadNode = objectMapper.createObjectNode();
+    payloadNode.set("tokenIds", removedTokenIdsNode);
+    payloadNode.set("removedCharacterIds", removedCharacterIdsNode);
+    payloadNode.put("combatChanged", combatSync.touched());
+    if (combatSync.touched()) {
+      payloadNode.set("combat", combatSync.combatNode());
+    } else {
+      payloadNode.putNull("combat");
+    }
+
+    GameSessionEventResponse event = new GameSessionEventResponse(
+        UUID.randomUUID().toString(),
+        gameId,
+        sessionState.getVersion(),
+        "TOKENS_REMOVED",
         userId,
         payloadNode,
         createdAt
@@ -415,16 +520,12 @@ public class GameSessionCommandService {
     ArrayNode tokensNode = ensureArray(rootNode, "tokens");
     ArrayNode charactersNode = ensureArray(rootNode, "characters");
 
-    ensureCombatForAttack(
-        userId,
-        gameId,
-        sessionState,
-        rootNode,
-        tokensNode,
-        charactersNode,
-        attackerTokenId,
-        targetTokenId
-    );
+    ensureUserCanControlToken(game, userId, tokensNode, charactersNode, attackerTokenId);
+
+    ObjectNode combatState = requireActiveCombatState(rootNode);
+    ensureTokensParticipateInCombat(combatState, attackerTokenId, targetTokenId);
+    ensureCombatTurnActor(combatState, attackerTokenId);
+    ensureCombatActionAvailable(combatState);
 
     ObjectNode attackerTokenNode = findTokenById(tokensNode, attackerTokenId);
     if (attackerTokenNode == null) {
@@ -476,11 +577,10 @@ public class GameSessionCommandService {
     ObjectNode hitPointContainer = resolveHitPointContainer(targetCharacterNode);
     String currentHpField = "current";
     String tempHpField = "temporary";
-    String maxHpField = "max";
 
     int currentHp = hitPointContainer.path(currentHpField).asInt(0);
     int tempHp = Math.max(0, hitPointContainer.path(tempHpField).asInt(0));
-    int maxHp = Math.max(1, hitPointContainer.path(maxHpField).asInt(1));
+    int maxHp = resolveCharacterHitPointMaximum(targetCharacterNode, hitPointContainer);
 
     if (hit) {
       DiceRollResult damageRoll = rollDiceFormula(
@@ -511,6 +611,8 @@ public class GameSessionCommandService {
       remainingTempHp = tempHp;
     }
 
+    consumeActionForActiveParticipant(combatState);
+
     Instant createdAt = Instant.now();
     sessionState.setVersion(sessionState.getVersion() + 1);
     sessionState.setStateJson(toJson(rootNode));
@@ -530,6 +632,7 @@ public class GameSessionCommandService {
     payloadNode.put("damageApplied", damageApplied);
     payloadNode.put("remainingCurrentHp", remainingCurrentHp);
     payloadNode.put("remainingTempHp", remainingTempHp);
+    payloadNode.set("combat", combatState.deepCopy());
 
     GameSessionEventResponse event = new GameSessionEventResponse(
         UUID.randomUUID().toString(),
@@ -569,8 +672,18 @@ public class GameSessionCommandService {
 
     ObjectNode combatState = buildCombatState(tokensNode, charactersNode, tokenIds);
     rootNode.set("combat", combatState);
-
     Instant createdAt = Instant.now();
+    ArrayNode messagesNode = ensureArray(rootNode, "messages");
+    List<ObjectNode> initiativeMessages = buildCombatInitiativeMessages(
+        resolveCombatParticipants(combatState),
+        charactersNode,
+        createdAt
+    );
+    for (ObjectNode messageNode : initiativeMessages) {
+      messagesNode.add(messageNode);
+    }
+    trimMessages(messagesNode);
+
     sessionState.setVersion(sessionState.getVersion() + 1);
     sessionState.setStateJson(toJson(rootNode));
     gameSessionStateRepository.save(sessionState);
@@ -589,6 +702,7 @@ public class GameSessionCommandService {
     );
 
     messagingTemplate.convertAndSend(gameTopic(gameId), event);
+    publishMessageEvents(gameId, userId, sessionState.getVersion(), initiativeMessages, createdAt);
     return event;
   }
 
@@ -618,6 +732,7 @@ public class GameSessionCommandService {
 
     combatState.put("turnIndex", nextTurnIndex);
     combatState.put("round", currentRound);
+    combatState.set("turnResources", buildTurnResourcesForActiveParticipant(combatState, rootNode));
 
     Instant createdAt = Instant.now();
     sessionState.setVersion(sessionState.getVersion() + 1);
@@ -718,14 +833,12 @@ public class GameSessionCommandService {
     ObjectNode hitPointContainer = resolveHitPointContainer(characterNode);
     String currentHpField = "current";
     String tempHpField = "temporary";
-    String maxHpField = "max";
 
     JsonNode currentHpNode = hitPointContainer.get(currentHpField);
     int currentHp = currentHpNode != null && currentHpNode.isNumber() ? currentHpNode.asInt() : 0;
     JsonNode tempHpNode = hitPointContainer.get(tempHpField);
     int tempHp = tempHpNode != null && tempHpNode.isNumber() ? Math.max(0, tempHpNode.asInt()) : 0;
-    JsonNode maxHpNode = hitPointContainer.get(maxHpField);
-    int maxHp = maxHpNode != null && maxHpNode.isNumber() ? maxHpNode.asInt() : 1;
+    int maxHp = resolveCharacterHitPointMaximum(characterNode, hitPointContainer);
     int normalizedTempHp = tempHp;
     int normalizedHp;
 
@@ -872,6 +985,66 @@ public class GameSessionCommandService {
   }
 
   @Transactional
+  public GameSessionEventResponse updateCharacterController(
+      Long userId,
+      Long gameId,
+      String characterIdRaw,
+      Long controlledByUserIdRaw
+  ) {
+    GameEntity game = gameAccessService.requireGameWithAccess(gameId, userId);
+    if (!game.getOwner().getId().equals(userId)) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Apenas o mestre pode definir o controlador do personagem.");
+    }
+
+    String characterId = characterIdRaw == null ? "" : characterIdRaw.trim();
+    if (characterId.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Personagem é obrigatório.");
+    }
+
+    Long controlledByUserId = normalizeControlledByUserIdForAssignment(game, controlledByUserIdRaw);
+
+    GameSessionStateEntity sessionState = gameSessionStateRepository.findByGameId(gameId)
+        .orElseGet(() -> initializeSessionState(game));
+    ObjectNode rootNode = parseStateAsObject(sessionState, gameId);
+    ArrayNode charactersNode = ensureArray(rootNode, "characters");
+
+    ObjectNode characterNode = findCharacterById(charactersNode, characterId);
+    if (characterNode == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado na sessão.");
+    }
+
+    if ("NPC".equals(characterNode.path("type").asText("").trim())) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "NPCs são de uso exclusivo do mestre e não aceitam controlador por jogador."
+      );
+    }
+
+    writeControlledByUserId(characterNode, controlledByUserId);
+
+    Instant createdAt = Instant.now();
+    sessionState.setVersion(sessionState.getVersion() + 1);
+    sessionState.setStateJson(toJson(rootNode));
+    gameSessionStateRepository.save(sessionState);
+
+    ObjectNode payloadNode = objectMapper.createObjectNode();
+    payloadNode.set("character", characterNode.deepCopy());
+
+    GameSessionEventResponse event = new GameSessionEventResponse(
+        UUID.randomUUID().toString(),
+        gameId,
+        sessionState.getVersion(),
+        "CHARACTER_CONTROL_UPDATED",
+        userId,
+        payloadNode,
+        createdAt
+    );
+
+    messagingTemplate.convertAndSend(gameTopic(gameId), event);
+    return event;
+  }
+
+  @Transactional
   public GameSessionEventResponse createCharacter(Long userId, Long gameId, JsonNode characterRaw) {
     GameEntity game = gameAccessService.requireGameWithAccess(gameId, userId);
 
@@ -892,6 +1065,7 @@ public class GameSessionCommandService {
     }
 
     SessionCharacterPayloadValidator.validateForCreate(characterNode);
+    normalizeControlledByUserIdField(characterNode);
 
     GameSessionStateEntity sessionState = gameSessionStateRepository.findByGameId(gameId)
         .orElseGet(() -> initializeSessionState(game));
@@ -927,6 +1101,69 @@ public class GameSessionCommandService {
   }
 
   @Transactional
+  public GameSessionEventResponse spawnMonsterCharacter(
+      Long userId,
+      Long gameId,
+      String monsterIdRaw,
+      String nameOverrideRaw,
+      String sceneIdRaw,
+      Integer x,
+      Integer y
+  ) {
+    GameEntity game = gameAccessService.requireGameWithAccess(gameId, userId);
+    if (!game.getOwner().getId().equals(userId)) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Apenas o mestre pode instanciar monstros na sessão.");
+    }
+
+    String monsterId = normalizeMonsterId(monsterIdRaw);
+    String nameOverride = normalizeOptionalOverrideText(nameOverrideRaw);
+    ObjectNode characterNode = buildMonsterCharacterNode(monsterId, nameOverride);
+    String characterId = characterNode.path("id").asText("");
+    SpawnTokenRequest spawnTokenRequest = normalizeOptionalMonsterSpawnToken(sceneIdRaw, x, y);
+
+    GameSessionStateEntity sessionState = gameSessionStateRepository.findByGameId(gameId)
+        .orElseGet(() -> initializeSessionState(game));
+    ObjectNode rootNode = parseStateAsObject(sessionState, gameId);
+    ArrayNode charactersNode = ensureArray(rootNode, "characters");
+    ArrayNode tokensNode = ensureArray(rootNode, "tokens");
+
+    if (findCharacterById(charactersNode, characterId) != null) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe personagem com este id na sessão.");
+    }
+
+    charactersNode.add(characterNode);
+    ObjectNode tokenNode = null;
+    if (spawnTokenRequest != null) {
+      tokenNode = buildTokenNode(characterId, spawnTokenRequest.sceneId(), spawnTokenRequest.x(), spawnTokenRequest.y());
+      tokensNode.add(tokenNode);
+    }
+
+    Instant createdAt = Instant.now();
+    sessionState.setVersion(sessionState.getVersion() + 1);
+    sessionState.setStateJson(toJson(rootNode));
+    gameSessionStateRepository.save(sessionState);
+
+    ObjectNode payloadNode = objectMapper.createObjectNode();
+    payloadNode.set("character", characterNode);
+    if (tokenNode != null) {
+      payloadNode.set("token", tokenNode);
+    }
+
+    GameSessionEventResponse event = new GameSessionEventResponse(
+        UUID.randomUUID().toString(),
+        gameId,
+        sessionState.getVersion(),
+        tokenNode == null ? "CHARACTER_CREATED" : "TOKEN_CREATED",
+        userId,
+        payloadNode,
+        createdAt
+    );
+
+    messagingTemplate.convertAndSend(gameTopic(gameId), event);
+    return event;
+  }
+
+  @Transactional
   public GameSessionEventResponse duplicateCharacter(Long userId, Long gameId, String characterIdRaw) {
     GameEntity game = gameAccessService.requireGameWithAccess(gameId, userId);
 
@@ -944,6 +1181,8 @@ public class GameSessionCommandService {
     if (sourceCharacterNode == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado na sessão.");
     }
+
+    ensureUserCanDuplicateCharacter(game, userId, sourceCharacterNode);
 
     ObjectNode duplicatedCharacterNode = buildDuplicatedCharacterNode(
         charactersNode,
@@ -1007,6 +1246,8 @@ public class GameSessionCommandService {
     if (sourceCharacterNode == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado na sessão.");
     }
+
+    ensureUserCanDuplicateCharacter(game, userId, sourceCharacterNode);
 
     ObjectNode duplicatedCharacterNode = buildDuplicatedCharacterNode(
         charactersNode,
@@ -1103,8 +1344,11 @@ public class GameSessionCommandService {
     ObjectNode payloadNode = objectMapper.createObjectNode();
     payloadNode.put("characterId", characterId);
     payloadNode.set("removedTokenIds", removedTokenIds);
+    payloadNode.put("combatChanged", combatSync.touched());
     if (combatSync.touched()) {
       payloadNode.set("combat", combatSync.combatNode());
+    } else {
+      payloadNode.putNull("combat");
     }
 
     GameSessionEventResponse event = new GameSessionEventResponse(
@@ -1399,46 +1643,6 @@ public class GameSessionCommandService {
     return toJson(rootNode);
   }
 
-  private void ensureCombatForAttack(
-      Long userId,
-      Long gameId,
-      GameSessionStateEntity sessionState,
-      ObjectNode rootNode,
-      ArrayNode tokensNode,
-      ArrayNode charactersNode,
-      String attackerTokenId,
-      String targetTokenId
-  ) {
-    ObjectNode activeCombatState = getActiveCombatState(rootNode);
-    if (activeCombatState != null) {
-      ensureTokensParticipateInCombat(activeCombatState, attackerTokenId, targetTokenId);
-      return;
-    }
-
-    ObjectNode combatState = buildCombatState(tokensNode, charactersNode, List.of(attackerTokenId, targetTokenId));
-    rootNode.set("combat", combatState);
-
-    Instant createdAt = Instant.now();
-    sessionState.setVersion(sessionState.getVersion() + 1);
-    sessionState.setStateJson(toJson(rootNode));
-    gameSessionStateRepository.save(sessionState);
-
-    ObjectNode payloadNode = objectMapper.createObjectNode();
-    payloadNode.set("combat", combatState.deepCopy());
-
-    GameSessionEventResponse event = new GameSessionEventResponse(
-        UUID.randomUUID().toString(),
-        gameId,
-        sessionState.getVersion(),
-        "COMBAT_STARTED",
-        userId,
-        payloadNode,
-        createdAt
-    );
-
-    messagingTemplate.convertAndSend(gameTopic(gameId), event);
-  }
-
   private List<String> normalizeCombatTokenIds(List<String> tokenIdsRaw) {
     if (tokenIdsRaw == null || tokenIdsRaw.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selecione ao menos um token para o combate.");
@@ -1490,6 +1694,7 @@ public class GameSessionCommandService {
       participantNode.put("initiativeRoll", initiativeRoll);
       participantNode.put("initiativeTotal", initiativeTotal);
       participantNode.put("dexterityScore", dexterityScore);
+      participantNode.put("movementBudgetCells", resolveMovementBudgetCells(characterNode));
       participantNode.put("status", "active");
       participants.add(participantNode);
     }
@@ -1524,6 +1729,7 @@ public class GameSessionCommandService {
       participantsNode.add(participant);
     }
     combatState.set("participants", participantsNode);
+    combatState.set("turnResources", buildTurnResourcesForActiveParticipant(combatState, charactersNode));
     return combatState;
   }
 
@@ -1558,6 +1764,14 @@ public class GameSessionCommandService {
     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Participantes do combate persistidos estão corrompidos.");
   }
 
+  private ObjectNode resolveCombatTurnResources(ObjectNode combatState) {
+    JsonNode turnResourcesNode = combatState.get("turnResources");
+    if (turnResourcesNode instanceof ObjectNode turnResourcesObject) {
+      return turnResourcesObject;
+    }
+    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Recursos do turno do combate estão corrompidos.");
+  }
+
   private void ensureTokensParticipateInCombat(ObjectNode combatState, String... tokenIds) {
     ArrayNode participants = resolveCombatParticipants(combatState);
     for (String tokenId : tokenIds) {
@@ -1579,6 +1793,548 @@ public class GameSessionCommandService {
     }
   }
 
+  private void ensureCombatMovementAllowed(ObjectNode rootNode, String tokenId) {
+    ObjectNode combatState = getActiveCombatState(rootNode);
+    if (combatState == null) {
+      return;
+    }
+
+    Integer participantIndex = findCombatParticipantIndex(combatState, tokenId);
+    if (participantIndex == null) {
+      return;
+    }
+
+    int turnIndex = normalizeCombatTurnIndex(combatState);
+    if (participantIndex != turnIndex) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Participantes do combate só podem se mover no próprio turno."
+      );
+    }
+  }
+
+  private void ensureUserCanControlToken(
+      GameEntity game,
+      Long userId,
+      ArrayNode tokensNode,
+      ArrayNode charactersNode,
+      String tokenId
+  ) {
+    ObjectNode tokenNode = findTokenById(tokensNode, tokenId);
+    if (tokenNode == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token não encontrado na sessão.");
+    }
+
+    String characterId = tokenNode.path("characterId").asText("").trim();
+    if (characterId.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token sem personagem válido.");
+    }
+
+    ObjectNode characterNode = findCharacterById(charactersNode, characterId);
+    if (characterNode == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem do token não encontrado na sessão.");
+    }
+
+    Long ownerUserId = game.getOwner().getId();
+    if ("NPC".equals(characterNode.path("type").asText("").trim())) {
+      if (!ownerUserId.equals(userId)) {
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN,
+            "NPCs são de uso exclusivo do mestre."
+        );
+      }
+      return;
+    }
+
+    Long controlledByUserId = readControlledByUserId(characterNode);
+
+    if (controlledByUserId == null) {
+      if (!ownerUserId.equals(userId)) {
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN,
+            "Este personagem está sob controle exclusivo do mestre."
+        );
+      }
+      return;
+    }
+
+    if (!controlledByUserId.equals(userId)) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN,
+          "Este personagem pertence a outro jogador."
+      );
+    }
+  }
+
+  private void ensureUserCanInstantiateCharacterToken(
+      GameEntity game,
+      Long userId,
+      ObjectNode characterNode
+  ) {
+    Long ownerUserId = game.getOwner().getId();
+    if ("NPC".equals(characterNode.path("type").asText("").trim())) {
+      if (!ownerUserId.equals(userId)) {
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN,
+            "Somente o mestre pode instanciar tokens de NPC."
+        );
+      }
+      return;
+    }
+
+    Long controlledByUserId = readControlledByUserId(characterNode);
+
+    if (controlledByUserId == null) {
+      if (!ownerUserId.equals(userId)) {
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN,
+            "Somente o mestre pode instanciar tokens de personagens sem controlador atribuído."
+        );
+      }
+      return;
+    }
+
+    if (!controlledByUserId.equals(userId)) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN,
+          "Você não pode instanciar tokens de personagens que pertencem a outro jogador."
+      );
+    }
+  }
+
+  private void ensureCombatTurnActor(ObjectNode combatState, String attackerTokenId) {
+    Integer participantIndex = findCombatParticipantIndex(combatState, attackerTokenId);
+    if (participantIndex == null) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "O atacante precisa estar no combate ativo."
+      );
+    }
+
+    int turnIndex = normalizeCombatTurnIndex(combatState);
+    if (participantIndex != turnIndex) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Ações de combate só podem ser executadas pelo participante do turno atual."
+      );
+    }
+  }
+
+  private void ensureCombatActionAvailable(ObjectNode combatState) {
+    ObjectNode turnResources = resolveCombatTurnResources(combatState);
+    if (!turnResources.path("actionAvailable").asBoolean(false)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "O participante do turno atual já gastou a ação deste turno."
+      );
+    }
+  }
+
+  private String normalizeMonsterId(String monsterIdRaw) {
+    String monsterId = monsterIdRaw == null ? "" : monsterIdRaw.trim();
+    if (monsterId.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "monsterId é obrigatório.");
+    }
+
+    monsterCatalogManifestService.requireKnownMonster(monsterId);
+    return monsterId;
+  }
+
+  private String normalizeOptionalOverrideText(String valueRaw) {
+    String value = valueRaw == null ? "" : valueRaw.trim();
+    return value.isBlank() ? null : value;
+  }
+
+  private List<String> normalizeRequiredTokenIds(List<String> tokenIdsRaw) {
+    if (tokenIdsRaw == null || tokenIdsRaw.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tokens são obrigatórios.");
+    }
+
+    LinkedHashSet<String> normalizedTokenIds = new LinkedHashSet<>();
+    for (String tokenIdRaw : tokenIdsRaw) {
+      String tokenId = tokenIdRaw == null ? "" : tokenIdRaw.trim();
+      if (tokenId.isBlank()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token é obrigatório.");
+      }
+      normalizedTokenIds.add(tokenId);
+    }
+
+    if (normalizedTokenIds.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tokens são obrigatórios.");
+    }
+
+    return List.copyOf(normalizedTokenIds);
+  }
+
+  private SpawnTokenRequest normalizeOptionalMonsterSpawnToken(String sceneIdRaw, Integer x, Integer y) {
+    String sceneId = sceneIdRaw == null ? "" : sceneIdRaw.trim();
+    boolean hasSceneId = !sceneId.isBlank();
+    boolean hasX = x != null;
+    boolean hasY = y != null;
+
+    if (!hasSceneId && !hasX && !hasY) {
+      return null;
+    }
+
+    if (!hasSceneId || !hasX || !hasY) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "sceneId, x e y devem ser enviados juntos para criar token no spawn do monstro."
+      );
+    }
+
+    if (x < 0 || y < 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Posição inválida.");
+    }
+
+    return new SpawnTokenRequest(sceneId, x, y);
+  }
+
+  private ObjectNode buildTokenNode(String characterId, String sceneId, int x, int y) {
+    ObjectNode tokenNode = objectMapper.createObjectNode();
+    tokenNode.put("id", UUID.randomUUID().toString());
+    tokenNode.put("characterId", characterId);
+    tokenNode.put("sceneId", sceneId);
+    ObjectNode positionNode = objectMapper.createObjectNode();
+    positionNode.put("x", x);
+    positionNode.put("y", y);
+    tokenNode.set("position", positionNode);
+    return tokenNode;
+  }
+
+  private ObjectNode buildMonsterCharacterNode(String monsterId, String nameOverride) {
+    MonsterCatalogManifestService.MonsterCatalogEntry monsterEntry = monsterCatalogManifestService.requireKnownMonster(monsterId);
+    Integer hitPointMaximum = monsterEntry.hitPointMaximum();
+    if (hitPointMaximum == null || hitPointMaximum < 1) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Catálogo canônico do monstro está sem hitPointMaximum válido."
+      );
+    }
+
+    ObjectNode characterNode = objectMapper.createObjectNode();
+    characterNode.put("id", UUID.randomUUID().toString());
+    characterNode.put("type", "NPC");
+    characterNode.put("monsterId", monsterId);
+    if (nameOverride == null) {
+      characterNode.putNull("nameOverride");
+    } else {
+      characterNode.put("nameOverride", nameOverride);
+    }
+    characterNode.putNull("imageOverride");
+
+    ObjectNode hitPointsNode = objectMapper.createObjectNode();
+    hitPointsNode.put("current", hitPointMaximum);
+    hitPointsNode.put("temporary", 0);
+    characterNode.set("hitPoints", hitPointsNode);
+
+    ObjectNode resourcePoolsNode = objectMapper.createObjectNode();
+    resourcePoolsNode.putArray("pools");
+    characterNode.set("resourcePools", resourcePoolsNode);
+
+    ObjectNode activeEffectsNode = objectMapper.createObjectNode();
+    activeEffectsNode.putArray("effects");
+    characterNode.set("activeEffects", activeEffectsNode);
+
+    characterNode.putNull("notes");
+
+    SessionCharacterPayloadValidator.validateMonsterForCreate(characterNode);
+    return characterNode;
+  }
+
+  private void normalizeControlledByUserIdField(ObjectNode characterNode) {
+    if ("NPC".equals(characterNode.path("type").asText("").trim())) {
+      characterNode.remove("controlledByUserId");
+      return;
+    }
+
+    Long controlledByUserId = readControlledByUserId(characterNode);
+    writeControlledByUserId(characterNode, controlledByUserId);
+  }
+
+  private Long readControlledByUserId(ObjectNode characterNode) {
+    JsonNode controlledByUserIdNode = characterNode.get("controlledByUserId");
+    if (controlledByUserIdNode == null || controlledByUserIdNode.isNull()) {
+      return null;
+    }
+
+    if (!controlledByUserIdNode.canConvertToLong()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "controlledByUserId inválido.");
+    }
+
+    long controlledByUserId = controlledByUserIdNode.asLong();
+    if (controlledByUserId <= 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "controlledByUserId inválido.");
+    }
+
+    return controlledByUserId;
+  }
+
+  private void writeControlledByUserId(ObjectNode characterNode, Long controlledByUserId) {
+    if (controlledByUserId == null) {
+      characterNode.putNull("controlledByUserId");
+      return;
+    }
+
+    characterNode.put("controlledByUserId", controlledByUserId);
+  }
+
+  private Long normalizeControlledByUserIdForAssignment(GameEntity game, Long controlledByUserId) {
+    if (controlledByUserId == null) {
+      return null;
+    }
+
+    if (controlledByUserId <= 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Controlador inválido.");
+    }
+
+    Long ownerUserId = game.getOwner().getId();
+    if (ownerUserId.equals(controlledByUserId)) {
+      return controlledByUserId;
+    }
+
+    if (gameMemberRepository.existsByGameIdAndUserId(game.getId(), controlledByUserId)) {
+      return controlledByUserId;
+    }
+
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O controlador precisa ser um membro ativo da mesa.");
+  }
+
+  private Integer findCombatParticipantIndex(ObjectNode combatState, String tokenId) {
+    ArrayNode participants = resolveCombatParticipants(combatState);
+    for (int i = 0; i < participants.size(); i++) {
+      JsonNode participantNode = participants.get(i);
+      if (tokenId.equals(participantNode.path("tokenId").asText("").trim())) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  private void consumeActionForActiveParticipant(ObjectNode combatState) {
+    ObjectNode turnResources = resolveCombatTurnResources(combatState);
+    turnResources.put("actionAvailable", false);
+    autoAdvanceCombatTurnIfExhausted(combatState);
+  }
+
+  private void consumeMovementForActiveParticipant(
+      ObjectNode combatState,
+      ObjectNode movedToken,
+      int nextX,
+      int nextY
+  ) {
+    Integer participantIndex = findCombatParticipantIndex(
+        combatState,
+        movedToken.path("id").asText("").trim()
+    );
+    if (participantIndex == null) {
+      return;
+    }
+
+    int turnIndex = normalizeCombatTurnIndex(combatState);
+    if (participantIndex != turnIndex) {
+      return;
+    }
+
+    JsonNode currentPositionNode = movedToken.path("position");
+    int currentX = currentPositionNode.path("x").asInt(nextX);
+    int currentY = currentPositionNode.path("y").asInt(nextY);
+    int movementCostCells = Math.max(Math.abs(nextX - currentX), Math.abs(nextY - currentY));
+    if (movementCostCells <= 0) {
+      return;
+    }
+
+    ObjectNode turnResources = resolveCombatTurnResources(combatState);
+    int remainingMovementCells = Math.max(0, turnResources.path("remainingMovementCells").asInt(0));
+    if (movementCostCells > remainingMovementCells) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "O participante do turno atual não possui deslocamento suficiente."
+      );
+    }
+
+    turnResources.put("remainingMovementCells", remainingMovementCells - movementCostCells);
+    autoAdvanceCombatTurnIfExhausted(combatState);
+  }
+
+  private void autoAdvanceCombatTurnIfExhausted(ObjectNode combatState) {
+    ObjectNode turnResources = resolveCombatTurnResources(combatState);
+    boolean actionAvailable = turnResources.path("actionAvailable").asBoolean(false);
+    int remainingMovementCells = Math.max(0, turnResources.path("remainingMovementCells").asInt(0));
+    if (actionAvailable || remainingMovementCells > 0) {
+      return;
+    }
+
+    advanceCombatStateInPlace(combatState);
+  }
+
+  private void advanceCombatStateInPlace(ObjectNode combatState) {
+    ArrayNode participants = resolveCombatParticipants(combatState);
+    if (participants.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O combate ativo não possui participantes.");
+    }
+
+    int currentTurnIndex = Math.max(0, combatState.path("turnIndex").asInt(0));
+    int nextTurnIndex = currentTurnIndex + 1;
+    int currentRound = Math.max(1, combatState.path("round").asInt(1));
+    if (nextTurnIndex >= participants.size()) {
+      nextTurnIndex = 0;
+      currentRound += 1;
+    }
+
+    combatState.put("turnIndex", nextTurnIndex);
+    combatState.put("round", currentRound);
+    combatState.set("turnResources", buildTurnResourcesFromParticipants(combatState, participants));
+  }
+
+  private int normalizeCombatTurnIndex(ObjectNode combatState) {
+    ArrayNode participants = resolveCombatParticipants(combatState);
+    if (participants.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O combate ativo não possui participantes.");
+    }
+
+    int rawTurnIndex = Math.max(0, combatState.path("turnIndex").asInt(0));
+    if (rawTurnIndex >= participants.size()) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Estado de turno do combate está corrompido.");
+    }
+    return rawTurnIndex;
+  }
+
+  private ObjectNode buildTurnResourcesForActiveParticipant(ObjectNode combatState, ObjectNode rootNode) {
+    ArrayNode charactersNode = ensureArray(rootNode, "characters");
+    return buildTurnResourcesForActiveParticipant(combatState, charactersNode);
+  }
+
+  private ObjectNode buildTurnResourcesForActiveParticipant(ObjectNode combatState, ArrayNode charactersNode) {
+    ArrayNode participants = resolveCombatParticipants(combatState);
+    int turnIndex = normalizeCombatTurnIndex(combatState);
+    JsonNode activeParticipant = participants.get(turnIndex);
+    String characterId = activeParticipant.path("characterId").asText("").trim();
+    ObjectNode characterNode = findCharacterById(charactersNode, characterId);
+    int movementBudgetCells = resolveMovementBudgetCells(characterNode);
+
+    ObjectNode turnResources = objectMapper.createObjectNode();
+    turnResources.put("actionAvailable", true);
+    turnResources.put("bonusActionAvailable", true);
+    turnResources.put("remainingMovementCells", movementBudgetCells);
+    turnResources.put("totalMovementCells", movementBudgetCells);
+    return turnResources;
+  }
+
+  private ObjectNode buildTurnResourcesFromParticipants(ObjectNode combatState, ArrayNode participants) {
+    int turnIndex = normalizeCombatTurnIndex(combatState);
+    JsonNode activeParticipant = participants.get(turnIndex);
+    int movementBudgetCells = Math.max(1, activeParticipant.path("movementBudgetCells").asInt(DEFAULT_MOVEMENT_CELLS));
+
+    ObjectNode turnResources = objectMapper.createObjectNode();
+    turnResources.put("actionAvailable", true);
+    turnResources.put("bonusActionAvailable", true);
+    turnResources.put("remainingMovementCells", movementBudgetCells);
+    turnResources.put("totalMovementCells", movementBudgetCells);
+    return turnResources;
+  }
+
+  private int resolveMovementBudgetCells(ObjectNode characterNode) {
+    if (characterNode == null) {
+      return DEFAULT_MOVEMENT_CELLS;
+    }
+
+    JsonNode speedNode = characterNode.path("combatStats").path("speed");
+    if (!speedNode.isNumber()) {
+      return DEFAULT_MOVEMENT_CELLS;
+    }
+
+    int speedFeet = Math.max(0, speedNode.asInt(0));
+    if (speedFeet <= 0) {
+      return DEFAULT_MOVEMENT_CELLS;
+    }
+
+    return Math.max(1, speedFeet / 5);
+  }
+
+  private List<ObjectNode> buildCombatInitiativeMessages(
+      ArrayNode participants,
+      ArrayNode charactersNode,
+      Instant createdAt
+  ) {
+    List<ObjectNode> messages = new java.util.ArrayList<>();
+
+    for (int i = 0; i < participants.size(); i++) {
+      JsonNode participantNode = participants.get(i);
+      String characterId = participantNode.path("characterId").asText("").trim();
+      String tokenId = participantNode.path("tokenId").asText("").trim();
+      String participantLabel = resolveCombatParticipantLabel(charactersNode, characterId, tokenId);
+      int initiativeRoll = participantNode.path("initiativeRoll").asInt(0);
+      int initiativeTotal = participantNode.path("initiativeTotal").asInt(0);
+      int dexterityModifier = getAbilityModifier(participantNode.path("dexterityScore").asInt(10));
+
+      ObjectNode messageNode = objectMapper.createObjectNode();
+      messageNode.put("id", UUID.randomUUID().toString());
+      messageNode.put("sender", "Sistema");
+      messageNode.put("text", String.format(
+          Locale.ROOT,
+          "Iniciativa - %s: %d (d20 %d %+d DES).",
+          participantLabel,
+          initiativeTotal,
+          initiativeRoll,
+          dexterityModifier
+      ));
+      messageNode.put("timestamp", createdAt.toString());
+      messageNode.put("isDiceRoll", false);
+      messages.add(messageNode);
+    }
+
+    return messages;
+  }
+
+  private String resolveCombatParticipantLabel(ArrayNode charactersNode, String characterId, String fallbackTokenId) {
+    if (!characterId.isBlank()) {
+      ObjectNode characterNode = findCharacterById(charactersNode, characterId);
+      if (characterNode != null) {
+        String name = characterNode.path("name").asText("").trim();
+        if (!name.isBlank()) {
+          return name;
+        }
+
+        if ("NPC".equals(characterNode.path("type").asText("").trim())) {
+          String nameOverride = characterNode.path("nameOverride").asText("").trim();
+          if (!nameOverride.isBlank()) {
+            return nameOverride;
+          }
+
+          return resolveMonsterCatalogEntry(characterNode).primaryName();
+        }
+      }
+    }
+
+    return fallbackTokenId;
+  }
+
+  private void publishMessageEvents(
+      Long gameId,
+      Long actorUserId,
+      long serverVersion,
+      List<ObjectNode> messages,
+      Instant createdAt
+  ) {
+    for (ObjectNode messageNode : messages) {
+      ObjectNode payloadNode = objectMapper.createObjectNode();
+      payloadNode.set("message", messageNode.deepCopy());
+
+      GameSessionEventResponse event = new GameSessionEventResponse(
+          UUID.randomUUID().toString(),
+          gameId,
+          serverVersion,
+          "CHAT_MESSAGE_CREATED",
+          actorUserId,
+          payloadNode,
+          createdAt
+      );
+
+      messagingTemplate.convertAndSend(gameTopic(gameId), event);
+    }
+  }
+
   private CombatSyncResult syncCombatStateAfterRemovedTokenIds(ObjectNode rootNode, List<String> removedTokenIds) {
     if (removedTokenIds == null || removedTokenIds.isEmpty()) {
       return new CombatSyncResult(false, null);
@@ -1593,6 +2349,7 @@ public class GameSessionCommandService {
     ArrayNode participants = resolveCombatParticipants(combatState);
     int previousTurnIndex = Math.max(0, combatState.path("turnIndex").asInt(0));
     int removedBeforeTurn = 0;
+    boolean removedCurrentTurnParticipant = false;
 
     for (int i = participants.size() - 1; i >= 0; i--) {
       JsonNode participantNode = participants.get(i);
@@ -1602,6 +2359,9 @@ public class GameSessionCommandService {
       }
       if (i < previousTurnIndex) {
         removedBeforeTurn += 1;
+      }
+      if (i == previousTurnIndex) {
+        removedCurrentTurnParticipant = true;
       }
       participants.remove(i);
     }
@@ -1616,6 +2376,9 @@ public class GameSessionCommandService {
       adjustedTurnIndex = 0;
     }
     combatState.put("turnIndex", adjustedTurnIndex);
+    if (removedCurrentTurnParticipant) {
+      combatState.set("turnResources", buildTurnResourcesFromParticipants(combatState, participants));
+    }
     return new CombatSyncResult(true, combatState.deepCopy());
   }
 
@@ -1761,6 +2524,10 @@ public class GameSessionCommandService {
       ObjectNode sourceCharacterNode,
       String sourceCharacterId
   ) {
+    if ("NPC".equals(sourceCharacterNode.path("type").asText("").trim())) {
+      return buildDuplicatedMonsterCharacterNode(sourceCharacterNode);
+    }
+
     ObjectNode duplicatedCharacterNode = sourceCharacterNode.deepCopy();
     duplicatedCharacterNode.put("id", UUID.randomUUID().toString());
     duplicatedCharacterNode.put("isSessionClone", true);
@@ -1771,6 +2538,38 @@ public class GameSessionCommandService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do personagem é obrigatório.");
     }
     duplicatedCharacterNode.put("name", buildDuplicatedCharacterName(charactersNode, sourceName));
+    normalizeControlledByUserIdField(duplicatedCharacterNode);
+
+    SessionCharacterPayloadValidator.validatePersistedCharacter(duplicatedCharacterNode);
+    return duplicatedCharacterNode;
+  }
+
+  private void ensureUserCanDuplicateCharacter(GameEntity game, Long userId, ObjectNode sourceCharacterNode) {
+    if (!"NPC".equals(sourceCharacterNode.path("type").asText("").trim())) {
+      return;
+    }
+
+    if (!game.getOwner().getId().equals(userId)) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN,
+          "Somente o mestre pode duplicar monstros."
+      );
+    }
+  }
+
+  private ObjectNode buildDuplicatedMonsterCharacterNode(ObjectNode sourceCharacterNode) {
+    String monsterId = normalizeMonsterId(sourceCharacterNode.path("monsterId").asText(""));
+    String nameOverride = readOptionalString(sourceCharacterNode, "nameOverride");
+    String imageOverride = readOptionalString(sourceCharacterNode, "imageOverride");
+    String notes = readOptionalString(sourceCharacterNode, "notes");
+
+    ObjectNode duplicatedCharacterNode = buildMonsterCharacterNode(monsterId, nameOverride);
+    if (imageOverride != null) {
+      duplicatedCharacterNode.put("imageOverride", imageOverride);
+    }
+    if (notes != null) {
+      duplicatedCharacterNode.put("notes", notes);
+    }
 
     SessionCharacterPayloadValidator.validatePersistedCharacter(duplicatedCharacterNode);
     return duplicatedCharacterNode;
@@ -2007,6 +2806,18 @@ public class GameSessionCommandService {
   }
 
   private int resolveCharacterArmorClass(ObjectNode characterNode) {
+    if ("NPC".equals(characterNode.path("type").asText("").trim())) {
+      Integer armorClass = resolveMonsterCatalogEntry(characterNode).armorClass();
+      if (armorClass == null || armorClass < 1) {
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Catálogo canônico do monstro está sem armorClass válido."
+        );
+      }
+
+      return armorClass;
+    }
+
     ObjectNode equipmentNode = resolveRuntimeEquipmentContainer(characterNode);
     int dexterity = resolveBaseAbilityScore(characterNode, "dexterity");
 
@@ -2038,6 +2849,36 @@ public class GameSessionCommandService {
   }
 
   private int resolveBaseAbilityScore(ObjectNode characterNode, String abilityName) {
+    if ("NPC".equals(characterNode.path("type").asText("").trim())) {
+      MonsterCatalogManifestService.MonsterCatalogAbilityScores abilityScores =
+          resolveMonsterCatalogEntry(characterNode).abilityScores();
+      if (abilityScores == null) {
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Catálogo canônico do monstro está sem abilityScores."
+        );
+      }
+
+      Integer value = switch (abilityName) {
+        case "strength" -> abilityScores.strength();
+        case "dexterity" -> abilityScores.dexterity();
+        case "constitution" -> abilityScores.constitution();
+        case "intelligence" -> abilityScores.intelligence();
+        case "wisdom" -> abilityScores.wisdom();
+        case "charisma" -> abilityScores.charisma();
+        default -> null;
+      };
+
+      if (value == null) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Atributo de monstro não suportado para resolução autoritativa."
+        );
+      }
+
+      return value;
+    }
+
     JsonNode attributesNode = characterNode.get("attributes");
     if (!(attributesNode instanceof ObjectNode attributesObject)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Personagem sem atributos em runtime.");
@@ -2070,20 +2911,54 @@ public class GameSessionCommandService {
     return Math.floorDiv(score - 10, 2);
   }
 
+  private MonsterCatalogManifestService.MonsterCatalogEntry resolveMonsterCatalogEntry(ObjectNode characterNode) {
+    String monsterId = characterNode.path("monsterId").asText("").trim();
+    if (monsterId.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Monstro sem monsterId válido em runtime.");
+    }
+
+    return monsterCatalogManifestService.requireKnownMonster(monsterId);
+  }
+
   private ObjectNode resolveHitPointContainer(ObjectNode characterNode) {
     JsonNode hitPointsNode = characterNode.get("hitPoints");
     if (hitPointsNode instanceof ObjectNode hitPointsObject) {
       JsonNode currentNode = hitPointsObject.get("current");
-      JsonNode maxNode = hitPointsObject.get("max");
       JsonNode temporaryNode = hitPointsObject.get("temporary");
       if (currentNode != null && currentNode.isNumber()
-          && maxNode != null && maxNode.isNumber()
           && temporaryNode != null && temporaryNode.isNumber()) {
         return hitPointsObject;
       }
     }
 
     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Personagem sem estado de HP em runtime válido.");
+  }
+
+  private int resolveCharacterHitPointMaximum(ObjectNode characterNode, ObjectNode hitPointContainer) {
+    String characterType = characterNode.path("type").asText("").trim();
+    if ("NPC".equals(characterType)) {
+      String monsterId = characterNode.path("monsterId").asText("").trim();
+      if (monsterId.isBlank()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Monstro sem monsterId válido em runtime.");
+      }
+
+      Integer hitPointMaximum = monsterCatalogManifestService.requireKnownMonster(monsterId).hitPointMaximum();
+      if (hitPointMaximum == null || hitPointMaximum < 1) {
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Catálogo canônico do monstro está sem hitPointMaximum válido."
+        );
+      }
+
+      return hitPointMaximum;
+    }
+
+    JsonNode maxNode = hitPointContainer.get("max");
+    if (maxNode != null && maxNode.isNumber()) {
+      return Math.max(1, maxNode.asInt());
+    }
+
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Personagem sem HP máximo válido em runtime.");
   }
 
   private GameSessionEventResponse persistAndPublishCharacterHpUpdated(
@@ -2137,5 +3012,8 @@ public class GameSessionCommandService {
   }
 
   private record CombatSyncResult(boolean touched, JsonNode combatNode) {
+  }
+
+  private record SpawnTokenRequest(String sceneId, int x, int y) {
   }
 }

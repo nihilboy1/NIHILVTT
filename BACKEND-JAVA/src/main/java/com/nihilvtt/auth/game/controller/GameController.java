@@ -11,14 +11,17 @@ import com.nihilvtt.auth.game.dto.GameJoinRequestResponse;
 import com.nihilvtt.auth.game.dto.GameResponse;
 import com.nihilvtt.auth.game.dto.GameSessionEventResponse;
 import com.nihilvtt.auth.game.dto.GameSessionSnapshotResponse;
-import com.nihilvtt.auth.game.dto.StartCombatRequest;
 import com.nihilvtt.auth.game.dto.MoveTokenRequest;
 import com.nihilvtt.auth.game.dto.CreateTokenRequest;
 import com.nihilvtt.auth.game.dto.RemoveCharacterRequest;
 import com.nihilvtt.auth.game.dto.RemoveTokenRequest;
+import com.nihilvtt.auth.game.dto.RemoveTokensRequest;
 import com.nihilvtt.auth.game.dto.ResolveAttackRequest;
+import com.nihilvtt.auth.game.dto.SpawnMonsterRequest;
+import com.nihilvtt.auth.game.dto.StartCombatRequest;
 import com.nihilvtt.auth.game.dto.SubmitJoinRequestRequest;
 import com.nihilvtt.auth.game.dto.UpdateCharacterEquipmentRequest;
+import com.nihilvtt.auth.game.dto.UpdateCharacterControllerRequest;
 import com.nihilvtt.auth.game.dto.UpdateCharacterHpRequest;
 import com.nihilvtt.auth.game.dto.UpdateCharacterTempHpRequest;
 import com.nihilvtt.auth.game.dto.UpdateGameNicknameRequest;
@@ -238,6 +241,17 @@ public class GameController {
         .body(gameSessionCommandService.removeToken(userId, gameId, request.tokenId()));
   }
 
+  @PostMapping("/{gameId}/session/tokens/remove-batch")
+  public ResponseEntity<GameSessionEventResponse> removeTokens(
+      Authentication authentication,
+      @PathVariable Long gameId,
+      @Valid @RequestBody RemoveTokensRequest request
+  ) {
+    Long userId = (Long) authentication.getPrincipal();
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(gameSessionCommandService.removeTokens(userId, gameId, request.tokenIds()));
+  }
+
   @PostMapping("/{gameId}/session/combat/attacks")
   public ResponseEntity<GameSessionEventResponse> resolveAttack(
       Authentication authentication,
@@ -339,6 +353,22 @@ public class GameController {
         ));
   }
 
+  @PostMapping("/{gameId}/session/characters/controller")
+  public ResponseEntity<GameSessionEventResponse> updateCharacterController(
+      Authentication authentication,
+      @PathVariable Long gameId,
+      @Valid @RequestBody UpdateCharacterControllerRequest request
+  ) {
+    Long userId = (Long) authentication.getPrincipal();
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(gameSessionCommandService.updateCharacterController(
+            userId,
+            gameId,
+            request.characterId(),
+            request.controlledByUserId()
+        ));
+  }
+
   @PostMapping("/{gameId}/session/characters/inventory/add")
   public ResponseEntity<GameSessionEventResponse> addItemToCharacterInventory(
       Authentication authentication,
@@ -365,6 +395,25 @@ public class GameController {
     Long userId = (Long) authentication.getPrincipal();
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(gameSessionCommandService.createCharacter(userId, gameId, request.character()));
+  }
+
+  @PostMapping("/{gameId}/session/monsters")
+  public ResponseEntity<GameSessionEventResponse> spawnMonster(
+      Authentication authentication,
+      @PathVariable Long gameId,
+      @Valid @RequestBody SpawnMonsterRequest request
+  ) {
+    Long userId = (Long) authentication.getPrincipal();
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(gameSessionCommandService.spawnMonsterCharacter(
+            userId,
+            gameId,
+            request.monsterId(),
+            request.nameOverride(),
+            request.sceneId(),
+            request.x(),
+            request.y()
+        ));
   }
 
   @PostMapping("/{gameId}/session/characters/duplicate")

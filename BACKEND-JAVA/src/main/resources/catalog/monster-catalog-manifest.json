@@ -1,0 +1,2116 @@
+{
+  "monsters": [
+    {
+      "id": "monster-ape",
+      "primaryName": "Macaco",
+      "names": [
+        "Macaco",
+        "Ape"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 16,
+        "dexterity": 14,
+        "constitution": 14,
+        "intelligence": 6,
+        "wisdom": 12,
+        "charisma": 7
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 19,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": 30,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-awakened-shrub",
+      "primaryName": "Arbusto Desperto",
+      "names": [
+        "Arbusto Desperto",
+        "Awakened Shrub"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "plant",
+      "alignment": "trueNeutral",
+      "abilityScores": {
+        "strength": 3,
+        "dexterity": 8,
+        "constitution": 11,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 6
+      },
+      "armorClass": 9,
+      "hitPointMaximum": 10,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-baboon",
+      "primaryName": "Babuíno",
+      "names": [
+        "Babuíno",
+        "Baboon"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 8,
+        "dexterity": 14,
+        "constitution": 11,
+        "intelligence": 4,
+        "wisdom": 12,
+        "charisma": 6
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 3,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": 30,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-badger",
+      "primaryName": "Texugo",
+      "names": [
+        "Texugo",
+        "Badger"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 10,
+        "dexterity": 11,
+        "constitution": 16,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 5
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 5,
+      "speed": {
+        "walk": 20,
+        "burrow": 5,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-bat",
+      "primaryName": "Morcego",
+      "names": [
+        "Morcego",
+        "Bat"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 2,
+        "dexterity": 15,
+        "constitution": 8,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 4
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": 30,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-black-bear",
+      "primaryName": "Urso Negro",
+      "names": [
+        "Urso Negro",
+        "Black Bear"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 15,
+        "dexterity": 12,
+        "constitution": 14,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 7
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 19,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": 30,
+        "fly": null,
+        "swim": 30,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-cat",
+      "primaryName": "Gato",
+      "names": [
+        "Gato",
+        "Cat"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 3,
+        "dexterity": 15,
+        "constitution": 10,
+        "intelligence": 3,
+        "wisdom": 12,
+        "charisma": 7
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 2,
+      "speed": {
+        "walk": 40,
+        "burrow": null,
+        "climb": 40,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-cockatrice",
+      "primaryName": "Cocatriz",
+      "names": [
+        "Cocatriz",
+        "Cockatrice"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "monstrosity",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 6,
+        "dexterity": 12,
+        "constitution": 12,
+        "intelligence": 2,
+        "wisdom": 13,
+        "charisma": 5
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 22,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": 40,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-commoner",
+      "primaryName": "Plebeu",
+      "names": [
+        "Plebeu",
+        "Commoner"
+      ],
+      "tokenUrl": "https://i.imgur.com/UHQB5bK.png",
+      "splashArtUrl": "https://i.imgur.com/UHQB5bK.png",
+      "size": "medium",
+      "creatureType": "humanoid",
+      "alignment": "trueNeutral",
+      "abilityScores": {
+        "strength": 10,
+        "dexterity": 10,
+        "constitution": 10,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 10
+      },
+      "armorClass": 10,
+      "hitPointMaximum": 4,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-crab",
+      "primaryName": "Caranguejo",
+      "names": [
+        "Caranguejo",
+        "Crab"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 6,
+        "dexterity": 11,
+        "constitution": 12,
+        "intelligence": 1,
+        "wisdom": 8,
+        "charisma": 2
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 3,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 20,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-crawling-claw",
+      "primaryName": "Garra Rastejante",
+      "names": [
+        "Garra Rastejante",
+        "Crawling Claw"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "undead",
+      "alignment": "neutralEvil",
+      "abilityScores": {
+        "strength": 13,
+        "dexterity": 14,
+        "constitution": 11,
+        "intelligence": 5,
+        "wisdom": 10,
+        "charisma": 4
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 2,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": 20,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-crocodile",
+      "primaryName": "Crocodilo",
+      "names": [
+        "Crocodilo",
+        "Crocodile"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "large",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 15,
+        "dexterity": 10,
+        "constitution": 13,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 5
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 13,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 30,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-darkmantle",
+      "primaryName": "Manto Sombrio",
+      "names": [
+        "Manto Sombrio",
+        "Darkmantle"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "aberration",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 16,
+        "dexterity": 12,
+        "constitution": 13,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 5
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 22,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": null,
+        "fly": 30,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-deer",
+      "primaryName": "Cervo",
+      "names": [
+        "Cervo",
+        "Deer"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 11,
+        "dexterity": 16,
+        "constitution": 11,
+        "intelligence": 2,
+        "wisdom": 14,
+        "charisma": 5
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 4,
+      "speed": {
+        "walk": 50,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-dust-mephit",
+      "primaryName": "Mefit de Poeira",
+      "names": [
+        "Mefit de Poeira",
+        "Dust Mephit"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "elemental",
+      "alignment": "neutralEvil",
+      "abilityScores": {
+        "strength": 5,
+        "dexterity": 14,
+        "constitution": 10,
+        "intelligence": 9,
+        "wisdom": 11,
+        "charisma": 10
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 17,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": 30,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-eagle",
+      "primaryName": "Águia",
+      "names": [
+        "Águia",
+        "Eagle"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 6,
+        "dexterity": 15,
+        "constitution": 12,
+        "intelligence": 2,
+        "wisdom": 14,
+        "charisma": 7
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 4,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": null,
+        "fly": 60,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-frog",
+      "primaryName": "Sapo",
+      "names": [
+        "Sapo",
+        "Frog"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 1,
+        "dexterity": 13,
+        "constitution": 8,
+        "intelligence": 1,
+        "wisdom": 8,
+        "charisma": 3
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 20,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-gas-spore-fungus",
+      "primaryName": "Fungo Esporo de Gás",
+      "names": [
+        "Fungo Esporo de Gás",
+        "Gas Spore Fungus"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "large",
+      "creatureType": "plant",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 5,
+        "dexterity": 1,
+        "constitution": 3,
+        "intelligence": 1,
+        "wisdom": 1,
+        "charisma": 1
+      },
+      "armorClass": 8,
+      "hitPointMaximum": 13,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": 10,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-giant-fire-beetle",
+      "primaryName": "Besouro de Fogo Gigante",
+      "names": [
+        "Besouro de Fogo Gigante",
+        "Giant Fire Beetle"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 8,
+        "dexterity": 10,
+        "constitution": 12,
+        "intelligence": 1,
+        "wisdom": 7,
+        "charisma": 3
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 4,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": 30,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-giant-goat",
+      "primaryName": "Cabra Gigante",
+      "names": [
+        "Cabra Gigante",
+        "Giant Goat"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "large",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 17,
+        "dexterity": 13,
+        "constitution": 12,
+        "intelligence": 3,
+        "wisdom": 12,
+        "charisma": 6
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 19,
+      "speed": {
+        "walk": 40,
+        "burrow": null,
+        "climb": 30,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-giant-seahorse",
+      "primaryName": "Cavalo-Marinho Gigante",
+      "names": [
+        "Cavalo-Marinho Gigante",
+        "Giant Seahorse"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "large",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 15,
+        "dexterity": 12,
+        "constitution": 11,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 5
+      },
+      "armorClass": 14,
+      "hitPointMaximum": 16,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 40,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-giant-wasp",
+      "primaryName": "Vespa Gigante",
+      "names": [
+        "Vespa Gigante",
+        "Giant Wasp"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 10,
+        "dexterity": 14,
+        "constitution": 10,
+        "intelligence": 1,
+        "wisdom": 10,
+        "charisma": 3
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 22,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": null,
+        "fly": 50,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-gnoll-warrior",
+      "primaryName": "Gnoll Guerreiro",
+      "names": [
+        "Gnoll Guerreiro",
+        "Gnoll Warrior"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "fiend",
+      "alignment": "chaoticEvil",
+      "abilityScores": {
+        "strength": 14,
+        "dexterity": 12,
+        "constitution": 11,
+        "intelligence": 6,
+        "wisdom": 10,
+        "charisma": 7
+      },
+      "armorClass": 15,
+      "hitPointMaximum": 27,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-goat",
+      "primaryName": "Cabra",
+      "names": [
+        "Cabra",
+        "Goat"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 11,
+        "dexterity": 10,
+        "constitution": 11,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 5
+      },
+      "armorClass": 10,
+      "hitPointMaximum": 4,
+      "speed": {
+        "walk": 40,
+        "burrow": null,
+        "climb": 30,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-gray-ooze",
+      "primaryName": "Lodo Cinzento",
+      "names": [
+        "Lodo Cinzento",
+        "Gray Ooze"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "ooze",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 12,
+        "dexterity": 6,
+        "constitution": 16,
+        "intelligence": 1,
+        "wisdom": 6,
+        "charisma": 2
+      },
+      "armorClass": 9,
+      "hitPointMaximum": 22,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": 10,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-hawk",
+      "primaryName": "Falcão",
+      "names": [
+        "Falcão",
+        "Hawk"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 5,
+        "dexterity": 16,
+        "constitution": 8,
+        "intelligence": 2,
+        "wisdom": 14,
+        "charisma": 6
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": null,
+        "fly": 60,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-hobgoblin-warrior",
+      "primaryName": "Hobgoblin Guerreiro",
+      "names": [
+        "Hobgoblin Guerreiro",
+        "Hobgoblin Warrior"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "fey",
+      "alignment": "lawfulEvil",
+      "abilityScores": {
+        "strength": 13,
+        "dexterity": 12,
+        "constitution": 12,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 9
+      },
+      "armorClass": 18,
+      "hitPointMaximum": 11,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-homunculus",
+      "primaryName": "Homúnculo",
+      "names": [
+        "Homúnculo",
+        "Homunculus"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "construct",
+      "alignment": "trueNeutral",
+      "abilityScores": {
+        "strength": 4,
+        "dexterity": 15,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 7
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 4,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": 40,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-hyena",
+      "primaryName": "Hiena",
+      "names": [
+        "Hiena",
+        "Hyena"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 11,
+        "dexterity": 13,
+        "constitution": 12,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 5
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 5,
+      "speed": {
+        "walk": 50,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-ice-mephit",
+      "primaryName": "Mefit de Gelo",
+      "names": [
+        "Mefit de Gelo",
+        "Ice Mephit"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "elemental",
+      "alignment": "neutralEvil",
+      "abilityScores": {
+        "strength": 7,
+        "dexterity": 13,
+        "constitution": 10,
+        "intelligence": 9,
+        "wisdom": 11,
+        "charisma": 12
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 21,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": 30,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-jackal",
+      "primaryName": "Chacal",
+      "names": [
+        "Chacal",
+        "Jackal"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 8,
+        "dexterity": 15,
+        "constitution": 11,
+        "intelligence": 3,
+        "wisdom": 12,
+        "charisma": 6
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 3,
+      "speed": {
+        "walk": 40,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-jackalwere",
+      "primaryName": "Homem-Chacal",
+      "names": [
+        "Homem-Chacal",
+        "Jackalwere"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "fiend",
+      "alignment": "chaoticEvil",
+      "abilityScores": {
+        "strength": 11,
+        "dexterity": 15,
+        "constitution": 12,
+        "intelligence": 13,
+        "wisdom": 11,
+        "charisma": 10
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 18,
+      "speed": {
+        "walk": 40,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-larva",
+      "primaryName": "Larva",
+      "names": [
+        "Larva",
+        "Larva"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "fiend",
+      "alignment": "neutralEvil",
+      "abilityScores": {
+        "strength": 9,
+        "dexterity": 9,
+        "constitution": 10,
+        "intelligence": 6,
+        "wisdom": 10,
+        "charisma": 2
+      },
+      "armorClass": 9,
+      "hitPointMaximum": 9,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-lemure",
+      "primaryName": "Lêmure",
+      "names": [
+        "Lêmure",
+        "Lemure"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "fiend",
+      "alignment": "lawfulEvil",
+      "abilityScores": {
+        "strength": 10,
+        "dexterity": 5,
+        "constitution": 11,
+        "intelligence": 1,
+        "wisdom": 11,
+        "charisma": 3
+      },
+      "armorClass": 9,
+      "hitPointMaximum": 9,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-lizard",
+      "primaryName": "Lagarto",
+      "names": [
+        "Lagarto",
+        "Lizard"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 2,
+        "dexterity": 11,
+        "constitution": 10,
+        "intelligence": 1,
+        "wisdom": 8,
+        "charisma": 3
+      },
+      "armorClass": 10,
+      "hitPointMaximum": 2,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": 20,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-magma-mephit",
+      "primaryName": "Mefit de Magma",
+      "names": [
+        "Mefit de Magma",
+        "Magma Mephit"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "elemental",
+      "alignment": "neutralEvil",
+      "abilityScores": {
+        "strength": 8,
+        "dexterity": 12,
+        "constitution": 12,
+        "intelligence": 7,
+        "wisdom": 10,
+        "charisma": 10
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 18,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": 30,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-magmin",
+      "primaryName": "Magmin",
+      "names": [
+        "Magmin",
+        "Magmin"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "elemental",
+      "alignment": "chaoticNeutral",
+      "abilityScores": {
+        "strength": 7,
+        "dexterity": 15,
+        "constitution": 12,
+        "intelligence": 8,
+        "wisdom": 11,
+        "charisma": 10
+      },
+      "armorClass": 14,
+      "hitPointMaximum": 13,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-modron-tridrone",
+      "primaryName": "Modron Tridrone",
+      "names": [
+        "Modron Tridrone",
+        "Modron Tridrone"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "construct",
+      "alignment": "lawfulNeutral",
+      "abilityScores": {
+        "strength": 12,
+        "dexterity": 13,
+        "constitution": 12,
+        "intelligence": 9,
+        "wisdom": 10,
+        "charisma": 9
+      },
+      "armorClass": 15,
+      "hitPointMaximum": 16,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-myconid-adult",
+      "primaryName": "Miconídeo Adulto",
+      "names": [
+        "Miconídeo Adulto",
+        "Myconid Adult"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "plant",
+      "alignment": "lawfulNeutral",
+      "abilityScores": {
+        "strength": 10,
+        "dexterity": 10,
+        "constitution": 12,
+        "intelligence": 10,
+        "wisdom": 13,
+        "charisma": 7
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 16,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-myconid-sprout",
+      "primaryName": "Brote de Miconídeo",
+      "names": [
+        "Brote de Miconídeo",
+        "Myconid Sprout"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "plant",
+      "alignment": "lawfulNeutral",
+      "abilityScores": {
+        "strength": 8,
+        "dexterity": 10,
+        "constitution": 10,
+        "intelligence": 8,
+        "wisdom": 11,
+        "charisma": 5
+      },
+      "armorClass": 10,
+      "hitPointMaximum": 3,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-octopus",
+      "primaryName": "Polvo",
+      "names": [
+        "Polvo",
+        "Octopus"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 4,
+        "dexterity": 15,
+        "constitution": 11,
+        "intelligence": 3,
+        "wisdom": 10,
+        "charisma": 4
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 3,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 30,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-owl",
+      "primaryName": "Coruja",
+      "names": [
+        "Coruja",
+        "Owl"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 3,
+        "dexterity": 13,
+        "constitution": 8,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 7
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": 60,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-performer",
+      "primaryName": "Artista",
+      "names": [
+        "Artista",
+        "Performer"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "humanoid",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 12,
+        "dexterity": 16,
+        "constitution": 12,
+        "intelligence": 13,
+        "wisdom": 14,
+        "charisma": 16
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 27,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-piercer",
+      "primaryName": "Perfurador",
+      "names": [
+        "Perfurador",
+        "Piercer"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "aberration",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 13,
+        "dexterity": 13,
+        "constitution": 16,
+        "intelligence": 1,
+        "wisdom": 7,
+        "charisma": 3
+      },
+      "armorClass": 15,
+      "hitPointMaximum": 22,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": 15,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-piranha",
+      "primaryName": "Piranha",
+      "names": [
+        "Piranha",
+        "Piranha"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 2,
+        "dexterity": 16,
+        "constitution": 9,
+        "intelligence": 1,
+        "wisdom": 7,
+        "charisma": 2
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 40,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-rat",
+      "primaryName": "Rato",
+      "names": [
+        "Rato",
+        "Rat"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 2,
+        "dexterity": 11,
+        "constitution": 9,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 4
+      },
+      "armorClass": 10,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": 20,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-raven",
+      "primaryName": "Corvo",
+      "names": [
+        "Corvo",
+        "Raven"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 2,
+        "dexterity": 14,
+        "constitution": 10,
+        "intelligence": 5,
+        "wisdom": 13,
+        "charisma": 6
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 2,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": null,
+        "fly": 50,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-reef-shark",
+      "primaryName": "Tubarão de Recife",
+      "names": [
+        "Tubarão de Recife",
+        "Reef Shark"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 14,
+        "dexterity": 15,
+        "constitution": 13,
+        "intelligence": 1,
+        "wisdom": 10,
+        "charisma": 4
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 22,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 30,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-rust-monster",
+      "primaryName": "Monstro da Ferrugem",
+      "names": [
+        "Monstro da Ferrugem",
+        "Rust Monster"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "monstrosity",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 13,
+        "dexterity": 12,
+        "constitution": 13,
+        "intelligence": 2,
+        "wisdom": 13,
+        "charisma": 6
+      },
+      "armorClass": 14,
+      "hitPointMaximum": 33,
+      "speed": {
+        "walk": 40,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-sahuagin-warrior",
+      "primaryName": "Sahuagin Guerreiro",
+      "names": [
+        "Sahuagin Guerreiro",
+        "Sahuagin Warrior"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "fiend",
+      "alignment": "lawfulEvil",
+      "abilityScores": {
+        "strength": 13,
+        "dexterity": 11,
+        "constitution": 12,
+        "intelligence": 12,
+        "wisdom": 13,
+        "charisma": 9
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 22,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 40,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-satyr",
+      "primaryName": "Sátiro",
+      "names": [
+        "Sátiro",
+        "Satyr"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "fey",
+      "alignment": "chaoticNeutral",
+      "abilityScores": {
+        "strength": 12,
+        "dexterity": 16,
+        "constitution": 11,
+        "intelligence": 12,
+        "wisdom": 10,
+        "charisma": 14
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 31,
+      "speed": {
+        "walk": 40,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-scorpion",
+      "primaryName": "Escorpião",
+      "names": [
+        "Escorpião",
+        "Scorpion"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 2,
+        "dexterity": 11,
+        "constitution": 8,
+        "intelligence": 1,
+        "wisdom": 8,
+        "charisma": 2
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-scout",
+      "primaryName": "Batedor",
+      "names": [
+        "Batedor",
+        "Scout"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "humanoid",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 11,
+        "dexterity": 14,
+        "constitution": 12,
+        "intelligence": 11,
+        "wisdom": 13,
+        "charisma": 11
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 16,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-seahorse",
+      "primaryName": "Cavalo-Marinho",
+      "names": [
+        "Cavalo-Marinho",
+        "Seahorse"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 1,
+        "dexterity": 12,
+        "constitution": 8,
+        "intelligence": 1,
+        "wisdom": 10,
+        "charisma": 2
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": 20,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-shadow",
+      "primaryName": "Sombra",
+      "names": [
+        "Sombra",
+        "Shadow"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "undead",
+      "alignment": "chaoticEvil",
+      "abilityScores": {
+        "strength": 6,
+        "dexterity": 14,
+        "constitution": 13,
+        "intelligence": 6,
+        "wisdom": 10,
+        "charisma": 8
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 27,
+      "speed": {
+        "walk": 40,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-shrieker-fungus",
+      "primaryName": "Fungo Berrador",
+      "names": [
+        "Fungo Berrador",
+        "Shrieker Fungus"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "plant",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 1,
+        "dexterity": 1,
+        "constitution": 10,
+        "intelligence": 1,
+        "wisdom": 3,
+        "charisma": 1
+      },
+      "armorClass": 5,
+      "hitPointMaximum": 13,
+      "speed": {
+        "walk": 5,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-spider",
+      "primaryName": "Aranha",
+      "names": [
+        "Aranha",
+        "Spider"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 2,
+        "dexterity": 14,
+        "constitution": 8,
+        "intelligence": 1,
+        "wisdom": 10,
+        "charisma": 2
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": 20,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-swarm-of-insects",
+      "primaryName": "Enxame de Insetos",
+      "names": [
+        "Enxame de Insetos",
+        "Swarm of Insects"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 3,
+        "dexterity": 13,
+        "constitution": 14,
+        "intelligence": 1,
+        "wisdom": 7,
+        "charisma": 1
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 19,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": 20,
+        "fly": 20,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-tough",
+      "primaryName": "Durão",
+      "names": [
+        "Durão",
+        "Tough"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "humanoid",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 15,
+        "dexterity": 12,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 11
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 32,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-troll-limb",
+      "primaryName": "Membro de Troll",
+      "names": [
+        "Membro de Troll",
+        "Troll Limb"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "small",
+      "creatureType": "giant",
+      "alignment": "chaoticEvil",
+      "abilityScores": {
+        "strength": 18,
+        "dexterity": 12,
+        "constitution": 10,
+        "intelligence": 1,
+        "wisdom": 9,
+        "charisma": 1
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 14,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-vine-blight",
+      "primaryName": "Praga de Videira",
+      "names": [
+        "Praga de Videira",
+        "Vine Blight"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "plant",
+      "alignment": "neutralEvil",
+      "abilityScores": {
+        "strength": 15,
+        "dexterity": 8,
+        "constitution": 14,
+        "intelligence": 5,
+        "wisdom": 10,
+        "charisma": 3
+      },
+      "armorClass": 12,
+      "hitPointMaximum": 19,
+      "speed": {
+        "walk": 20,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-vulture",
+      "primaryName": "Abutre",
+      "names": [
+        "Abutre",
+        "Vulture"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "medium",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 7,
+        "dexterity": 10,
+        "constitution": 13,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 4
+      },
+      "armorClass": 10,
+      "hitPointMaximum": 5,
+      "speed": {
+        "walk": 10,
+        "burrow": null,
+        "climb": null,
+        "fly": 50,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-warhorse",
+      "primaryName": "Cavalo de Guerra",
+      "names": [
+        "Cavalo de Guerra",
+        "Warhorse"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "large",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 18,
+        "dexterity": 12,
+        "constitution": 13,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 7
+      },
+      "armorClass": 11,
+      "hitPointMaximum": 19,
+      "speed": {
+        "walk": 60,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-warhorse-skeleton",
+      "primaryName": "Cavalo de Guerra Esqueleto",
+      "names": [
+        "Cavalo de Guerra Esqueleto",
+        "Warhorse Skeleton"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "large",
+      "creatureType": "undead",
+      "alignment": "lawfulEvil",
+      "abilityScores": {
+        "strength": 18,
+        "dexterity": 12,
+        "constitution": 15,
+        "intelligence": 2,
+        "wisdom": 8,
+        "charisma": 5
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 22,
+      "speed": {
+        "walk": 60,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    },
+    {
+      "id": "monster-weasel",
+      "primaryName": "Doninha",
+      "names": [
+        "Doninha",
+        "Weasel"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "tiny",
+      "creatureType": "beast",
+      "alignment": "unaligned",
+      "abilityScores": {
+        "strength": 3,
+        "dexterity": 16,
+        "constitution": 8,
+        "intelligence": 2,
+        "wisdom": 12,
+        "charisma": 3
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 1,
+      "speed": {
+        "walk": 30,
+        "burrow": null,
+        "climb": 30,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "0"
+    },
+    {
+      "id": "monster-worg",
+      "primaryName": "Worg",
+      "names": [
+        "Worg",
+        "Worg"
+      ],
+      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
+      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "size": "large",
+      "creatureType": "fey",
+      "alignment": "neutralEvil",
+      "abilityScores": {
+        "strength": 16,
+        "dexterity": 13,
+        "constitution": 13,
+        "intelligence": 7,
+        "wisdom": 11,
+        "charisma": 8
+      },
+      "armorClass": 13,
+      "hitPointMaximum": 26,
+      "speed": {
+        "walk": 50,
+        "burrow": null,
+        "climb": null,
+        "fly": null,
+        "swim": null,
+        "unit": "ft"
+      },
+      "challengeRating": "1/2"
+    }
+  ]
+}

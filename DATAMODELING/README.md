@@ -2,6 +2,12 @@
 
 Pacote `@nihilvtt/datamodeling` com schemas, tipos, dados e ferramentas de validacao do dominio.
 
+Este README e um guia operacional do pacote: organizacao interna, exports, fluxo de trabalho e direcao tecnica da modelagem.
+
+Regra editorial do modulo:
+
+- o datamodeling do NIHILVTT esta em pre-versao; schemas e documentacao devem refletir apenas o contrato atual, sem qualquer nocao de suporte legado
+
 ## Estrutura principal
 
 - `src/data/`: dados do jogo (classes, feats, itens, monstros, magias, tokens).
@@ -12,6 +18,7 @@ Pacote `@nihilvtt/datamodeling` com schemas, tipos, dados e ferramentas de valid
   - `value-objects/`: blocos mutaveis pequenos e reutilizaveis.
   - `entities/`: agregados runtime persistidos, como `PlayerCharacterState`.
 - `src/tooling/`: scripts de validacao e geracao.
+- `MONSTER_RUNTIME_BLUEPRINT.md`: blueprint tecnico da futura ficha/runtime autoritativo de monstros.
 
 ## Exports do pacote
 
@@ -28,6 +35,8 @@ No diretorio `DATAMODELING/`:
 - `pnpm validate:data`
 - `pnpm enums`
 - `pnpm monsters`
+- `pnpm export:backend-item-manifest`
+- `pnpm export:backend-monster-manifest`
 - `pnpm lint`
 
 ## Fluxo recomendado
@@ -68,7 +77,15 @@ Leitura atual do pacote, confirmada no codigo:
   - `ResourcePoolStateSchema`
   - `ActiveEffectStateSchema`
   - `PlayerCharacterStateSchema`
+  - `MonsterCharacterStateSchema`
+  - `SessionCharacterStateSchema` (uniao discriminada canônica de personagem de sessao)
 - `PlayerCharacterHitPointStateSchema` agora exige `current`, `temporary` e `max`; `max` passa a ser a fonte canonica e obrigatoria de HP maximo no runtime.
+- `PlayerCharacterStateSchema` agora tambem carrega `controlledByUserId` (nullable), para definir de forma autoritativa quem controla aquela ficha na mesa.
+- O runtime de `Player` agora segue a mesma disciplina estrita do runtime de `NPC`: `controlledByUserId`, `inspiration`, `build.subclassId`, `build.selectedFeatIds`, `progression`, `hitPoints.temporary`, `inventory.items`, `equipment`, `resourcePools`, `activeEffects` e seus campos mutaveis internos precisam existir explicitamente no payload; `default()` nao deve mais completar estado ausente por baixo dos panos.
+- Monstros agora tambem tem um primeiro corte de runtime: `MonsterCharacterStateSchema`, mantendo `MonsterType` como catalogo estatico e usando `monsterId` como referencia canonica da instancia em mesa.
+- `MonsterCharacterStateSchema` nao carrega `controlledByUserId`: no estado atual do produto, `NPC` e sempre de uso exclusivo do mestre.
+- `MonsterCharacterStateSchema` tambem nao usa mais defaults silenciosos para campos mutaveis: `nameOverride`, `imageOverride`, `notes`, `hitPoints.temporary`, `resourcePools.pools[]` e `activeEffects.effects[]` precisam existir explicitamente no payload runtime, alinhados ao validador do backend.
+- `SessionCharacterStateSchema` passa a ser a borda canônica de parse para snapshots e eventos de sessao, reduzindo branching manual entre `Player` e `NPC`.
 
 ## Distincao Importante
 
@@ -201,7 +218,10 @@ Diretriz explicita:
 
 - o projeto nao deve manter suporte legado dentro do runtime tipado
 - quando um campo passar a ser obrigatorio no runtime, ele deve ser exigido por schema e pelos consumidores
-- nao adicionar fallback nem backfill automatico para "corrigir" personagens antigos; contratos invalidos devem falhar cedo
+- nao adicionar fallback nem backfill automatico para corrigir payloads/estados; contratos invalidos devem falhar cedo
+- a futura ficha de monstro deve seguir a mesma regra: o runtime guarda apenas estado mutavel, e frontend/backend projetam dados canonicos sem duplicar nem reconstruir regra fora do catalogo
+- no primeiro corte de runtime de monstro, HP maximo, AC, speed, atributos, traits e acoes continuam fora do runtime e devem ser resolvidos do catalogo canonico
+- para manter SSOT com o backend, o runtime de monstro nao deve depender de `default()` para \"completar\" campos ausentes; payload incompleto e invalido por contrato
 
 ## Convencoes Iniciais de Runtime
 
@@ -241,6 +261,7 @@ Regra atual:
 - a composicao de `PHB2024ITEMS` deve permanecer alinhada aos enums gerados em `src/shared/data-based-enums.ts` (especialmente `AllItemsEnum`)
 - itens validos ja modelados no pacote nao devem ficar fora do export principal por omissao na uniao
 - o script `pnpm export:backend-item-manifest` gera um manifest JSON consumido pelo backend Java para validacao de inventario/equipamento sem heuristica por prefixo
+- o script `pnpm export:backend-monster-manifest` gera o manifest JSON canônico de monstros para o backend Java, incluindo identidade base, `primaryName`, `abilityScores`, AC, HP máximo e deslocamentos necessarios para spawn/validacao/combate sem confiar em payload montado pelo frontend
 - o script `pnpm enums` deve classificar familias de item pela origem canonica dos arquivos de dados (e metadado associado), nao por prefixo textual de `id`
 - o script `pnpm enums` deve apontar para os diretórios reais de dados publicados (`items`, `actions`, `spells`, `feats`, `summonedTokens`, `monsters`), respeitando também a extensão real dos módulos publicados (`.ts` ou `.js`) para evitar enums vazios
 

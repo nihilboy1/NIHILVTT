@@ -378,8 +378,8 @@ export const monstersCR0 = [
     name: ["Plebeu", "Commoner"],
     description:
       "Plebeus são as pessoas comuns encontradas em cidades, vilas e aldeias. Eles não são guerreiros, mas podem lutar para defender seus lares e famílias.",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/UHQB5bK.png",
+    splashArtUrl: "https://i.imgur.com/UHQB5bK.png",
     source: "MM2024",
     size: "medium",
     type: "humanoid",

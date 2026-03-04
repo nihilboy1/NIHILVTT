@@ -5,10 +5,10 @@ export const BodyArmorIdEnum = ArmorIdEnum.exclude(["armor-escudo"]);
 export const ShieldArmorIdEnum = z.literal("armor-escudo");
 
 export const EquipmentStateSchema = z.object({
-  bodyArmorItemId: BodyArmorIdEnum.nullable().default(null),
-  shieldItemId: ShieldArmorIdEnum.nullable().default(null),
-  mainHandWeaponId: WeaponIdEnum.nullable().default(null),
-  offHandWeaponId: WeaponIdEnum.nullable().default(null),
+  bodyArmorItemId: BodyArmorIdEnum.nullable(),
+  shieldItemId: ShieldArmorIdEnum.nullable(),
+  mainHandWeaponId: WeaponIdEnum.nullable(),
+  offHandWeaponId: WeaponIdEnum.nullable(),
 });
 
 export type EquipmentStateType = z.infer<typeof EquipmentStateSchema>;

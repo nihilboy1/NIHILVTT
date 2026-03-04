@@ -9,9 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 final class SessionCharacterPayloadValidator {
-  private static final Set<String> SUPPORTED_CHARACTER_TYPES = Set.of("Player");
+  private static final Set<String> SUPPORTED_CHARACTER_TYPES = Set.of("Player", "NPC");
   private static final Set<String> ACTIVE_EFFECT_SOURCE_TYPES = Set.of("class", "feat", "item", "spell", "action");
   private static final Pattern CLASS_ID_PATTERN = Pattern.compile("^class-[a-z0-9-]+$");
+  private static final Pattern MONSTER_ID_PATTERN = Pattern.compile("^monster-[a-z0-9-]+$");
   private static final Pattern ORIGIN_ID_PATTERN = Pattern.compile("^origin-[a-z0-9-]+$");
   private static final Pattern SPECIE_ID_PATTERN = Pattern.compile("^specie-[a-z0-9-]+$");
   private static final Pattern SUBCLASS_ID_PATTERN = Pattern.compile("^subclass-[a-z0-9-]+$");
@@ -21,78 +22,121 @@ final class SessionCharacterPayloadValidator {
   }
 
   static void validateForCreate(ObjectNode characterNode) {
-    validateRuntimeCharacterNode(characterNode);
+    String type = requireSessionCharacterEnvelope(characterNode);
+    if (!"Player".equals(type)) {
+      throw invalid("A criação genérica aceita apenas PlayerCharacterState em runtime.");
+    }
+
+    validateRuntimeCharacterByType(type, characterNode, "A criação genérica aceita apenas PlayerCharacterState em runtime.");
+  }
+
+  static void validateMonsterForCreate(ObjectNode characterNode) {
+    validateRuntimeMonsterCharacter(characterNode);
+    if (characterNode.has("controlledByUserId")) {
+      throw invalid("MonsterCharacterState não aceita controlledByUserId.");
+    }
   }
 
   static void validatePersistedCharacter(ObjectNode characterNode) {
-    validateRuntimeCharacterNode(characterNode);
+    String type = requireSessionCharacterEnvelope(characterNode);
+    validateRuntimeCharacterByType(type, characterNode, "A sessão aceita apenas PlayerCharacterState em runtime.");
   }
 
-  private static void validateRuntimeCharacterNode(ObjectNode characterNode) {
-    requireUuid(characterNode.path("id"), "Id do personagem é inválido.");
-    requireNonBlankText(characterNode.path("name"), "Nome do personagem é obrigatório.");
+  private static void validateRuntimeMonsterCharacter(ObjectNode characterNode) {
+    requirePattern(requireField(characterNode, "monsterId", "monsterId inválido."), MONSTER_ID_PATTERN, "monsterId inválido.");
+    requireExplicitOptionalNullableText(characterNode, "nameOverride", "nameOverride inválido.");
+    requireExplicitOptionalNullableText(characterNode, "imageOverride", "imageOverride inválido.");
+    requireExplicitOptionalNullableText(characterNode, "notes", "notes inválido.");
 
-    String type = requireSupportedType(characterNode.path("type"));
-    if (!"Player".equals(type) || !characterNode.path("build").isObject()) {
-      throw invalid("A sessao aceita apenas PlayerCharacterState em runtime.");
-    }
+    ObjectNode hitPointsNode = requireExplicitObject(characterNode, "hitPoints", "hitPoints do monstro é obrigatório.");
+    requireExplicitIntMin(hitPointsNode, "current", 0, "HP atual inválido.");
+    requireExplicitIntMin(hitPointsNode, "temporary", 0, "HP temporário inválido.");
 
-    validateRuntimePlayerCharacter(characterNode);
+    validateResourcePoolsState(requireExplicitObject(characterNode, "resourcePools", "resourcePools do monstro é obrigatório."));
+    validateActiveEffectsState(requireExplicitObject(characterNode, "activeEffects", "activeEffects do monstro é obrigatório."));
   }
 
   private static void validateRuntimePlayerCharacter(ObjectNode characterNode) {
-    ObjectNode buildNode = requireObject(characterNode.path("build"), "Build do personagem é obrigatoria.");
-    requirePattern(buildNode.path("classId"), CLASS_ID_PATTERN, "classId inválido.");
-    requirePattern(buildNode.path("originId"), ORIGIN_ID_PATTERN, "originId inválido.");
-    requirePattern(buildNode.path("specieId"), SPECIE_ID_PATTERN, "specieId inválido.");
+    ObjectNode buildNode = requireExplicitObject(characterNode, "build", "Build do personagem é obrigatoria.");
+    requirePattern(requireField(buildNode, "classId", "classId inválido."), CLASS_ID_PATTERN, "classId inválido.");
+    requirePattern(requireField(buildNode, "originId", "originId inválido."), ORIGIN_ID_PATTERN, "originId inválido.");
+    requirePattern(requireField(buildNode, "specieId", "specieId inválido."), SPECIE_ID_PATTERN, "specieId inválido.");
     requireExplicitOptionalNullablePattern(buildNode, "subclassId", SUBCLASS_ID_PATTERN, "subclassId inválido.");
-    JsonNode selectedFeatIdsNode = requireArray(buildNode.path("selectedFeatIds"), "selectedFeatIds inválido.");
+    JsonNode selectedFeatIdsNode = requireExplicitArray(buildNode, "selectedFeatIds", "selectedFeatIds inválido.");
     for (JsonNode featIdNode : selectedFeatIdsNode) {
       requirePattern(featIdNode, CANONICAL_ID_PATTERN, "selectedFeatIds contém id inválido.");
     }
 
-    ObjectNode progressionNode = requireObject(
-        characterNode.path("progression"),
+    ObjectNode progressionNode = requireExplicitObject(
+        characterNode,
+        "progression",
         "Progressão do personagem é obrigatoria."
     );
-    requireIntMin(progressionNode.path("currentLevel"), 1, "Nível atual inválido.");
-    requireIntMin(progressionNode.path("pendingLevelUps"), 0, "pendingLevelUps inválido.");
+    requireExplicitIntMin(progressionNode, "currentLevel", 1, "Nível atual inválido.");
+    requireExplicitIntMin(progressionNode, "pendingLevelUps", 0, "pendingLevelUps inválido.");
 
-    ObjectNode attributesNode = requireObject(
-        characterNode.path("attributes"),
+    ObjectNode attributesNode = requireExplicitObject(
+        characterNode,
+        "attributes",
         "Atributos do personagem são obrigatorios."
     );
-    ObjectNode baseAttributesNode = requireObject(
-        attributesNode.path("base"),
+    ObjectNode baseAttributesNode = requireExplicitObject(
+        attributesNode,
+        "base",
         "Atributos base do personagem são obrigatorios."
     );
     validateAbilityScores(baseAttributesNode);
 
-    ObjectNode hitPointsNode = requireObject(
-        characterNode.path("hitPoints"),
+    ObjectNode hitPointsNode = requireExplicitObject(
+        characterNode,
+        "hitPoints",
         "hitPoints do personagem é obrigatorio."
     );
-    requireIntMin(hitPointsNode.path("current"), 0, "HP atual inválido.");
-    requireIntMin(hitPointsNode.path("max"), 1, "HP máximo inválido.");
+    requireExplicitIntMin(hitPointsNode, "current", 0, "HP atual inválido.");
+    requireExplicitIntMin(hitPointsNode, "max", 1, "HP máximo inválido.");
     if (hitPointsNode.path("current").asInt() > hitPointsNode.path("max").asInt()) {
       throw invalid("HP atual não pode ser maior que HP máximo.");
     }
-    if (!hitPointsNode.path("temporary").isMissingNode() && !hitPointsNode.path("temporary").isNull()) {
-      requireIntMin(hitPointsNode.path("temporary"), 0, "HP temporário inválido.");
+    requireExplicitIntMin(hitPointsNode, "temporary", 0, "HP temporário inválido.");
+
+    JsonNode controlledByUserIdNode = requireField(characterNode, "controlledByUserId", "controlledByUserId inválido.");
+    if (controlledByUserIdNode != null && !controlledByUserIdNode.isNull()) {
+      requireLongMin(controlledByUserIdNode, 1L, "controlledByUserId inválido.");
     }
 
-    validateInventoryState(requireObject(characterNode.path("inventory"), "Inventário do personagem é obrigatorio."));
-    validateEquipmentState(requireObject(characterNode.path("equipment"), "Equipment do personagem é obrigatorio."));
-    validateResourcePoolsState(requireObject(characterNode.path("resourcePools"), "resourcePools do personagem é obrigatorio."));
-    validateActiveEffectsState(requireObject(characterNode.path("activeEffects"), "activeEffects do personagem é obrigatorio."));
+    validateInventoryState(requireExplicitObject(characterNode, "inventory", "Inventário do personagem é obrigatorio."));
+    validateEquipmentState(requireExplicitObject(characterNode, "equipment", "Equipment do personagem é obrigatorio."));
+    validateResourcePoolsState(requireExplicitObject(characterNode, "resourcePools", "resourcePools do personagem é obrigatorio."));
+    validateActiveEffectsState(requireExplicitObject(characterNode, "activeEffects", "activeEffects do personagem é obrigatorio."));
 
-    if (!characterNode.path("inspiration").isMissingNode() && !characterNode.path("inspiration").isBoolean()) {
-      throw invalid("Inspiration inválido.");
+    requireExplicitBoolean(characterNode, "inspiration", "Inspiration inválido.");
+  }
+
+  private static String requireSessionCharacterEnvelope(ObjectNode characterNode) {
+    requireUuid(characterNode.path("id"), "Id do personagem é inválido.");
+    return requireSupportedType(characterNode.path("type"));
+  }
+
+  private static void validateRuntimeCharacterByType(
+      String type,
+      ObjectNode characterNode,
+      String playerRuntimeContractMessage
+  ) {
+    if ("Player".equals(type)) {
+      requireNonBlankText(characterNode.path("name"), "Nome do personagem é obrigatório.");
+      if (!characterNode.has("build")) {
+        throw invalid(playerRuntimeContractMessage);
+      }
+
+      validateRuntimePlayerCharacter(characterNode);
+      return;
     }
+
+    validateRuntimeMonsterCharacter(characterNode);
   }
 
   private static void validateInventoryState(ObjectNode inventoryNode) {
-    JsonNode itemsNode = requireArray(inventoryNode.path("items"), "Itens do inventário são obrigatórios.");
+    JsonNode itemsNode = requireExplicitArray(inventoryNode, "items", "Itens do inventário são obrigatórios.");
     for (JsonNode entryNode : itemsNode) {
       if (!(entryNode instanceof ObjectNode itemEntry)) {
         throw invalid("Entrada de inventário inválida.");
@@ -110,7 +154,7 @@ final class SessionCharacterPayloadValidator {
   }
 
   private static void validateResourcePoolsState(ObjectNode resourcePoolsNode) {
-    JsonNode poolsNode = requireArray(resourcePoolsNode.path("pools"), "Pontos de recurso são obrigatórios.");
+    JsonNode poolsNode = requireExplicitArray(resourcePoolsNode, "pools", "Pontos de recurso são obrigatórios.");
     for (JsonNode entryNode : poolsNode) {
       if (!(entryNode instanceof ObjectNode poolEntry)) {
         throw invalid("Entrada de resource pool inválida.");
@@ -121,26 +165,24 @@ final class SessionCharacterPayloadValidator {
   }
 
   private static void validateActiveEffectsState(ObjectNode activeEffectsNode) {
-    JsonNode effectsNode = requireArray(activeEffectsNode.path("effects"), "Effects ativos são obrigatórios.");
+    JsonNode effectsNode = requireExplicitArray(activeEffectsNode, "effects", "Effects ativos são obrigatórios.");
     for (JsonNode entryNode : effectsNode) {
       if (!(entryNode instanceof ObjectNode effectEntry)) {
         throw invalid("Entrada de efeito ativo inválida.");
       }
 
-      requireUuid(effectEntry.path("instanceId"), "instanceId de efeito ativo inválido.");
-      ObjectNode sourceNode = requireObject(effectEntry.path("source"), "Source de efeito ativo é obrigatória.");
-      String sourceType = requireNonBlankText(sourceNode.path("sourceType"), "sourceType inválido.");
+      requireUuid(requireField(effectEntry, "instanceId", "instanceId de efeito ativo inválido."), "instanceId de efeito ativo inválido.");
+      ObjectNode sourceNode = requireExplicitObject(effectEntry, "source", "Source de efeito ativo é obrigatória.");
+      String sourceType = requireNonBlankText(requireField(sourceNode, "sourceType", "sourceType inválido."), "sourceType inválido.");
       if (!ACTIVE_EFFECT_SOURCE_TYPES.contains(sourceType)) {
         throw invalid("sourceType inválido.");
       }
-      requirePattern(sourceNode.path("sourceId"), CANONICAL_ID_PATTERN, "sourceId inválido.");
-      requireIntMin(effectEntry.path("effectIndex"), 0, "effectIndex inválido.");
+      requirePattern(requireField(sourceNode, "sourceId", "sourceId inválido."), CANONICAL_ID_PATTERN, "sourceId inválido.");
+      requireExplicitIntMin(effectEntry, "effectIndex", 0, "effectIndex inválido.");
       requireOptionalNonBlankText(effectEntry.path("appliedByCharacterId"), "appliedByCharacterId inválido.");
       requireOptionalNonBlankText(effectEntry.path("linkedCondition"), "linkedCondition inválido.");
-      requireIntMin(effectEntry.path("stackCount"), 1, "stackCount inválido.");
-      if (!effectEntry.path("isSuppressed").isMissingNode() && !effectEntry.path("isSuppressed").isBoolean()) {
-        throw invalid("isSuppressed inválido.");
-      }
+      requireExplicitIntMin(effectEntry, "stackCount", 1, "stackCount inválido.");
+      requireExplicitBoolean(effectEntry, "isSuppressed", "isSuppressed inválido.");
 
       JsonNode durationNode = effectEntry.path("remainingDuration");
       if (!durationNode.isMissingNode() && !durationNode.isNull()) {
@@ -203,6 +245,23 @@ final class SessionCharacterPayloadValidator {
     requireOptionalNullablePattern(parentNode.get(fieldName), pattern, message);
   }
 
+  private static void requireExplicitOptionalNullableText(
+      ObjectNode parentNode,
+      String fieldName,
+      String message
+  ) {
+    if (!parentNode.has(fieldName)) {
+      throw invalid(message);
+    }
+
+    JsonNode valueNode = parentNode.get(fieldName);
+    if (valueNode == null || valueNode.isNull()) {
+      return;
+    }
+
+    requireNonBlankText(valueNode, message);
+  }
+
   private static void requireOptionalNonBlankText(JsonNode node, String message) {
     if (node.isMissingNode() || node.isNull()) {
       return;
@@ -263,7 +322,42 @@ final class SessionCharacterPayloadValidator {
     }
   }
 
+  private static void requireLongMin(JsonNode node, long minValue, String message) {
+    if (!node.canConvertToLong()) {
+      throw invalid(message);
+    }
+    if (node.asLong() < minValue) {
+      throw invalid(message);
+    }
+  }
+
   private static ResponseStatusException invalid(String message) {
     return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+  }
+
+  private static JsonNode requireField(ObjectNode parentNode, String fieldName, String message) {
+    if (!parentNode.has(fieldName)) {
+      throw invalid(message);
+    }
+    return parentNode.get(fieldName);
+  }
+
+  private static ObjectNode requireExplicitObject(ObjectNode parentNode, String fieldName, String message) {
+    return requireObject(requireField(parentNode, fieldName, message), message);
+  }
+
+  private static JsonNode requireExplicitArray(ObjectNode parentNode, String fieldName, String message) {
+    return requireArray(requireField(parentNode, fieldName, message), message);
+  }
+
+  private static void requireExplicitIntMin(ObjectNode parentNode, String fieldName, int minValue, String message) {
+    requireIntMin(requireField(parentNode, fieldName, message), minValue, message);
+  }
+
+  private static void requireExplicitBoolean(ObjectNode parentNode, String fieldName, String message) {
+    JsonNode node = requireField(parentNode, fieldName, message);
+    if (!node.isBoolean()) {
+      throw invalid(message);
+    }
   }
 }

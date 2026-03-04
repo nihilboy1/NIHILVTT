@@ -33,23 +33,24 @@ export const PlayerCharacterBuildStateSchema = z.object({
   classId: ClassIdEnum,
   originId: OriginIdSchema,
   specieId: SpecieIdSchema,
-  subclassId: SubclassIdSchema.nullable().default(null),
-  selectedFeatIds: z.array(FeatIdEnum).default([]),
+  subclassId: SubclassIdSchema.nullable(),
+  selectedFeatIds: z.array(FeatIdEnum),
 });
 
 export const PlayerCharacterHitPointStateSchema = z.object({
   current: z.number().int().min(0),
   max: z.number().int().positive(),
-  temporary: z.number().int().min(0).default(0),
+  temporary: z.number().int().min(0),
 });
 
 export const PlayerCharacterStateSchema = z.object({
   ...PlayerCharacterIdentityStateSchema.shape,
+  controlledByUserId: z.number().int().positive().nullable(),
   build: PlayerCharacterBuildStateSchema,
   progression: ProgressionStateSchema,
   attributes: AttributesStateSchema,
   hitPoints: PlayerCharacterHitPointStateSchema,
-  inspiration: z.boolean().default(false),
+  inspiration: z.boolean(),
   inventory: InventoryStateSchema,
   equipment: EquipmentStateSchema,
   resourcePools: ResourcePoolStateSchema,

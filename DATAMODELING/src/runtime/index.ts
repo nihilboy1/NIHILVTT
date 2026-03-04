@@ -5,3 +5,5 @@ export * from "./value-objects/equipment.state.js";
 export * from "./value-objects/resource-pool.state.js";
 export * from "./value-objects/active-effect.state.js";
 export * from "./entities/player-character.state.js";
+export * from "./entities/monster-character.state.js";
+export * from "./entities/session-character.state.js";
