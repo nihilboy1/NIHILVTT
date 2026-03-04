@@ -1,3 +1,6 @@
+# Utilitario de conveniencia.
+# Recria o atalho "NIHILVTT RESET APP.lnk" apontando para reset-dev.bat.
+# Use este script quando o shortcut precisar ser regenerado no Windows.
 $ErrorActionPreference = 'Stop'
 
 $launchersDir = Split-Path -Parent $MyInvocation.MyCommand.Path

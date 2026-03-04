@@ -1,4 +1,7 @@
 @echo off
+rem Utilitario de manutencao local.
+rem Encerra backend/frontend, limpa e recria o banco H2 de desenvolvimento.
+rem Nao reabre o ambiente automaticamente.
 setlocal
 
 set "LAUNCHERS_DIR=%~dp0"

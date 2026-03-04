@@ -1,14 +1,17 @@
 @echo off
+rem Launcher principal de uso diario.
+rem Reinicia backend e frontend sem rodar testes.
+rem Use este arquivo quando quiser apenas subir o ambiente rapidamente.
 setlocal
 
 set "LAUNCHERS_DIR=%~dp0"
-set "SCRIPTS_DIR=%LAUNCHERS_DIR%..\"
-set "ROOT=%SCRIPTS_DIR%..\"
+set "BACKEND_TITLE=NIHILVTT Backend"
+set "FRONTEND_TITLE=NIHILVTT Frontend"
 
 echo [NIHILVTT] Reiniciando ambiente local...
 echo [NIHILVTT] Encerrando instancias antigas...
 
-for %%T in ("NIHILVTT Backend" "NIHILVTT Frontend") do (
+for %%T in ("%BACKEND_TITLE%" "%FRONTEND_TITLE%") do (
   taskkill /FI "WINDOWTITLE eq %%~T*" /F /T >nul 2>&1
 )
 
@@ -18,13 +21,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 timeout /t 1 /nobreak >nul
 
 echo [NIHILVTT] Subindo backend...
-start "NIHILVTT Backend" cmd /c "title NIHILVTT Backend && cd /d "%ROOT%BACKEND-JAVA" && mvn spring-boot:run"
+start "%BACKEND_TITLE%" cmd /k call "%LAUNCHERS_DIR%run-backend-dev.bat"
 
 echo [NIHILVTT] Subindo frontend...
-start "NIHILVTT Frontend" cmd /c "title NIHILVTT Frontend && cd /d "%ROOT%FRONTEND" && pnpm dev"
+start "%FRONTEND_TITLE%" cmd /k call "%LAUNCHERS_DIR%run-frontend-dev.bat"
 
 echo [NIHILVTT] Backend e frontend iniciados em janelas separadas.
-echo [NIHILVTT] As janelas fecham automaticamente quando os processos terminam.
-echo [NIHILVTT] Portas padrao limpas: backend 8080, frontend 5173.
+echo [NIHILVTT] Use reset-safe.bat para gate rapido de smoke tests.
+echo [NIHILVTT] Use run-full-tests.bat para rodar a suite completa fora do ciclo de boot.
 
 endlocal

@@ -1,58 +1,40 @@
 # NIHILVTT
 
-Monorepo do NIHILVTT (Virtual Tabletop).
+NihilVTT e um Virtual Tabletop em desenvolvimento com foco em mesa online autoritativa, sincronizacao multiplayer e automacao orientada a dados.
 
-## Modulos
+Hoje o projeto ja cobre autenticacao, dashboard, criacao e gerenciamento de mesas, snapshot server-side de sessao, sincronizacao realtime e os primeiros fluxos de combate.
 
-- `FRONTEND/`: aplicacao web (React + TypeScript)
-  - Guia: `FRONTEND/README.md`
-  - Arquitetura: `FRONTEND/ARCHITECTURE.md`
-  - Ambiente: `FRONTEND/ENVIRONMENT.md`
-  - Roadmap: `FRONTEND/ROADMAP.md`
-- `BACKEND-JAVA/`: API de autenticacao e jogos (Spring Boot)
-  - Guia: `BACKEND-JAVA/README.md`
-- `DATAMODELING/`: schemas, dados e ferramentas de validacao
-  - Guia: `DATAMODELING/README.md`
-  - Brief de revisao: `DATAMODELING/REVIEW_BRIEF.md`
-  - Direcao atual: evoluir para `catalogo + runtime tipado`, mantendo separacao explicita entre regras estaticas e estado vivo da ficha
+## O que o projeto busca
 
-## Sincronizacao de mesa (estado atual)
+- mesa multiplayer com backend autoritativo
+- ficha e combate orientados por runtime tipado compartilhado
+- automacao incremental inspirada em CRPGs, sem duplicar regra entre frontend e backend
+- base de dados de regras centralizada e reutilizavel
 
-- Snapshot server-side versionado para mesa multiplayer:
-  - `GET /games/{gameId}/session-state`
-  - hidratacao do frontend ao entrar em `/game/:gameId`
-- Primeira vertical realtime ativa (chat):
-  - comando autoritativo no backend (`POST /games/{gameId}/session/chat-messages`)
-  - broadcast STOMP por jogo (`/topic/games.{gameId}.events`)
-- Realtime de rolagem ativo:
-  - comando autoritativo (`POST /games/{gameId}/session/dice-rolls`)
-  - broadcast `DICE_ROLLED` no mesmo topico da mesa
-- Realtime de movimento de token ativo:
-  - comando autoritativo de criacao (`POST /games/{gameId}/session/tokens`)
-  - comando autoritativo (`POST /games/{gameId}/session/tokens/move`)
-  - comando autoritativo de remocao (`POST /games/{gameId}/session/tokens/remove`)
-  - broadcast `TOKEN_CREATED`/`TOKEN_MOVED`/`TOKEN_REMOVED` no mesmo topico da mesa
-- Realtime de HP de personagem ativo:
-  - comando autoritativo (`POST /games/{gameId}/session/characters/hp`)
-  - broadcast `CHARACTER_HP_UPDATED` no mesmo topico da mesa
-- Expulsao de membro com efeito realtime:
-  - mestre executa revoke (`POST /games/{gameId}/members/{memberUserId}/revoke`)
-  - backend publica `MEMBER_REVOKED`, registra bloqueio do usuario no jogo e o cliente alvo retorna ao dashboard
-  - jogo revogado deixa de aparecer em `Jogos Ativos` para o usuario expulso
-  - recriar conta com o mesmo email nao remove esse bloqueio
-- Identidade visual persistente por membro:
-  - backend persiste `colorHex` por participante (incluindo mestre)
-  - chat renderiza nome com `senderColor` vindo do servidor
-- Evolucao incremental em andamento para tokens/HP/rolagens.
-- Diretriz atual de arquitetura: fluxos de sessao devem operar exclusivamente sobre runtime tipado compartilhado (`PlayerCharacterState` e derivados), sem caminhos de compatibilidade para payloads antigos ou estruturas legadas em inventario/equipamento.
-- Diretriz atual de runtime: o projeto nao faz suporte legado nem backfill automatico para personagens/estados antigos; contratos novos devem falhar cedo quando estiverem incompletos ou invalidos.
-- Diretriz atual para itens: frontend e backend devem consumir o catálogo canônico de itens (e o manifest derivado dele), sem filtrar ou validar por prefixo de `id`.
-- Diretriz atual de mesas: toda criacao de jogo nasce com capacidade fixa de `1 mestre + 5 jogadores` (`6` participantes no total), sem configuracao editavel desse limite.
-- O mestre pode excluir um jogo a partir do dashboard; essa exclusao remove o jogo e todos os registros vinculados a ele no backend.
-- O card de jogo no dashboard agora reserva uma área dedicada para capa de mesa; o mestre pode enviar/trocar essa capa com crop antes do upload.
-- A mesa agora suporta estado formal de combate (`combat`) persistido no snapshot, com `round`, `turnIndex` e `participants[]`; o mestre pode iniciar/avancar/encerrar combate, e o primeiro ataque fora de combate inicia esse estado automaticamente com atacante + alvo.
+## Estado atual
 
-## Setup local (basico)
+- autenticacao com refresh token em cookie HttpOnly
+- dashboard com criacao, entrada, exclusao e capa de mesa
+- sincronizacao de sessao via snapshot + eventos realtime
+- chat, rolagens, tokens, HP, inventario, equipamento e combate formal controlado pelo mestre
+- contrato compartilhado de runtime para personagem (`PlayerCharacterState`)
+- o projeto ainda esta em pre-versao (antes da versao 0) e nao deve carregar compatibilidade retroativa: nao existe conceito de legado aceito no produto
+
+## Estrutura do monorepo
+
+- `FRONTEND/`: aplicacao web em React + TypeScript
+  - guia operacional: `FRONTEND/README.md`
+  - arquitetura: `FRONTEND/ARCHITECTURE.md`
+  - ambiente: `FRONTEND/ENVIRONMENT.md`
+  - roadmap: `FRONTEND/ROADMAP.md`
+- `BACKEND-JAVA/`: API Spring Boot de autenticacao e jogos
+  - guia operacional: `BACKEND-JAVA/README.md`
+- `DATAMODELING/`: schemas, catalogos, enums e tooling de validacao
+  - guia operacional: `DATAMODELING/README.md`
+  - brief tecnico: `DATAMODELING/REVIEW_BRIEF.md`
+  - blueprint de monstros: `DATAMODELING/MONSTER_RUNTIME_BLUEPRINT.md`
+
+## Setup rapido
 
 1. Inicie o backend:
    - `cd BACKEND-JAVA`
@@ -62,26 +44,81 @@ Monorepo do NIHILVTT (Virtual Tabletop).
    - `pnpm install`
    - `pnpm dev`
 
-## Scripts na raiz
+## Scripts da raiz
 
 - `pnpm dev:front`
 - `pnpm dev:back`
 - `pnpm test:front`
 - `pnpm test:e2e:front`
 - `pnpm test:front:all`
-- `SCRIPTS/launchers/reset-dev.bat`
-  - encerra instancias antigas do backend/frontend abertas por ele e libera as portas padrao (`8080` e `5173`)
-  - abre o backend e o frontend em janelas separadas
-  - fecha automaticamente as janelas quando os processos terminam
-  - reinicia o ambiente sem limpar o banco local
-- `SCRIPTS/launchers/reset-db.bat`
-  - encerra instancias antigas do backend/frontend abertas por ele e libera as portas padrao (`8080` e `5173`)
-  - limpa e recria o banco local H2 com Flyway (`clean` + `migrate`)
-  - nao reabre backend/frontend automaticamente; use quando voce quiser resetar os dados explicitamente
-- `SCRIPTS/launchers/create-reset-dev-shortcut.ps1`
-  - gera/atualiza `SCRIPTS/launchers/NIHILVTT RESET APP.lnk`
-  - usa `SCRIPTS/assets/d20-purple.ico` como icone do atalho (variante roxa `#522678`)
-  - esse `.lnk` pode ser usado para fixar o reset na barra de tarefas do Windows
+- `SCRIPTS/launchers/reset-dev.bat`: reinicia backend e frontend sem rodar testes; e o launcher mais simples e confiavel para o ciclo diario
+- `SCRIPTS/launchers/reset-safe.bat`: executa um subconjunto critico de smoke tests e so entao sobe backend e frontend
+- `SCRIPTS/launchers/run-full-tests.bat`: executa a suite completa (backend + frontend unitario + frontend e2e) fora do ciclo de boot
+- `SCRIPTS/launchers/reset-db.bat`: limpa e recria o banco local H2
+- `SCRIPTS/launchers/create-reset-dev-shortcut.ps1`: gera um atalho do reset no Windows
+
+## Launchers do Windows
+
+No momento, os launchers de `SCRIPTS/launchers` tem papeis diferentes e nao sao redundantes:
+
+- `reset-dev.bat`
+  - uso diario
+  - encerra backend/frontend antigos, limpa as portas `8080` e `5173` e sobe backend + frontend
+  - nao roda testes
+
+- `reset-safe.bat`
+  - reset com gate rapido
+  - faz o mesmo reset do ambiente, mas antes roda um subconjunto critico de smoke tests
+  - se qualquer smoke test falhar, nao sobe backend/frontend
+
+- `run-full-tests.bat`
+  - validacao pesada
+  - roda a suite completa: backend + frontend unitario + frontend e2e
+  - nao sobe servidor; serve para verificacao completa fora do ciclo de boot
+
+- `reset-db.bat`
+  - manutencao local
+  - limpa e recria o banco H2 de desenvolvimento
+  - use quando quiser descartar estado local deliberadamente
+
+- `run-backend-dev.bat`
+  - utilitario interno
+  - sobe apenas o backend
+  - hoje e usado como helper pelos launchers de reset; nao e o ponto de entrada principal
+
+- `run-frontend-dev.bat`
+  - utilitario interno
+  - sobe apenas o frontend
+  - hoje e usado como helper pelos launchers de reset; nao e o ponto de entrada principal
+
+- `create-reset-dev-shortcut.ps1`
+  - utilitario de conveniencia
+  - recria o atalho `NIHILVTT RESET APP.lnk` apontando para `reset-dev.bat`
+
+- `NIHILVTT RESET APP.lnk`
+  - atalho de conveniencia
+  - abre diretamente o `reset-dev.bat`
+
+Em termos de uso pratico, os unicos launchers que importam como entrada principal sao:
+
+1. `reset-dev.bat`
+2. `reset-safe.bat`
+3. `run-full-tests.bat`
+
+Os demais existem para suporte operacional e nao devem ser tratados como fluxo principal duplicado.
+
+## Como ler a documentacao
+
+- este `README.md` e a apresentacao geral do projeto
+- os READMEs de modulo concentram instrucoes operacionais e diretrizes tecnicas
+- novos padroes tecnicos devem ser documentados no modulo impactado e, quando fizer sentido, refletidos aqui de forma resumida
+- como o produto ainda nao teve release, a documentacao deve assumir contratos atuais apenas: sem fallback, sem backfill e sem qualquer suporte a payload/estado "legado"
+- no fluxo atual de combate, o estado global so nasce por acao explicita do mestre; nao existe auto-combate por ataque ou proximidade
+- o combate atual tambem ja usa economia de turno autoritativa basica (acao + deslocamento), com consumo e avanco automatico do turno no backend
+- ownership de personagem em mesa tambem e autoritativo: o mestre vincula cada ficha a um jogador, e esse ownership define quem pode controlar aquele personagem
+- as stores centrais do cliente nao devem operar em modo local para fichas de sessao; criacao, duplicacao e remocao de personagens dependem de pipeline autoritativo
+- operacoes estruturais de token no board (`copy`, `paste` e `delete`) permanecem centralizadas no mestre
+- a trilha de monstro segue o mesmo padrao data-driven: catalogo canonico em `DATAMODELING`, `MonsterCharacterState` autoritativo no backend e frontend apenas como projecao do catalogo + runtime; o fluxo operacional de spawn parte da `Biblioteca`, com drag do monstro para o grid
 
 ## Contribuicao
 
