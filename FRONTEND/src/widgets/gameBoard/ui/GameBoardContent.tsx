@@ -61,6 +61,11 @@ interface GameBoardContentProps {
   updateTokenPosition: (tokenId: string, newPosition: Point) => void;
   marqueeSelection: MarqueeSelectionState;
   rulerPath: RulerPathState;
+  activeCombatTurnTokenId: string | null;
+  combatParticipantTokenIds: string[];
+  activeCombatTurnCanMove: boolean;
+  controllableTokenIds: string[];
+  combatLockReason: string | null;
 }
 
 export function GameBoardContent({
@@ -95,6 +100,11 @@ export function GameBoardContent({
   updateTokenPosition,
   marqueeSelection,
   rulerPath,
+  activeCombatTurnTokenId,
+  combatParticipantTokenIds,
+  activeCombatTurnCanMove,
+  controllableTokenIds,
+  combatLockReason,
 }:GameBoardContentProps) {
   const { isRightSidebarVisible } = useUIStore();
 
@@ -161,6 +171,10 @@ export function GameBoardContent({
           multiSelectedTokenIds={multiSelectedTokenIds}
           handleBoardTokenDoubleClick={handleBoardTokenDoubleClick}
           onSetMultiSelectedTokenIds={onSetMultiSelectedTokenIds}
+          activeCombatTurnTokenId={activeCombatTurnTokenId}
+          combatParticipantTokenIds={combatParticipantTokenIds}
+          activeCombatTurnCanMove={activeCombatTurnCanMove}
+          controllableTokenIds={controllableTokenIds}
         />
 
         {pasteTargetCell && copiedTokenId && (
@@ -219,6 +233,16 @@ export function GameBoardContent({
           isOpen={isPageAndGridSettingsModalOpen}
           onClose={() => setIsPageAndGridSettingsModalOpen(false)}
         />
+      ) : null}
+      {combatLockReason ? (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-surface-0/55 backdrop-blur-[1px]">
+          <div className="pointer-events-none rounded-xl border border-surface-2 bg-surface-1/95 px-4 py-3 text-center shadow-lg">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-secondary">
+              Combate em andamento
+            </p>
+            <p className="mt-1 text-sm font-semibold text-text-primary">{combatLockReason}</p>
+          </div>
+        </div>
       ) : null}
     </div>
   );

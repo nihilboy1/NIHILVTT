@@ -1,25 +1,36 @@
 import { GiAncientSword } from 'react-icons/gi';
 import { useParams } from 'react-router-dom';
+import { useAuthStore } from '@/features/auth/model/authStore';
 import { useCharactersStore } from '@/entities/character/model/store';
 import { CharacterCard } from '@/entities/character/ui/CharacterCard';
 import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
-import { sendGameDuplicateCharacter, sendGameRemoveCharacter } from '@/features/game/model/gameSessionApi';
+import {
+  sendGameDuplicateCharacter,
+  sendGameRemoveCharacter,
+} from '@/features/game/model/gameSessionApi';
+import { useGameStore } from '@/features/game/model/gameStore';
 import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
 
 import { useTokenStore } from '../../../entities/token/model/store/tokenStore';
 
 export function CharactersPanel() {
   const { gameId } = useParams<{ gameId: string }>();
-  const { characters, deleteCharacter, duplicateCharacter } = useCharactersStore();
+  const { characters, runtimeCharactersById } = useCharactersStore();
   const { tokenInstanceCounts } = useTokenStore();
   const { openModal, closeModal } = useSessionModalStore();
+  const currentGame = useGameStore((state) => state.currentGame);
+  const currentUserId = useAuthStore((state) => state.user?.id ?? null);
+  const playerCharacters = characters.filter((character) => character.type === 'Player');
 
   const handleDuplicateCharacter = async (characterId: string) => {
     const parsedGameId = Number(gameId);
     const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
 
     if (!isValidGameId) {
-      duplicateCharacter(characterId);
+      console.error(
+        'Fluxo local bloqueado: duplicação de ficha exige contexto de sessão autoritativa.',
+        { characterId },
+      );
       return;
     }
 
@@ -48,7 +59,10 @@ export function CharactersPanel() {
       cancelText: 'Cancelar',
       onConfirm: async () => {
         if (!isValidGameId) {
-          deleteCharacter(characterId);
+          console.error(
+            'Fluxo local bloqueado: remoção de ficha exige contexto de sessão autoritativa.',
+            { characterId },
+          );
           closeModal();
           return;
         }
@@ -65,6 +79,49 @@ export function CharactersPanel() {
         closeModal();
       },
     });
+  };
+
+  const parsedGameId = Number(gameId);
+  const isSessionContext = Number.isInteger(parsedGameId) && parsedGameId > 0;
+  const isGameMaster =
+    currentGame != null && currentUserId != null && currentGame.owner.id === currentUserId;
+
+  const canCurrentUserInstantiateCharacterToken = (characterId: string): boolean => {
+    if (!isSessionContext) {
+      return true;
+    }
+
+    const runtimeCharacter = runtimeCharactersById[characterId] ?? null;
+    if (!runtimeCharacter) {
+      return isGameMaster;
+    }
+
+    if (runtimeCharacter.type !== 'Player') {
+      console.error(
+        'Violação de contrato de sessão: CharactersPanel deve operar apenas com fichas Player.',
+        { characterId, runtimeType: runtimeCharacter.type },
+      );
+      return false;
+    }
+
+    if (runtimeCharacter.controlledByUserId == null) {
+      return isGameMaster;
+    }
+
+    return currentUserId != null && runtimeCharacter.controlledByUserId === currentUserId;
+  };
+
+  const getCharacterDragDisabledReason = (characterId: string): string => {
+    if (!isSessionContext) {
+      return 'Você não pode instanciar tokens desta ficha.';
+    }
+
+    const runtimeCharacter = runtimeCharactersById[characterId] ?? null;
+    if (!runtimeCharacter || runtimeCharacter.type !== 'Player' || runtimeCharacter.controlledByUserId == null) {
+      return 'Somente o mestre pode instanciar tokens desta ficha.';
+    }
+
+    return 'Esta ficha pertence a outro jogador.';
   };
 
   return (
@@ -113,11 +170,11 @@ export function CharactersPanel() {
 
       <div>
         <h3 className="mt-6 mb-3 border-t pt-4 text-lg font-semibold">Fichas de Personagem</h3>
-        {characters.length === 0 ? (
+        {playerCharacters.length === 0 ? (
           <p className="text-text-secondary">Nenhuma ficha por aqui... Que tal criar uma? 👀</p>
         ) : (
           <ul className="space-y-2" aria-label="Lista de modelos de personagem">
-            {characters.map((character) => (
+            {playerCharacters.map((character) => (
               <CharacterCard
                 key={character.id}
                 character={character}
@@ -125,6 +182,8 @@ export function CharactersPanel() {
                 openSheetModal={() => openModal('sheet', { characterId: character.id })}
                 onDuplicate={handleDuplicateCharacter}
                 onDelete={handleDeleteCharacter}
+                canDragToBoard={canCurrentUserInstantiateCharacterToken(character.id)}
+                dragDisabledReason={getCharacterDragDisabledReason(character.id)}
               />
             ))}
           </ul>

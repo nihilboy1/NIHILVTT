@@ -38,16 +38,19 @@ export function SessionModalManager({
   handleTempHpChangeFromModal,
 }: SessionModalManagerProps) {
   const { modalStack, closeModal } = useSessionModalStore();
-  const { characters } = useCharactersStore();
+  const characters = useCharactersStore((state) => state.characters);
+  const runtimeCharactersById = useCharactersStore((state) => state.runtimeCharactersById);
   const { tokensOnBoard } = useTokenStore();
   const currentGame = useGameStore((state) => state.currentGame);
   const user = useAuthStore((state) => state.user);
+  const isToolbarVisible = useUIStore((state) => state.isToolbarVisible);
   const isRightSidebarVisible = useUIStore((state) => state.isRightSidebarVisible);
   const canModifyHp = currentGame?.owner.id === user?.id;
 
   const topModal = modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
   const shouldRenderOverlay =
     topModal && topModal.name !== 'hpControl' && topModal.name !== 'sheet';
+  const isGameMaster = currentGame?.owner.id === user?.id;
 
   return (
     <>
@@ -90,7 +93,7 @@ export function SessionModalManager({
           case 'sheet':
             return (
               <Suspense
-                key={props.characterId as string}
+                key={(props.characterId as string | undefined) ?? (props.monsterId as string)}
                 fallback={(
                   <div
                     className="fixed inset-0 flex items-center justify-center"
@@ -101,7 +104,8 @@ export function SessionModalManager({
                 )}
               >
                 <SheetModal
-                  characterId={props.characterId as string}
+                  characterId={(props.characterId as string | undefined) ?? null}
+                  monsterId={(props.monsterId as string | undefined) ?? null}
                   isOpen={true}
                   onClose={closeModal}
                   zIndex={1000 + index} // Character sheet zIndex (higher than overlay)
@@ -148,6 +152,17 @@ export function SessionModalManager({
             const characterForHPModal = selectedTokenForHP
               ? characters.find((c) => c.id === selectedTokenForHP.characterId)
               : null;
+            const runtimeCharacterForHPModal = selectedTokenForHP
+              ? runtimeCharactersById[selectedTokenForHP.characterId] ?? null
+              : null;
+            const canAccessHpControl =
+              isGameMaster ||
+              (
+                runtimeCharacterForHPModal != null &&
+                runtimeCharacterForHPModal.type === 'Player' &&
+                runtimeCharacterForHPModal.controlledByUserId != null &&
+                runtimeCharacterForHPModal.controlledByUserId === user?.id
+              );
 
             return (
               props.tokenId &&
@@ -161,6 +176,9 @@ export function SessionModalManager({
                   onHPChange={handleHPChangeFromModal}
                   onTempHpChange={handleTempHpChangeFromModal}
                   canModifyHp={canModifyHp}
+                  canAccessContext={canAccessHpControl}
+                  dockSide={canModifyHp ? 'left' : 'right'}
+                  leftToolbarVisible={isToolbarVisible}
                   rightSidebarVisible={isRightSidebarVisible}
                   zIndex={100 + index} // Default modal zIndex
                 />

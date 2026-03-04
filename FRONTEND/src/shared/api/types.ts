@@ -97,7 +97,7 @@ export interface HPControlModalState {
   anchorPoint: Point | null;
 }
 
-export type AttackSourceType = 'unarmed' | 'weapon' | 'legacy';
+export type AttackSourceType = 'unarmed' | 'weapon' | 'action';
 export type AttackSourceSlot = 'mainHandWeaponId' | 'offHandWeaponId' | null;
 
 export interface AttackEntry {
@@ -123,7 +123,15 @@ export interface CombatParticipant {
   initiativeRoll: number;
   initiativeTotal: number;
   dexterityScore: number;
+  movementBudgetCells: number;
   status: 'active';
+}
+
+export interface CombatTurnResources {
+  actionAvailable: boolean;
+  bonusActionAvailable: boolean;
+  remainingMovementCells: number;
+  totalMovementCells: number;
 }
 
 export interface CombatState {
@@ -131,6 +139,7 @@ export interface CombatState {
   round: number;
   turnIndex: number;
   participants: CombatParticipant[];
+  turnResources: CombatTurnResources;
 }
 
 export interface DraggingVisuals {

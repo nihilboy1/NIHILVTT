@@ -58,6 +58,8 @@ const tokenMovedPayloadSchema = z.object({
     x: z.number().int().nonnegative(),
     y: z.number().int().nonnegative(),
   }),
+  combatChanged: z.boolean(),
+  combat: z.lazy(() => combatStateSchema).nullable(),
 });
 
 const characterHpUpdatedPayloadSchema = z.object({
@@ -78,7 +80,7 @@ const tokenSchema = z.object({
 
 const tokenCreatedPayloadSchema = z.object({
   token: tokenSchema,
-  character: z.unknown().optional(),
+  character: z.unknown().nullable(),
 });
 
 const combatParticipantSchema = z.object({
@@ -87,7 +89,15 @@ const combatParticipantSchema = z.object({
   initiativeRoll: z.number().int(),
   initiativeTotal: z.number().int(),
   dexterityScore: z.number().int(),
+  movementBudgetCells: z.number().int().min(1),
   status: z.literal('active'),
+});
+
+const combatTurnResourcesSchema = z.object({
+  actionAvailable: z.boolean(),
+  bonusActionAvailable: z.boolean(),
+  remainingMovementCells: z.number().int().min(0),
+  totalMovementCells: z.number().int().min(1),
 });
 
 const combatStateSchema = z.object({
@@ -95,6 +105,7 @@ const combatStateSchema = z.object({
   round: z.number().int().min(1),
   turnIndex: z.number().int().min(0),
   participants: z.array(combatParticipantSchema),
+  turnResources: combatTurnResourcesSchema,
 });
 
 const attackResolvedPayloadSchema = z.object({
@@ -111,12 +122,21 @@ const attackResolvedPayloadSchema = z.object({
   damageApplied: z.number().int().nonnegative(),
   remainingCurrentHp: z.number().int().nonnegative(),
   remainingTempHp: z.number().int().nonnegative(),
+  combat: combatStateSchema,
 });
 
 const tokenRemovedPayloadSchema = z.object({
   tokenId: z.string().min(1),
-  removedCharacterId: z.string().min(1).optional(),
-  combat: combatStateSchema.nullable().optional(),
+  removedCharacterId: z.string().min(1).nullable(),
+  combatChanged: z.boolean(),
+  combat: combatStateSchema.nullable(),
+});
+
+const tokensRemovedPayloadSchema = z.object({
+  tokenIds: z.array(z.string().min(1)).min(1),
+  removedCharacterIds: z.array(z.string().min(1)),
+  combatChanged: z.boolean(),
+  combat: combatStateSchema.nullable(),
 });
 
 const characterCreatedPayloadSchema = z.object({
@@ -125,8 +145,9 @@ const characterCreatedPayloadSchema = z.object({
 
 const characterRemovedPayloadSchema = z.object({
   characterId: z.string().min(1),
-  removedTokenIds: z.array(z.string().min(1)).optional(),
-  combat: combatStateSchema.nullable().optional(),
+  removedTokenIds: z.array(z.string().min(1)),
+  combatChanged: z.boolean(),
+  combat: combatStateSchema.nullable(),
 });
 
 const combatPayloadSchema = z.object({
@@ -152,7 +173,7 @@ function requireEventPayload<T>(
 export function applyGameSessionEvent(event: GameSessionEvent): void {
   if (event.type === 'TOKEN_CREATED') {
     const parsed = requireEventPayload(event, tokenCreatedPayloadSchema, 'TOKEN_CREATED');
-    if (parsed.character !== undefined) {
+    if (parsed.character !== null) {
       useCharactersStore.getState().addCharacterFromSession(parsed.character);
     }
     useTokenStore.getState().addTokenFromSession(parsed.token);
@@ -165,7 +186,23 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
     if (parsed.removedCharacterId) {
       useCharactersStore.getState().removeCharacterFromSession(parsed.removedCharacterId);
     }
-    if (parsed.combat !== undefined) {
+    if (parsed.combatChanged) {
+      useCombatStore.getState().setCombatState(parsed.combat);
+    }
+    return;
+  }
+
+  if (event.type === 'TOKENS_REMOVED') {
+    const parsed = requireEventPayload(event, tokensRemovedPayloadSchema, 'TOKENS_REMOVED');
+    parsed.tokenIds.forEach((tokenId) => {
+      useTokenStore.getState().removeTokenFromSession(tokenId);
+    });
+    if (parsed.removedCharacterIds.length > 0) {
+      parsed.removedCharacterIds.forEach((characterId) => {
+        useCharactersStore.getState().removeCharacterFromSession(characterId);
+      });
+    }
+    if (parsed.combatChanged) {
       useCombatStore.getState().setCombatState(parsed.combat);
     }
     return;
@@ -183,6 +220,7 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
     useCharactersStore
       .getState()
       .updateCharacterHp(parsed.targetCharacterId, parsed.remainingCurrentHp, parsed.remainingTempHp);
+    useCombatStore.getState().setCombatState(parsed.combat);
 
     const summary = parsed.hit
       ? `${parsed.attackName}: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> acerto, ${parsed.damageApplied} dano.`
@@ -202,6 +240,7 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
 
   if (
     event.type === 'CHARACTER_CREATED' ||
+    event.type === 'CHARACTER_CONTROL_UPDATED' ||
     event.type === 'CHARACTER_EQUIPMENT_UPDATED' ||
     event.type === 'CHARACTER_INVENTORY_UPDATED'
   ) {
@@ -219,17 +258,17 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
     const parsed = requireEventPayload(event, characterRemovedPayloadSchema, 'CHARACTER_REMOVED');
 
     useCharactersStore.getState().removeCharacterFromSession(parsed.characterId);
-    if (parsed.removedTokenIds && parsed.removedTokenIds.length > 0) {
+    if (parsed.removedTokenIds.length > 0) {
       parsed.removedTokenIds.forEach((tokenId) => {
         useTokenStore.getState().removeTokenFromSession(tokenId);
       });
-      if (parsed.combat !== undefined) {
+      if (parsed.combatChanged) {
         useCombatStore.getState().setCombatState(parsed.combat);
       }
       return;
     }
     useTokenStore.getState().removeTokensByCharacterIdFromSession(parsed.characterId);
-    if (parsed.combat !== undefined) {
+    if (parsed.combatChanged) {
       useCombatStore.getState().setCombatState(parsed.combat);
     }
     return;
@@ -250,6 +289,9 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
   if (event.type === 'TOKEN_MOVED') {
     const parsed = requireEventPayload(event, tokenMovedPayloadSchema, 'TOKEN_MOVED');
     useTokenStore.getState().updateTokenPosition(parsed.tokenId, parsed.position);
+    if (parsed.combatChanged) {
+      useCombatStore.getState().setCombatState(parsed.combat);
+    }
     return;
   }
 

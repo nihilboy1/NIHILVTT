@@ -1,10 +1,14 @@
 import { useMemo, useState } from 'react';
 
-import { PHB2024ITEMS } from '@nihilvtt/datamodeling/data';
+import { PHB2024ITEMS, PHB2024MONSTERS } from '@nihilvtt/datamodeling/data';
 
+import { useAuthStore } from '@/features/auth/model/authStore';
+import { useGameStore } from '@/features/game/model/gameStore';
 import { useCharactersStore } from '@/entities/character/model/store';
 import { sendGameAddCharacterInventoryItem } from '@/features/game/model/gameSessionApi';
+import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
 import { Modal } from '@/shared/ui/Modal';
+import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 
 interface CompendiumPanelProps {
   gameId: number | null;
@@ -29,6 +33,14 @@ function getItemTypeLabel(item: (typeof PHB2024ITEMS)[number]): string {
   }
 }
 
+function getMonsterDisplayName(monster: (typeof PHB2024MONSTERS)[number]): string {
+  return monster.name[0] ?? monster.name[1] ?? monster.id;
+}
+
+function getMonsterTypeLabel(monster: (typeof PHB2024MONSTERS)[number]): string {
+  return `${monster.type} • CR ${monster.challengeRating}`;
+}
+
 export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
   const [query, setQuery] = useState('');
   const [targetQuery, setTargetQuery] = useState('');
@@ -40,6 +52,11 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
   const [pickerAddCounts, setPickerAddCounts] = useState<Record<string, number>>({});
   const addCharacterFromSession = useCharactersStore((state) => state.addCharacterFromSession);
   const runtimeCharactersById = useCharactersStore((state) => state.runtimeCharactersById);
+  const openModal = useSessionModalStore((state) => state.openModal);
+  const currentGame = useGameStore((state) => state.currentGame);
+  const currentUserId = useAuthStore((state) => state.user?.id ?? null);
+  const isGameMaster =
+    currentGame != null && currentUserId != null && currentGame.owner.id === currentUserId;
 
   const normalizedQuery = query.trim().toLowerCase();
   const normalizedTargetQuery = targetQuery.trim().toLowerCase();
@@ -51,7 +68,7 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
     );
 
     if (!normalizedQuery) {
-      return sortedItems.slice(0, 60);
+      return sortedItems.slice(0, 30);
     }
 
     return sortedItems.filter((item) => {
@@ -59,6 +76,7 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
       const translatedType = getItemTypeLabel(item).toLowerCase();
       return (
         displayName.includes(normalizedQuery) ||
+        item.name.some((name) => name.toLowerCase().includes(normalizedQuery)) ||
         item.id.toLowerCase().includes(normalizedQuery) ||
         item.type.toLowerCase().includes(normalizedQuery) ||
         translatedType.includes(normalizedQuery)
@@ -66,10 +84,36 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
     });
   }, [normalizedQuery]);
 
-  const availableTargets = useMemo(() => {
-    return Object.values(runtimeCharactersById).sort((left, right) =>
-      left.name.localeCompare(right.name, 'pt-BR', { sensitivity: 'base' }),
+  const visibleMonsters = useMemo(() => {
+    const sortedMonsters = [...PHB2024MONSTERS].sort((left, right) =>
+      getMonsterDisplayName(left).localeCompare(getMonsterDisplayName(right), 'pt-BR', {
+        sensitivity: 'base',
+      }),
     );
+
+    if (!normalizedQuery) {
+      return sortedMonsters.slice(0, 30);
+    }
+
+    return sortedMonsters.filter((monster) => {
+      const displayName = getMonsterDisplayName(monster).toLowerCase();
+      const secondaryNames = monster.name.map((name) => name.toLowerCase());
+      const typeLabel = getMonsterTypeLabel(monster).toLowerCase();
+      return (
+        displayName.includes(normalizedQuery) ||
+        secondaryNames.some((name) => name.includes(normalizedQuery)) ||
+        monster.id.toLowerCase().includes(normalizedQuery) ||
+        typeLabel.includes(normalizedQuery)
+      );
+    });
+  }, [normalizedQuery]);
+
+  const availableTargets = useMemo(() => {
+    return Object.values(runtimeCharactersById)
+      .filter(isPlayerCharacterRuntime)
+      .sort((left, right) =>
+        left.name.localeCompare(right.name, 'pt-BR', { sensitivity: 'base' }),
+      );
   }, [runtimeCharactersById]);
 
   const visibleTargets = useMemo(() => {
@@ -155,6 +199,24 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
     setPickerAddCounts({});
   };
 
+  const handleMonsterDragStart = (
+    event: React.DragEvent<HTMLDivElement>,
+    monsterId: string,
+  ) => {
+    if (!isGameMaster || gameId === null) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer.setData('application/vtt-monster-id', monsterId);
+    event.dataTransfer.effectAllowed = 'move';
+    event.currentTarget.style.opacity = '0.55';
+  };
+
+  const handleMonsterDragEnd = (event: React.DragEvent<HTMLDivElement>) => {
+    event.currentTarget.style.opacity = '1';
+  };
+
   const pickerItem = pickerItemId
     ? PHB2024ITEMS.find((item) => item.id === pickerItemId) ?? null
     : null;
@@ -167,7 +229,8 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
             Biblioteca
           </h2>
           <p className="text-xs text-text-secondary">
-            Apenas o mestre pode conceder itens. Escolha um item e depois selecione, em popup, para qual personagem runtime ele será enviado.
+            Pesquise itens e monstros canônicos. Itens são concedidos pelo mestre; monstros podem
+            ser arrastados da biblioteca direto para o grid.
           </p>
         </div>
         <div className="space-y-2">
@@ -175,13 +238,13 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar item"
+            placeholder="Buscar item ou monstro"
             className="w-full rounded-lg bg-surface-1/70 px-3 py-2 text-sm text-text-primary outline-none ring-1 ring-surface-2/60 placeholder:text-text-secondary/70 focus:ring-accent-secondary/50"
           />
           <div className="rounded-lg bg-surface-1/55 px-3 py-2 text-xs text-text-secondary">
-            {availableTargets.length > 0
-              ? 'Selecione um item e escolha o personagem em um popup pesquisável. Não depende de ficha aberta.'
-              : 'Nenhum personagem runtime disponível para receber itens.'}
+            {isGameMaster
+              ? 'Arraste monstros para o tabuleiro. Itens continuam sendo distribuídos via popup de personagem runtime.'
+              : 'Somente o mestre pode arrastar monstros da biblioteca e conceder itens.'}
           </div>
           {formError ? (
             <div className="rounded-lg bg-feedback-negative/10 px-3 py-2 text-xs text-feedback-negative">
@@ -191,41 +254,106 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
         </div>
       </header>
 
-      <div className="hide-scrollbar flex-1 space-y-2 overflow-y-auto pr-1">
-        {visibleItems.length === 0 ? (
-          <div className="rounded-lg bg-surface-1/55 px-3 py-3 text-xs text-text-secondary">
-            Nenhum item encontrado.
+      <div className="hide-scrollbar flex-1 space-y-4 overflow-y-auto pr-1">
+        <section className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
+              Monstros
+            </h3>
+            <span className="text-[0.65rem] uppercase tracking-[0.08em] text-text-secondary">
+              {visibleMonsters.length}
+            </span>
           </div>
-        ) : (
-          visibleItems.map((item) => {
-            const displayName = getItemDisplayName(item);
-            const isPending = pendingItemId === item.id;
-
-            return (
+          {visibleMonsters.length === 0 ? (
+            <div className="rounded-lg bg-surface-1/55 px-3 py-3 text-xs text-text-secondary">
+              Nenhum monstro encontrado.
+            </div>
+          ) : (
+            visibleMonsters.map((monster) => (
               <div
-                key={item.id}
+                key={monster.id}
                 className="rounded-xl bg-surface-1/55 px-3 py-2.5"
+                draggable={isGameMaster && gameId !== null}
+                onDragStart={(event) => handleMonsterDragStart(event, monster.id)}
+                onDragEnd={handleMonsterDragEnd}
+                title={
+                  isGameMaster
+                    ? `Arraste ${getMonsterDisplayName(monster)} para o tabuleiro.`
+                    : 'Somente o mestre pode instanciar monstros.'
+                }
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-text-primary">{displayName}</p>
+                    <p className="truncate text-sm font-medium text-text-primary">
+                      {getMonsterDisplayName(monster)}
+                    </p>
                     <p className="text-[0.68rem] uppercase tracking-[0.08em] text-text-secondary">
-                      {getItemTypeLabel(item)}
+                      {getMonsterTypeLabel(monster)}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    className="rounded-md bg-accent-primary/15 px-2.5 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-accent-secondary disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={!canChooseTarget || pendingItemId !== null}
-                    onClick={() => handleOpenPicker(item.id)}
-                  >
-                    {isPending ? 'Adicionando...' : 'Adicionar'}
-                  </button>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      className="rounded-md bg-surface-2/75 px-2.5 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-text-primary transition-colors hover:bg-surface-2"
+                      draggable={false}
+                      onClick={() => openModal('sheet', { monsterId: monster.id })}
+                    >
+                      Detalhes
+                    </button>
+                    <span className="rounded-md bg-accent-primary/12 px-2.5 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-accent-secondary">
+                      Arrastar
+                    </span>
+                  </div>
                 </div>
               </div>
-            );
-          })
-        )}
+            ))
+          )}
+        </section>
+
+        <section className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
+              Itens
+            </h3>
+            <span className="text-[0.65rem] uppercase tracking-[0.08em] text-text-secondary">
+              {visibleItems.length}
+            </span>
+          </div>
+          {visibleItems.length === 0 ? (
+            <div className="rounded-lg bg-surface-1/55 px-3 py-3 text-xs text-text-secondary">
+              Nenhum item encontrado.
+            </div>
+          ) : (
+            visibleItems.map((item) => {
+              const displayName = getItemDisplayName(item);
+              const isPending = pendingItemId === item.id;
+
+              return (
+                <div
+                  key={item.id}
+                  className="rounded-xl bg-surface-1/55 px-3 py-2.5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-text-primary">{displayName}</p>
+                      <p className="text-[0.68rem] uppercase tracking-[0.08em] text-text-secondary">
+                        {getItemTypeLabel(item)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="rounded-md bg-accent-primary/15 px-2.5 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-accent-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={!canChooseTarget || pendingItemId !== null || !isGameMaster}
+                      onClick={() => handleOpenPicker(item.id)}
+                    >
+                      {isPending ? 'Adicionando...' : 'Adicionar'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </section>
       </div>
 
       <Modal
@@ -238,7 +366,8 @@ export function CompendiumPanel({ gameId }: CompendiumPanelProps) {
       >
         <div className="space-y-3">
           <p className="text-sm text-text-secondary">
-            Escolha para quais personagens runtime este item será adicionado. O popup permanece aberto para distribuicao continua.
+            Escolha para quais personagens runtime este item será adicionado. O popup permanece
+            aberto para distribuição contínua.
           </p>
           {formError ? (
             <div className="rounded-lg bg-feedback-negative/10 px-3 py-2 text-xs text-feedback-negative">

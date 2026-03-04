@@ -13,6 +13,8 @@ interface CharacterCardProps {
   openSheetModal: (characterId: string) => void;
   onDuplicate: (characterId: string) => void | Promise<void>;
   onDelete: (characterId: string) => void;
+  canDragToBoard: boolean;
+  dragDisabledReason?: string;
 }
 
 export function CharacterCard({
@@ -21,12 +23,19 @@ export function CharacterCard({
   openSheetModal,
   onDuplicate,
   onDelete,
+  canDragToBoard,
+  dragDisabledReason,
 }: CharacterCardProps) {
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const cardAnchorRef = useRef<HTMLLIElement>(null);
   const optionsButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleDragStart = (event: React.DragEvent<HTMLLIElement>, characterId: string) => {
+    if (!canDragToBoard) {
+      event.preventDefault();
+      return;
+    }
+
     event.dataTransfer.setData('application/vtt-character-id', characterId);
     event.dataTransfer.effectAllowed = 'move';
     event.currentTarget.style.opacity = '0.5';
@@ -58,9 +67,15 @@ export function CharacterCard({
   return (
     <li
       ref={cardAnchorRef}
-      className="bg-surface-3 flex items-center justify-between rounded-md p-3 shadow duration-150"
-      title={`Arraste '${character.name}' para o tabuleiro para criar uma instância, ou clique para abrir a ficha.`}
-      draggable={true}
+      className={`bg-surface-3 flex items-center justify-between rounded-md p-3 shadow duration-150 ${
+        canDragToBoard ? '' : 'opacity-75'
+      }`}
+      title={
+        canDragToBoard
+          ? `Arraste '${character.name}' para o tabuleiro para criar uma instância, ou clique para abrir a ficha.`
+          : (dragDisabledReason ?? 'Você não pode instanciar tokens desta ficha.')
+      }
+      draggable={canDragToBoard}
       onDragStart={(e) => handleDragStart(e, character.id)}
       onDragEnd={handleDragEnd}
       aria-label={`Modelo de personagem ${character.name}. Tipo: ${

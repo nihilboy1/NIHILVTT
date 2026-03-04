@@ -24,6 +24,9 @@ import { GameBoard } from '../widgets/gameBoard/ui/GameBoard';
 import { SessionModalManager } from '../widgets/sessionModalManager/ui/SessionModalManager';
 import { TokenActionBar } from '@/features/combat/ui/TokenActionBar';
 import { InitiativeTrack } from '@/features/combat/ui/InitiativeTrack';
+import { useCombatStore } from '@/features/combat/model/store';
+import { useTokenStore } from '@/entities/token/model/store/tokenStore';
+import { useCharactersStore } from '@/entities/character/model/store';
 
 export default function GamePage() {
   const navigate = useNavigate();
@@ -43,6 +46,9 @@ export default function GamePage() {
   } = useGameStore();
   const user = useAuthStore((state) => state.user);
   const { closeModal, modalStack } = useSessionModalStore();
+  const combatState = useCombatStore((state) => state.combatState);
+  const tokensOnBoard = useTokenStore((state) => state.tokensOnBoard);
+  const runtimeCharactersById = useCharactersStore((state) => state.runtimeCharactersById);
 
   const [isHydratingSession, setIsHydratingSession] = useState(false);
   const realtimeClientRef = useRef<GameSessionRealtimeClient | null>(null);
@@ -75,6 +81,40 @@ export default function GamePage() {
     }
     handleClearMultiSelection();
   };
+
+  const activeCombatTurnTokenId =
+    combatState && combatState.participants.length > 0
+      ? combatState.participants[combatState.turnIndex]?.tokenId ?? null
+      : null;
+  const selectedCombatParticipant =
+    selectedActionTokenId != null &&
+    combatState?.participants.some((participant) => participant.tokenId === selectedActionTokenId);
+  const isGameMaster = currentGame != null && user != null && currentGame.owner.id === user.id;
+  const selectedActionToken = selectedActionTokenId
+    ? tokensOnBoard.find((token) => token.id === selectedActionTokenId) ?? null
+    : null;
+  const selectedRuntimeCharacter = selectedActionToken
+    ? runtimeCharactersById[selectedActionToken.characterId] ?? null
+    : null;
+  const currentUserControlsSelectedToken =
+    user != null &&
+    currentGame != null &&
+    (
+      selectedRuntimeCharacter == null
+        ? false
+        : selectedRuntimeCharacter.type === 'NPC'
+          ? currentGame.owner.id === user.id
+        : selectedRuntimeCharacter.controlledByUserId == null
+          ? currentGame.owner.id === user.id
+          : selectedRuntimeCharacter.controlledByUserId === user.id
+    );
+  const combatLockReason =
+    !isGameMaster &&
+    currentUserControlsSelectedToken &&
+    selectedCombatParticipant &&
+    selectedActionTokenId !== activeCombatTurnTokenId
+      ? 'Aguarde o seu turno para agir no combate.'
+      : null;
 
   useEffect(() => {
     let isCancelled = false;
@@ -220,6 +260,7 @@ export default function GamePage() {
         onClearMultiSelection={handleClearMultiSelection}
         onBoardPointerMove={handleBoardPointerMove}
         onBoardPointerLeave={handleBoardPointerLeave}
+        combatLockReason={combatLockReason}
       />
       <SessionModalManager
         handleHPChangeFromModal={handleHPChangeFromModal}

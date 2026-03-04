@@ -28,17 +28,21 @@ const gameSessionSnapshotSchema = z.object({
   serverVersion: z.number().int().nonnegative(),
   state: z
     .object({
-      characters: z.array(z.unknown()).default([]),
-      tokens: z.array(z.unknown()).default([]),
-      messages: z.array(z.unknown()).default([]),
+      characters: z.array(z.unknown()),
+      tokens: z.array(z.unknown()),
+      messages: z.array(z.unknown()),
     })
     .passthrough(),
-  recentEvents: z.array(z.unknown()).default([]),
+  recentEvents: z.array(z.unknown()),
   generatedAt: z.string().optional(),
 });
 
 export type GameSessionEvent = z.infer<typeof gameSessionEventSchema>;
 export type GameSessionSnapshot = z.infer<typeof gameSessionSnapshotSchema>;
+
+export function parseGameSessionSnapshotPayload(payload: unknown): GameSessionSnapshot {
+  return gameSessionSnapshotSchema.parse(payload);
+}
 
 function parseApiError(error: unknown, fallback: string): GameSessionApiError {
   if (!axios.isAxiosError(error)) {
@@ -54,7 +58,7 @@ function parseApiError(error: unknown, fallback: string): GameSessionApiError {
 export async function fetchGameSessionSnapshot(gameId: number): Promise<GameSessionSnapshot> {
   try {
     const response = await sessionApi.get<unknown>(`/games/${gameId}/session-state`);
-    return gameSessionSnapshotSchema.parse(response.data);
+    return parseGameSessionSnapshotPayload(response.data);
   } catch (error) {
     throw parseApiError(error, 'Falha ao carregar estado da sessão.');
   }
@@ -224,6 +228,22 @@ export async function sendGameUpdateCharacterEquipment(
   }
 }
 
+export async function sendGameUpdateCharacterController(
+  gameId: number,
+  characterId: string,
+  controlledByUserId: number | null,
+): Promise<GameSessionEvent> {
+  try {
+    const response = await sessionApi.post<unknown>(`/games/${gameId}/session/characters/controller`, {
+      characterId,
+      controlledByUserId,
+    });
+    return gameSessionEventSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error, 'Falha ao atualizar controlador do personagem.');
+  }
+}
+
 export async function sendGameAddCharacterInventoryItem(
   gameId: number,
   characterId: string,
@@ -276,6 +296,17 @@ export async function sendGameRemoveToken(gameId: number, tokenId: string): Prom
   }
 }
 
+export async function sendGameRemoveTokens(gameId: number, tokenIds: string[]): Promise<GameSessionEvent> {
+  try {
+    const response = await sessionApi.post<unknown>(`/games/${gameId}/session/tokens/remove-batch`, {
+      tokenIds,
+    });
+    return gameSessionEventSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error, 'Falha ao remover tokens.');
+  }
+}
+
 export async function sendGameCreateCharacter(
   gameId: number,
   character: Record<string, unknown>,
@@ -287,6 +318,30 @@ export async function sendGameCreateCharacter(
     return gameSessionEventSchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error, 'Falha ao criar personagem.');
+  }
+}
+
+export async function sendGameSpawnMonster(
+  gameId: number,
+  monsterId: string,
+  options?: {
+    nameOverride?: string | null;
+    sceneId?: string;
+    x?: number;
+    y?: number;
+  },
+): Promise<GameSessionEvent> {
+  try {
+    const response = await sessionApi.post<unknown>(`/games/${gameId}/session/monsters`, {
+      monsterId,
+      nameOverride: options?.nameOverride?.trim() ? options.nameOverride.trim() : null,
+      sceneId: options?.sceneId ?? null,
+      x: options?.x ?? null,
+      y: options?.y ?? null,
+    });
+    return gameSessionEventSchema.parse(response.data);
+  } catch (error) {
+    throw parseApiError(error, 'Falha ao instanciar monstro.');
   }
 }
 

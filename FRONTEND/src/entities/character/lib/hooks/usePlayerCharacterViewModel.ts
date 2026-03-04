@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { useCharactersStore } from '@/entities/character/model/store';
+import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 import {
   buildPlayerCharacterViewModel,
   buildPlayerCharacterViewModelFromRuntime,
@@ -15,10 +16,11 @@ export function usePlayerCharacterViewModel(
     ? characters.find((entry) => entry.id === characterId)
     : undefined;
   const runtimeCharacter = characterId ? runtimeCharactersById[characterId] ?? null : null;
+  const playerRuntimeCharacter = isPlayerCharacterRuntime(runtimeCharacter) ? runtimeCharacter : null;
 
   return useMemo(() => {
-    if (runtimeCharacter) {
-      return buildPlayerCharacterViewModelFromRuntime(runtimeCharacter);
+    if (playerRuntimeCharacter) {
+      return buildPlayerCharacterViewModelFromRuntime(playerRuntimeCharacter);
     }
 
     if (!character || character.type !== 'Player') {
@@ -26,5 +28,5 @@ export function usePlayerCharacterViewModel(
     }
 
     return buildPlayerCharacterViewModel(character);
-  }, [character, runtimeCharacter]);
+  }, [character, playerRuntimeCharacter]);
 }

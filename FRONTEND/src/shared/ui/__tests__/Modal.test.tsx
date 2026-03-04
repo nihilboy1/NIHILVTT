@@ -1,10 +1,20 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 
+const mockUseDismissable = jest.fn();
+
+jest.mock('@/shared/lib/hooks/useDismissable', () => ({
+  useDismissable: (...args: unknown[]) => mockUseDismissable(...args),
+}));
+
 import { Modal } from '../Modal';
 
 describe('Modal accessibility', () => {
-  test('fecha no Escape', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('registra o fechamento externo via useDismissable', () => {
     const onClose = jest.fn();
 
     render(
@@ -13,11 +23,11 @@ describe('Modal accessibility', () => {
       </Modal>,
     );
 
-    const overlay = document.querySelector('div[role="button"][tabindex="-1"]');
-    expect(overlay).not.toBeNull();
-
-    fireEvent.keyDown(overlay as Element, { key: 'Escape' });
-    expect(onClose).toHaveBeenCalled();
+    expect(mockUseDismissable).toHaveBeenCalledWith(
+      expect.objectContaining({ current: expect.any(HTMLDivElement) }),
+      true,
+      onClose,
+    );
   });
 
   test('mantém o foco preso com Tab e Shift+Tab', () => {

@@ -9,11 +9,20 @@ export const useSessionModalStore = create<ModalState>((set) => ({
   openModal: (modalName, props = {}, dismissible = true) => {
     set((prevState) => {
       if (modalName === "sheet") {
-        const isSheetAlreadyOpen = prevState.modalStack.some(
+        const existingSheetIndex = prevState.modalStack.findIndex(
           (modal) => modal.name === "sheet"
         );
-        if (isSheetAlreadyOpen) {
-          return prevState;
+        if (existingSheetIndex >= 0) {
+          const nextModalStack = [...prevState.modalStack];
+          nextModalStack[existingSheetIndex] = {
+            ...nextModalStack[existingSheetIndex],
+            props,
+            dismissible,
+          };
+
+          return {
+            modalStack: nextModalStack,
+          };
         }
       }
 

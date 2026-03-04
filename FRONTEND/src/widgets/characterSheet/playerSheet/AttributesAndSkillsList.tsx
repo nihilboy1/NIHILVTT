@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
 import { ATTRIBUTES_CONFIG } from "@/entities/character/constants";
 import { useCharactersStore } from "@/entities/character/model/store";
+import { isPlayerCharacterRuntime } from "@/entities/character/model/schemas/playerCharacterRuntime.schema";
 import { buildPlayerCharacterSkillsViewModel } from "@/entities/character/model/view-models/playerCharacterSkillsViewModel";
 import { PlayerCharacter } from "@/entities/character/model/schemas/character.schema";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
@@ -75,10 +76,11 @@ export function AttributesAndSkillsList({
   const runtimeCharacter = useCharactersStore(
     (state) => state.runtimeCharactersById[characterId] ?? null
   );
+  const playerRuntimeCharacter = isPlayerCharacterRuntime(runtimeCharacter) ? runtimeCharacter : null;
 
-  const characterName = runtimeCharacter?.name ?? character?.name ?? "";
-  const level = runtimeCharacter?.progression.currentLevel ?? character?.level ?? 1;
-  const attributes = runtimeCharacter?.attributes.base ?? character?.attributes ?? DEFAULT_ATTRIBUTES;
+  const characterName = playerRuntimeCharacter?.name ?? character?.name ?? "";
+  const level = playerRuntimeCharacter?.progression.currentLevel ?? character?.level ?? 1;
+  const attributes = playerRuntimeCharacter?.attributes.base ?? character?.attributes ?? DEFAULT_ATTRIBUTES;
   const proficiencies = character?.proficiencies ?? DEFAULT_PROFICIENCIES;
 
   const skillsViewModel = useMemo(

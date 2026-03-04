@@ -36,6 +36,7 @@ interface BoardTokenProps {
   // onRemoveFromBoard: (tokenId: string) => void;
   // onMakeIndependent: (tokenId: string) => void;
   onSetMultiSelectedTokenIds: (ids: string[]) => void;
+  canDrag: boolean;
 }
 
 export function BoardToken({
@@ -54,6 +55,7 @@ export function BoardToken({
   isMultiSelected,
   onBoardTokenDoubleClick,
   onSetMultiSelectedTokenIds,
+  canDrag,
 }: BoardTokenProps) {
   const tokenGroupRef = useRef<SVGGElement>(null);
   const { selectedTokenId, setSelectedTokenId } = useSelectedTokenStore();
@@ -82,6 +84,7 @@ export function BoardToken({
     onDragMove: onTokenDragMove,
     onDragEnd: onTokenDragEnd,
     onSelectToken: handleSelectThisToken,
+    canDrag,
   });
 
   // O useEffect para atualizar a posição do HPModal não é mais necessário aqui
@@ -167,22 +170,12 @@ export function BoardToken({
       {/* Renderiza HealthBar apenas para PlayerCharacter ou MonsterNPCCharacter */}
       {(character.type === CharacterTypeEnum.enum.Player ||
         character.type === CharacterTypeEnum.enum.NPC) && (
-        <>
-          {console.log(
-            "BoardToken: Renderizando HealthBar para Character ID:",
-            character.id,
-            "HP Atual:",
-            character.combatStats.currentHp,
-            "HP Máximo:",
-            character.combatStats.maxHp
-          )}
-          <HealthBar
-            currentHp={character.combatStats.currentHp}
-            maxHp={character.combatStats.maxHp}
-            tokenRenderWidth={tokenRenderWidth}
-            zoomLevel={zoomLevel}
-          />
-        </>
+        <HealthBar
+          currentHp={character.combatStats.currentHp}
+          maxHp={character.combatStats.maxHp}
+          tokenRenderWidth={tokenRenderWidth}
+          zoomLevel={zoomLevel}
+        />
       )}
       <TokenVisual metrics={tokenMetrics} />
       <text

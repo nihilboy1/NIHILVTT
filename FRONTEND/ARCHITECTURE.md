@@ -2,6 +2,9 @@
 
 Referencia arquitetural do frontend NIHILVTT.
 
+Este documento descreve estrutura, fronteiras e fluxos principais do cliente.
+Nao e o guia de setup nem o catalogo de regras de negocio: esses papeis ficam em `README.md` e nos documentos especificos do modulo.
+
 ## Padrao de arquitetura
 
 A aplicacao segue Feature-Sliced Design (FSD):

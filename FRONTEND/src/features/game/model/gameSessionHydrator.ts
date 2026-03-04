@@ -67,7 +67,15 @@ const combatParticipantSchema = z.object({
   initiativeRoll: z.number().int(),
   initiativeTotal: z.number().int(),
   dexterityScore: z.number().int(),
+  movementBudgetCells: z.number().int().min(1),
   status: z.literal('active'),
+});
+
+const combatTurnResourcesSchema = z.object({
+  actionAvailable: z.boolean(),
+  bonusActionAvailable: z.boolean(),
+  remainingMovementCells: z.number().int().min(0),
+  totalMovementCells: z.number().int().min(1),
 });
 
 const combatStateSchema = z.object({
@@ -75,6 +83,7 @@ const combatStateSchema = z.object({
   round: z.number().int().min(1),
   turnIndex: z.number().int().min(0),
   participants: z.array(combatParticipantSchema),
+  turnResources: combatTurnResourcesSchema,
 });
 
 export function resetGameSessionClientState(): void {
@@ -86,15 +95,15 @@ export function resetGameSessionClientState(): void {
 }
 
 export function hydrateGameSessionSnapshot(snapshot: GameSessionSnapshot): void {
-  const rawCharacters = snapshot.state.characters ?? [];
+  const rawCharacters = snapshot.state.characters;
 
-  const rawTokens = snapshot.state.tokens ?? [];
+  const rawTokens = snapshot.state.tokens;
   const parsedTokens = rawTokens
     .map((entry) => tokenSchema.safeParse(entry))
     .filter((result): result is z.ZodSafeParseSuccess<z.infer<typeof tokenSchema>> => result.success)
     .map((result) => result.data);
 
-  const rawMessages = snapshot.state.messages ?? [];
+  const rawMessages = snapshot.state.messages;
   const parsedMessages = rawMessages
     .map((entry) => messageSchema.safeParse(entry))
     .filter((result): result is z.ZodSafeParseSuccess<z.infer<typeof messageSchema>> => result.success)

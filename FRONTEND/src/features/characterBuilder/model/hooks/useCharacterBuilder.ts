@@ -4,10 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { PlayerCharacter } from '@/entities/character/model/schemas/character.schema';
-import { useCharactersStore } from '@/entities/character/model/store';
 import { Attributes } from '@/shared/constants/characterData/attributes';
 import { DEFAULT_ATTRIBUTES } from '@/shared/constants/characterData/attributes';
-import { CharacterTypeEnum } from '@nihilvtt/datamodeling/primitives';
 
 import { useEffectsProcessor } from './useEffectsProcessor';
 import { buildPlayerCharacterFromBuilder } from '../../lib/buildPlayerCharacterFromBuilder';
@@ -21,7 +19,6 @@ import {
 
 export function useCharacterBuilder() {
   const [currentStep, setCurrentStep] = useState<Step>('species');
-  const { addCharacter } = useCharactersStore();
 
   // Hook para processar efeitos das origens e talentos
   const effectsProcessor = useEffectsProcessor();
@@ -271,11 +268,10 @@ export function useCharacterBuilder() {
       }
       console.info('[CharacterBuilder] Personagem persistido por pipeline externo.');
     } else {
-      addCharacter({
-        ...playerCharacterData,
-        type: CharacterTypeEnum.enum.Player,
-      });
-      console.info('[CharacterBuilder] Personagem persistido localmente no store.');
+      console.error(
+        '[CharacterBuilder] Fluxo local bloqueado: o builder exige pipeline autoritativo de persistência.',
+      );
+      return false;
     }
 
     effectsProcessor.resetEffectChoices();

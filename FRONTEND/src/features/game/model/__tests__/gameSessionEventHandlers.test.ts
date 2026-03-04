@@ -9,6 +9,7 @@ const removeTokensByCharacterIdFromSession = jest.fn();
 const updateTokenPosition = jest.fn();
 const addIncomingMessage = jest.fn();
 const clearAllMessages = jest.fn();
+const setCombatState = jest.fn();
 
 jest.mock('@/entities/character/model/store', () => ({
   useCharactersStore: {
@@ -36,6 +37,15 @@ jest.mock('@/features/chat/model/store', () => ({
     getState: () => ({
       addIncomingMessage,
       clearAllMessages,
+    }),
+  },
+}));
+
+jest.mock('@/features/combat/model/store', () => ({
+  useCombatStore: {
+    getState: () => ({
+      setCombatState,
+      clearCombatState: jest.fn(),
     }),
   },
 }));
@@ -79,11 +89,68 @@ describe('applyGameSessionEvent', () => {
     expect(addTokenFromSession).toHaveBeenCalledWith(token);
   });
 
+  it('aplica TOKEN_CREATED com character nulo e sincroniza apenas o token', () => {
+    const token = {
+      id: 'token-2',
+      characterId: 'char-2',
+      sceneId: 'scene-1',
+      position: { x: 5, y: 6 },
+    };
+
+    applyGameSessionEvent(
+      createEvent('TOKEN_CREATED', {
+        character: null,
+        token,
+      }),
+    );
+
+    expect(addCharacterFromSession).not.toHaveBeenCalled();
+    expect(addTokenFromSession).toHaveBeenCalledWith(token);
+  });
+
+  it('aplica CHARACTER_CREATED para payload de Player', () => {
+    const runtimeCharacter = {
+      id: 'char-player-1',
+      type: 'Player',
+      name: 'Heroi',
+    };
+
+    applyGameSessionEvent(
+      createEvent('CHARACTER_CREATED', {
+        character: runtimeCharacter,
+      }),
+    );
+
+    expect(addCharacterFromSession).toHaveBeenCalledWith(runtimeCharacter);
+  });
+
+  it('aplica CHARACTER_CREATED para payload de NPC', () => {
+    const runtimeCharacter = {
+      id: 'char-npc-1',
+      type: 'NPC',
+      monsterId: 'monster-commoner',
+      hitPoints: {
+        current: 4,
+        temporary: 0,
+      },
+    };
+
+    applyGameSessionEvent(
+      createEvent('CHARACTER_CREATED', {
+        character: runtimeCharacter,
+      }),
+    );
+
+    expect(addCharacterFromSession).toHaveBeenCalledWith(runtimeCharacter);
+  });
+
   it('aplica TOKEN_REMOVED com removedCharacterId e remove token + ficha clone', () => {
     applyGameSessionEvent(
       createEvent('TOKEN_REMOVED', {
         tokenId: 'token-1',
         removedCharacterId: 'char-1',
+        combatChanged: false,
+        combat: null,
       }),
     );
 
@@ -101,6 +168,114 @@ describe('applyGameSessionEvent', () => {
     );
 
     expect(updateCharacterHp).toHaveBeenCalledWith('char-1', 3, 2);
+  });
+
+  it('aplica TOKENS_REMOVED e sincroniza todos os tokens removidos em um único evento', () => {
+    applyGameSessionEvent(
+      createEvent('TOKENS_REMOVED', {
+        tokenIds: ['token-1', 'token-2'],
+        removedCharacterIds: ['char-1'],
+        combatChanged: true,
+        combat: null,
+      }),
+    );
+
+    expect(removeTokenFromSession).toHaveBeenCalledWith('token-1');
+    expect(removeTokenFromSession).toHaveBeenCalledWith('token-2');
+    expect(removeCharacterFromSession).toHaveBeenCalledWith('char-1');
+    expect(setCombatState).toHaveBeenCalledWith(null);
+  });
+
+  it('aplica COMBAT_STARTED e sincroniza o combatState completo', () => {
+    const combat = {
+      active: true,
+      round: 1,
+      turnIndex: 0,
+      participants: [
+        {
+          tokenId: 'token-1',
+          characterId: 'char-1',
+          initiativeRoll: 12,
+          initiativeTotal: 14,
+          dexterityScore: 14,
+          movementBudgetCells: 6,
+          status: 'active' as const,
+        },
+      ],
+      turnResources: {
+        actionAvailable: true,
+        bonusActionAvailable: true,
+        remainingMovementCells: 6,
+        totalMovementCells: 6,
+      },
+    };
+
+    applyGameSessionEvent(
+      createEvent('COMBAT_STARTED', {
+        combat,
+      }),
+    );
+
+    expect(setCombatState).toHaveBeenCalledWith(combat);
+  });
+
+  it('aplica COMBAT_TURN_ADVANCED e sincroniza o novo estado de turno', () => {
+    const combat = {
+      active: true,
+      round: 2,
+      turnIndex: 1,
+      participants: [
+        {
+          tokenId: 'token-1',
+          characterId: 'char-1',
+          initiativeRoll: 12,
+          initiativeTotal: 14,
+          dexterityScore: 14,
+          movementBudgetCells: 6,
+          status: 'active' as const,
+        },
+        {
+          tokenId: 'token-2',
+          characterId: 'char-2',
+          initiativeRoll: 9,
+          initiativeTotal: 10,
+          dexterityScore: 12,
+          movementBudgetCells: 6,
+          status: 'active' as const,
+        },
+      ],
+      turnResources: {
+        actionAvailable: false,
+        bonusActionAvailable: true,
+        remainingMovementCells: 2,
+        totalMovementCells: 6,
+      },
+    };
+
+    applyGameSessionEvent(
+      createEvent('COMBAT_TURN_ADVANCED', {
+        combat,
+      }),
+    );
+
+    expect(setCombatState).toHaveBeenCalledWith(combat);
+  });
+
+  it('falha explicitamente quando TOKENS_REMOVED vier com payload inválido', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    expect(() =>
+      applyGameSessionEvent(
+        createEvent('TOKENS_REMOVED', {
+          tokenIds: ['token-1', 2],
+          removedCharacterIds: [],
+          combatChanged: false,
+          combat: null,
+        }),
+      ),
+    ).toThrow('Violação de contrato realtime em TOKENS_REMOVED: payload inválido.');
+
+    expect(errorSpy).toHaveBeenCalled();
   });
 
   it('preenche senderUserId a partir de actorUserId em CHAT_MESSAGE_CREATED', () => {

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 import { useBoardZoomStore } from "@/features/boardZoom/model/store"; // Import the new zoom store
 import { useSessionModalStore } from "@/features/modalManager/model/sessionModalStore";
 import { applyGameSessionEvent } from "@/features/game/model/gameSessionEventHandlers";
-import { sendGameCreateToken, sendGameMoveToken } from "@/features/game/model/gameSessionApi";
+import { sendGameCreateToken, sendGameMoveToken, sendGameSpawnMonster } from "@/features/game/model/gameSessionApi";
 import { useGameStore } from "@/features/game/model/gameStore";
 import { useAuthStore } from "@/features/auth/model/authStore";
+import { useCombatStore } from "@/features/combat/model/store";
 
 import { useBoardStore } from "../../../entities/board/model/store";
 import { parseCharacterSize } from "../../../entities/character/lib/utils/characterUtils";
@@ -38,6 +40,7 @@ interface GameBoardProps {
   onClearMultiSelection: () => void;
   onBoardPointerMove: (svgPoint: Point) => void;
   onBoardPointerLeave: () => void;
+  combatLockReason?: string | null;
 }
 
 export function GameBoard({
@@ -53,9 +56,11 @@ export function GameBoard({
   onClearMultiSelection,
   onBoardPointerMove,
   onBoardPointerLeave,
+  combatLockReason = null,
 }: GameBoardProps) {
   const { gameId } = useParams<{ gameId: string }>();
   const { characters } = useCharactersStore();
+  const runtimeCharactersById = useCharactersStore((state) => state.runtimeCharactersById);
   const { tokensOnBoard, updateTokenPosition } = useTokenStore();
   const { gridSettings, pageSettings, rulerPlacementMode, rulerPersists } =
     useBoardSettingsStore();
@@ -63,6 +68,62 @@ export function GameBoard({
   const { openModal } = useSessionModalStore();
   const currentGame = useGameStore((state) => state.currentGame);
   const currentUserId = useAuthStore((state) => state.user?.id ?? null);
+  const combatState = useCombatStore((state) => state.combatState);
+  const activeCombatTurnTokenId =
+    combatState && combatState.participants.length > 0
+      ? combatState.participants[combatState.turnIndex]?.tokenId ?? null
+      : null;
+  const combatParticipantTokenIds = combatState?.participants.map((participant) => participant.tokenId) ?? [];
+  const activeCombatTurnCanMove =
+    combatState == null || combatState.turnResources.remainingMovementCells > 0;
+  const isGameMaster =
+    currentGame != null && currentUserId != null && currentGame.owner.id === currentUserId;
+  const canCurrentUserInstantiateCharacterToken = useCallback(
+    (characterId: string) => {
+      const runtimeCharacter = runtimeCharactersById[characterId] ?? null;
+      if (!runtimeCharacter) {
+        console.error(
+          'Violação de contrato de sessão: token em mesa sem runtime compartilhado.',
+          { characterId },
+        );
+        return false;
+      }
+
+      if (runtimeCharacter.type === 'NPC') {
+        return isGameMaster;
+      }
+
+      if (runtimeCharacter.controlledByUserId == null) {
+        return isGameMaster;
+      }
+
+      return currentUserId != null && runtimeCharacter.controlledByUserId === currentUserId;
+    },
+    [currentUserId, isGameMaster, runtimeCharactersById],
+  );
+  const controllableTokenIds = tokensOnBoard
+    .filter((token) => {
+      const runtimeCharacter = runtimeCharactersById[token.characterId] ?? null;
+      if (!runtimeCharacter) {
+        console.error(
+          'Violação de contrato de sessão: token em mesa sem runtime compartilhado.',
+          { tokenId: token.id, characterId: token.characterId },
+        );
+        return false;
+      }
+
+      if (runtimeCharacter.type === 'NPC') {
+        return isGameMaster;
+      }
+
+      const controlledByUserId = runtimeCharacter.controlledByUserId;
+      if (controlledByUserId == null) {
+        return isGameMaster;
+      }
+
+      return currentUserId != null && controlledByUserId === currentUserId;
+    })
+    .map((token) => token.id);
 
   const handleTokenMove = useCallback(
     (tokenId: string, newPosition: Point) => {
@@ -96,8 +157,38 @@ export function GameBoard({
         .then((event) => {
           applyGameSessionEvent(event);
         })
+        .catch((error) => {
+          const message =
+            typeof error === 'object' &&
+            error !== null &&
+            'formError' in error &&
+            typeof (error as { formError?: unknown }).formError === 'string'
+              ? (error as { formError: string }).formError
+              : 'Falha ao criar token no servidor.';
+          toast.error(message);
+        });
+    },
+    [gameId],
+  );
+
+  const handleMonsterSpawnFromCatalog = useCallback(
+    (monsterId: string, position: Point) => {
+      const parsedGameId = Number(gameId);
+      const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
+      if (!isValidGameId) {
+        return;
+      }
+
+      void sendGameSpawnMonster(parsedGameId, monsterId, {
+        sceneId: 'default-scene',
+        x: position.x,
+        y: position.y,
+      })
+        .then((event) => {
+          applyGameSessionEvent(event);
+        })
         .catch(() => {
-          console.warn('Falha ao criar token no servidor.');
+          toast.error('Falha ao instanciar monstro no tabuleiro.');
         });
     },
     [gameId],
@@ -193,6 +284,9 @@ export function GameBoard({
     gridSettings,
     pageSettings,
     addToken: handleTokenCreate,
+    spawnMonsterFromCatalog: handleMonsterSpawnFromCatalog,
+    canSpawnMonsterFromCompendium: isGameMaster,
+    canCreateTokenForCharacter: canCurrentUserInstantiateCharacterToken,
   });
 
   const handlePanMoveWithZoom = useCallback(
@@ -309,6 +403,11 @@ export function GameBoard({
         updateTokenPosition={handleTokenMove}
         marqueeSelection={marqueeSelection}
         rulerPath={rulerPath}
+        activeCombatTurnTokenId={activeCombatTurnTokenId}
+        combatParticipantTokenIds={combatParticipantTokenIds}
+        activeCombatTurnCanMove={activeCombatTurnCanMove}
+        controllableTokenIds={controllableTokenIds}
+        combatLockReason={combatLockReason}
       />
     </>
   );

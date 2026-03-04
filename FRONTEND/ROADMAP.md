@@ -1,5 +1,10 @@
 # FRONTEND Roadmap
 
+Plano vivo de evolucao do frontend.
+
+Este documento registra prioridades e proximos blocos de trabalho.
+Nao deve repetir setup nem documentacao arquitetural detalhada; ele existe para orientar sequenciamento.
+
 ## Melhorias de curto prazo
 
 1. Revisar UX de mensagens de erro/comandos no chat para manter consistencia entre validacao e execucao.

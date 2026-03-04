@@ -11,6 +11,7 @@ export function buildPlayerCharacterRuntimeFromSheetState(
     name: character.name,
     image: character.image,
     notes: character.notes,
+    controlledByUserId: null,
     build: {
       classId: character.charClass,
       originId: character.background,

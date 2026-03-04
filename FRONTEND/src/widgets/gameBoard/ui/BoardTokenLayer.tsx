@@ -25,6 +25,10 @@ interface BoardTokenLayerProps {
   multiSelectedTokenIds: string[];
   handleBoardTokenDoubleClick: (tokenId: string, altKey: boolean) => void;
   onSetMultiSelectedTokenIds: (ids: string[]) => void;
+  activeCombatTurnTokenId: string | null;
+  combatParticipantTokenIds: string[];
+  activeCombatTurnCanMove: boolean;
+  controllableTokenIds: string[];
 }
 
 export function BoardTokenLayer({
@@ -43,6 +47,10 @@ export function BoardTokenLayer({
   multiSelectedTokenIds,
   handleBoardTokenDoubleClick,
   onSetMultiSelectedTokenIds,
+  activeCombatTurnTokenId,
+  combatParticipantTokenIds,
+  activeCombatTurnCanMove,
+  controllableTokenIds,
 }: BoardTokenLayerProps) {
   return (
     <>
@@ -93,6 +101,15 @@ export function BoardTokenLayer({
             isMultiSelected={multiSelectedTokenIds.includes(token.id)}
             onBoardTokenDoubleClick={handleBoardTokenDoubleClick}
             onSetMultiSelectedTokenIds={onSetMultiSelectedTokenIds}
+            canDrag={
+              controllableTokenIds.includes(token.id) &&
+              (
+                !combatParticipantTokenIds.includes(token.id) ||
+                (activeCombatTurnTokenId != null &&
+                  activeCombatTurnTokenId === token.id &&
+                  activeCombatTurnCanMove)
+              )
+            }
           />
         );
       })}

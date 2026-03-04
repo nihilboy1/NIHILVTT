@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 import { useCharactersStore } from "@/entities/character/model/store";
 import { useUIStore } from "@/features/layoutControls/model/store";
@@ -11,11 +12,13 @@ import {
   sendGameCharacterHpUpdate,
   sendGameCharacterTempHpUpdate,
   sendGameDuplicateCharacterWithToken,
+  sendGameRemoveTokens,
   sendGameRemoveToken,
   sendGameResolveAttack,
 } from "@/features/game/model/gameSessionApi";
 import { useAuthStore } from "@/features/auth/model/authStore";
 import { useGameStore } from "@/features/game/model/gameStore";
+import { useCombatStore } from "@/features/combat/model/store";
 
 import { useSelectedTokenStore } from "../../../../entities/token/model/store/selectedTokenStore";
 import { useTokenStore } from "../../../../entities/token/model/store/tokenStore";
@@ -35,6 +38,27 @@ interface CopiedTokenSnapshot {
   characterId: string;
   sceneId: string;
   position: AppPoint;
+}
+
+function isCombatParticipant(
+  combatState: ReturnType<typeof useCombatStore.getState>['combatState'],
+  tokenId: string | null,
+): boolean {
+  if (!combatState || !tokenId) {
+    return false;
+  }
+
+  return combatState.participants.some((participant) => participant.tokenId === tokenId);
+}
+
+function getActiveCombatTurnTokenId(
+  combatState: ReturnType<typeof useCombatStore.getState>['combatState'],
+): string | null {
+  if (!combatState || combatState.participants.length === 0) {
+    return null;
+  }
+
+  return combatState.participants[combatState.turnIndex]?.tokenId ?? null;
 }
 
 function isTargetWithinAttackRange(
@@ -84,11 +108,12 @@ interface UseGameBoardInteractionReturn {
 
 export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
   const { gameId } = useParams<{ gameId: string }>();
-  const { characters } = useCharactersStore();
+  const { characters, runtimeCharactersById } = useCharactersStore();
   const { tokensOnBoard } = useTokenStore();
   const metersPerSquare = useBoardSettingsStore((state) => state.gridSettings.metersPerSquare);
   const { activeTool, activePopover } = useUIStore();
   const currentGame = useGameStore((state) => state.currentGame);
+  const combatState = useCombatStore((state) => state.combatState);
   const user = useAuthStore((state) => state.user);
   const { modalStack, openModal, closeModalByName, updateModalProps } = useSessionModalStore();
   const { selectedTokenId, setSelectedTokenId } = useSelectedTokenStore();
@@ -114,6 +139,46 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
     modalStack.length > 0 ? modalStack[modalStack.length - 1] : null;
   const activeModalName = activeModalEntry?.name;
   const activeModalProps = activeModalEntry?.props;
+  const activeCombatTurnTokenId = getActiveCombatTurnTokenId(combatState);
+  const isGameMaster = currentGame?.owner.id === user?.id;
+
+  const canCurrentUserControlToken = useCallback(
+    (tokenId: string | null) => {
+      if (!tokenId || !currentGame || !user) {
+        return false;
+      }
+
+      const token = tokensOnBoard.find((entry: Token) => entry.id === tokenId);
+      if (!token) {
+        return false;
+      }
+
+      const runtimeCharacter = runtimeCharactersById[token.characterId] ?? null;
+      if (!runtimeCharacter) {
+        console.error(
+          'Violação de contrato de sessão: token em mesa sem runtime compartilhado.',
+          { tokenId, characterId: token.characterId },
+        );
+        return false;
+      }
+
+      if (runtimeCharacter.type === 'NPC') {
+        return currentGame.owner.id === user.id;
+      }
+
+      if (runtimeCharacter.controlledByUserId == null) {
+        return currentGame.owner.id === user.id;
+      }
+
+      return runtimeCharacter.controlledByUserId === user.id;
+    },
+    [currentGame, runtimeCharactersById, tokensOnBoard, user],
+  );
+
+  const canCurrentUserAccessTokenContext = useCallback(
+    (tokenId: string | null) => isGameMaster || canCurrentUserControlToken(tokenId),
+    [canCurrentUserControlToken, isGameMaster],
+  );
 
   const handleClearMultiSelection = useCallback(() => {
     setMultiSelectedTokenIds([]); // Renomeado
@@ -127,6 +192,17 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         return;
       }
 
+      if (!canCurrentUserControlToken(selectedTokenId)) {
+        return;
+      }
+
+      if (
+        isCombatParticipant(combatState, selectedTokenId) &&
+        activeCombatTurnTokenId !== selectedTokenId
+      ) {
+        return;
+      }
+
       setPendingAttack({
         attackerTokenId: selectedTokenId,
         attack,
@@ -135,7 +211,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       setMultiSelectedTokenIds([selectedTokenId]);
       closeModalByName('hpControl');
     },
-    [closeModalByName, selectedTokenId],
+    [activeCombatTurnTokenId, canCurrentUserControlToken, closeModalByName, combatState, selectedTokenId],
   );
 
   const handleCancelPendingAttack = useCallback(() => {
@@ -165,6 +241,10 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         return;
       }
 
+      if (!canCurrentUserAccessTokenContext(tokenId)) {
+        return;
+      }
+
       if (activeModalName === "hpControl") {
         updateModalProps({ tokenId });
         return;
@@ -174,6 +254,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
     },
     [
       activeTool,
+      canCurrentUserAccessTokenContext,
       openModal,
       modalStack,
       setSelectedTokenId, // Renomeado
@@ -215,8 +296,16 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         .then((event) => {
           applyGameSessionEvent(event);
         })
-        .catch(() => {
+        .catch((error) => {
           console.warn("Falha ao sincronizar HP do personagem com o servidor.");
+          const message =
+            typeof error === 'object' &&
+            error !== null &&
+            'formError' in error &&
+            typeof (error as { formError?: unknown }).formError === 'string'
+              ? (error as { formError: string }).formError
+              : 'Falha ao sincronizar HP do personagem com o servidor.';
+          toast.error(message);
         });
     },
     [tokensOnBoard, characters, gameId, currentGame, user]
@@ -254,30 +343,55 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         .then((event) => {
           applyGameSessionEvent(event);
         })
-        .catch(() => {
+        .catch((error) => {
           console.warn("Falha ao sincronizar HP temporário do personagem com o servidor.");
+          const message =
+            typeof error === 'object' &&
+            error !== null &&
+            'formError' in error &&
+            typeof (error as { formError?: unknown }).formError === 'string'
+              ? (error as { formError: string }).formError
+              : 'Falha ao sincronizar HP temporário do personagem com o servidor.';
+          toast.error(message);
         });
     },
     [tokensOnBoard, characters, gameId, currentGame, user]
   );
 
   const removeTokenAuthoritative = useCallback(
-    (tokenId: string) => {
+    async (tokenId: string) => {
       const parsedGameId = Number(gameId);
       const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
       if (!isValidGameId) {
         return;
       }
 
-      void sendGameRemoveToken(parsedGameId, tokenId)
-        .then((event) => {
-          applyGameSessionEvent(event);
-        })
-        .catch(() => {
-          console.warn("Falha ao remover token no servidor.");
-        });
+      try {
+        const event = await sendGameRemoveToken(parsedGameId, tokenId);
+        applyGameSessionEvent(event);
+      } catch {
+        console.warn("Falha ao remover token no servidor.");
+      }
     },
     [gameId]
+  );
+
+  const removeTokensAuthoritative = useCallback(
+    async (tokenIds: string[]) => {
+      const parsedGameId = Number(gameId);
+      const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
+      if (!isValidGameId || tokenIds.length === 0) {
+        return;
+      }
+
+      try {
+        const event = await sendGameRemoveTokens(parsedGameId, tokenIds);
+        applyGameSessionEvent(event);
+      } catch {
+        console.warn("Falha ao remover tokens no servidor.");
+      }
+    },
+    [gameId],
   );
 
   const duplicateCopiedTokenAuthoritative = useCallback(async () => {
@@ -398,6 +512,16 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
     // Renomeado
     (ids: string[]) => {
       if (pendingAttack && ids.length === 1) {
+        if (
+          isCombatParticipant(combatState, pendingAttack.attackerTokenId) &&
+          activeCombatTurnTokenId !== pendingAttack.attackerTokenId
+        ) {
+          setPendingAttack(null);
+          setMultiSelectedTokenIds([pendingAttack.attackerTokenId]);
+          setSelectedTokenId(pendingAttack.attackerTokenId);
+          return;
+        }
+
         const targetTokenId = ids[0];
 
         if (targetTokenId === pendingAttack.attackerTokenId) {
@@ -473,13 +597,16 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         const isHpControlAlreadyOpenForToken = modalStack.some(
           (modal: ModalEntry) => modal.name === "hpControl" && modal.props.tokenId === ids[0]
         );
+        const canAccessTokenContext = canCurrentUserAccessTokenContext(ids[0]);
 
-        if (token && !isHpControlAlreadyOpenForToken) {
+        if (token && canAccessTokenContext && !isHpControlAlreadyOpenForToken) {
           if (activeModalName === "hpControl") {
             updateModalProps({ tokenId: ids[0] });
           } else {
             openModal("hpControl", { tokenId: ids[0] });
           }
+        } else if (!canAccessTokenContext && activeModalName === "hpControl") {
+          closeModalByName("hpControl");
         }
       } else {
         setSelectedTokenId(null); // Renomeado
@@ -490,7 +617,10 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
     },
     [
       activeModalName,
+      activeCombatTurnTokenId,
+      canCurrentUserAccessTokenContext,
       closeModalByName,
+      combatState,
       gameId,
       setSelectedTokenId, // Renomeado
       openModal,
@@ -505,15 +635,20 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
   // Efeitos de limpeza e gerenciamento de estado
   useEffect(() => {
     const currentHPModalTokenId = // Renomeado
-      activeModalName === "hpControl" ? activeModalProps?.tokenId : null; // Renomeado
+      activeModalName === "hpControl" && typeof activeModalProps?.tokenId === 'string'
+        ? activeModalProps.tokenId
+        : null; // Renomeado
     const sheetModalEntry = modalStack.find((modal) => modal.name === "sheet") ?? null;
     const currentSheetId = sheetModalEntry?.props.characterId; // Renomeado
 
     if (
       activeModalName === "hpControl" &&
       currentHPModalTokenId && // Renomeado
-      !tokensOnBoard.find(
-        (t: Token) => t.id === currentHPModalTokenId
+      (
+        !tokensOnBoard.find(
+          (t: Token) => t.id === currentHPModalTokenId
+        ) ||
+        !canCurrentUserAccessTokenContext(currentHPModalTokenId)
       )
     ) {
       closeModalByName("hpControl");
@@ -557,6 +692,9 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       setSelectedTokenId(null);
     }
     if (pendingAttack) {
+      const attackerCanStillAct =
+        !isCombatParticipant(combatState, pendingAttack.attackerTokenId) ||
+        activeCombatTurnTokenId === pendingAttack.attackerTokenId;
       const attackerStillExists = tokensOnBoard.some(
         (t: Token) => t.id === pendingAttack.attackerTokenId,
       );
@@ -564,7 +702,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         pendingAttack.targetTokenId == null ||
         tokensOnBoard.some((t: Token) => t.id === pendingAttack.targetTokenId);
 
-      if (!attackerStillExists || !targetStillExists) {
+      if (!attackerStillExists || !targetStillExists || !attackerCanStillAct) {
         setPendingAttack(null);
       }
     }
@@ -572,7 +710,10 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
     characters,
     tokensOnBoard,
     activeModalName,
+    activeCombatTurnTokenId,
+    canCurrentUserAccessTokenContext,
     closeModalByName,
+    combatState,
     draggingVisuals.tokenId,
     preDragHPModalTokenId,
     activeModalProps?.tokenId,
@@ -659,6 +800,10 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
     setPasteTargetCell(null);
   }, []);
 
+  const notifyBoardShortcutMasterOnly = useCallback(() => {
+    toast.error("Somente o mestre pode usar copiar, colar ou excluir tokens.");
+  }, []);
+
   // Handle DELETE / COPY / PASTE key press
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -680,6 +825,14 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       }
 
       if (shortcutKeyPressed && normalizedKey === 'c') {
+        const isMaster = currentGame?.owner.id === user?.id;
+        if (!isMaster) {
+          event.preventDefault();
+          clearCopiedToken();
+          notifyBoardShortcutMasterOnly();
+          return;
+        }
+
         const activeTokenId =
           selectedTokenId ??
           (activeModalName === 'hpControl' && typeof activeModalProps?.tokenId === 'string'
@@ -706,6 +859,14 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       }
 
       if (isPasteShortcut) {
+        const isMaster = currentGame?.owner.id === user?.id;
+        if (!isMaster) {
+          event.preventDefault();
+          clearCopiedToken();
+          notifyBoardShortcutMasterOnly();
+          return;
+        }
+
         if (!copiedTokenSnapshot) {
           return;
         }
@@ -718,22 +879,24 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       if (event.key === 'Delete') {
         const isMaster = currentGame?.owner.id === user?.id;
         if (!isMaster) {
+          event.preventDefault();
+          notifyBoardShortcutMasterOnly();
           return;
         }
 
         if (selectedTokenId) {
-          removeTokenAuthoritative(selectedTokenId);
+          void removeTokenAuthoritative(selectedTokenId);
           setSelectedTokenId(null);
           closeModalByName('hpControl');
         } else if (multiSelectedTokenIds.length > 0) {
-          multiSelectedTokenIds.forEach((id: string) => removeTokenAuthoritative(id));
+          void removeTokensAuthoritative([...multiSelectedTokenIds]);
           handleClearMultiSelection();
         } else if (
           activeModalName === 'hpControl' &&
           activeModalProps?.tokenId &&
           typeof activeModalProps.tokenId === 'string'
         ) {
-          removeTokenAuthoritative(activeModalProps.tokenId);
+          void removeTokenAuthoritative(activeModalProps.tokenId);
           closeModalByName('hpControl');
         }
       }
@@ -751,6 +914,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
     currentGame,
     duplicateCopiedTokenAuthoritative,
     multiSelectedTokenIds,
+    removeTokensAuthoritative,
     removeTokenAuthoritative,
     handleClearMultiSelection,
     closeModalByName,
@@ -759,6 +923,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
     shouldIgnoreBoardShortcut,
     tokensOnBoard,
     user,
+    notifyBoardShortcutMasterOnly,
   ]);
 
   // Prevent default behavior for Alt key to avoid browser menu focus

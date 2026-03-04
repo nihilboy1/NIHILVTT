@@ -19,6 +19,7 @@ interface UseTokenDragProps {
   onDragMove: (tokenId: string, visualSVGPoint: Point) => void;
   onDragEnd: (tokenId: string) => void;
   onSelectToken: (tokenId: string) => void;
+  canDrag: boolean;
 }
 
 export function useTokenDrag({
@@ -34,6 +35,7 @@ export function useTokenDrag({
   onDragMove,
   onDragEnd,
   onSelectToken,
+  canDrag,
 }: UseTokenDragProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartMouseOffset, setDragStartMouseOffset] = useState<{
@@ -51,6 +53,12 @@ export function useTokenDrag({
       if (activeTool !== Tool.SELECT || event.button !== 0) return;
 
       event.stopPropagation();
+
+      if (!canDrag) {
+        onSelectToken(tokenId);
+        return;
+      }
+
       setClickStartTimestamp(Date.now());
 
       const initialSVGPoint = getSVGPoint(event.clientX, event.clientY);
@@ -63,7 +71,7 @@ export function useTokenDrag({
       });
       setCurrentVisualPosition({ x: tokenCurrentSvgX, y: tokenCurrentSvgY });
     },
-    [activeTool, initialPosition, cellSize, getSVGPoint],
+    [activeTool, canDrag, initialPosition, cellSize, getSVGPoint, onSelectToken, tokenId],
   );
 
   useEffect(() => {

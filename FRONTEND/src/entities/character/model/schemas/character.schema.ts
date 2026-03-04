@@ -76,6 +76,7 @@ export const actionSchema = z.object({
   name: z.string(),
   bonus: z.string().or(z.number()).optional(),
   damage: z.string().or(z.number()).optional(),
+  rangeMeters: z.number().positive().optional(),
 });
 
 const attackSchema = z.object({

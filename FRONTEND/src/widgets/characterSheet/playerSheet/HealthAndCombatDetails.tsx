@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useCharacterCalculations } from "@/entities/character/lib/hooks/useCharacterCalculations";
 import { usePlayerCharacterCombatViewModel } from "@/entities/character/lib/hooks/usePlayerCharacterCombatViewModel";
 import { useCharactersStore } from "@/entities/character/model/store";
+import { isPlayerCharacterRuntime } from "@/entities/character/model/schemas/playerCharacterRuntime.schema";
 import {
   getAbilityModifier,
   getPlayerProficiencyBonusFromLevel,
@@ -37,9 +38,9 @@ export function HealthAndCombatDetails({
   const runtimeCharacter = useCharactersStore(
     (state) => state.runtimeCharactersById[characterId] ?? null,
   );
-  const legacyActions = runtimeCharacter ? [] : (character?.actions ?? []);
+  const playerRuntimeCharacter = isPlayerCharacterRuntime(runtimeCharacter) ? runtimeCharacter : null;
 
-  const characterName = runtimeCharacter?.name ?? character?.name ?? '-';
+  const characterName = playerRuntimeCharacter?.name ?? character?.name ?? '-';
 
   const calculationsViewModel = useMemo(
     () =>
@@ -84,20 +85,20 @@ export function HealthAndCombatDetails({
       },
     ];
 
-    if (runtimeCharacter) {
+    if (playerRuntimeCharacter) {
       const mainHandAction = buildWeaponAttackAction(
-        runtimeCharacter.equipment.mainHandWeaponId,
+        playerRuntimeCharacter.equipment.mainHandWeaponId,
         {
-          classId: runtimeCharacter.build.classId,
+          classId: playerRuntimeCharacter.build.classId,
           strength: strengthScore,
           dexterity: combatViewModel?.dexterity ?? 10,
           proficiencyBonus: getPlayerProficiencyBonusFromLevel(combatViewModel?.level ?? 1),
         },
       );
       const offHandAction = buildWeaponAttackAction(
-        runtimeCharacter.equipment.offHandWeaponId,
+        playerRuntimeCharacter.equipment.offHandWeaponId,
         {
-          classId: runtimeCharacter.build.classId,
+          classId: playerRuntimeCharacter.build.classId,
           strength: strengthScore,
           dexterity: combatViewModel?.dexterity ?? 10,
           proficiencyBonus: getPlayerProficiencyBonusFromLevel(combatViewModel?.level ?? 1),
@@ -121,12 +122,11 @@ export function HealthAndCombatDetails({
       }
     }
 
-    return [...derivedActions, ...legacyActions];
+    return derivedActions;
   }, [
-    legacyActions,
     combatViewModel?.dexterity,
     combatViewModel?.level,
-    runtimeCharacter,
+    playerRuntimeCharacter,
     strengthScore,
     unarmedAttackBonus,
     unarmedDamage,

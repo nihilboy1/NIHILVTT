@@ -2,9 +2,13 @@
 
 Variaveis de ambiente do frontend (Vite).
 
+Este documento cobre apenas configuracao de ambiente do cliente.
+Regras de arquitetura e comportamento ficam em `ARCHITECTURE.md` e `README.md`.
+
 ## Arquivo
 
 Use `FRONTEND/.env`.
+Referencia versionada: `FRONTEND/.env.example`.
 
 ## Variaveis
 

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { useUIStore } from '@/features/layoutControls/model/store';
-import { DraggableHandle, DraggablePanel } from '@/shared/ui/DraggablePanel';
+import { DraggablePanel } from '@/shared/ui/DraggablePanel';
 
 import { useAuthStore } from '@/features/auth/model/authStore';
 import { useGameStore } from '@/features/game/model/gameStore';
@@ -15,7 +15,7 @@ import { useCharactersStore } from '@/entities/character/model/store';
 import { useTokenStore } from '@/entities/token/model/store/tokenStore';
 import { useCombatStore } from '@/features/combat/model/store';
 import { AppButton } from '@/shared/ui/AppButton';
-import { DragHandleIcon } from '@/shared/ui/Icons';
+import { FloatingPanelDragBar } from '@/shared/ui/FloatingPanelDragBar';
 import { cn } from '@/shared/lib/utils/cn';
 
 interface InitiativeTrackProps {
@@ -131,19 +131,13 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
         bottom: 16,
       }}
     >
+      <FloatingPanelDragBar title="Arrastar painel de combate" />
       {!combatState ? (
         <div className="flex items-center justify-between gap-3">
-          <DraggableHandle
-            className="min-w-0 flex flex-1 cursor-move select-none flex-col rounded-lg px-1 py-0.5 text-text-secondary/80"
-            aria-label="Arrastar painel de combate"
-            title="Arrastar painel"
-          >
-            <span className="mb-1 flex items-center">
-              <DragHandleIcon className="h-3 w-3" />
-            </span>
+          <div className="min-w-0 flex flex-1 flex-col rounded-lg px-1 py-0.5 text-text-secondary/80">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-text-secondary">Combate</p>
             <p className="text-sm text-text-primary">{selectedTokenIds.length} tokens selecionados</p>
-          </DraggableHandle>
+          </div>
           <AppButton disabled={isSubmitting} onClick={() => void handleStartCombat()}>
             Iniciar combate
           </AppButton>
@@ -151,17 +145,10 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
       ) : (
         <>
           <div className="flex items-center justify-between gap-3">
-            <DraggableHandle
-              className="min-w-0 flex flex-1 cursor-move select-none flex-col rounded-lg px-1 py-0.5 text-text-secondary/80"
-              aria-label="Arrastar painel de combate"
-              title="Arrastar painel"
-            >
-              <span className="mb-1 flex items-center">
-                <DragHandleIcon className="h-3 w-3" />
-              </span>
+            <div className="min-w-0 flex flex-1 flex-col rounded-lg px-1 py-0.5 text-text-secondary/80">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-text-secondary">Combate ativo</p>
               <p className="text-sm font-semibold text-text-primary">Rodada {combatState.round}</p>
-            </DraggableHandle>
+            </div>
             {canControlCombat ? (
               <div className="flex items-center gap-2">
                 <AppButton disabled={isSubmitting} onClick={() => void handleAdvanceTurn()}>
@@ -188,6 +175,26 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
                 <span>({participant.initiativeTotal})</span>
               </div>
             ))}
+          </div>
+          <div className="grid grid-cols-3 gap-2 rounded-lg border border-surface-2 bg-surface-0/80 p-2 text-xs text-text-secondary">
+            <div className="rounded-md bg-surface-1 px-2 py-1">
+              <span className="block text-[0.65rem] uppercase tracking-[0.14em]">Ação</span>
+              <span className="font-semibold text-text-primary">
+                {combatState.turnResources.actionAvailable ? 'Disponível' : 'Gasta'}
+              </span>
+            </div>
+            <div className="rounded-md bg-surface-1 px-2 py-1">
+              <span className="block text-[0.65rem] uppercase tracking-[0.14em]">Ação bônus</span>
+              <span className="font-semibold text-text-primary">
+                {combatState.turnResources.bonusActionAvailable ? 'Disponível' : 'Gasta'}
+              </span>
+            </div>
+            <div className="rounded-md bg-surface-1 px-2 py-1">
+              <span className="block text-[0.65rem] uppercase tracking-[0.14em]">Movimento</span>
+              <span className="font-semibold text-text-primary">
+                {combatState.turnResources.remainingMovementCells}/{combatState.turnResources.totalMovementCells}
+              </span>
+            </div>
           </div>
         </>
       )}

@@ -1,22 +1,207 @@
 import { z } from 'zod';
+import { type MonsterCharacterStateType } from '@nihilvtt/datamodeling/runtime';
+import { PHB2024MONSTERS } from '@nihilvtt/datamodeling/data';
+import type { MonsterType } from '@nihilvtt/datamodeling/domain';
 
-import { Character, PlayerCharacter, characterSchema } from '@/entities/character/model/schemas/character.schema';
+import {
+  Character,
+  MonsterNpcCharacter,
+  PlayerCharacter,
+} from '@/entities/character/model/schemas/character.schema';
 import { DEFAULT_PLAYER_DATA, DEFAULT_TOKEN_IMAGE } from '@/entities/character/config/sheetDefaults';
 import {
+  isMonsterCharacterRuntime,
+  isPlayerCharacterRuntime,
+  monsterCharacterRuntimeSchema,
+  sessionCharacterRuntimeSchema,
+  type SessionCharacterRuntime,
   playerCharacterRuntimeSchema,
   type PlayerCharacterRuntime,
 } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 import { getArmorClassFromEquipment } from '@/entities/character/model/rules/itemDerivedRules';
 import { getBaseWalkSpeedFromSpecieId } from '@/entities/character/model/rules/specieDerivedRules';
-import { generateUniqueId } from '@/shared/lib/utils/id/idUtils';
 
 export type NormalizedCharacterEntry = {
   character: Character;
-  runtimeCharacter: PlayerCharacterRuntime | null;
+  runtimeCharacter: SessionCharacterRuntime | null;
 };
+
+const MONSTERS_BY_ID = new Map<string, MonsterType>(
+  PHB2024MONSTERS.map((monster) => [monster.id, monster]),
+);
 
 const deepCloneDefaultPlayer = (): Omit<PlayerCharacter, 'id' | 'type'> =>
   JSON.parse(JSON.stringify(DEFAULT_PLAYER_DATA)) as Omit<PlayerCharacter, 'id' | 'type'>;
+
+function hashStringToUint32(value: string): number {
+  let hash = 2166136261;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+function toHex32(value: number): string {
+  return value.toString(16).padStart(8, '0');
+}
+
+function buildDeterministicUuid(seed: string): string {
+  const blockA = toHex32(hashStringToUint32(`${seed}:0`));
+  const blockB = toHex32(hashStringToUint32(`${seed}:1`));
+  const blockC = toHex32(hashStringToUint32(`${seed}:2`));
+  const blockD = toHex32(hashStringToUint32(`${seed}:3`));
+
+  const hex = `${blockA}${blockB}${blockC}${blockD}`;
+  const versioned = `${hex.slice(0, 12)}4${hex.slice(13, 16)}8${hex.slice(17)}`;
+
+  return [
+    versioned.slice(0, 8),
+    versioned.slice(8, 12),
+    versioned.slice(12, 16),
+    versioned.slice(16, 20),
+    versioned.slice(20, 32),
+  ].join('-');
+}
+
+function formatMonsterDamageFormula(formula: unknown): string | undefined {
+  if (!formula || typeof formula !== 'object') {
+    return undefined;
+  }
+
+  const formulaRecord = formula as Record<string, unknown>;
+  if (typeof formulaRecord.fixed === 'number') {
+    return String(formulaRecord.fixed);
+  }
+
+  const roll = formulaRecord.roll;
+  if (!roll || typeof roll !== 'object') {
+    return undefined;
+  }
+
+  const rollRecord = roll as Record<string, unknown>;
+  const count = typeof rollRecord.count === 'number' ? rollRecord.count : null;
+  const faces = typeof rollRecord.faces === 'number' ? rollRecord.faces : null;
+  if (count == null || faces == null) {
+    return undefined;
+  }
+
+  const bonusValueRaw =
+    rollRecord.bonus && typeof rollRecord.bonus === 'object'
+      ? (rollRecord.bonus as Record<string, unknown>).value
+      : undefined;
+  const bonusValue = typeof bonusValueRaw === 'number' ? bonusValueRaw : 0;
+  if (bonusValue === 0) {
+    return `${count}d${faces}`;
+  }
+
+  const sign = bonusValue > 0 ? '+' : '';
+  return `${count}d${faces}${sign}${bonusValue}`;
+}
+
+function convertFeetToMeters(feet: number): number {
+  const meters = feet * 0.3;
+  return Number.isInteger(meters) ? meters : Number(meters.toFixed(1));
+}
+
+function buildMonsterActionsFromCatalog(monster: MonsterType): MonsterNpcCharacter['actions'] {
+  return monster.effects.flatMap((effect, effectIndex) => {
+    if (effect.type !== 'activatableAction') {
+      return [];
+    }
+
+    const parameters = effect.parameters as Record<string, unknown>;
+    const attackBonusValue =
+      parameters.attackBonus && typeof parameters.attackBonus === 'object'
+        ? (parameters.attackBonus as Record<string, unknown>).value
+        : undefined;
+    const rangeNormal =
+      parameters.range && typeof parameters.range === 'object'
+        ? (parameters.range as Record<string, unknown>).normal
+        : undefined;
+    const outcomes = Array.isArray(effect.parameters?.outcomes) ? effect.parameters.outcomes : [];
+    const firstOutcome = outcomes.find((outcome) => outcome.type === 'modifyTargetHP');
+    return [
+      {
+        id: buildDeterministicUuid(`monster-action:${monster.id}:${effectIndex}:${effect.name}`),
+        name: effect.name,
+        bonus: typeof attackBonusValue === 'number' ? attackBonusValue : 0,
+        damage: firstOutcome ? formatMonsterDamageFormula(firstOutcome.formula) : undefined,
+        rangeMeters: typeof rangeNormal === 'number' ? convertFeetToMeters(rangeNormal) : 1.5,
+      },
+    ];
+  });
+}
+
+function buildMonsterActions(character: MonsterCharacterStateType): MonsterNpcCharacter['actions'] {
+  const monster = MONSTERS_BY_ID.get(character.monsterId);
+  if (!monster) {
+    return [];
+  }
+
+  return buildMonsterActionsFromCatalog(monster);
+}
+
+export function adaptMonsterCatalogToSheetModel(monster: MonsterType): MonsterNpcCharacter {
+  return {
+    id: buildDeterministicUuid(`monster-catalog:${monster.id}`),
+    type: 'NPC',
+    name: monster.name[0] ?? monster.id,
+    image: monster.tokenUrl ?? DEFAULT_TOKEN_IMAGE,
+    size: monster.size,
+    notes: monster.description,
+    attributes: { ...monster.abilityScores },
+    proficiencies: {
+      savingThrows: {
+        strength: 'none',
+        dexterity: 'none',
+        constitution: 'none',
+        intelligence: 'none',
+        wisdom: 'none',
+        charisma: 'none',
+      },
+      skills: {
+        acrobatics: 'none',
+        animalHandling: 'none',
+        arcana: 'none',
+        athletics: 'none',
+        deception: 'none',
+        history: 'none',
+        insight: 'none',
+        intimidation: 'none',
+        investigation: 'none',
+        medicine: 'none',
+        nature: 'none',
+        perception: 'none',
+        performance: 'none',
+        persuasion: 'none',
+        religion: 'none',
+        sleightOfHand: 'none',
+        stealth: 'none',
+        survival: 'none',
+      },
+    },
+    combatStats: {
+      maxHp: monster.hitPoints.average,
+      currentHp: monster.hitPoints.average,
+      tempHp: 0,
+      armorClass: monster.armorClass,
+      speed: convertFeetToMeters(monster.speed.walk ?? 0),
+      shieldEquipped: false,
+    },
+    actions: buildMonsterActionsFromCatalog(monster),
+    attacks: [],
+    equipment: [],
+    featuresAndTraits: ('traits' in monster ? monster.traits ?? [] : []).map((trait, traitIndex) => ({
+      id: buildDeterministicUuid(`monster-trait:${monster.id}:${traitIndex}:${trait.name}`),
+      name: trait.name,
+      description: trait.description,
+    })),
+    challengeRating: Number(monster.challengeRating),
+  };
+}
 
 function adaptRuntimePlayerCharacterToSheetModel(character: PlayerCharacterRuntime): PlayerCharacter {
   const base = deepCloneDefaultPlayer();
@@ -52,8 +237,8 @@ function adaptRuntimePlayerCharacterToSheetModel(character: PlayerCharacterRunti
     subclass: character.build.subclassId ?? '',
     background: character.build.originId,
     species: character.build.specieId,
-    equipment: character.inventory.items.map((item) => ({
-      id: generateUniqueId(),
+    equipment: character.inventory.items.map((item, itemIndex) => ({
+      id: buildDeterministicUuid(`player-inventory:${character.id}:${itemIndex}:${item.itemId}`),
       name: item.itemId,
       quantity: item.quantity,
       equipped:
@@ -67,6 +252,29 @@ function adaptRuntimePlayerCharacterToSheetModel(character: PlayerCharacterRunti
   return sheetCharacter;
 }
 
+function adaptRuntimeMonsterCharacterToSheetModel(character: MonsterCharacterStateType): MonsterNpcCharacter | null {
+  const monster = MONSTERS_BY_ID.get(character.monsterId);
+  if (!monster) {
+    return null;
+  }
+
+  const sheetCharacter = adaptMonsterCatalogToSheetModel(monster);
+
+  return {
+    ...sheetCharacter,
+    id: character.id,
+    name: character.nameOverride ?? sheetCharacter.name,
+    image: character.imageOverride ?? sheetCharacter.image,
+    notes: character.notes ?? sheetCharacter.notes,
+    combatStats: {
+      ...sheetCharacter.combatStats,
+      currentHp: character.hitPoints.current,
+      tempHp: character.hitPoints.temporary,
+    },
+    actions: buildMonsterActions(character),
+  };
+}
+
 export function parseRuntimePlayerCharacter(
   entry: unknown,
 ): PlayerCharacterRuntime | null {
@@ -74,16 +282,44 @@ export function parseRuntimePlayerCharacter(
   return runtimeParsed.success ? runtimeParsed.data : null;
 }
 
+export function parseRuntimeMonsterCharacter(
+  entry: unknown,
+): MonsterCharacterStateType | null {
+  const runtimeCharacter = parseSessionRuntimeCharacter(entry);
+  return isMonsterCharacterRuntime(runtimeCharacter) ? runtimeCharacter : null;
+}
+
+export function parseSessionRuntimeCharacter(
+  entry: unknown,
+): SessionCharacterRuntime | null {
+  const runtimeParsed = sessionCharacterRuntimeSchema.safeParse(entry);
+  return runtimeParsed.success ? runtimeParsed.data : null;
+}
+
 export function normalizeCharacterEntry(
   entry: unknown,
 ): NormalizedCharacterEntry | null {
-  const runtimeCharacter = parseRuntimePlayerCharacter(entry);
+  const runtimeCharacter = parseSessionRuntimeCharacter(entry);
   if (!runtimeCharacter) {
     return null;
   }
 
+  if (isPlayerCharacterRuntime(runtimeCharacter)) {
+    return {
+      character: adaptRuntimePlayerCharacterToSheetModel(runtimeCharacter),
+      runtimeCharacter,
+    };
+  }
+
+  const character = adaptRuntimeMonsterCharacterToSheetModel(runtimeCharacter);
+  if (!character) {
+    throw new Error(
+      `Violação de contrato de sessão: monsterId "${runtimeCharacter.monsterId}" não existe no catálogo canônico do frontend.`,
+    );
+  }
+
   return {
-    character: adaptRuntimePlayerCharacterToSheetModel(runtimeCharacter),
+    character,
     runtimeCharacter,
   };
 }
@@ -92,30 +328,41 @@ export function requireNormalizedCharacterEntry(
   entry: unknown,
   context: string,
 ): NormalizedCharacterEntry {
-  const runtimeParsed = playerCharacterRuntimeSchema.safeParse(entry);
-  if (!runtimeParsed.success) {
-    const formattedError = JSON.stringify(z.treeifyError(runtimeParsed.error), null, 2);
-    console.error(`Violação de contrato de sessão em ${context}. Payload recebido:`, entry);
-    console.error(`Detalhes da validação em ${context}:`, formattedError);
-    throw new Error(`Violação de contrato de sessão em ${context}: PlayerCharacterState inválido.`);
+  const sessionRuntimeParsed = sessionCharacterRuntimeSchema.safeParse(entry);
+  if (sessionRuntimeParsed.success) {
+    const runtimeCharacter = sessionRuntimeParsed.data;
+    if (isPlayerCharacterRuntime(runtimeCharacter)) {
+      return {
+        character: adaptRuntimePlayerCharacterToSheetModel(runtimeCharacter),
+        runtimeCharacter,
+      };
+    }
+
+    const character = adaptRuntimeMonsterCharacterToSheetModel(runtimeCharacter);
+    if (!character) {
+      throw new Error(
+        `Violação de contrato de sessão em ${context}: monsterId "${runtimeCharacter.monsterId}" não existe no catálogo canônico do frontend.`,
+      );
+    }
+
+    return {
+      character,
+      runtimeCharacter,
+    };
   }
 
-  return {
-    character: adaptRuntimePlayerCharacterToSheetModel(runtimeParsed.data),
-    runtimeCharacter: runtimeParsed.data,
-  };
-}
-
-export function normalizeCharacterForStore(entry: unknown): Character | null {
-  const runtimeEntry = normalizeCharacterEntry(entry);
-  if (runtimeEntry) {
-    return runtimeEntry.character;
-  }
-
-  const sheetModelParsed = characterSchema.safeParse(entry);
-  return sheetModelParsed.success ? sheetModelParsed.data : null;
-}
-
-export function parseSessionCharacter(entry: unknown): Character | null {
-  return normalizeCharacterEntry(entry)?.character ?? null;
+  const playerRuntimeParsed = playerCharacterRuntimeSchema.safeParse(entry);
+  const monsterRuntimeParsed = monsterCharacterRuntimeSchema.safeParse(entry);
+  const formattedSessionError = JSON.stringify(z.treeifyError(sessionRuntimeParsed.error), null, 2);
+  const formattedPlayerError = playerRuntimeParsed.success
+    ? 'PlayerCharacterState aceitou o payload; a divergência está fora da trilha esperada.'
+    : JSON.stringify(z.treeifyError(playerRuntimeParsed.error), null, 2);
+  const formattedMonsterError = monsterRuntimeParsed.success
+    ? 'MonsterCharacterState aceitou o payload; a divergência está fora da trilha esperada.'
+    : JSON.stringify(z.treeifyError(monsterRuntimeParsed.error), null, 2);
+  console.error(`Violação de contrato de sessão em ${context}. Payload recebido:`, entry);
+  console.error(`Detalhes SessionCharacterState em ${context}:`, formattedSessionError);
+  console.error(`Detalhes PlayerCharacterState em ${context}:`, formattedPlayerError);
+  console.error(`Detalhes MonsterCharacterState em ${context}:`, formattedMonsterError);
+  throw new Error(`Violação de contrato de sessão em ${context}: runtime de personagem inválido.`);
 }
