@@ -91,9 +91,13 @@ export function CharactersPanel() {
       return true;
     }
 
+    if (isGameMaster) {
+      return true;
+    }
+
     const runtimeCharacter = runtimeCharactersById[characterId] ?? null;
     if (!runtimeCharacter) {
-      return isGameMaster;
+      return false;
     }
 
     if (runtimeCharacter.type !== 'Player') {
@@ -105,7 +109,7 @@ export function CharactersPanel() {
     }
 
     if (runtimeCharacter.controlledByUserId == null) {
-      return isGameMaster;
+      return false;
     }
 
     return currentUserId != null && runtimeCharacter.controlledByUserId === currentUserId;
@@ -181,6 +185,7 @@ export function CharactersPanel() {
                 instanceCount={tokenInstanceCounts.get(character.id) || 0}
                 openSheetModal={() => openModal('sheet', { characterId: character.id })}
                 onDuplicate={handleDuplicateCharacter}
+                canDuplicate={isGameMaster}
                 onDelete={handleDeleteCharacter}
                 canDragToBoard={canCurrentUserInstantiateCharacterToken(character.id)}
                 dragDisabledReason={getCharacterDragDisabledReason(character.id)}

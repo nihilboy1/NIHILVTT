@@ -75,6 +75,7 @@ describe('gameSessionHydrator', () => {
         ],
         tokens: [],
         messages: [],
+        combat: null,
       },
       recentEvents: [],
     };
@@ -98,6 +99,7 @@ describe('gameSessionHydrator', () => {
         ],
         tokens: [],
         messages: [],
+        combat: null,
       },
       recentEvents: [],
     };
@@ -223,6 +225,7 @@ describe('gameSessionHydrator', () => {
           },
         ],
         messages: [],
+        combat: null,
       },
       recentEvents: [],
     };
@@ -251,6 +254,98 @@ describe('gameSessionHydrator', () => {
     expect(replaceCharacters).not.toHaveBeenCalled();
     expect(replaceTokens).not.toHaveBeenCalled();
     expect(replaceMessages).not.toHaveBeenCalled();
+  });
+
+  it('fails fast when the snapshot contains an invalid token entry', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    const snapshot: GameSessionSnapshot = {
+      gameId: 1,
+      serverVersion: 1,
+      state: {
+        characters: [],
+        tokens: [
+          {
+            id: 'token-1',
+            characterId: 'char-1',
+            sceneId: 'default-scene',
+          },
+        ] as unknown as GameSessionSnapshot['state']['tokens'],
+        messages: [],
+        combat: null,
+      },
+      recentEvents: [],
+    };
+
+    expect(() => hydrateGameSessionSnapshot(snapshot)).toThrow(
+      'Violação de contrato de sessão em hydrateGameSessionSnapshot.tokens: token inválido.',
+    );
+    expect(errorSpy).toHaveBeenCalled();
+    expect(replaceCharacters).not.toHaveBeenCalled();
+    expect(replaceTokens).not.toHaveBeenCalled();
+    expect(replaceMessages).not.toHaveBeenCalled();
+    expect(setCombatState).not.toHaveBeenCalled();
+  });
+
+  it('fails fast when the snapshot contains an invalid message entry', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    const snapshot: GameSessionSnapshot = {
+      gameId: 1,
+      serverVersion: 1,
+      state: {
+        characters: [],
+        tokens: [],
+        messages: [
+          {
+            id: 'msg-1',
+            sender: 'Sistema',
+            text: 'Teste',
+            isDiceRoll: false,
+          },
+        ] as unknown as GameSessionSnapshot['state']['messages'],
+        combat: null,
+      },
+      recentEvents: [],
+    };
+
+    expect(() => hydrateGameSessionSnapshot(snapshot)).toThrow(
+      'Violação de contrato de sessão em hydrateGameSessionSnapshot.messages: mensagem inválida.',
+    );
+    expect(errorSpy).toHaveBeenCalled();
+    expect(replaceCharacters).not.toHaveBeenCalled();
+    expect(replaceTokens).not.toHaveBeenCalled();
+    expect(replaceMessages).not.toHaveBeenCalled();
+    expect(setCombatState).not.toHaveBeenCalled();
+  });
+
+  it('fails fast when the snapshot contains an invalid combat state', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    const snapshot = {
+      gameId: 1,
+      serverVersion: 1,
+      state: {
+        characters: [],
+        tokens: [],
+        messages: [],
+        combat: {
+          active: true,
+          round: 1,
+          participants: [],
+        },
+      },
+      recentEvents: [],
+    } as unknown as GameSessionSnapshot;
+
+    expect(() => hydrateGameSessionSnapshot(snapshot)).toThrow(
+      'Violação de contrato de sessão em hydrateGameSessionSnapshot.combat: combate inválido.',
+    );
+    expect(errorSpy).toHaveBeenCalled();
+    expect(replaceCharacters).not.toHaveBeenCalled();
+    expect(replaceTokens).not.toHaveBeenCalled();
+    expect(replaceMessages).not.toHaveBeenCalled();
+    expect(setCombatState).not.toHaveBeenCalled();
   });
 
   it('reset clears the session state stores explicitly', () => {

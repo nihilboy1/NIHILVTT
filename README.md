@@ -17,7 +17,7 @@ Hoje o projeto ja cobre autenticacao, dashboard, criacao e gerenciamento de mesa
 - dashboard com criacao, entrada, exclusao e capa de mesa
 - sincronizacao de sessao via snapshot + eventos realtime
 - chat, rolagens, tokens, HP, inventario, equipamento e combate formal controlado pelo mestre
-- contrato compartilhado de runtime para personagem (`PlayerCharacterState`)
+- contrato compartilhado de runtime para sessao (`SessionCharacterState`), cobrindo `PlayerCharacterState` e `MonsterCharacterState`
 - o projeto ainda esta em pre-versao (antes da versao 0) e nao deve carregar compatibilidade retroativa: nao existe conceito de legado aceito no produto
 
 ## Estrutura do monorepo
@@ -54,6 +54,7 @@ Hoje o projeto ja cobre autenticacao, dashboard, criacao e gerenciamento de mesa
 - `SCRIPTS/launchers/reset-dev.bat`: reinicia backend e frontend sem rodar testes; e o launcher mais simples e confiavel para o ciclo diario
 - `SCRIPTS/launchers/reset-safe.bat`: executa um subconjunto critico de smoke tests e so entao sobe backend e frontend
 - `SCRIPTS/launchers/run-full-tests.bat`: executa a suite completa (backend + frontend unitario + frontend e2e) fora do ciclo de boot
+- `SCRIPTS/launchers/run-playwright-e2e.bat`: executa apenas a suite e2e do frontend (Playwright)
 - `SCRIPTS/launchers/reset-db.bat`: limpa e recria o banco local H2
 - `SCRIPTS/launchers/create-reset-dev-shortcut.ps1`: gera um atalho do reset no Windows
 
@@ -64,6 +65,7 @@ No momento, os launchers de `SCRIPTS/launchers` tem papeis diferentes e nao sao 
 - `reset-dev.bat`
   - uso diario
   - encerra backend/frontend antigos, limpa as portas `8080` e `5173` e sobe backend + frontend
+  - registra stdout/stderr do backend em `backend.log` e poda o arquivo no inicio do reset (limite de linhas configurado no proprio `.bat`)
   - nao roda testes
 
 - `reset-safe.bat`
@@ -75,6 +77,11 @@ No momento, os launchers de `SCRIPTS/launchers` tem papeis diferentes e nao sao 
   - validacao pesada
   - roda a suite completa: backend + frontend unitario + frontend e2e
   - nao sobe servidor; serve para verificacao completa fora do ciclo de boot
+
+- `run-playwright-e2e.bat`
+  - validacao e2e dedicada
+  - roda apenas a suite Playwright do frontend
+  - nao sobe servidor; serve para validar fluxos de navegador sem passar pela suite completa
 
 - `reset-db.bat`
   - manutencao local
@@ -93,11 +100,15 @@ No momento, os launchers de `SCRIPTS/launchers` tem papeis diferentes e nao sao 
 
 - `create-reset-dev-shortcut.ps1`
   - utilitario de conveniencia
-  - recria o atalho `NIHILVTT RESET APP.lnk` apontando para `reset-dev.bat`
+  - recria os atalhos `NIHILVTT RESET APP.lnk` e `NIHILVTT PLAYWRIGHT E2E.lnk`
 
 - `NIHILVTT RESET APP.lnk`
   - atalho de conveniencia
   - abre diretamente o `reset-dev.bat`
+
+- `NIHILVTT PLAYWRIGHT E2E.lnk`
+  - atalho de conveniencia
+  - abre diretamente o `run-playwright-e2e.bat`
 
 Em termos de uso pratico, os unicos launchers que importam como entrada principal sao:
 
@@ -105,7 +116,7 @@ Em termos de uso pratico, os unicos launchers que importam como entrada principa
 2. `reset-safe.bat`
 3. `run-full-tests.bat`
 
-Os demais existem para suporte operacional e nao devem ser tratados como fluxo principal duplicado.
+Os demais existem para suporte operacional e validacao especializada e nao devem ser tratados como fluxo principal duplicado.
 
 ## Como ler a documentacao
 
@@ -113,10 +124,13 @@ Os demais existem para suporte operacional e nao devem ser tratados como fluxo p
 - os READMEs de modulo concentram instrucoes operacionais e diretrizes tecnicas
 - novos padroes tecnicos devem ser documentados no modulo impactado e, quando fizer sentido, refletidos aqui de forma resumida
 - como o produto ainda nao teve release, a documentacao deve assumir contratos atuais apenas: sem fallback, sem backfill e sem qualquer suporte a payload/estado "legado"
+- snapshots e eventos realtime da mesa devem usar payload explicito; ausencia de campo nao deve carregar semantica de "valor padrao" ou "nao mudou"
+- no cliente, comandos HTTP de sessao apenas confirmam aceite do backend; a aplicacao canonica de estado deve ocorrer pela trilha realtime para evitar duplo apply e drift
 - no fluxo atual de combate, o estado global so nasce por acao explicita do mestre; nao existe auto-combate por ataque ou proximidade
 - o combate atual tambem ja usa economia de turno autoritativa basica (acao + deslocamento), com consumo e avanco automatico do turno no backend
 - ownership de personagem em mesa tambem e autoritativo: o mestre vincula cada ficha a um jogador, e esse ownership define quem pode controlar aquele personagem
 - as stores centrais do cliente nao devem operar em modo local para fichas de sessao; criacao, duplicacao e remocao de personagens dependem de pipeline autoritativo
+- a mesma regra vale para tokens de mesa: criacao, remocao e reposicao de tokens devem nascer de snapshot, eventos realtime e comandos autoritativos, nunca de mutacao local paralela
 - operacoes estruturais de token no board (`copy`, `paste` e `delete`) permanecem centralizadas no mestre
 - a trilha de monstro segue o mesmo padrao data-driven: catalogo canonico em `DATAMODELING`, `MonsterCharacterState` autoritativo no backend e frontend apenas como projecao do catalogo + runtime; o fluxo operacional de spawn parte da `Biblioteca`, com drag do monstro para o grid
 

@@ -131,7 +131,7 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
         bottom: 16,
       }}
     >
-      <FloatingPanelDragBar title="Arrastar painel de combate" />
+      <FloatingPanelDragBar title={combatState ? 'Combate ativo' : 'Combate'} />
       {!combatState ? (
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex flex-1 flex-col rounded-lg px-1 py-0.5 text-text-secondary/80">
@@ -146,7 +146,6 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
         <>
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex flex-1 flex-col rounded-lg px-1 py-0.5 text-text-secondary/80">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-text-secondary">Combate ativo</p>
               <p className="text-sm font-semibold text-text-primary">Rodada {combatState.round}</p>
             </div>
             {canControlCombat ? (

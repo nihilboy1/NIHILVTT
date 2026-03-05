@@ -11,6 +11,7 @@ interface UseTokenDragProps {
   initialPosition: Point;
   characterSize: string;
   cellSize: number;
+  preventDrag?: boolean;
   activeTool: Tool;
   pageSettings: PageSettings;
   getSVGPoint: (clientX: number, clientY: number) => Point;
@@ -20,6 +21,7 @@ interface UseTokenDragProps {
   onDragEnd: (tokenId: string) => void;
   onSelectToken: (tokenId: string) => void;
   canDrag: boolean;
+  onDragBlocked?: (tokenId: string) => void;
 }
 
 export function useTokenDrag({
@@ -27,6 +29,7 @@ export function useTokenDrag({
   initialPosition,
   characterSize,
   cellSize,
+  preventDrag = false,
   activeTool,
   pageSettings,
   getSVGPoint,
@@ -36,6 +39,7 @@ export function useTokenDrag({
   onDragEnd,
   onSelectToken,
   canDrag,
+  onDragBlocked,
 }: UseTokenDragProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartMouseOffset, setDragStartMouseOffset] = useState<{
@@ -49,13 +53,19 @@ export function useTokenDrag({
   const [clickStartTimestamp, setClickStartTimestamp] = useState<number | null>(null);
 
   const handleMouseDown = useCallback(
-    (event: React.MouseEvent<SVGGElement>) => {
+    (event: React.MouseEvent<SVGElement>) => {
       if (activeTool !== Tool.SELECT || event.button !== 0) return;
 
       event.stopPropagation();
 
+      if (preventDrag) {
+        onSelectToken(tokenId);
+        return;
+      }
+
       if (!canDrag) {
         onSelectToken(tokenId);
+        onDragBlocked?.(tokenId);
         return;
       }
 
@@ -71,7 +81,7 @@ export function useTokenDrag({
       });
       setCurrentVisualPosition({ x: tokenCurrentSvgX, y: tokenCurrentSvgY });
     },
-    [activeTool, canDrag, initialPosition, cellSize, getSVGPoint, onSelectToken, tokenId],
+    [activeTool, canDrag, initialPosition, cellSize, getSVGPoint, onDragBlocked, onSelectToken, preventDrag, tokenId],
   );
 
   useEffect(() => {

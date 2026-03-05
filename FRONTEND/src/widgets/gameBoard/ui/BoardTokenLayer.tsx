@@ -4,6 +4,7 @@ import { BoardToken } from "../../../entities/token/ui/BoardToken";
 import {
   Point,
   GridSettings,
+  PendingAttackSelection,
   PageSettings,
   Tool,
   Token,
@@ -26,9 +27,11 @@ interface BoardTokenLayerProps {
   handleBoardTokenDoubleClick: (tokenId: string, altKey: boolean) => void;
   onSetMultiSelectedTokenIds: (ids: string[]) => void;
   activeCombatTurnTokenId: string | null;
+  activeCombatNextTurnTokenId: string | null;
   combatParticipantTokenIds: string[];
   activeCombatTurnCanMove: boolean;
   controllableTokenIds: string[];
+  pendingAttack: PendingAttackSelection | null;
 }
 
 export function BoardTokenLayer({
@@ -48,9 +51,11 @@ export function BoardTokenLayer({
   handleBoardTokenDoubleClick,
   onSetMultiSelectedTokenIds,
   activeCombatTurnTokenId,
+  activeCombatNextTurnTokenId,
   combatParticipantTokenIds,
   activeCombatTurnCanMove,
   controllableTokenIds,
+  pendingAttack,
 }: BoardTokenLayerProps) {
   return (
     <>
@@ -81,6 +86,22 @@ export function BoardTokenLayer({
           inspiration: inspirationValue,
         };
 
+        const isControllableToken = controllableTokenIds.includes(token.id);
+        const isCombatParticipant = combatParticipantTokenIds.includes(token.id);
+        const isActiveTurnToken =
+          activeCombatTurnTokenId != null && activeCombatTurnTokenId === token.id;
+        const isNextTurnToken =
+          activeCombatNextTurnTokenId != null && activeCombatNextTurnTokenId === token.id;
+        const canTokenMoveInCombat = !isCombatParticipant || (isActiveTurnToken && activeCombatTurnCanMove);
+        const canDragToken = isControllableToken && canTokenMoveInCombat;
+        const dragBlockedReason = !isControllableToken
+          ? 'Esse token está sob controle do mestre.'
+          : pendingAttack == null && isCombatParticipant && !isActiveTurnToken
+            ? 'Aguarde o seu turno para agir no combate.'
+            : pendingAttack == null && isCombatParticipant && !activeCombatTurnCanMove
+              ? 'Seu movimento neste turno acabou.'
+              : null;
+
         return (
           <BoardToken
             key={`${token.id}-${token.characterId}`}
@@ -101,15 +122,12 @@ export function BoardTokenLayer({
             isMultiSelected={multiSelectedTokenIds.includes(token.id)}
             onBoardTokenDoubleClick={handleBoardTokenDoubleClick}
             onSetMultiSelectedTokenIds={onSetMultiSelectedTokenIds}
-            canDrag={
-              controllableTokenIds.includes(token.id) &&
-              (
-                !combatParticipantTokenIds.includes(token.id) ||
-                (activeCombatTurnTokenId != null &&
-                  activeCombatTurnTokenId === token.id &&
-                  activeCombatTurnCanMove)
-              )
-            }
+            canDrag={canDragToken}
+            dragBlockedReason={dragBlockedReason}
+            isCombatParticipant={isCombatParticipant}
+            isActiveTurnToken={isActiveTurnToken}
+            isNextTurnToken={isNextTurnToken}
+            isAttackTargeting={pendingAttack != null}
           />
         );
       })}

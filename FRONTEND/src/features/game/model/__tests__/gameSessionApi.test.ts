@@ -17,19 +17,21 @@ describe('gameSessionApi snapshot contract', () => {
           characters: [],
           tokens: [],
           messages: [],
+          combat: null,
         },
         recentEvents: [],
       }),
     ).not.toThrow();
   });
 
-  it('fails fast when snapshot arrays are missing', () => {
+  it('fails fast when snapshot required state fields are missing', () => {
     expect(() =>
       parseGameSessionSnapshotPayload({
         gameId: 1,
         serverVersion: 2,
         state: {
           characters: [],
+          tokens: [],
           messages: [],
         },
         recentEvents: [],

@@ -39,18 +39,22 @@ Regra editorial do modulo:
 
 ### Runtime Boundary
 
-O frontend continua com uma camada de UI transitória para ficha e stores, mas a entrada de personagens vindos da sessao agora aceita apenas o schema compartilhado `PlayerCharacterStateSchema` de `@nihilvtt/datamodeling/runtime`.
+O frontend projeta dados de sessao a partir do runtime compartilhado e usa view models apenas como camada de renderizacao. A entrada canonica de personagens vindos da sessao e o schema compartilhado `SessionCharacterStateSchema` de `@nihilvtt/datamodeling/runtime`.
 
 Regra atual:
 
 - bordas de sessao (`hydrate` e `event handlers`) devem aceitar e processar exclusivamente o runtime compartilhado
 - a borda canônica de personagem de sessao passa a ser `SessionCharacterStateSchema` de `@nihilvtt/datamodeling/runtime`; o frontend faz parse da uniao compartilhada e so depois discrimina por `type` para projetar UI
+- runtime compartilhado e a unica fonte de verdade para sessao; view model nao substitui nem flexibiliza o contrato da borda
 - o `Character Builder` passa a enviar `PlayerCharacterState` para o backend no fluxo autoritativo de criacao
 - a `charactersStore` deixa de nascer com seed local e nao deve criar, duplicar, editar ou remover fichas fora de eventos/comandos autoritativos de sessao
+- a `tokenStore` tambem passa a ser estritamente orientada a sessao: tokens de mesa entram por snapshot/eventos autoritativos e nao devem existir mutacoes locais paralelas para criar/remover/editar token fora dessa trilha
+- `gameSessionHydrator` nao deve mais aceitar snapshot parcialmente invalido: token, mensagem ou `combatState` invalidos precisam falhar antes de qualquer mutacao de store, sem filtrar entradas ruins e seguir com estado parcial
 - a store de personagens passa a normalizar entradas de sessao pelo adapter compartilhado e preserva o `PlayerCharacterState` original quando ele vier da sessao
 - o adapter de sessao de personagens nao deve aceitar `characterSchema` como fallback; na borda de sessao, payload invalido deve falhar e nao ser reinterpretado como modelo de UI
 - a `TokenActionBar` nao usa mais `AttackEntry` de compatibilidade; ataques de ficha agora saem de derivacao canonica (`unarmed`/`weapon`) ou de acoes explicitas com `sourceType: action`
 - o snapshot de sessao vindo da API deve trazer `characters`, `tokens`, `messages` e `recentEvents` explicitamente; a borda do cliente nao preenche arrays ausentes com default
+- o snapshot de sessao vindo da API tambem deve trazer `combat` explicitamente (`null` ou objeto); ausencia de `combat` e violacao de contrato, nao fallback aceitavel
 - ownership de controle da ficha em mesa (`controlledByUserId`) passa a vir no proprio runtime compartilhado e nao em estado paralelo de UI
 - a ficha passa a depender de um `PlayerCharacterViewModel` nos componentes de topo, preferindo o runtime compartilhado quando ele existir
 - `PrincipalHeader`, `Detalhes` e `Configuracoes` agora leem apenas view models/estado da store, sem depender do `react-hook-form` para edicao desses campos
@@ -134,12 +138,14 @@ Regra atual:
   - backend publica `CHAT_MESSAGE_CREATED`/`DICE_ROLLED`/`CHAT_HISTORY_CLEARED`/`TOKEN_CREATED`/`TOKEN_MOVED`/`TOKEN_REMOVED`/`CHARACTER_CREATED`/`CHARACTER_REMOVED`/`CHARACTER_HP_UPDATED`/`CHARACTER_EQUIPMENT_UPDATED`/`CHARACTER_INVENTORY_UPDATED`/`ATTACK_RESOLVED`/`MEMBER_REVOKED` em `/topic/games.{gameId}.events`
   - quando `TOKEN_REMOVED` vier com `removedCharacterId`, o frontend remove junto a ficha clone correspondente do `CharactersPanel`
   - frontend aplica evento com deduplicacao por `message.id`
+  - comandos HTTP de sessao nao devem mutar store diretamente no retorno da resposta; a mutacao canonica do cliente deve entrar pelo evento realtime correspondente, mantendo trilha unica de aplicacao de estado
 - Ao receber `MEMBER_REVOKED` para o usuario autenticado, o frontend sai imediatamente da mesa e redireciona para `/dashboard`.
 - Nesse caso, o jogo tambem e removido da lista local do dashboard imediatamente, e o backend nao retorna mais esse jogo em `GET /games/active` para o usuario expulso.
 - O dashboard renderiza cards apenas para jogos com relacao ao usuario: dono, solicitacao pendente ou acesso aprovado.
 - Identificacao visual de mensagem propria prioriza `senderUserId` (fallback para nome), reduzindo inconsistencias entre navegadores.
 - Snapshot inicial (`/games/{gameId}/session-state`) continua como base para hidratacao e recuperacao.
 - As bordas de sessao no cliente (`gameSessionHydrator` e `gameSessionEventHandlers`) agora devem manter testes de contrato dedicados: snapshots validos precisam hidratar sem erro, e payloads realtime invalidos devem falhar cedo de forma explicita.
+- A suite Playwright de sessao (`FRONTEND/e2e/session.spec.ts`) deve cobrir ao menos os fluxos criticos de persistencia apos `F5`: mesa recem-criada com `combat: null` explicito e persistencia de chat apos recarregar.
 - Nos eventos realtime, o cliente deve assumir payload explicito:
   - `TOKEN_CREATED` sempre traz `character` (objeto ou `null`)
   - eventos de remocao e movimento sempre trazem `combatChanged` + `combat`, em vez de usar ausencia de campo como sinal de "sem alteracao"
@@ -185,7 +191,7 @@ Regra atual:
 - O `Delete` em massa no board deve usar o comando autoritativo em lote (`POST /games/{gameId}/session/tokens/remove-batch`), para que todas as remocoes sejam persistidas em um unico commit de snapshot.
 - Quando um token removido por `Delete` for o ultimo token de uma ficha clone de sessao, a ficha clone correspondente tambem sai automaticamente do `CharactersPanel`.
 - O `hpControl` agora fica fixo no canto inferior direito da viewport, respeitando a area ocupada pela sidebar direita, exibe o nome do personagem selecionado e nao usa mais ancoragem por token (`anchorPoint`).
-- O `hpControl` e outros modais contextuais de token so devem abrir para o mestre ou para o usuario que controla aquela ficha; outros jogadores podem ate selecionar visualmente o token, mas nao recebem input contextual dele.
+- O `hpControl` e demais modais contextuais de token devem abrir apenas para o mestre; outros jogadores podem selecionar token visualmente, mas nao recebem modal contextual de HP.
 - A remocao por `Delete` agora respeita contexto de foco de forma mais rigida: dialogs e popovers que nao sejam o proprio `hpControl` nao devem disparar remocao de token.
 - Apenas o mestre pode alterar HP em jogo; o backend bloqueia esse comando e a UI desabilita a interacao para nao-mestres.
 - Apenas o mestre pode acessar configuracoes de pagina e grade; jogadores continuam com acesso aos controles de zoom, mas nao veem o botao nem o modal de configuracao.
@@ -208,6 +214,8 @@ Regra atual:
 - Mutacoes locais (`updateCharacter`, `deleteCharacter` e `duplicateCharacter`) ficam bloqueadas para personagens runtime-backed; em sessao, personagens autoritativos so devem mudar por comandos de backend.
 - No `CharactersPanel`, o menu de opcoes deve ser ancorado no proprio botao de tres pontos que o abre; o posicionamento e calculado pelo `getBoundingClientRect()` do gatilho para evitar abrir no canto da tela quando a referencia ainda nao foi montada.
 - `Duplicar Personagem` no `CharactersPanel` agora cria um clone persistente autoritativo em sessao: o frontend envia um comando de duplicacao, o backend gera uma nova ficha com novo `id`, renomeia o clone no formato `Nome [N]`, publica `CHARACTER_CREATED` e a copia passa a divergir da origem a partir dali.
+- `Duplicar Personagem` no `CharactersPanel` e exclusivo do mestre; jogadores nao devem receber essa acao no menu.
+- Toda duplicacao de ficha `Player` passa a nascer sem dono (`controlledByUserId: null`), mantendo o controle inicial da copia com o mestre ate nova atribuicao explicita na aba de configuracao da ficha.
 - No board, apenas o mestre pode usar `Ctrl+C`/`Cmd+C` para copiar o token atualmente selecionado (ou o token do `hpControl` ativo) como fonte de clonagem; `Ctrl+V`/`Cmd+V` tambem permanece exclusivo do mestre e executa um comando autoritativo atômico no backend que duplica a ficha e já cria o novo token na célula atualmente visada pelo cursor no grid (com destaque visual da célula), sem janela intermediária de clone órfão. Se não houver alvo visado, o fallback continua sendo a célula adjacente.
 - Quando a fonte copiada for um `NPC`, o backend deve tratar `Ctrl+V`/`Cmd+V` como novo spawn da mesma criatura: cria uma nova instancia runtime a partir do mesmo `monsterId`, sem reaproveitar HP/efeitos do token original, e já publica o token novo no mesmo comando.
 - O token atualmente copiado para `Ctrl+C`/`Cmd+C` deve exibir um marcador visual proprio no board, deixando explicito qual token esta na area de transferencia; o modo de copia e temporario e deve ser cancelado automaticamente por qualquer clique esquerdo ou interacao de teclado que nao seja `Ctrl+V`/`Cmd+V`.
@@ -226,8 +234,8 @@ Regra atual:
 - Para personagens runtime-backed, a seção `Acoes` nao deve misturar fallback local de `character.actions`; o runtime e os derivados passam a ser a fonte primária.
 - O bônus de ataque dessas armas só soma bônus de proficiência quando o runtime conseguir provar, pelo catálogo da classe, proficiência automática no `weaponType` da arma (`simple`/`martial`).
 - O fluxo de combate entre tokens usa uma barra de `Ações do Token` fixa no canto inferior direito; cada ação é projetada como `AttackEntry` (incluindo `rangeMeters`), clicar em uma ação arma um `pendingAttack`, o alcance da ação é exibido no board ao redor do atacante e o clique no token alvo só avança se ele estiver dentro desse alcance.
-- O controle de token/personagem na mesa e exclusivo por ownership runtime para fichas `Player`: se `controlledByUserId` estiver definido, apenas aquele jogador pode mover e agir com a ficha; se estiver `null`, o controle permanece com o mestre.
-- Fora de combate, ownership nao deve disparar overlay global no board; a restricao continua valendo para drag/acoes, mas o bloqueio visual de tela cheia fica reservado ao lock de turno em combate.
+- O controle de token/personagem na mesa segue ownership runtime para fichas `Player`, com autoridade absoluta do mestre: o owner da mesa sempre pode mover e agir com qualquer token; para jogadores, se `controlledByUserId` estiver definido, apenas aquele jogador pode mover e agir com a ficha, e se estiver `null`, o controle fica com o mestre.
+- O board nao deve usar overlay bloqueante para lock de ownership/turno; quando uma acao for bloqueada por permissao ou turno, o feedback deve ser toast e a restricao continua aplicada no comando/drag.
 - `NPC` e sempre de uso exclusivo do mestre. `MonsterCharacterState` nao carrega `controlledByUserId`, e o board deve aplicar essa regra de forma explicita em drag, acoes e modais contextuais.
 - A mesa agora pode entrar em combate formal: o frontend hidrata `combatState` a partir do snapshot/eventos e projeta uma `InitiativeTrack` como painel arrastável.
 - Painéis flutuantes arrastáveis da mesa (como `InitiativeTrack`) seguem o mesmo padrão de drag manual da ficha: arraste direto por uma área de header/handle ampliada, com `mousemove` document-level, `safeArea` da viewport e `reclamp` em resize/mudança de layout.
@@ -239,7 +247,8 @@ Regra atual:
 - Enquanto houver combate ativo, tokens participantes ficam sob lock de turno: so o participante do turno atual pode mover e iniciar acoes; participantes fora do turno devem permanecer bloqueados no board.
 - No estado atual, um turno possui `1` acao, `1` acao bonus (reservada para o fluxo futuro) e deslocamento em grade; ataques consomem a acao, movimento consome deslocamento restante e, quando acao e deslocamento acabam, o backend avanca automaticamente para o proximo turno.
 - Os recursos do turno atual devem ser projetados na `Ações do Token` do personagem ativo; essa barra agora aparece apenas para o usuario que controla aquela ficha, nasce no canto inferior direito e continua arrastavel como painel flutuante.
-- O `hpControl` do mestre fica ancorado no canto inferior esquerdo da viewport; quando o modal contextual for exibido para um jogador controlador em modo somente leitura, ele permanece no canto inferior direito.
+- O `hpControl` do mestre fica ancorado no canto inferior esquerdo da viewport e nao possui variante readonly para jogador.
+- O nome exibido nos tokens do board deve ficar visivel apenas em hover.
 - O `hpControl` deve abrir com largura ajustada ao próprio conteúdo (sem largura fixa desnecessária) e respeitar a `safe area` da toolbar esquerda na posição inicial, no mesmo padrão dos demais painéis flutuantes.
 - Enquanto houver combate ativo, a `InitiativeTrack` permite ao mestre avançar o turno (`Proximo turno`) ou encerrar o combate.
 - No MVP atual, o frontend envia `attackBonus` e `damageFormula`, enquanto o backend deriva a CA do alvo a partir do runtime + catálogo (via manifest canônico de itens), resolve a aleatoriedade (`d20`, hit/miss e dano), aplica HP/THP e publica `ATTACK_RESOLVED`, que atualiza HP e registra um log de sistema no chat.

@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useBoardZoomStore } from "@/features/boardZoom/model/store"; // Import the new zoom store
 import { useSessionModalStore } from "@/features/modalManager/model/sessionModalStore";
-import { applyGameSessionEvent } from "@/features/game/model/gameSessionEventHandlers";
 import { sendGameCreateToken, sendGameMoveToken, sendGameSpawnMonster } from "@/features/game/model/gameSessionApi";
 import { useGameStore } from "@/features/game/model/gameStore";
 import { useAuthStore } from "@/features/auth/model/authStore";
 import { useCombatStore } from "@/features/combat/model/store";
+import { canUserControlToken } from '@/features/game/model/tokenControlPolicy';
 
 import { useBoardStore } from "../../../entities/board/model/store";
 import { parseCharacterSize } from "../../../entities/character/lib/utils/characterUtils";
@@ -40,7 +40,6 @@ interface GameBoardProps {
   onClearMultiSelection: () => void;
   onBoardPointerMove: (svgPoint: Point) => void;
   onBoardPointerLeave: () => void;
-  combatLockReason?: string | null;
 }
 
 export function GameBoard({
@@ -56,7 +55,6 @@ export function GameBoard({
   onClearMultiSelection,
   onBoardPointerMove,
   onBoardPointerLeave,
-  combatLockReason = null,
 }: GameBoardProps) {
   const { gameId } = useParams<{ gameId: string }>();
   const { characters } = useCharactersStore();
@@ -73,6 +71,10 @@ export function GameBoard({
     combatState && combatState.participants.length > 0
       ? combatState.participants[combatState.turnIndex]?.tokenId ?? null
       : null;
+  const activeCombatNextTurnTokenId =
+    combatState && combatState.participants.length > 1
+      ? combatState.participants[(combatState.turnIndex + 1) % combatState.participants.length]?.tokenId ?? null
+      : null;
   const combatParticipantTokenIds = combatState?.participants.map((participant) => participant.tokenId) ?? [];
   const activeCombatTurnCanMove =
     combatState == null || combatState.turnResources.remainingMovementCells > 0;
@@ -80,6 +82,10 @@ export function GameBoard({
     currentGame != null && currentUserId != null && currentGame.owner.id === currentUserId;
   const canCurrentUserInstantiateCharacterToken = useCallback(
     (characterId: string) => {
+      if (isGameMaster) {
+        return true;
+      }
+
       const runtimeCharacter = runtimeCharactersById[characterId] ?? null;
       if (!runtimeCharacter) {
         console.error(
@@ -89,20 +95,20 @@ export function GameBoard({
         return false;
       }
 
-      if (runtimeCharacter.type === 'NPC') {
-        return isGameMaster;
-      }
-
-      if (runtimeCharacter.controlledByUserId == null) {
-        return isGameMaster;
-      }
-
-      return currentUserId != null && runtimeCharacter.controlledByUserId === currentUserId;
+      return canUserControlToken({
+        gameOwnerUserId: currentGame?.owner.id,
+        currentUserId,
+        runtimeCharacter,
+      });
     },
-    [currentUserId, isGameMaster, runtimeCharactersById],
+    [currentGame?.owner.id, currentUserId, isGameMaster, runtimeCharactersById],
   );
   const controllableTokenIds = tokensOnBoard
     .filter((token) => {
+      if (isGameMaster) {
+        return true;
+      }
+
       const runtimeCharacter = runtimeCharactersById[token.characterId] ?? null;
       if (!runtimeCharacter) {
         console.error(
@@ -112,16 +118,11 @@ export function GameBoard({
         return false;
       }
 
-      if (runtimeCharacter.type === 'NPC') {
-        return isGameMaster;
-      }
-
-      const controlledByUserId = runtimeCharacter.controlledByUserId;
-      if (controlledByUserId == null) {
-        return isGameMaster;
-      }
-
-      return currentUserId != null && controlledByUserId === currentUserId;
+      return canUserControlToken({
+        gameOwnerUserId: currentGame?.owner.id,
+        currentUserId,
+        runtimeCharacter,
+      });
     })
     .map((token) => token.id);
 
@@ -135,9 +136,7 @@ export function GameBoard({
 
       updateTokenPosition(tokenId, newPosition);
       void sendGameMoveToken(parsedGameId, tokenId, newPosition.x, newPosition.y)
-        .then((event) => {
-          applyGameSessionEvent(event);
-        })
+        .then(() => {})
         .catch(() => {
           console.warn('Falha ao sincronizar movimento de token com o servidor.');
         });
@@ -154,9 +153,7 @@ export function GameBoard({
       }
 
       void sendGameCreateToken(parsedGameId, characterId, 'default-scene', position.x, position.y)
-        .then((event) => {
-          applyGameSessionEvent(event);
-        })
+        .then(() => {})
         .catch((error) => {
           const message =
             typeof error === 'object' &&
@@ -184,9 +181,7 @@ export function GameBoard({
         x: position.x,
         y: position.y,
       })
-        .then((event) => {
-          applyGameSessionEvent(event);
-        })
+        .then(() => {})
         .catch(() => {
           toast.error('Falha ao instanciar monstro no tabuleiro.');
         });
@@ -195,6 +190,7 @@ export function GameBoard({
   );
 
   const svgRef = useRef<SVGSVGElement>(null);
+  const lastAutoCenteredTurnKeyRef = useRef<string | null>(null);
   const [isPageAndGridSettingsModalOpen, setIsPageAndGridSettingsModalOpen] =
     useState(false);
   const canManageBoardSettings =
@@ -207,6 +203,7 @@ export function GameBoard({
     handlePanStart,
     handlePanMove,
     handlePanEnd,
+    centerViewOnPoint,
     setSvgRef,
     setGridSettings,
     setPageSettings,
@@ -230,6 +227,49 @@ export function GameBoard({
   useEffect(() => {
     initializeViewBox(setZoomLevel);
   }, [initializeViewBox, setZoomLevel]);
+
+  useEffect(() => {
+    if (combatState == null || activeCombatTurnTokenId == null) {
+      lastAutoCenteredTurnKeyRef.current = null;
+      return;
+    }
+
+    if (isPanning) {
+      return;
+    }
+
+    const turnKey = `${combatState.round}:${combatState.turnIndex}`;
+    if (lastAutoCenteredTurnKeyRef.current === turnKey) {
+      return;
+    }
+
+    const activeToken = tokensOnBoard.find((token) => token.id === activeCombatTurnTokenId);
+    if (!activeToken) {
+      return;
+    }
+
+    const activeCharacter = characters.find((character) => character.id === activeToken.characterId);
+    if (!activeCharacter) {
+      return;
+    }
+
+    const [sizeMultiplierX, sizeMultiplierY] = parseCharacterSize(activeCharacter.size);
+    const activeTokenCenter = {
+      x: (activeToken.position.x + sizeMultiplierX / 2) * gridSettings.visualCellSize,
+      y: (activeToken.position.y + sizeMultiplierY / 2) * gridSettings.visualCellSize,
+    };
+
+    centerViewOnPoint(activeTokenCenter);
+    lastAutoCenteredTurnKeyRef.current = turnKey;
+  }, [
+    activeCombatTurnTokenId,
+    centerViewOnPoint,
+    characters,
+    combatState,
+    gridSettings.visualCellSize,
+    isPanning,
+    tokensOnBoard,
+  ]);
 
   const getSVGPointWithZoom = useCallback(
     (clientX: number, clientY: number) => {
@@ -270,6 +310,7 @@ export function GameBoard({
     handleMarqueeMouseUp,
   } = useMarqueeSelection({
     activeTool,
+    isSelectionLocked: pendingAttack != null,
     getSVGPoint: getSVGPointWithZoom,
     tokensOnBoard,
     characters,
@@ -404,10 +445,10 @@ export function GameBoard({
         marqueeSelection={marqueeSelection}
         rulerPath={rulerPath}
         activeCombatTurnTokenId={activeCombatTurnTokenId}
+        activeCombatNextTurnTokenId={activeCombatNextTurnTokenId}
         combatParticipantTokenIds={combatParticipantTokenIds}
         activeCombatTurnCanMove={activeCombatTurnCanMove}
         controllableTokenIds={controllableTokenIds}
-        combatLockReason={combatLockReason}
       />
     </>
   );

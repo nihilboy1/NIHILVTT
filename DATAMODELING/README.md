@@ -86,6 +86,7 @@ Leitura atual do pacote, confirmada no codigo:
 - `MonsterCharacterStateSchema` nao carrega `controlledByUserId`: no estado atual do produto, `NPC` e sempre de uso exclusivo do mestre.
 - `MonsterCharacterStateSchema` tambem nao usa mais defaults silenciosos para campos mutaveis: `nameOverride`, `imageOverride`, `notes`, `hitPoints.temporary`, `resourcePools.pools[]` e `activeEffects.effects[]` precisam existir explicitamente no payload runtime, alinhados ao validador do backend.
 - `SessionCharacterStateSchema` passa a ser a borda canônica de parse para snapshots e eventos de sessao, reduzindo branching manual entre `Player` e `NPC`.
+- `SessionCharacterStateSchema` tambem deve ser tratado como SSOT formal do shape de personagem em sessao: frontend e backend devem consumir esse contrato, e nao manter schemas paralelos concorrentes para a mesma borda.
 
 ## Distincao Importante
 

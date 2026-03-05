@@ -5,6 +5,7 @@ import { useChatStore } from '@/features/chat/model/store';
 import { useTokenStore } from '@/entities/token/model/store/tokenStore';
 import { useCharactersStore } from '@/entities/character/model/store';
 import { useCombatStore } from '@/features/combat/model/store';
+import { useAttackFeedbackStore } from '@/features/combat/model/attackFeedbackStore';
 
 import { GameSessionEvent } from './gameSessionApi';
 
@@ -80,7 +81,7 @@ const tokenSchema = z.object({
 
 const tokenCreatedPayloadSchema = z.object({
   token: tokenSchema,
-  character: z.unknown().nullable(),
+  character: z.object({}).passthrough().nullable(),
 });
 
 const combatParticipantSchema = z.object({
@@ -140,7 +141,7 @@ const tokensRemovedPayloadSchema = z.object({
 });
 
 const characterCreatedPayloadSchema = z.object({
-  character: z.unknown(),
+  character: z.object({}).passthrough(),
 });
 
 const characterRemovedPayloadSchema = z.object({
@@ -170,7 +171,23 @@ function requireEventPayload<T>(
   return parsed.data;
 }
 
+function resolveTokenDisplayName(tokenId: string): string {
+  const token = useTokenStore.getState().tokensOnBoard.find((entry) => entry.id === tokenId);
+  if (!token) {
+    return `Token ${tokenId}`;
+  }
+
+  const character = useCharactersStore.getState().characters.find((entry) => entry.id === token.characterId);
+  return character?.name ?? `Token ${tokenId}`;
+}
+
 export function applyGameSessionEvent(event: GameSessionEvent): void {
+  console.info('[gameSession] applying event', {
+    type: event.type,
+    eventId: event.eventId,
+    createdAt: event.createdAt,
+    gameId: event.gameId,
+  });
   if (event.type === 'TOKEN_CREATED') {
     const parsed = requireEventPayload(event, tokenCreatedPayloadSchema, 'TOKEN_CREATED');
     if (parsed.character !== null) {
@@ -182,6 +199,7 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
 
   if (event.type === 'TOKEN_REMOVED') {
     const parsed = requireEventPayload(event, tokenRemovedPayloadSchema, 'TOKEN_REMOVED');
+    useAttackFeedbackStore.getState().clearFeedbackForToken(parsed.tokenId);
     useTokenStore.getState().removeTokenFromSession(parsed.tokenId);
     if (parsed.removedCharacterId) {
       useCharactersStore.getState().removeCharacterFromSession(parsed.removedCharacterId);
@@ -195,6 +213,7 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
   if (event.type === 'TOKENS_REMOVED') {
     const parsed = requireEventPayload(event, tokensRemovedPayloadSchema, 'TOKENS_REMOVED');
     parsed.tokenIds.forEach((tokenId) => {
+      useAttackFeedbackStore.getState().clearFeedbackForToken(tokenId);
       useTokenStore.getState().removeTokenFromSession(tokenId);
     });
     if (parsed.removedCharacterIds.length > 0) {
@@ -216,15 +235,51 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
 
   if (event.type === 'ATTACK_RESOLVED') {
     const parsed = requireEventPayload(event, attackResolvedPayloadSchema, 'ATTACK_RESOLVED');
+    console.info('[attack-feedback] ATTACK_RESOLVED parsed', {
+      eventId: event.eventId,
+      attackerTokenId: parsed.attackerTokenId,
+      targetTokenId: parsed.targetTokenId,
+      hit: parsed.hit,
+      attackTotal: parsed.attackTotal,
+      targetArmorClass: parsed.targetArmorClass,
+      damageApplied: parsed.damageApplied,
+    });
 
     useCharactersStore
       .getState()
       .updateCharacterHp(parsed.targetCharacterId, parsed.remainingCurrentHp, parsed.remainingTempHp);
     useCombatStore.getState().setCombatState(parsed.combat);
+    useAttackFeedbackStore.getState().pushFeedback({
+      id: event.eventId,
+      tokenId: parsed.targetTokenId,
+      hit: parsed.hit,
+      attackTotal: parsed.attackTotal,
+      targetArmorClass: parsed.targetArmorClass,
+      damageApplied: parsed.damageApplied,
+    });
 
-    const summary = parsed.hit
-      ? `${parsed.attackName}: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> acerto, ${parsed.damageApplied} dano.`
-      : `${parsed.attackName}: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> erro.`;
+    const attackerName = resolveTokenDisplayName(parsed.attackerTokenId);
+    const targetName = resolveTokenDisplayName(parsed.targetTokenId);
+    const hitStatus = parsed.hit ? 'ACERTO' : 'ERRO';
+    const remainingHpSummary =
+      parsed.remainingTempHp > 0
+        ? `${parsed.remainingCurrentHp} HP + ${parsed.remainingTempHp} THP`
+        : `${parsed.remainingCurrentHp} HP`;
+    const compactSummary = parsed.hit
+      ? `${attackerName} usou ${parsed.attackName} em ${targetName}: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> ACERTO, ${parsed.damageApplied} dano`
+      : `${attackerName} usou ${parsed.attackName} em ${targetName}: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> ERRO`;
+    const summary = [
+      compactSummary,
+      '---',
+      `Ataque: ${parsed.attackName}`,
+      `Atacante: ${attackerName}`,
+      `Alvo(s): ${targetName}`,
+      `Resultado: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> ${hitStatus}`,
+      parsed.hit
+        ? `Dano aplicado: ${parsed.damageApplied} (rolado: ${parsed.damageTotal})`
+        : 'Dano aplicado: 0',
+      `HP do alvo: ${remainingHpSummary}`,
+    ].join('\n');
 
     const message: Message = {
       id: event.eventId,

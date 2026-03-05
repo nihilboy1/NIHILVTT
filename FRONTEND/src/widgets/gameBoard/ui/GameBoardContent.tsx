@@ -1,7 +1,9 @@
 import React from "react";
 
 import { type Character } from "@/entities/character/model/schemas/character.schema";
+import { parseCharacterSize } from "@/entities/character/lib/utils/characterUtils";
 import { useUIStore } from "@/features/layoutControls/model/store";
+import aimCursorUrl from "@/shared/assets/aim.png";
 import {
   GridSettings,
   MarqueeSelectionState,
@@ -62,10 +64,10 @@ interface GameBoardContentProps {
   marqueeSelection: MarqueeSelectionState;
   rulerPath: RulerPathState;
   activeCombatTurnTokenId: string | null;
+  activeCombatNextTurnTokenId: string | null;
   combatParticipantTokenIds: string[];
   activeCombatTurnCanMove: boolean;
   controllableTokenIds: string[];
-  combatLockReason: string | null;
 }
 
 export function GameBoardContent({
@@ -101,10 +103,10 @@ export function GameBoardContent({
   marqueeSelection,
   rulerPath,
   activeCombatTurnTokenId,
+  activeCombatNextTurnTokenId,
   combatParticipantTokenIds,
   activeCombatTurnCanMove,
   controllableTokenIds,
-  combatLockReason,
 }:GameBoardContentProps) {
   const { isRightSidebarVisible } = useUIStore();
 
@@ -122,17 +124,56 @@ export function GameBoardContent({
   const pendingAttackToken = pendingAttack
     ? tokensOnBoard.find((token) => token.id === pendingAttack.attackerTokenId) ?? null
     : null;
-  const pendingAttackRadius =
-    pendingAttackToken && gridSettings.metersPerSquare > 0
-      ? ((pendingAttack?.attack.rangeMeters ?? 0) / gridSettings.metersPerSquare) *
-        gridSettings.visualCellSize
-      : null;
-  const pendingAttackCenter = pendingAttackToken
-    ? {
-        x: (pendingAttackToken.position.x + 0.5) * gridSettings.visualCellSize,
-        y: (pendingAttackToken.position.y + 0.5) * gridSettings.visualCellSize,
-      }
-    : null;
+  const pendingAttackAreaCells =
+    pendingAttackToken && pendingAttack && gridSettings.metersPerSquare > 0
+      ? (() => {
+          const attackerCharacter = characters.find(
+            (character) => character.id === pendingAttackToken.characterId,
+          );
+          const [attackerWidth, attackerHeight] = attackerCharacter
+            ? parseCharacterSize(attackerCharacter.size)
+            : [1, 1];
+
+          const rangeSquares = Math.floor(
+            (pendingAttack.attack.rangeMeters + Number.EPSILON) / gridSettings.metersPerSquare,
+          );
+          if (rangeSquares <= 0) {
+            return [] as Point[];
+          }
+
+          const attackerMinX = pendingAttackToken.position.x;
+          const attackerMinY = pendingAttackToken.position.y;
+          const attackerMaxX = attackerMinX + attackerWidth - 1;
+          const attackerMaxY = attackerMinY + attackerHeight - 1;
+          const cells: Point[] = [];
+
+          for (let y = attackerMinY - rangeSquares; y <= attackerMaxY + rangeSquares; y += 1) {
+            for (let x = attackerMinX - rangeSquares; x <= attackerMaxX + rangeSquares; x += 1) {
+              if (
+                x < 0 ||
+                y < 0 ||
+                x >= pageSettings.widthInUnits ||
+                y >= pageSettings.heightInUnits
+              ) {
+                continue;
+              }
+
+              const distanceX =
+                x < attackerMinX ? attackerMinX - x : x > attackerMaxX ? x - attackerMaxX : 0;
+              const distanceY =
+                y < attackerMinY ? attackerMinY - y : y > attackerMaxY ? y - attackerMaxY : 0;
+              const isAttackerCell = distanceX === 0 && distanceY === 0;
+              const chebyshevDistance = Math.max(distanceX, distanceY);
+
+              if (!isAttackerCell && chebyshevDistance <= rangeSquares) {
+                cells.push({ x, y });
+              }
+            }
+          }
+
+          return cells;
+        })()
+      : [];
 
   return (
     <div className="flex-grow bg-surface-0 relative overflow-hidden">
@@ -140,6 +181,9 @@ export function GameBoardContent({
         ref={svgRef}
         width="100%"
         height="100%"
+        style={{
+          cursor: pendingAttack ? `url(${aimCursorUrl}) 32 32, crosshair` : "default",
+        }}
         viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
         onMouseDown={handleMouseDown}
         onWheel={handleWheel}
@@ -172,9 +216,11 @@ export function GameBoardContent({
           handleBoardTokenDoubleClick={handleBoardTokenDoubleClick}
           onSetMultiSelectedTokenIds={onSetMultiSelectedTokenIds}
           activeCombatTurnTokenId={activeCombatTurnTokenId}
+          activeCombatNextTurnTokenId={activeCombatNextTurnTokenId}
           combatParticipantTokenIds={combatParticipantTokenIds}
           activeCombatTurnCanMove={activeCombatTurnCanMove}
           controllableTokenIds={controllableTokenIds}
+          pendingAttack={pendingAttack}
         />
 
         {pasteTargetCell && copiedTokenId && (
@@ -191,19 +237,22 @@ export function GameBoardContent({
           />
         )}
 
-        {pendingAttackCenter && pendingAttackRadius != null && (
-          <circle
-            cx={pendingAttackCenter.x}
-            cy={pendingAttackCenter.y}
-            r={pendingAttackRadius}
+        {pendingAttackAreaCells.map((cell) => (
+          <rect
+            key={`pending-attack-cell-${cell.x}-${cell.y}`}
+            x={cell.x * gridSettings.visualCellSize}
+            y={cell.y * gridSettings.visualCellSize}
+            width={gridSettings.visualCellSize}
+            height={gridSettings.visualCellSize}
+            pointerEvents="none"
             fill="var(--color-accent-primary)"
-            fillOpacity="0.08"
+            fillOpacity="0.10"
             stroke="var(--color-accent-primary)"
-            strokeWidth={1.5 / zoomLevel}
+            strokeWidth={1 / zoomLevel}
             strokeOpacity="0.55"
-            strokeDasharray={`${8 / zoomLevel} ${6 / zoomLevel}`}
+            strokeDasharray={`${4 / zoomLevel} ${3 / zoomLevel}`}
           />
-        )}
+        ))}
 
         {multiSelectBoundingBox && (
           <rect
@@ -233,16 +282,6 @@ export function GameBoardContent({
           isOpen={isPageAndGridSettingsModalOpen}
           onClose={() => setIsPageAndGridSettingsModalOpen(false)}
         />
-      ) : null}
-      {combatLockReason ? (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-surface-0/55 backdrop-blur-[1px]">
-          <div className="pointer-events-none rounded-xl border border-surface-2 bg-surface-1/95 px-4 py-3 text-center shadow-lg">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-secondary">
-              Combate em andamento
-            </p>
-            <p className="mt-1 text-sm font-semibold text-text-primary">{combatLockReason}</p>
-          </div>
-        </div>
       ) : null}
     </div>
   );

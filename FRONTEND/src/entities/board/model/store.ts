@@ -11,6 +11,7 @@ interface BoardState {
   viewBox: { x: number; y: number; width: number; height: number };
   isPanning: boolean;
   lastPanPoint: Point | null;
+  centerAnimationFrameId: number | null;
 }
 
 interface BoardActions {
@@ -23,6 +24,7 @@ interface BoardActions {
   handlePanMove: (event: MouseEvent, zoomLevel: number) => void;
   handlePanEnd: () => void;
   getViewportDimensions: () => { width: number; height: number };
+  centerViewOnPoint: (point: Point, durationMs?: number) => void;
 }
 
 export const useBoardStore = create<BoardState & BoardActions>()((set, get) => ({
@@ -32,6 +34,7 @@ export const useBoardStore = create<BoardState & BoardActions>()((set, get) => (
   viewBox: { x: 0, y: 0, width: 1000, height: 800 },
   isPanning: false,
   lastPanPoint: null,
+  centerAnimationFrameId: null,
 
   setSvgRef: (ref) => set({ svgRef: ref.current }),
   setGridSettings: (settings) => set({ gridSettings: settings }),
@@ -78,9 +81,14 @@ export const useBoardStore = create<BoardState & BoardActions>()((set, get) => (
 
   handlePanStart: (point: Point) => {
     const svgElement = get().svgRef;
+    const { centerAnimationFrameId } = get();
+    if (centerAnimationFrameId != null) {
+      cancelAnimationFrame(centerAnimationFrameId);
+    }
     set(() => ({
       isPanning: true,
       lastPanPoint: point,
+      centerAnimationFrameId: null,
     }));
     if (svgElement) svgElement.classList.add('cursor-grabbing');
   },
@@ -108,5 +116,56 @@ export const useBoardStore = create<BoardState & BoardActions>()((set, get) => (
       lastPanPoint: null,
     }));
     if (svgElement) svgElement.classList.remove('cursor-grabbing');
+  },
+
+  centerViewOnPoint: (point, durationMs = 420) => {
+    const { isPanning, centerAnimationFrameId } = get();
+    if (isPanning) {
+      return;
+    }
+
+    if (centerAnimationFrameId != null) {
+      cancelAnimationFrame(centerAnimationFrameId);
+    }
+
+    const startViewBox = get().viewBox;
+    const targetViewBox = {
+      ...startViewBox,
+      x: point.x - startViewBox.width / 2,
+      y: point.y - startViewBox.height / 2,
+    };
+
+    if (durationMs <= 0) {
+      set({ viewBox: targetViewBox, centerAnimationFrameId: null });
+      return;
+    }
+
+    const startTime = performance.now();
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / durationMs);
+      const eased = easeOutCubic(progress);
+
+      set(() => ({
+        viewBox: {
+          ...startViewBox,
+          x: startViewBox.x + (targetViewBox.x - startViewBox.x) * eased,
+          y: startViewBox.y + (targetViewBox.y - startViewBox.y) * eased,
+        },
+      }));
+
+      if (progress < 1) {
+        const nextFrame = requestAnimationFrame(tick);
+        set({ centerAnimationFrameId: nextFrame });
+        return;
+      }
+
+      set({ centerAnimationFrameId: null });
+    };
+
+    const frameId = requestAnimationFrame(tick);
+    set({ centerAnimationFrameId: frameId });
   },
 }));

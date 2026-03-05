@@ -12,6 +12,7 @@ interface CharacterCardProps {
   instanceCount: number;
   openSheetModal: (characterId: string) => void;
   onDuplicate: (characterId: string) => void | Promise<void>;
+  canDuplicate: boolean;
   onDelete: (characterId: string) => void;
   canDragToBoard: boolean;
   dragDisabledReason?: string;
@@ -22,6 +23,7 @@ export function CharacterCard({
   instanceCount,
   openSheetModal,
   onDuplicate,
+  canDuplicate,
   onDelete,
   canDragToBoard,
   dragDisabledReason,
@@ -126,16 +128,18 @@ export function CharacterCard({
         targetRef={optionsButtonRef}
       >
         <ul className="min-w-[150px]">
-          <li>
-            <button
-              onClick={handleDuplicate}
-              className="hover:bg-accent-secondary block w-full rounded-md px-3 py-2 text-left text-sm"
-              role="menuitem"
-              title="Duplicar personagem"
-            >
-              Duplicar Personagem
-            </button>
-          </li>
+          {canDuplicate ? (
+            <li>
+              <button
+                onClick={handleDuplicate}
+                className="hover:bg-accent-secondary block w-full rounded-md px-3 py-2 text-left text-sm"
+                role="menuitem"
+                title="Duplicar personagem"
+              >
+                Duplicar Personagem
+              </button>
+            </li>
+          ) : null}
           <li>
             <button
               onClick={handleDeleteClick}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 
 import { DiceRollMessage, DiceRollDetails, Message } from '@/shared/api/types';
 
@@ -23,6 +24,7 @@ export function MessageList({
   currentUserId,
   senderOverridesByUserId,
 }: MessageListProps) {
+  const [expandedSystemMessages, setExpandedSystemMessages] = useState<Set<string>>(new Set());
   const formatTimestamp = (date: Date): string => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
@@ -55,22 +57,49 @@ export function MessageList({
           msg.senderUserId != null && currentUserId != null && msg.senderUserId === currentUserId;
         const isOwnMessageByName = normalizedAliases.has(normalizeName(persistedSender));
         const isOwnMessage = isOwnMessageById || isOwnMessageByName;
+        const isSystemMessage = normalizeName(persistedSender) === 'sistema';
         const displaySender = isOwnMessageById ? stripMasterSuffix(currentSender) : persistedSender;
+        const textParts = msg.text.split('\n---\n');
+        const hasExpandableDetails = isSystemMessage && textParts.length > 1;
+        const compactText = hasExpandableDetails ? textParts[0] : msg.text;
+        const detailedText = hasExpandableDetails ? textParts.slice(1).join('\n---\n') : '';
+        const isExpanded = expandedSystemMessages.has(msg.id);
+
+        const toggleSystemMessageDetails = () => {
+          setExpandedSystemMessages((prev) => {
+            const next = new Set(prev);
+            if (next.has(msg.id)) {
+              next.delete(msg.id);
+            } else {
+              next.add(msg.id);
+            }
+            return next;
+          });
+        };
 
         return (
           <div
             key={msg.id}
-            className={`flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'}`}
+            className={`flex flex-col ${isSystemMessage ? 'items-stretch' : isOwnMessage ? 'items-end' : 'items-start'}`}
           >
             <div
               className={`relative max-w-xs rounded-lg p-2.5 shadow md:max-w-md ${
-                isOwnMessage ? 'bg-surface-2 text-text-primary' : 'bg-surface-1'
+                isSystemMessage
+                  ? 'w-full max-w-none border border-accent-primary/40 bg-surface-2 text-text-primary'
+                  : isOwnMessage
+                    ? 'bg-surface-2 text-text-primary'
+                    : 'bg-surface-1'
               } ${msg.isDiceRoll ? 'border border-accent-primary' : ''}`}
             >
               <div className="mb-1 flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold">{displaySender}</span>
                 <span className="ml-2 shrink-0 text-xs opacity-60">{formatTimestamp(msg.timestamp)}</span>
               </div>
+              {isSystemMessage ? (
+                <span className="absolute -top-1.5 -left-2 rounded bg-accent-primary px-1 py-[1px] text-[8px] font-semibold uppercase tracking-wide text-surface-0 ring-1 ring-surface-0">
+                  LOG
+                </span>
+              ) : null}
               {msg.senderColor && !isMasterMessage ? (
                 <span
                   className={`absolute -top-0.5 h-2 w-2 rounded-[2px] ring-2 ring-surface-0 ${
@@ -170,7 +199,25 @@ export function MessageList({
                   })()}
                 </div>
               ) : (
-                <p className="text-sm break-words whitespace-pre-line">{msg.text}</p>
+                <div className="space-y-2">
+                  <p className="text-sm break-words whitespace-pre-line">{compactText}</p>
+                  {hasExpandableDetails ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={toggleSystemMessageDetails}
+                        className="rounded border border-surface-0/40 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide hover:bg-surface-1"
+                      >
+                        {isExpanded ? 'Ocultar detalhes' : 'Ver detalhes'}
+                      </button>
+                      {isExpanded ? (
+                        <p className="border-l-2 border-accent-primary/50 pl-2 text-xs break-words whitespace-pre-line opacity-90">
+                          {detailedText}
+                        </p>
+                      ) : null}
+                    </>
+                  ) : null}
+                </div>
               )}
             </div>
           </div>

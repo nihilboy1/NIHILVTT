@@ -47,6 +47,7 @@ public class GameSessionStateService {
     requireExplicitSnapshotArray(stateNode, "characters");
     requireExplicitSnapshotArray(stateNode, "tokens");
     requireExplicitSnapshotArray(stateNode, "messages");
+    requireExplicitSnapshotCombat(stateNode);
     validatePersistedCharacters(stateNode, gameId, sessionState.getId());
 
     return new GameSessionSnapshotResponse(
@@ -72,6 +73,7 @@ public class GameSessionStateService {
       emptyState.putArray("characters");
       emptyState.putArray("tokens");
       emptyState.putArray("messages");
+      emptyState.putNull("combat");
       return objectMapper.writeValueAsString(emptyState);
     } catch (JsonProcessingException e) {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Falha ao inicializar sessão do jogo.");
@@ -137,6 +139,16 @@ public class GameSessionStateService {
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR,
           "Estado da sessão sem " + fieldName + " válido."
+      );
+    }
+  }
+
+  private void requireExplicitSnapshotCombat(ObjectNode stateNode) {
+    JsonNode value = stateNode.get("combat");
+    if (value == null || !(value.isNull() || value.isObject())) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Estado da sessão sem combat válido."
       );
     }
   }

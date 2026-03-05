@@ -11,6 +11,7 @@ import { useGameStore } from '@/features/game/model/gameStore';
 import { useUIStore } from '@/features/layoutControls/model/store';
 import { useCombatStore } from '@/features/combat/model/store';
 import { buildActionAttackEntries } from '@/features/combat/model/actionEntryAdapters';
+import { canUserControlToken } from '@/features/game/model/tokenControlPolicy';
 import { AttackEntry, PendingAttackSelection } from '@/shared/api/types';
 import { DraggablePanel } from '@/shared/ui/DraggablePanel';
 import { FloatingPanelDragBar } from '@/shared/ui/FloatingPanelDragBar';
@@ -137,6 +138,10 @@ export function TokenActionBar({
       return false;
     }
 
+    if (currentGame.owner.id === currentUser.id) {
+      return true;
+    }
+
     if (!runtimeCharacter) {
       console.error(
         'Violação de contrato de sessão: TokenActionBar recebeu token sem runtime compartilhado.',
@@ -145,15 +150,11 @@ export function TokenActionBar({
       return false;
     }
 
-    if (runtimeCharacter.type === 'NPC') {
-      return currentGame.owner.id === currentUser.id;
-    }
-
-    if (runtimeCharacter.controlledByUserId == null) {
-      return currentGame.owner.id === currentUser.id;
-    }
-
-    return runtimeCharacter.controlledByUserId === currentUser.id;
+    return canUserControlToken({
+      gameOwnerUserId: currentGame.owner.id,
+      currentUserId: currentUser.id,
+      runtimeCharacter,
+    });
   }, [currentGame, currentUser, runtimeCharacter, token]);
 
   if (!token || !character || attackEntries.length === 0 || !canActInCombat || !canCurrentUserControlToken) {
@@ -161,17 +162,15 @@ export function TokenActionBar({
   }
 
   const activeAttackId = pendingAttack?.attackerTokenId === token.id ? pendingAttack.attack.id : null;
-  const panelWidth = 384;
-  const estimatedPanelHeight = 260;
   const rightInset = isRightSidebarVisible ? 400 : 16;
   const initialPosition = {
     x:
       typeof window !== 'undefined'
-        ? Math.max(16, window.innerWidth - panelWidth - rightInset)
+        ? Math.max(16, window.innerWidth - rightInset)
         : 16,
     y:
       typeof window !== 'undefined'
-        ? Math.max(16, window.innerHeight - estimatedPanelHeight - 16)
+        ? Math.max(16, window.innerHeight - 16)
         : 16,
   };
 
@@ -189,12 +188,9 @@ export function TokenActionBar({
         width: 'min(24rem, calc(100vw - 2rem))',
       }}
     >
-      <FloatingPanelDragBar title="Arrastar barra de ações do token" />
+      <FloatingPanelDragBar title="Ações do token" />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex flex-1 flex-col rounded-lg px-1 py-0.5 text-text-secondary/80">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-text-secondary">
-            Ações do Token
-          </p>
           <p className="truncate text-sm font-bold text-text-primary">{character.name}</p>
         </div>
         {pendingAttack?.attackerTokenId === token.id ? (

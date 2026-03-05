@@ -97,7 +97,7 @@ Jogos:
 
 - Estado base da mesa persistido em banco na tabela `game_session_state`.
 - Snapshot inclui `version` (serverVersion) e payload JSON (`characters`, `tokens`, `messages`).
-- O payload de snapshot deve expor `characters`, `tokens`, `messages` e `recentEvents` explicitamente; o backend nao deve omitir arrays vazios esperando que o cliente preencha defaults.
+- O payload de snapshot deve expor `characters`, `tokens`, `messages`, `combat` e `recentEvents` explicitamente; o backend nao deve omitir arrays vazios nem o estado nulo de combate esperando que o cliente preencha defaults.
 - Antes de devolver o snapshot, o backend exige que o `stateJson` persisted continue parseável e com raiz-objeto válida; se o JSON estiver corrompido, o snapshot falha explicitamente (sem fallback para estado vazio).
 - O mesmo padrão vale para comandos de mutação: o backend não reconstrói estado vazio quando o `stateJson` estiver corrompido; ele falha explicitamente e interrompe a mutação.
 - Antes de devolver o snapshot, o backend também revalida `state.characters` contra o contrato runtime; se houver personagem persistido inválido, o snapshot falha explicitamente em vez de propagar estado corrompido.
@@ -128,6 +128,8 @@ Jogos:
   - backend persiste em `state.characters[]`, incrementa `version` e publica `CHARACTER_CREATED`
   - cliente envia `POST /games/{gameId}/session/characters/duplicate`
   - backend clona o personagem runtime com novo `id`, gera um novo nome derivado no formato `Nome [N]`, incrementa `version` e publica `CHARACTER_CREATED`
+  - duplicacao de personagem e exclusiva do mestre; usuario nao-owner recebe `403`
+  - quando a origem da duplicacao e uma ficha `Player`, a copia nasce com `controlledByUserId: null` (controle inicial do mestre), sem herdar ownership do personagem de origem
   - quando a origem da duplicacao e um `NPC`, o backend nao clona o runtime mutavel; ele instancia um novo `MonsterCharacterState` fresco a partir do mesmo `monsterId` (preservando apenas overrides visuais/textuais), mantendo HP/recursos/efeitos resetados como no spawn da Biblioteca
   - cliente envia `POST /games/{gameId}/session/characters/duplicate-with-token`
   - backend executa a clonagem e a criação do token no mesmo commit, incrementa `version` uma única vez e publica `TOKEN_CREATED` com `character` + `token` no payload, evitando clones órfãos no fluxo de `Ctrl+V`
@@ -153,7 +155,7 @@ Jogos:
   - mestre pode avançar turno com `POST /games/{gameId}/session/combat/next-turn`; o backend atualiza `turnIndex`/`round` e publica `COMBAT_TURN_ADVANCED`
   - mestre pode encerrar combate com `POST /games/{gameId}/session/combat/end`; o backend limpa `combat` e publica `COMBAT_ENDED`
   - membro com acesso ao jogo pode enviar `POST /games/{gameId}/session/combat/attacks`
-  - se nao houver combate ativo, o backend inicia combate automaticamente com atacante + alvo antes de resolver o primeiro ataque e publica `COMBAT_STARTED`
+  - ataques fora de combate formal devem falhar; o backend nao deve instanciar combate implicitamente a partir de ataque
   - no MVP atual, o frontend envia `attackBonus` e `damageFormula`, e o backend deriva a CA do alvo a partir do runtime + catálogo (via `catalog/item-catalog-manifest.json`), rederiva `Ataque desarmado` internamente, valida que ataques `builtin-*` de arma só usem itens realmente equipados pelo atacante, resolve a rolagem de ataque (`1d20`), aplica hit/miss, rola dano, consome `hitPoints.temporary` antes de `hitPoints.current` e publica `ATTACK_RESOLVED`
   - quando tokens/personagens saem da mesa, o backend sincroniza `combat.participants[]`; se nao restar participante, o estado de combate e limpo
 - o fluxo de concessão de item e a compatibilidade de slots passam a usar o manifest canônico `catalog/item-catalog-manifest.json`, gerado pelo `DATAMODELING`, sem heurística de prefixo no backend

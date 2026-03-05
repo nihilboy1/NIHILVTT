@@ -1820,6 +1820,11 @@ public class GameSessionCommandService {
       ArrayNode charactersNode,
       String tokenId
   ) {
+    Long ownerUserId = game.getOwner().getId();
+    if (ownerUserId.equals(userId)) {
+      return;
+    }
+
     ObjectNode tokenNode = findTokenById(tokensNode, tokenId);
     if (tokenNode == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token não encontrado na sessão.");
@@ -1835,15 +1840,11 @@ public class GameSessionCommandService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem do token não encontrado na sessão.");
     }
 
-    Long ownerUserId = game.getOwner().getId();
     if ("NPC".equals(characterNode.path("type").asText("").trim())) {
-      if (!ownerUserId.equals(userId)) {
-        throw new ResponseStatusException(
-            HttpStatus.FORBIDDEN,
-            "NPCs são de uso exclusivo do mestre."
-        );
-      }
-      return;
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN,
+          "NPCs são de uso exclusivo do mestre."
+      );
     }
 
     Long controlledByUserId = readControlledByUserId(characterNode);
@@ -1872,14 +1873,15 @@ public class GameSessionCommandService {
       ObjectNode characterNode
   ) {
     Long ownerUserId = game.getOwner().getId();
-    if ("NPC".equals(characterNode.path("type").asText("").trim())) {
-      if (!ownerUserId.equals(userId)) {
-        throw new ResponseStatusException(
-            HttpStatus.FORBIDDEN,
-            "Somente o mestre pode instanciar tokens de NPC."
-        );
-      }
+    if (ownerUserId.equals(userId)) {
       return;
+    }
+
+    if ("NPC".equals(characterNode.path("type").asText("").trim())) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN,
+          "Somente o mestre pode instanciar tokens de NPC."
+      );
     }
 
     Long controlledByUserId = readControlledByUserId(characterNode);
@@ -2538,21 +2540,17 @@ public class GameSessionCommandService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do personagem é obrigatório.");
     }
     duplicatedCharacterNode.put("name", buildDuplicatedCharacterName(charactersNode, sourceName));
-    normalizeControlledByUserIdField(duplicatedCharacterNode);
+    writeControlledByUserId(duplicatedCharacterNode, null);
 
     SessionCharacterPayloadValidator.validatePersistedCharacter(duplicatedCharacterNode);
     return duplicatedCharacterNode;
   }
 
   private void ensureUserCanDuplicateCharacter(GameEntity game, Long userId, ObjectNode sourceCharacterNode) {
-    if (!"NPC".equals(sourceCharacterNode.path("type").asText("").trim())) {
-      return;
-    }
-
     if (!game.getOwner().getId().equals(userId)) {
       throw new ResponseStatusException(
           HttpStatus.FORBIDDEN,
-          "Somente o mestre pode duplicar monstros."
+          "Somente o mestre pode duplicar personagens."
       );
     }
   }

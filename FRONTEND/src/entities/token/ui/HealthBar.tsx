@@ -5,11 +5,12 @@ const HEALTH_BAR_CORNER_RADIUS = 1; // Raio da borda da barra de vida
 interface HealthBarProps {
   currentHp: number | undefined;
   maxHp: number | undefined;
+  tempHp?: number | undefined;
   tokenRenderWidth: number; // Usar a largura do token para a barra de vida
   zoomLevel: number;
 }
 
-export function HealthBar({ currentHp, maxHp, tokenRenderWidth, zoomLevel }: HealthBarProps) {
+export function HealthBar({ currentHp, maxHp, tempHp, tokenRenderWidth, zoomLevel }: HealthBarProps) {
   const showHealthBar = maxHp !== undefined && maxHp > 0 && currentHp !== undefined;
   if (!showHealthBar) {
     return null;
@@ -19,6 +20,9 @@ export function HealthBar({ currentHp, maxHp, tokenRenderWidth, zoomLevel }: Hea
   const actualMaxHp = maxHp ?? 0;
   const clampedCurrentHp = Math.max(0, Math.min(actualCurrentHp, actualMaxHp));
   const healthPercentage = actualMaxHp > 0 ? clampedCurrentHp / actualMaxHp : 0;
+  const actualTempHp = Math.max(0, tempHp ?? 0);
+  const showTempHpBar = actualTempHp > 0;
+  const tempHpNormalized = actualMaxHp > 0 ? Math.min(actualTempHp / actualMaxHp, 1) : 0;
 
   const healthBarTotalWidth = tokenRenderWidth;
   const healthBarHeightScaled = Math.max(1, HEALTH_BAR_HEIGHT / zoomLevel);
@@ -26,13 +30,39 @@ export function HealthBar({ currentHp, maxHp, tokenRenderWidth, zoomLevel }: Hea
 
   // Posição Y da barra de vida (acima do token)
   const healthBarY = -healthBarHeightScaled - HEALTH_BAR_MARGIN_TOP / zoomLevel;
+  const tempBarYOffset = showTempHpBar ? healthBarHeightScaled + 1 / zoomLevel : 0;
 
   const healthBarForegroundWidth = healthBarTotalWidth * healthPercentage;
+  const tempBarForegroundWidth = healthBarTotalWidth * tempHpNormalized;
 
   const cornerRadius = Math.min(HEALTH_BAR_CORNER_RADIUS / zoomLevel, HEALTH_BAR_CORNER_RADIUS);
 
   return (
     <g transform={`translate(0, ${healthBarY})`}>
+      {showTempHpBar && (
+        <g transform={`translate(0, ${-tempBarYOffset})`}>
+          <rect
+            x="0"
+            y="0"
+            width={healthBarTotalWidth}
+            height={healthBarHeightScaled}
+            fill={'var(--color-surface-0)'}
+            rx={cornerRadius}
+            ry={cornerRadius}
+            stroke={'var(--color-surface-0)'}
+            strokeWidth={healthBarStrokeWidth}
+          />
+          <rect
+            x={healthBarStrokeWidth / 2}
+            y={healthBarStrokeWidth / 2}
+            width={Math.max(0, tempBarForegroundWidth - healthBarStrokeWidth)}
+            height={healthBarHeightScaled - healthBarStrokeWidth}
+            fill={'var(--color-accent-secondary)'}
+            rx={Math.max(0, cornerRadius - healthBarStrokeWidth / 2)}
+            ry={Math.max(0, cornerRadius - healthBarStrokeWidth / 2)}
+          />
+        </g>
+      )}
       {/* Background da barra de vida */}
       <rect
         x="0"
@@ -48,7 +78,7 @@ export function HealthBar({ currentHp, maxHp, tokenRenderWidth, zoomLevel }: Hea
       <rect
         x={healthBarStrokeWidth / 2}
         y={healthBarStrokeWidth / 2}
-        width={healthBarForegroundWidth - healthBarStrokeWidth}
+        width={Math.max(0, healthBarForegroundWidth - healthBarStrokeWidth)}
         height={healthBarHeightScaled - healthBarStrokeWidth}
         fill={'var(--color-feedback-positive-hover)'}
         rx={Math.max(0, cornerRadius - healthBarStrokeWidth / 2)}

@@ -31,6 +31,8 @@ import com.nihilvtt.auth.game.service.GameSessionStateService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -48,6 +50,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/games")
 public class GameController {
+  private static final Logger logger = LoggerFactory.getLogger(GameController.class);
   private final GameService gameService;
   private final GameSessionStateService gameSessionStateService;
   private final GameSessionCommandService gameSessionCommandService;
@@ -75,7 +78,21 @@ public class GameController {
       HttpServletRequest httpRequest
   ) {
     Long ownerId = (Long) authentication.getPrincipal();
+    logger.info(
+        "event=game_create_request_received ownerId={} titleLength={} descriptionPresent={} origin={} remoteIp={}",
+        ownerId,
+        request.title() != null ? request.title().length() : 0,
+        request.description() != null && !request.description().isBlank(),
+        httpRequest.getHeader("Origin"),
+        extractClientIp(httpRequest)
+    );
     GameResponse created = gameService.createGame(ownerId, request, extractClientIp(httpRequest));
+    logger.info(
+        "event=game_create_response_sent gameId={} ownerId={} joinCode={}",
+        created.id(),
+        ownerId,
+        created.joinCode()
+    );
     return ResponseEntity.status(HttpStatus.CREATED).body(created);
   }
 

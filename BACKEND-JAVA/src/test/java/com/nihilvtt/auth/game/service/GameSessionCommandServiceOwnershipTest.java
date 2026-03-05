@@ -118,6 +118,97 @@ class GameSessionCommandServiceOwnershipTest {
   }
 
   @Test
+  void createToken_allowsMasterToInstantiateTokenEvenWhenCharacterBelongsToAnotherPlayer() throws Exception {
+    Long ownerUserId = 7L;
+    Long assignedControllerUserId = 33L;
+    Long gameId = 21L;
+    String characterId = "11111111-1111-4111-8111-111111111111";
+
+    GameAccessService gameAccessService = mock(GameAccessService.class);
+    GameMemberRepository gameMemberRepository = mock(GameMemberRepository.class);
+    GameSessionStateRepository gameSessionStateRepository = mock(GameSessionStateRepository.class);
+    SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
+    ItemCatalogManifestService itemCatalogManifestService = mock(ItemCatalogManifestService.class);
+    MonsterCatalogManifestService monsterCatalogManifestService = mock(MonsterCatalogManifestService.class);
+
+    GameEntity game = buildGame(ownerUserId, gameId);
+    GameSessionStateEntity sessionState = new GameSessionStateEntity();
+    sessionState.setId(305L);
+    sessionState.setGame(game);
+    sessionState.setVersion(12L);
+    sessionState.setStateJson(playerStateJson(characterId, assignedControllerUserId));
+
+    when(gameAccessService.requireGameWithAccess(gameId, ownerUserId)).thenReturn(game);
+    when(gameSessionStateRepository.findByGameId(gameId)).thenReturn(Optional.of(sessionState));
+    when(gameSessionStateRepository.save(any(GameSessionStateEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    GameSessionCommandService service = new GameSessionCommandService(
+        gameAccessService,
+        gameMemberRepository,
+        gameSessionStateRepository,
+        objectMapper,
+        messagingTemplate,
+        itemCatalogManifestService,
+        monsterCatalogManifestService
+    );
+
+    GameSessionEventResponse event = service.createToken(ownerUserId, gameId, characterId, "default-scene", 2, 3);
+
+    assertEquals("TOKEN_CREATED", event.type());
+    assertEquals(13L, event.serverVersion());
+    assertEquals(characterId, event.payload().path("token").path("characterId").asText());
+    assertEquals(2, event.payload().path("token").path("position").path("x").asInt());
+    assertEquals(3, event.payload().path("token").path("position").path("y").asInt());
+
+    JsonNode persistedState = objectMapper.readTree(sessionState.getStateJson());
+    assertEquals(1, persistedState.path("tokens").size());
+  }
+
+  @Test
+  void moveToken_allowsMasterToMoveTokenEvenWhenCharacterBelongsToAnotherPlayer() {
+    Long ownerUserId = 7L;
+    Long assignedControllerUserId = 33L;
+    Long gameId = 21L;
+    String characterId = "11111111-1111-4111-8111-111111111111";
+    String tokenId = "token-1";
+
+    GameAccessService gameAccessService = mock(GameAccessService.class);
+    GameMemberRepository gameMemberRepository = mock(GameMemberRepository.class);
+    GameSessionStateRepository gameSessionStateRepository = mock(GameSessionStateRepository.class);
+    SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
+    ItemCatalogManifestService itemCatalogManifestService = mock(ItemCatalogManifestService.class);
+    MonsterCatalogManifestService monsterCatalogManifestService = mock(MonsterCatalogManifestService.class);
+
+    GameEntity game = buildGame(ownerUserId, gameId);
+    GameSessionStateEntity sessionState = new GameSessionStateEntity();
+    sessionState.setId(306L);
+    sessionState.setGame(game);
+    sessionState.setVersion(20L);
+    sessionState.setStateJson(playerStateWithTokenJson(characterId, assignedControllerUserId, tokenId, 1, 1));
+
+    when(gameAccessService.requireGameWithAccess(gameId, ownerUserId)).thenReturn(game);
+    when(gameSessionStateRepository.findByGameId(gameId)).thenReturn(Optional.of(sessionState));
+    when(gameSessionStateRepository.save(any(GameSessionStateEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    GameSessionCommandService service = new GameSessionCommandService(
+        gameAccessService,
+        gameMemberRepository,
+        gameSessionStateRepository,
+        objectMapper,
+        messagingTemplate,
+        itemCatalogManifestService,
+        monsterCatalogManifestService
+    );
+
+    GameSessionEventResponse event = service.moveToken(ownerUserId, gameId, tokenId, 4, 6);
+
+    assertEquals("TOKEN_MOVED", event.type());
+    assertEquals(21L, event.serverVersion());
+    assertEquals(4, event.payload().path("position").path("x").asInt());
+    assertEquals(6, event.payload().path("position").path("y").asInt());
+  }
+
+  @Test
   void createToken_rejectsNpcInstantiationForNonMaster() {
     Long ownerUserId = 7L;
     Long playerUserId = 33L;
@@ -204,6 +295,91 @@ class GameSessionCommandServiceOwnershipTest {
     assertTrue(sessionState.getStateJson().contains("\"type\": \"NPC\""));
   }
 
+  @Test
+  void duplicateCharacter_rejectsNonMasterEvenWhenCharacterBelongsToTheSamePlayer() {
+    Long ownerUserId = 7L;
+    Long playerUserId = 33L;
+    Long gameId = 21L;
+    String characterId = "11111111-1111-4111-8111-111111111111";
+
+    GameAccessService gameAccessService = mock(GameAccessService.class);
+    GameMemberRepository gameMemberRepository = mock(GameMemberRepository.class);
+    GameSessionStateRepository gameSessionStateRepository = mock(GameSessionStateRepository.class);
+    SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
+    ItemCatalogManifestService itemCatalogManifestService = mock(ItemCatalogManifestService.class);
+    MonsterCatalogManifestService monsterCatalogManifestService = mock(MonsterCatalogManifestService.class);
+
+    GameEntity game = buildGame(ownerUserId, gameId);
+    GameSessionStateEntity sessionState = new GameSessionStateEntity();
+    sessionState.setId(307L);
+    sessionState.setGame(game);
+    sessionState.setVersion(30L);
+    sessionState.setStateJson(playerStateJson(characterId, playerUserId));
+
+    when(gameAccessService.requireGameWithAccess(gameId, playerUserId)).thenReturn(game);
+    when(gameSessionStateRepository.findByGameId(gameId)).thenReturn(Optional.of(sessionState));
+
+    GameSessionCommandService service = new GameSessionCommandService(
+        gameAccessService,
+        gameMemberRepository,
+        gameSessionStateRepository,
+        objectMapper,
+        messagingTemplate,
+        itemCatalogManifestService,
+        monsterCatalogManifestService
+    );
+
+    ResponseStatusException exception = assertThrows(
+        ResponseStatusException.class,
+        () -> service.duplicateCharacter(playerUserId, gameId, characterId)
+    );
+
+    assertEquals(403, exception.getStatusCode().value());
+    assertEquals(30L, sessionState.getVersion());
+  }
+
+  @Test
+  void duplicateCharacter_setsControlledByUserIdToNullForPlayerClone() {
+    Long ownerUserId = 7L;
+    Long assignedControllerUserId = 33L;
+    Long gameId = 21L;
+    String characterId = "11111111-1111-4111-8111-111111111111";
+
+    GameAccessService gameAccessService = mock(GameAccessService.class);
+    GameMemberRepository gameMemberRepository = mock(GameMemberRepository.class);
+    GameSessionStateRepository gameSessionStateRepository = mock(GameSessionStateRepository.class);
+    SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
+    ItemCatalogManifestService itemCatalogManifestService = mock(ItemCatalogManifestService.class);
+    MonsterCatalogManifestService monsterCatalogManifestService = mock(MonsterCatalogManifestService.class);
+
+    GameEntity game = buildGame(ownerUserId, gameId);
+    GameSessionStateEntity sessionState = new GameSessionStateEntity();
+    sessionState.setId(308L);
+    sessionState.setGame(game);
+    sessionState.setVersion(31L);
+    sessionState.setStateJson(playerStateJson(characterId, assignedControllerUserId));
+
+    when(gameAccessService.requireGameWithAccess(gameId, ownerUserId)).thenReturn(game);
+    when(gameSessionStateRepository.findByGameId(gameId)).thenReturn(Optional.of(sessionState));
+    when(gameSessionStateRepository.save(any(GameSessionStateEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    GameSessionCommandService service = new GameSessionCommandService(
+        gameAccessService,
+        gameMemberRepository,
+        gameSessionStateRepository,
+        objectMapper,
+        messagingTemplate,
+        itemCatalogManifestService,
+        monsterCatalogManifestService
+    );
+
+    GameSessionEventResponse event = service.duplicateCharacter(ownerUserId, gameId, characterId);
+
+    assertEquals("CHARACTER_CREATED", event.type());
+    assertTrue(event.payload().path("character").has("controlledByUserId"));
+    assertTrue(event.payload().path("character").path("controlledByUserId").isNull());
+  }
+
   private String playerStateJson(String characterId, Long controlledByUserId) {
     String controlledByUserIdJson = controlledByUserId == null ? "null" : controlledByUserId.toString();
 
@@ -281,6 +457,79 @@ class GameSessionCommandServiceOwnershipTest {
           "messages": []
         }
         """.formatted(characterId);
+  }
+
+  private String playerStateWithTokenJson(
+      String characterId,
+      Long controlledByUserId,
+      String tokenId,
+      int tokenX,
+      int tokenY
+  ) {
+    String controlledByUserIdJson = controlledByUserId == null ? "null" : controlledByUserId.toString();
+
+    return """
+        {
+          "characters": [
+            {
+              "id": "%s",
+              "type": "Player",
+              "name": "Heroi",
+              "image": null,
+              "notes": null,
+              "controlledByUserId": %s,
+              "build": {
+                "classId": "class-fighter",
+                "originId": "origin-acolyte",
+                "specieId": "specie-aasimar",
+                "subclassId": null,
+                "selectedFeatIds": []
+              },
+              "progression": {
+                "currentLevel": 1,
+                "pendingLevelUps": 0
+              },
+              "attributes": {
+                "base": {
+                  "strength": 10,
+                  "dexterity": 10,
+                  "constitution": 10,
+                  "intelligence": 10,
+                  "wisdom": 10,
+                  "charisma": 10
+                }
+              },
+              "hitPoints": {
+                "current": 10,
+                "max": 10,
+                "temporary": 0
+              },
+              "inspiration": false,
+              "inventory": { "items": [] },
+              "equipment": {
+                "bodyArmorItemId": null,
+                "shieldItemId": null,
+                "mainHandWeaponId": null,
+                "offHandWeaponId": null
+              },
+              "resourcePools": { "pools": [] },
+              "activeEffects": { "effects": [] }
+            }
+          ],
+          "tokens": [
+            {
+              "id": "%s",
+              "characterId": "%s",
+              "sceneId": "default-scene",
+              "position": {
+                "x": %d,
+                "y": %d
+              }
+            }
+          ],
+          "messages": []
+        }
+        """.formatted(characterId, controlledByUserIdJson, tokenId, characterId, tokenX, tokenY);
   }
 
   private GameEntity buildGame(Long ownerUserId, Long gameId) {

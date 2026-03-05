@@ -7,7 +7,6 @@ import { useUIStore } from "@/features/layoutControls/model/store";
 import { useBoardSettingsStore } from "@/features/boardSettings/model/store";
 import { ModalEntry } from "@/features/modalManager/model/baseModalConfig";
 import { useSessionModalStore } from "@/features/modalManager/model/sessionModalStore";
-import { applyGameSessionEvent } from "@/features/game/model/gameSessionEventHandlers";
 import {
   sendGameCharacterHpUpdate,
   sendGameCharacterTempHpUpdate,
@@ -19,9 +18,11 @@ import {
 import { useAuthStore } from "@/features/auth/model/authStore";
 import { useGameStore } from "@/features/game/model/gameStore";
 import { useCombatStore } from "@/features/combat/model/store";
+import { canUserControlToken } from '@/features/game/model/tokenControlPolicy';
 
 import { useSelectedTokenStore } from "../../../../entities/token/model/store/selectedTokenStore";
 import { useTokenStore } from "../../../../entities/token/model/store/tokenStore";
+import { parseTokenSize } from "../../../../entities/token/model/utils/tokenUtils";
 import {
   Tool,
   type AttackEntry,
@@ -66,13 +67,30 @@ function isTargetWithinAttackRange(
   target: Token,
   rangeMeters: number,
   metersPerSquare: number,
+  attackerSize: string,
+  targetSize: string,
 ): boolean {
   if (rangeMeters <= 0 || metersPerSquare <= 0) {
     return false;
   }
 
-  const deltaX = Math.abs(attacker.position.x - target.position.x);
-  const deltaY = Math.abs(attacker.position.y - target.position.y);
+  const [attackerWidth, attackerHeight] = parseTokenSize(attackerSize);
+  const [targetWidth, targetHeight] = parseTokenSize(targetSize);
+
+  const attackerMinX = attacker.position.x;
+  const attackerMinY = attacker.position.y;
+  const attackerMaxX = attackerMinX + attackerWidth - 1;
+  const attackerMaxY = attackerMinY + attackerHeight - 1;
+
+  const targetMinX = target.position.x;
+  const targetMinY = target.position.y;
+  const targetMaxX = targetMinX + targetWidth - 1;
+  const targetMaxY = targetMinY + targetHeight - 1;
+
+  const deltaX =
+    attackerMinX > targetMaxX ? attackerMinX - targetMaxX : targetMinX > attackerMaxX ? targetMinX - attackerMaxX : 0;
+  const deltaY =
+    attackerMinY > targetMaxY ? attackerMinY - targetMaxY : targetMinY > attackerMaxY ? targetMinY - attackerMaxY : 0;
   const distanceSquares = Math.max(deltaX, deltaY);
   const distanceMeters = distanceSquares * metersPerSquare;
 
@@ -111,7 +129,9 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
   const { characters, runtimeCharactersById } = useCharactersStore();
   const { tokensOnBoard } = useTokenStore();
   const metersPerSquare = useBoardSettingsStore((state) => state.gridSettings.metersPerSquare);
-  const { activeTool, activePopover } = useUIStore();
+  const activeTool = useUIStore((state) => state.activeTool);
+  const activePopover = useUIStore((state) => state.activePopover);
+  const setActiveTool = useUIStore((state) => state.setActiveTool);
   const currentGame = useGameStore((state) => state.currentGame);
   const combatState = useCombatStore((state) => state.combatState);
   const user = useAuthStore((state) => state.user);
@@ -148,6 +168,10 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         return false;
       }
 
+      if (currentGame.owner.id === user.id) {
+        return true;
+      }
+
       const token = tokensOnBoard.find((entry: Token) => entry.id === tokenId);
       if (!token) {
         return false;
@@ -162,22 +186,18 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         return false;
       }
 
-      if (runtimeCharacter.type === 'NPC') {
-        return currentGame.owner.id === user.id;
-      }
-
-      if (runtimeCharacter.controlledByUserId == null) {
-        return currentGame.owner.id === user.id;
-      }
-
-      return runtimeCharacter.controlledByUserId === user.id;
+      return canUserControlToken({
+        gameOwnerUserId: currentGame.owner.id,
+        currentUserId: user.id,
+        runtimeCharacter,
+      });
     },
     [currentGame, runtimeCharactersById, tokensOnBoard, user],
   );
 
   const canCurrentUserAccessTokenContext = useCallback(
-    (tokenId: string | null) => isGameMaster || canCurrentUserControlToken(tokenId),
-    [canCurrentUserControlToken, isGameMaster],
+    (_tokenId: string | null) => isGameMaster,
+    [isGameMaster],
   );
 
   const handleClearMultiSelection = useCallback(() => {
@@ -200,6 +220,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         isCombatParticipant(combatState, selectedTokenId) &&
         activeCombatTurnTokenId !== selectedTokenId
       ) {
+        toast.error('Aguarde o seu turno para agir no combate.');
         return;
       }
 
@@ -208,10 +229,11 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         attack,
         targetTokenId: null,
       });
+      setActiveTool(Tool.SELECT);
       setMultiSelectedTokenIds([selectedTokenId]);
       closeModalByName('hpControl');
     },
-    [activeCombatTurnTokenId, canCurrentUserControlToken, closeModalByName, combatState, selectedTokenId],
+    [activeCombatTurnTokenId, canCurrentUserControlToken, closeModalByName, combatState, selectedTokenId, setActiveTool],
   );
 
   const handleCancelPendingAttack = useCallback(() => {
@@ -293,9 +315,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       }
 
       void sendGameCharacterHpUpdate(parsedGameId, token.characterId, mode, amount)
-        .then((event) => {
-          applyGameSessionEvent(event);
-        })
+        .then(() => {})
         .catch((error) => {
           console.warn("Falha ao sincronizar HP do personagem com o servidor.");
           const message =
@@ -340,9 +360,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       }
 
       void sendGameCharacterTempHpUpdate(parsedGameId, token.characterId, amount)
-        .then((event) => {
-          applyGameSessionEvent(event);
-        })
+        .then(() => {})
         .catch((error) => {
           console.warn("Falha ao sincronizar HP temporário do personagem com o servidor.");
           const message =
@@ -367,8 +385,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       }
 
       try {
-        const event = await sendGameRemoveToken(parsedGameId, tokenId);
-        applyGameSessionEvent(event);
+        await sendGameRemoveToken(parsedGameId, tokenId);
       } catch {
         console.warn("Falha ao remover token no servidor.");
       }
@@ -385,8 +402,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       }
 
       try {
-        const event = await sendGameRemoveTokens(parsedGameId, tokenIds);
-        applyGameSessionEvent(event);
+        await sendGameRemoveTokens(parsedGameId, tokenIds);
       } catch {
         console.warn("Falha ao remover tokens no servidor.");
       }
@@ -425,7 +441,6 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         nextPosition.x,
         nextPosition.y,
       );
-      applyGameSessionEvent(createCloneTokenEvent);
 
       const createdToken = createCloneTokenEvent.payload?.token;
       const createdTokenId =
@@ -511,7 +526,20 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
   const handleSetMultiSelectedTokenIds = useCallback(
     // Renomeado
     (ids: string[]) => {
+      if (pendingAttack && ids.length !== 1) {
+        toast.error('Selecione um alvo válido.');
+        setSelectedTokenId(pendingAttack.attackerTokenId);
+        setMultiSelectedTokenIds([pendingAttack.attackerTokenId]);
+        return;
+      }
+
       if (pendingAttack && ids.length === 1) {
+        console.info('[attack-flow] target-click', {
+          attackerTokenId: pendingAttack.attackerTokenId,
+          clickedTokenId: ids[0],
+          attackId: pendingAttack.attack.id,
+          attackLabel: pendingAttack.attack.label,
+        });
         if (
           isCombatParticipant(combatState, pendingAttack.attackerTokenId) &&
           activeCombatTurnTokenId !== pendingAttack.attackerTokenId
@@ -525,6 +553,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         const targetTokenId = ids[0];
 
         if (targetTokenId === pendingAttack.attackerTokenId) {
+          toast.error('Você não pode ser alvo desse efeito.');
           setSelectedTokenId(pendingAttack.attackerTokenId);
           setMultiSelectedTokenIds([pendingAttack.attackerTokenId]);
           return;
@@ -541,17 +570,50 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         );
         const targetToken = tokensOnBoard.find((token: Token) => token.id === targetTokenId);
         if (!attackerToken || !targetToken) {
+          console.info('[attack-flow] abort-missing-token', {
+            attackerFound: Boolean(attackerToken),
+            targetFound: Boolean(targetToken),
+            attackerTokenId: pendingAttack.attackerTokenId,
+            targetTokenId,
+          });
           return;
         }
+        const attackerCharacter = characters.find((character) => character.id === attackerToken.characterId);
+        const targetCharacter = characters.find((character) => character.id === targetToken.characterId);
+        if (!attackerCharacter || !targetCharacter) {
+          console.error('Violação de contrato de sessão: token sem personagem para validação de alcance.', {
+            attackerTokenId: attackerToken.id,
+            attackerCharacterId: attackerToken.characterId,
+            attackerCharacterFound: Boolean(attackerCharacter),
+            targetTokenId: targetToken.id,
+            targetCharacterId: targetToken.characterId,
+            targetCharacterFound: Boolean(targetCharacter),
+          });
+          toast.error('Falha ao validar alcance do ataque. Recarregue a sessão.');
+          setPendingAttack(null);
+          setMultiSelectedTokenIds([]);
+          setSelectedTokenId(null);
+          return;
+        }
+        const attackerSize = attackerCharacter.size;
+        const targetSize = targetCharacter.size;
 
         const isWithinRange = isTargetWithinAttackRange(
           attackerToken,
           targetToken,
           pendingAttack.attack.rangeMeters,
           metersPerSquare,
+          attackerSize,
+          targetSize,
         );
 
         if (!isWithinRange) {
+          console.info('[attack-flow] abort-out-of-range', {
+            attackerTokenId: pendingAttack.attackerTokenId,
+            targetTokenId,
+            rangeMeters: pendingAttack.attack.rangeMeters,
+          });
+          toast.error('Alvo fora do alcance deste ataque.');
           setMultiSelectedTokenIds([pendingAttack.attackerTokenId]);
           setSelectedTokenId(pendingAttack.attackerTokenId);
           return;
@@ -564,6 +626,15 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
         setMultiSelectedTokenIds([pendingAttack.attackerTokenId, targetTokenId]);
         closeModalByName('hpControl');
 
+        console.info('[attack-flow] resolve-request:start', {
+          gameId: parsedGameId,
+          attackerTokenId: pendingAttack.attackerTokenId,
+          targetTokenId,
+          attackId: pendingAttack.attack.id,
+          attackName: pendingAttack.attack.label,
+          attackBonus: pendingAttack.attack.attackBonus,
+          damageFormula: pendingAttack.attack.damageFormula,
+        });
         void sendGameResolveAttack(
           parsedGameId,
           pendingAttack.attackerTokenId,
@@ -574,14 +645,25 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
           pendingAttack.attack.damageFormula,
         )
           .then((event) => {
-            applyGameSessionEvent(event);
+            console.info('[attack-flow] resolve-request:success', {
+              eventType: event.type,
+              eventId: event.eventId,
+            });
             setPendingAttack(null);
-            setSelectedTokenId(targetTokenId);
-            setMultiSelectedTokenIds([targetTokenId]);
-            openModal('hpControl', { tokenId: targetTokenId });
+            setSelectedTokenId(null);
+            setMultiSelectedTokenIds([]);
+            closeModalByName('hpControl');
           })
-          .catch(() => {
-            console.warn('Falha ao resolver ataque no servidor.');
+          .catch((error) => {
+            console.warn('[attack-flow] resolve-request:error', error);
+            const message =
+              typeof error === 'object' &&
+              error !== null &&
+              'formError' in error &&
+              typeof (error as { formError?: unknown }).formError === 'string'
+                ? (error as { formError: string }).formError
+                : 'Falha ao resolver ataque no servidor.';
+            toast.error(message);
             setPendingAttack(null);
             setMultiSelectedTokenIds([pendingAttack.attackerTokenId]);
             setSelectedTokenId(pendingAttack.attackerTokenId);
@@ -629,6 +711,7 @@ export const useGameBoardInteraction = (): UseGameBoardInteractionReturn => {
       updateModalProps,
       pendingAttack,
       metersPerSquare,
+      characters,
     ]
   );
 

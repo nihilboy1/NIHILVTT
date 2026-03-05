@@ -39,7 +39,6 @@ export function SessionModalManager({
 }: SessionModalManagerProps) {
   const { modalStack, closeModal } = useSessionModalStore();
   const characters = useCharactersStore((state) => state.characters);
-  const runtimeCharactersById = useCharactersStore((state) => state.runtimeCharactersById);
   const { tokensOnBoard } = useTokenStore();
   const currentGame = useGameStore((state) => state.currentGame);
   const user = useAuthStore((state) => state.user);
@@ -152,17 +151,7 @@ export function SessionModalManager({
             const characterForHPModal = selectedTokenForHP
               ? characters.find((c) => c.id === selectedTokenForHP.characterId)
               : null;
-            const runtimeCharacterForHPModal = selectedTokenForHP
-              ? runtimeCharactersById[selectedTokenForHP.characterId] ?? null
-              : null;
-            const canAccessHpControl =
-              isGameMaster ||
-              (
-                runtimeCharacterForHPModal != null &&
-                runtimeCharacterForHPModal.type === 'Player' &&
-                runtimeCharacterForHPModal.controlledByUserId != null &&
-                runtimeCharacterForHPModal.controlledByUserId === user?.id
-              );
+            const canAccessHpControl = isGameMaster;
 
             return (
               props.tokenId &&

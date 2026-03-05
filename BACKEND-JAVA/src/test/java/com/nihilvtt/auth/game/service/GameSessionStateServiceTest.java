@@ -33,7 +33,7 @@ class GameSessionStateServiceTest {
     GameEntity game = buildGame(gameId);
     GameSessionStateEntity sessionState = buildState(
         game,
-        "{\"characters\":[],\"tokens\":[],\"messages\":[]}"
+        "{\"characters\":[],\"tokens\":[],\"messages\":[],\"combat\":null}"
     );
 
     when(gameAccessService.requireGameWithAccess(gameId, userId)).thenReturn(game);
@@ -46,6 +46,7 @@ class GameSessionStateServiceTest {
     assertEquals(0, response.state().get("characters").size());
     assertEquals(0, response.state().get("tokens").size());
     assertEquals(0, response.state().get("messages").size());
+    assertEquals(true, response.state().get("combat").isNull());
     assertEquals(0, response.recentEvents().size());
   }
 
@@ -69,6 +70,28 @@ class GameSessionStateServiceTest {
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
     assertEquals("Estado da sessão sem tokens válido.", exception.getReason());
+  }
+
+  @Test
+  void getSnapshot_failsWhenCombatFieldIsMissing() {
+    Long userId = 10L;
+    Long gameId = 20L;
+    GameEntity game = buildGame(gameId);
+    GameSessionStateEntity sessionState = buildState(
+        game,
+        "{\"characters\":[],\"tokens\":[],\"messages\":[]}"
+    );
+
+    when(gameAccessService.requireGameWithAccess(gameId, userId)).thenReturn(game);
+    when(gameSessionStateRepository.findByGameId(gameId)).thenReturn(Optional.of(sessionState));
+
+    ResponseStatusException exception = assertThrows(
+        ResponseStatusException.class,
+        () -> service.getSnapshot(userId, gameId)
+    );
+
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
+    assertEquals("Estado da sessão sem combat válido.", exception.getReason());
   }
 
   private GameEntity buildGame(Long gameId) {

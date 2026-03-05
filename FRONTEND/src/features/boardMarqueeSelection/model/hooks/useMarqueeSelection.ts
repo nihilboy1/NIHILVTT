@@ -6,6 +6,7 @@ import { GridSettings, MarqueeSelectionState, Point, Token } from '@/shared/api/
 
 interface UseMarqueeSelectionProps {
   activeTool: string;
+  isSelectionLocked?: boolean;
   getSVGPoint: (clientX: number, clientY: number) => Point;
   tokensOnBoard: Token[];
   characters: Character[];
@@ -16,6 +17,7 @@ interface UseMarqueeSelectionProps {
 
 export function useMarqueeSelection({
   activeTool,
+  isSelectionLocked = false,
   getSVGPoint,
   tokensOnBoard,
   characters,
@@ -31,7 +33,7 @@ export function useMarqueeSelection({
 
   const handleMarqueeMouseDown = useCallback(
     (event: React.MouseEvent<SVGSVGElement>) => {
-      if (activeTool !== 'SELECT') return;
+      if (activeTool !== 'SELECT' || isSelectionLocked) return;
       onClearMultiSelection();
       const startPt = getSVGPoint(event.clientX, event.clientY);
       setMarqueeSelection({
@@ -40,7 +42,7 @@ export function useMarqueeSelection({
         currentPoint: startPt,
       });
     },
-    [activeTool, getSVGPoint, onClearMultiSelection],
+    [activeTool, getSVGPoint, isSelectionLocked, onClearMultiSelection],
   );
 
   const handleMarqueeMouseMove = useCallback(

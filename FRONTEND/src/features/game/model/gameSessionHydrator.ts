@@ -5,6 +5,7 @@ import { useSelectedTokenStore } from '@/entities/token/model/store/selectedToke
 import { useTokenStore } from '@/entities/token/model/store/tokenStore';
 import { useChatStore } from '@/features/chat/model/store';
 import { useCombatStore } from '@/features/combat/model/store';
+import { useAttackFeedbackStore } from '@/features/combat/model/attackFeedbackStore';
 import type { CombatState } from '@/shared/api/types';
 
 import { type GameSessionSnapshot } from './gameSessionApi';
@@ -92,31 +93,87 @@ export function resetGameSessionClientState(): void {
   useCharactersStore.getState().replaceCharacters([]);
   useChatStore.getState().clearMessages();
   useCombatStore.getState().clearCombatState();
+  useAttackFeedbackStore.getState().clearAllFeedback();
+}
+
+function parseSnapshotTokens(entries: unknown[]) {
+  return entries.map((entry, index) => {
+    const parsed = tokenSchema.safeParse(entry);
+    if (!parsed.success) {
+      const formattedError = JSON.stringify(z.treeifyError(parsed.error), null, 2);
+      console.error('Violação de contrato de sessão em hydrateGameSessionSnapshot.tokens.', {
+        index,
+        entry,
+        validation: formattedError,
+      });
+      throw new Error('Violação de contrato de sessão em hydrateGameSessionSnapshot.tokens: token inválido.');
+    }
+
+    return parsed.data;
+  });
+}
+
+function parseSnapshotMessages(entries: unknown[]) {
+  return entries.map((entry, index) => {
+    const parsed = messageSchema.safeParse(entry);
+    if (!parsed.success) {
+      const formattedError = JSON.stringify(z.treeifyError(parsed.error), null, 2);
+      console.error('Violação de contrato de sessão em hydrateGameSessionSnapshot.messages.', {
+        index,
+        entry,
+        validation: formattedError,
+      });
+      throw new Error('Violação de contrato de sessão em hydrateGameSessionSnapshot.messages: mensagem inválida.');
+    }
+
+    return {
+      ...parsed.data,
+      timestamp: parsed.data.timestamp instanceof Date ? parsed.data.timestamp : new Date(parsed.data.timestamp),
+    };
+  });
+}
+
+function parseSnapshotCombat(entry: unknown): CombatState | null {
+  if (entry == null) {
+    return null;
+  }
+
+  const parsed = combatStateSchema.safeParse(entry);
+  if (!parsed.success) {
+    const formattedError = JSON.stringify(z.treeifyError(parsed.error), null, 2);
+    console.error('Violação de contrato de sessão em hydrateGameSessionSnapshot.combat.', {
+      entry,
+      validation: formattedError,
+    });
+    throw new Error('Violação de contrato de sessão em hydrateGameSessionSnapshot.combat: combate inválido.');
+  }
+
+  return parsed.data as CombatState;
 }
 
 export function hydrateGameSessionSnapshot(snapshot: GameSessionSnapshot): void {
+  console.debug('[gameSession] hydrate snapshot begin', {
+    characters: snapshot.state.characters?.length ?? 0,
+    tokens: snapshot.state.tokens?.length ?? 0,
+    messages: snapshot.state.messages?.length ?? 0,
+    hasCombat: snapshot.state.combat != null,
+  });
   const rawCharacters = snapshot.state.characters;
-
-  const rawTokens = snapshot.state.tokens;
-  const parsedTokens = rawTokens
-    .map((entry) => tokenSchema.safeParse(entry))
-    .filter((result): result is z.ZodSafeParseSuccess<z.infer<typeof tokenSchema>> => result.success)
-    .map((result) => result.data);
-
-  const rawMessages = snapshot.state.messages;
-  const parsedMessages = rawMessages
-    .map((entry) => messageSchema.safeParse(entry))
-    .filter((result): result is z.ZodSafeParseSuccess<z.infer<typeof messageSchema>> => result.success)
-    .map((result) => ({
-      ...result.data,
-      timestamp: result.data.timestamp instanceof Date ? result.data.timestamp : new Date(result.data.timestamp),
-    }));
-
-  const parsedCombat = combatStateSchema.safeParse(snapshot.state.combat);
+  const parsedTokens = parseSnapshotTokens(snapshot.state.tokens);
+  const parsedMessages = parseSnapshotMessages(snapshot.state.messages);
+  const parsedCombat = parseSnapshotCombat(snapshot.state.combat);
 
   useCharactersStore.getState().replaceCharacters(rawCharacters);
   useTokenStore.getState().replaceTokens(parsedTokens);
   useChatStore.getState().replaceMessages(parsedMessages);
-  useCombatStore.getState().setCombatState(parsedCombat.success ? (parsedCombat.data as CombatState) : null);
+  useCombatStore.getState().setCombatState(parsedCombat);
+  useAttackFeedbackStore.getState().clearAllFeedback();
   useSelectedTokenStore.getState().setSelectedTokenId(null);
+  console.debug('[gameSession] hydrate snapshot complete', {
+    characters: rawCharacters.length,
+    tokens: parsedTokens.length,
+    messages: parsedMessages.length,
+    combatParticipants: parsedCombat?.participants.length ?? 0,
+    combatTurnIndex: parsedCombat?.turnIndex ?? null,
+  });
 }

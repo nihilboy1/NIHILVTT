@@ -2,6 +2,17 @@ import { expect, test } from '@playwright/test';
 
 import { buildUser, clearClientSession, registerUser } from './helpers/auth';
 
+async function createGameAndEnter(page: import('@playwright/test').Page, title: string) {
+  await page.goto('/games/new');
+  await expect(page.getByRole('heading', { name: /Criar Novo Jogo/i })).toBeVisible();
+
+  await page.getByLabel('Nome do jogo').fill(title);
+  await page.getByRole('button', { name: 'CRIAR JOGO' }).click();
+
+  await expect(page).toHaveURL(/\/game\/\d+$/);
+  await expect(page.getByLabel(/Esconder Barra Lateral Direita/i)).toBeVisible();
+}
+
 
 test('refresh automático mantém sessão após recarregar a página', async ({ page }) => {
   const user = buildUser('refresh-success');
@@ -48,4 +59,35 @@ test('aviso de sessão não aparece constantemente após login', async ({ page }
 
   await expect(page.getByText(/Sua sessão expira em breve/i)).toHaveCount(0);
   await expect(page.getByText(/Sessão expirada\. Tentando renovar automaticamente\./i)).toHaveCount(0);
+});
+
+test('mesa recém-criada mantém sessão vazia após recarregar', async ({ page }) => {
+  const user = buildUser('game-refresh-empty');
+  await registerUser(page, user);
+
+  await createGameAndEnter(page, `Mesa ${user.name}`);
+
+  await page.reload();
+
+  await expect(page).toHaveURL(/\/game\/\d+$/);
+  await expect(page.getByLabel(/Esconder Barra Lateral Direita/i)).toBeVisible();
+  await expect(page.getByLabel(/Entrada de mensagem do chat/i)).toBeVisible();
+});
+
+test('chat da mesa persiste após recarregar a página', async ({ page }) => {
+  const user = buildUser('game-refresh-chat');
+  await registerUser(page, user);
+
+  const message = `mensagem-e2e-${Date.now()}`;
+  await createGameAndEnter(page, `Mesa ${user.name}`);
+
+  await page.getByLabel(/Entrada de mensagem do chat/i).fill(message);
+  await page.getByRole('button', { name: /^Enviar$/i }).click();
+
+  await expect(page.getByText(message)).toBeVisible();
+
+  await page.reload();
+
+  await expect(page).toHaveURL(/\/game\/\d+$/);
+  await expect(page.getByText(message)).toBeVisible();
 });

@@ -31,6 +31,7 @@ const gameSessionSnapshotSchema = z.object({
       characters: z.array(z.unknown()),
       tokens: z.array(z.unknown()),
       messages: z.array(z.unknown()),
+      combat: z.object({}).passthrough().nullable(),
     })
     .passthrough(),
   recentEvents: z.array(z.unknown()),

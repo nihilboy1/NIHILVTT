@@ -18,6 +18,8 @@ export function TokenVisual({ metrics }: TokenVisualProps) {
       y="0"
       width={metrics.tokenRenderWidth}
       height={metrics.tokenRenderHeight}
+      pointerEvents="none"
+      style={{ userSelect: 'none' }}
       // Adiciona um fallback visual para imagens quebradas, se necessário,
       // mas a tag <img> nativamente já mostra um ícone de quebra.
       // Para SVG, 'image' tag não tem um 'alt' ou 'onerror' direto como HTML <img>.
