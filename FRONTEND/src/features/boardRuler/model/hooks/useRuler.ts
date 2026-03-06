@@ -14,7 +14,7 @@ interface UseRulerProps {
   rulerPlacementMode: RulerPlacementMode;
   rulerPersists: boolean;
   gridSettings: GridSettings;
-  getSVGPoint: (clientX: number, clientY: number) => Point;
+  getWorldPoint: (clientX: number, clientY: number) => Point;
 }
 
 export function useRuler({
@@ -22,7 +22,7 @@ export function useRuler({
   rulerPlacementMode,
   rulerPersists,
   gridSettings,
-  getSVGPoint,
+  getWorldPoint,
 }: UseRulerProps) {
   const [rulerPath, setRulerPath] = useState<RulerPathState>({
     isActive: false,
@@ -39,38 +39,38 @@ export function useRuler({
   }, []);
 
   const handleRulerMouseDown = useCallback(
-    (event: React.MouseEvent<SVGSVGElement>) => {
+    (event: React.MouseEvent<Element>) => {
       if (activeTool !== 'RULER') return;
 
-      const startPointSvg = getSVGPoint(event.clientX, event.clientY);
+      const startPointWorld = getWorldPoint(event.clientX, event.clientY);
       const startPoint =
         rulerPlacementMode === RulerPlacementMode.SNAP_TO_CENTER
-          ? snapToGridCenter(startPointSvg, gridSettings.visualCellSize)
-          : startPointSvg;
+          ? snapToGridCenter(startPointWorld, gridSettings.visualCellSize)
+          : startPointWorld;
       setRulerPath({
         isActive: true,
         points: [{ point: startPoint, cumulativeDistanceMeters: 0 }],
         liveEndPoint: startPoint,
       });
     },
-    [activeTool, getSVGPoint, rulerPlacementMode, snapToGridCenter, gridSettings.visualCellSize],
+    [activeTool, getWorldPoint, rulerPlacementMode, snapToGridCenter, gridSettings.visualCellSize],
   );
 
   const handleRulerMouseMove = useCallback(
     (event: MouseEvent) => {
       if (rulerPath.isActive && activeTool === 'RULER') {
-        const currentPointSvg = getSVGPoint(event.clientX, event.clientY);
+        const currentPointWorld = getWorldPoint(event.clientX, event.clientY);
         const currentPoint =
           rulerPlacementMode === RulerPlacementMode.SNAP_TO_CENTER
-            ? snapToGridCenter(currentPointSvg, gridSettings.visualCellSize)
-            : currentPointSvg;
+            ? snapToGridCenter(currentPointWorld, gridSettings.visualCellSize)
+            : currentPointWorld;
         setRulerPath((prev) => ({ ...prev, liveEndPoint: currentPoint }));
       }
     },
     [
       rulerPath.isActive,
       activeTool,
-      getSVGPoint,
+      getWorldPoint,
       rulerPlacementMode,
       snapToGridCenter,
       gridSettings.visualCellSize,
@@ -120,7 +120,7 @@ export function useRuler({
   );
 
   const handleRulerRightClick = useCallback(
-    (event: React.MouseEvent<SVGSVGElement>) => {
+    (event: React.MouseEvent<Element>) => {
       event.preventDefault();
       if (activeTool === 'RULER' && rulerPath.isActive) {
         if (!rulerPath.liveEndPoint || rulerPath.points.length === 0) return;

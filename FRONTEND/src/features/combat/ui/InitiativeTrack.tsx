@@ -1,22 +1,22 @@
 import { useMemo, useState } from 'react';
 
-import { useUIStore } from '@/features/layoutControls/model/store';
-import { DraggablePanel } from '@/shared/ui/DraggablePanel';
 
+import { useCharactersStore } from '@/entities/character/model/store';
+import { useTokenStore } from '@/entities/token/model/store/tokenStore';
 import { useAuthStore } from '@/features/auth/model/authStore';
-import { useGameStore } from '@/features/game/model/gameStore';
+import { useCombatStore } from '@/features/combat/model/store';
 import {
   sendGameAdvanceCombatTurn,
   sendGameEndCombat,
   sendGameStartCombat,
 } from '@/features/game/model/gameSessionApi';
 import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
-import { useCharactersStore } from '@/entities/character/model/store';
-import { useTokenStore } from '@/entities/token/model/store/tokenStore';
-import { useCombatStore } from '@/features/combat/model/store';
-import { AppButton } from '@/shared/ui/AppButton';
-import { FloatingPanelDragBar } from '@/shared/ui/FloatingPanelDragBar';
+import { useGameStore } from '@/features/game/model/gameStore';
+import { useUIStore } from '@/features/layoutControls/model/store';
 import { cn } from '@/shared/lib/utils/cn';
+import { AppButton } from '@/shared/ui/AppButton';
+import { DraggablePanel } from '@/shared/ui/DraggablePanel';
+import { FloatingPanelDragBar } from '@/shared/ui/FloatingPanelDragBar';
 
 interface InitiativeTrackProps {
   selectedTokenIds: string[];

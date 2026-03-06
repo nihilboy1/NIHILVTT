@@ -32,7 +32,6 @@ export const useAttackFeedbackStore = create<AttackFeedbackStoreState>((set) => 
   feedbackByTokenId: {},
 
   pushFeedback: (entry) => {
-    console.info('[attack-feedback] pushFeedback', entry);
     clearTimer(entry.tokenId);
 
     set((state) => ({
@@ -43,7 +42,6 @@ export const useAttackFeedbackStore = create<AttackFeedbackStoreState>((set) => 
     }));
 
     const timer = setTimeout(() => {
-      console.info('[attack-feedback] auto-clear', { tokenId: entry.tokenId, id: entry.id });
       set((state) => {
         if (!state.feedbackByTokenId[entry.tokenId]) {
           return state;
@@ -60,7 +58,6 @@ export const useAttackFeedbackStore = create<AttackFeedbackStoreState>((set) => 
   },
 
   clearFeedbackForToken: (tokenId) => {
-    console.info('[attack-feedback] clearFeedbackForToken', { tokenId });
     clearTimer(tokenId);
     set((state) => {
       if (!state.feedbackByTokenId[tokenId]) {
@@ -73,7 +70,6 @@ export const useAttackFeedbackStore = create<AttackFeedbackStoreState>((set) => 
   },
 
   clearAllFeedback: () => {
-    console.info('[attack-feedback] clearAllFeedback');
     for (const tokenId of feedbackTimers.keys()) {
       clearTimer(tokenId);
     }

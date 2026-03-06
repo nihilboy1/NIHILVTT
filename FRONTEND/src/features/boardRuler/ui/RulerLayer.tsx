@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { RulerPathState, RulerPointData, GridSettings } from '../../../shared/api/types';
 import { calculateDistanceInMeters } from '../../../entities/board/model/utils/boardUtils';
+import { RulerPathState, RulerPointData, GridSettings } from '../../../shared/api/types';
 // 2. A interface de props agora define que o componente deve receber o 'rulerPath'.
 interface RulerLayerProps {
   rulerPath: RulerPathState;

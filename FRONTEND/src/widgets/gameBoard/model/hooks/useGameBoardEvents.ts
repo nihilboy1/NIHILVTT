@@ -1,28 +1,31 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from 'react';
 
-import { Point, Tool } from "../../../../shared/api/types";
+import { Point, Tool } from '../../../../shared/api/types';
 
 interface UseGameBoardEventsProps {
-  svgRef: React.RefObject<SVGSVGElement | null>;
+  viewportRef: React.RefObject<HTMLElement | null>;
   activeTool: Tool;
+  getWorldPoint: (clientX: number, clientY: number) => Point;
   isPanning: boolean;
   handlePanStart: (point: Point) => void;
   handlePanMove: (event: MouseEvent) => void;
-  handlePanEnd: (event: MouseEvent) => void; 
-  handleRulerMouseDown: (event: React.MouseEvent<SVGSVGElement>) => void;
+  handlePanEnd: (event: MouseEvent) => void;
+  handleRulerMouseDown: (event: React.MouseEvent<Element>) => void;
   handleRulerMouseMove: (event: MouseEvent) => void;
   handleRulerMouseUp: (event: MouseEvent) => void;
-  handleRulerRightClick: (event: React.MouseEvent<SVGSVGElement>) => void;
-  handleMarqueeMouseDown: (event: React.MouseEvent<SVGSVGElement>) => void;
+  handleRulerRightClick: (event: React.MouseEvent<Element>) => void;
+  handleMarqueeMouseDown: (event: React.MouseEvent<Element>) => void;
   handleMarqueeMouseMove: (event: MouseEvent) => void;
   handleMarqueeMouseUp: (event: MouseEvent) => void;
+  onBoardSelectAtPoint?: (point: Point) => boolean;
+  onBoardPointerDownAtPoint?: (point: Point, event: React.MouseEvent<Element>) => boolean;
   onBackgroundClick: (() => void) | undefined;
-  onClearMultiSelection: () => void;
 }
 
 export const useGameBoardEvents = ({
-  svgRef,
+  viewportRef,
   activeTool,
+  getWorldPoint,
   isPanning,
   handlePanStart,
   handlePanMove,
@@ -34,33 +37,44 @@ export const useGameBoardEvents = ({
   handleMarqueeMouseDown,
   handleMarqueeMouseMove,
   handleMarqueeMouseUp,
+  onBoardSelectAtPoint,
+  onBoardPointerDownAtPoint,
   onBackgroundClick,
 }: UseGameBoardEventsProps) => {
   const handleMouseDown = useCallback(
-    (event: React.MouseEvent<SVGSVGElement>) => {
+    (event: React.MouseEvent<Element>) => {
       const isRMB = event.button === 2;
       const isLMB = event.button === 0;
-      const targetElement = event.target as SVGElement;
-      const isTokenClick = targetElement.closest(".board-token-group");
-
-      // If it's a token click, let useBoardTokenDrag handle it.
-      if (isTokenClick) return;
 
       // If it's a background click (not on a token)
       if (isLMB) {
-        // Always call onBackgroundClick for a left-click on the background
-        if (onBackgroundClick) {
-          onBackgroundClick();
-        }
-
         if (activeTool === Tool.SELECT) {
+          const point = getWorldPoint(event.clientX, event.clientY);
+          const handledByPointerDown = onBoardPointerDownAtPoint?.(point, event) ?? false;
+          if (handledByPointerDown) {
+            return;
+          }
+          const pickedOnBoard = onBoardSelectAtPoint?.(point) ?? false;
+          if (!pickedOnBoard && onBackgroundClick) {
+            onBackgroundClick();
+          }
+          if (pickedOnBoard) {
+            return;
+          }
           handleMarqueeMouseDown(event);
         } else if (activeTool === Tool.PAN) {
+          if (onBackgroundClick) {
+            onBackgroundClick();
+          }
           handlePanStart({ x: event.clientX, y: event.clientY });
         } else if (activeTool === Tool.RULER) {
+          if (onBackgroundClick) {
+            onBackgroundClick();
+          }
           handleRulerMouseDown(event);
+        } else if (onBackgroundClick) {
+          onBackgroundClick();
         }
-        // No 'else' needed here, as onBackgroundClick is already called
       }
 
       if (isRMB) {
@@ -76,11 +90,14 @@ export const useGameBoardEvents = ({
     [
       activeTool,
       onBackgroundClick,
+      onBoardSelectAtPoint,
+      onBoardPointerDownAtPoint,
+      getWorldPoint,
       handleMarqueeMouseDown,
       handlePanStart,
       handleRulerMouseDown,
       handleRulerRightClick,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -104,12 +121,12 @@ export const useGameBoardEvents = ({
       }
     };
 
-    window.addEventListener("mousemove", handleGlobalMouseMove);
-    window.addEventListener("mouseup", handleGlobalMouseUp);
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
 
     return () => {
-      window.removeEventListener("mousemove", handleGlobalMouseMove);
-      window.removeEventListener("mouseup", handleGlobalMouseUp);
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
     };
   }, [
     activeTool,
@@ -123,27 +140,27 @@ export const useGameBoardEvents = ({
   ]);
 
   useEffect(() => {
-    if (svgRef.current) {
-      svgRef.current.classList.remove(
-        "cursor-default",
-        "cursor-grab",
-        "cursor-grabbing",
-        "cursor-pointer",
-        "cursor-crosshair"
+    if (viewportRef.current) {
+      viewportRef.current.classList.remove(
+        'cursor-default',
+        'cursor-grab',
+        'cursor-grabbing',
+        'cursor-pointer',
+        'cursor-crosshair',
       );
       if (isPanning) {
-        svgRef.current.classList.add("cursor-grabbing");
+        viewportRef.current.classList.add('cursor-grabbing');
       } else if (activeTool === Tool.PAN) {
-        svgRef.current.classList.add("cursor-grab");
+        viewportRef.current.classList.add('cursor-grab');
       } else if (activeTool === Tool.SELECT) {
-        svgRef.current.classList.add("cursor-crosshair");
+        viewportRef.current.classList.add('cursor-crosshair');
       } else if (activeTool === Tool.RULER) {
-        svgRef.current.classList.add("cursor-crosshair");
+        viewportRef.current.classList.add('cursor-crosshair');
       } else {
-        svgRef.current.classList.add("cursor-default");
+        viewportRef.current.classList.add('cursor-default');
       }
     }
-  }, [activeTool, isPanning, svgRef]);
+  }, [activeTool, isPanning, viewportRef]);
 
   return {
     handleMouseDown,

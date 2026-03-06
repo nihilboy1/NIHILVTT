@@ -18,7 +18,7 @@ export function GameBoardSideOption({
     <div
       title="pageSettingsOptions"
       className={cn(
-        "border bg-surface-0 absolute top-2 flex flex-col items-end space-y-2 rounded",
+        "border bg-surface-0 absolute top-2 z-40 flex flex-col items-end space-y-2 rounded pointer-events-auto",
         isRightSidebarVisible ? "right-[21rem] md:right-[25rem]" : "right-2"
       )}
     >

@@ -1,12 +1,18 @@
 import { useCallback } from 'react';
+
 import { toast } from 'sonner';
 
 import { Character, CharacterTypeEnum } from '@/entities/character/model/schemas/character.schema';
 import { parseTokenSize } from '@/entities/token/model/utils/tokenUtils';
 import { GridSettings, PageSettings, Point } from '@/shared/api/types';
+import {
+  clampGridCellToBoard,
+  isWorldPointInsideBoard,
+  worldPointToGridCell,
+} from '@/shared/lib/board/boardMath';
 
 interface UseCharacterDropProps {
-  getSVGPoint: (clientX: number, clientY: number) => Point;
+  getWorldPoint: (clientX: number, clientY: number) => Point;
   characters: Character[];
   gridSettings: GridSettings;
   pageSettings: PageSettings;
@@ -17,7 +23,7 @@ interface UseCharacterDropProps {
 }
 
 export function useCharacterDrop({
-  getSVGPoint,
+  getWorldPoint,
   characters,
   gridSettings,
   pageSettings,
@@ -26,33 +32,31 @@ export function useCharacterDrop({
   canSpawnMonsterFromCompendium,
   canCreateTokenForCharacter,
 }: UseCharacterDropProps) {
-  const handleDragOver = useCallback((event: React.DragEvent<SVGSVGElement>) => {
+  const handleDragOver = useCallback((event: React.DragEvent<Element>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
   const handleCharacterDrop = useCallback(
-    (event: React.DragEvent<SVGSVGElement>) => {
+    (event: React.DragEvent<Element>) => {
       event.preventDefault();
       const monsterId = event.dataTransfer.getData('application/vtt-monster-id').trim();
       const characterId = event.dataTransfer.getData('application/vtt-character-id');
-      const dropPoint = getSVGPoint(event.clientX, event.clientY);
+      const dropPoint = getWorldPoint(event.clientX, event.clientY);
       const cellSize = gridSettings.visualCellSize;
-      const pageActualWidth = pageSettings.widthInUnits * cellSize;
-      const pageActualHeight = pageSettings.heightInUnits * cellSize;
-      if (
-        dropPoint.x < 0 ||
-        dropPoint.x > pageActualWidth ||
-        dropPoint.y < 0 ||
-        dropPoint.y > pageActualHeight
-      ) {
+      if (!isWorldPointInsideBoard({ worldPoint: dropPoint, pageSettings, cellSize })) {
         return;
       }
 
-      let gridX = Math.floor(dropPoint.x / cellSize);
-      let gridY = Math.floor(dropPoint.y / cellSize);
-      gridX = Math.max(0, Math.min(gridX, pageSettings.widthInUnits - 1));
-      gridY = Math.max(0, Math.min(gridY, pageSettings.heightInUnits - 1));
+      const rawGridCell = worldPointToGridCell({
+        worldPoint: dropPoint,
+        cellSize,
+        roundMode: 'floor',
+      });
+      const baseGridCell = clampGridCellToBoard({
+        gridCell: rawGridCell,
+        pageSettings,
+      });
 
       if (monsterId) {
         if (!canSpawnMonsterFromCompendium) {
@@ -60,7 +64,7 @@ export function useCharacterDrop({
           return;
         }
 
-        spawnMonsterFromCatalog(monsterId, { x: gridX, y: gridY });
+        spawnMonsterFromCatalog(monsterId, baseGridCell);
         return;
       }
 
@@ -73,17 +77,11 @@ export function useCharacterDrop({
         }
 
         const [sizeMultiplierX, sizeMultiplierY] = parseTokenSize(character.size);
-        let snappedGridX = gridX;
-        let snappedGridY = gridY;
-
-        snappedGridX = Math.max(
-          0,
-          Math.min(snappedGridX, pageSettings.widthInUnits - Math.ceil(sizeMultiplierX)),
-        );
-        snappedGridY = Math.max(
-          0,
-          Math.min(snappedGridY, pageSettings.heightInUnits - Math.ceil(sizeMultiplierY)),
-        );
+        const boundedGridCell = clampGridCellToBoard({
+          gridCell: baseGridCell,
+          pageSettings,
+          tokenSizeInCells: [sizeMultiplierX, sizeMultiplierY],
+        });
 
         const initialHp =
           character.type === CharacterTypeEnum.enum.Player ||
@@ -91,11 +89,11 @@ export function useCharacterDrop({
             ? character.combatStats.maxHp
             : undefined;
 
-        addToken(characterId, { x: snappedGridX, y: snappedGridY }, initialHp);
+        addToken(characterId, boundedGridCell, initialHp);
       }
     },
     [
-      getSVGPoint,
+      getWorldPoint,
       characters,
       gridSettings,
       pageSettings,

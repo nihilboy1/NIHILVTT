@@ -1,11 +1,16 @@
 import { create } from 'zustand';
 
+import { calculateInitialViewBox } from '@/entities/board/model/utils/boardUtils';
 import { GridSettings, PageSettings, Point } from '@/shared/api/types';
 import { ZOOM_CONFIG } from '@/shared/config/constants';
-import { calculateInitialViewBox } from '@/entities/board/model/utils/boardUtils';
+import {
+  applyPanDeltaToViewBox,
+  clientToViewportPoint,
+  viewportToWorldPoint,
+} from '@/shared/lib/board/boardMath';
 
 interface BoardState {
-  svgRef: SVGSVGElement | null;
+  viewportRef: HTMLElement | null;
   gridSettings: GridSettings;
   pageSettings: PageSettings;
   viewBox: { x: number; y: number; width: number; height: number };
@@ -15,11 +20,11 @@ interface BoardState {
 }
 
 interface BoardActions {
-  setSvgRef: (ref: React.RefObject<SVGSVGElement | null>) => void;
+  setViewportRef: (ref: React.RefObject<HTMLElement | null>) => void;
   setGridSettings: (settings: GridSettings) => void;
   setPageSettings: (settings: PageSettings) => void;
   initializeViewBox: (setZoomLevel: (level: number) => void) => void;
-  getSVGPoint: (clientX: number, clientY: number, zoomLevel: number) => Point;
+  getWorldPoint: (clientX: number, clientY: number, zoomLevel: number) => Point;
   handlePanStart: (point: Point) => void;
   handlePanMove: (event: MouseEvent, zoomLevel: number) => void;
   handlePanEnd: () => void;
@@ -28,7 +33,7 @@ interface BoardActions {
 }
 
 export const useBoardStore = create<BoardState & BoardActions>()((set, get) => ({
-  svgRef: null,
+  viewportRef: null,
   gridSettings: { visualCellSize: 50, lineColor: '#788475', metersPerSquare: 1.5 }, // Default values
   pageSettings: { widthInUnits: 30, heightInUnits: 30, backgroundColor: '#FFFFFF' }, // Default values
   viewBox: { x: 0, y: 0, width: 1000, height: 800 },
@@ -36,16 +41,19 @@ export const useBoardStore = create<BoardState & BoardActions>()((set, get) => (
   lastPanPoint: null,
   centerAnimationFrameId: null,
 
-  setSvgRef: (ref) => set({ svgRef: ref.current }),
+  setViewportRef: (ref) => set({ viewportRef: ref.current }),
   setGridSettings: (settings) => set({ gridSettings: settings }),
   setPageSettings: (settings) => set({ pageSettings: settings }),
 
   getViewportDimensions: () => {
-    const svgElement = get().svgRef;
-    if (svgElement) {
+    const viewportElement = get().viewportRef;
+    if (viewportElement) {
+      const rect = viewportElement.getBoundingClientRect();
+      const widthFromRect = Math.max(1, Math.floor(rect.width));
+      const heightFromRect = Math.max(1, Math.floor(rect.height));
       return {
-        width: svgElement.clientWidth,
-        height: svgElement.clientHeight,
+        width: Math.max(1, widthFromRect),
+        height: Math.max(1, heightFromRect),
       };
     }
     return { width: 1000, height: 800 };
@@ -66,21 +74,30 @@ export const useBoardStore = create<BoardState & BoardActions>()((set, get) => (
     setZoomLevel(ZOOM_CONFIG.INITIAL);
   },
 
-  getSVGPoint: (clientX: number, clientY: number, zoomLevel: number): Point => {
-    const { svgRef, viewBox } = get();
-    if (!svgRef) return { x: 0, y: 0 };
-    const svgRect = svgRef.getBoundingClientRect();
-    const svgRectLeft = Math.round(svgRect.left);
-    const svgRectTop = Math.round(svgRect.top);
-    const svgX = clientX - svgRectLeft;
-    const svgY = clientY - svgRectTop;
-    const worldX = viewBox.x + svgX / zoomLevel;
-    const worldY = viewBox.y + svgY / zoomLevel;
-    return { x: worldX, y: worldY };
+  getWorldPoint: (clientX: number, clientY: number, zoomLevel: number): Point => {
+    void zoomLevel;
+    const { viewportRef, viewBox } = get();
+    const viewportElement = viewportRef;
+    if (!viewportElement) return { x: 0, y: 0 };
+    const viewportRect = viewportElement.getBoundingClientRect();
+    const viewportPoint = clientToViewportPoint({
+      clientX,
+      clientY,
+      viewportLeft: viewportRect.left,
+      viewportTop: viewportRect.top,
+    });
+    return viewportToWorldPoint({
+      viewportPoint,
+      viewBox,
+      viewport: {
+        width: viewportRect.width,
+        height: viewportRect.height,
+      },
+    });
   },
 
   handlePanStart: (point: Point) => {
-    const svgElement = get().svgRef;
+    const viewportElement = get().viewportRef;
     const { centerAnimationFrameId } = get();
     if (centerAnimationFrameId != null) {
       cancelAnimationFrame(centerAnimationFrameId);
@@ -90,7 +107,7 @@ export const useBoardStore = create<BoardState & BoardActions>()((set, get) => (
       lastPanPoint: point,
       centerAnimationFrameId: null,
     }));
-    if (svgElement) svgElement.classList.add('cursor-grabbing');
+    if (viewportElement) viewportElement.classList.add('cursor-grabbing');
   },
 
   handlePanMove: (event: MouseEvent, zoomLevel: number) => {
@@ -99,23 +116,24 @@ export const useBoardStore = create<BoardState & BoardActions>()((set, get) => (
       const dx = event.clientX - lastPanPoint.x;
       const dy = event.clientY - lastPanPoint.y;
       set((state) => ({
-        viewBox: {
-          ...state.viewBox,
-          x: state.viewBox.x - dx / zoomLevel,
-          y: state.viewBox.y - dy / zoomLevel,
-        },
+        viewBox: applyPanDeltaToViewBox({
+          viewBox: state.viewBox,
+          deltaClientX: dx,
+          deltaClientY: dy,
+          zoomLevel,
+        }),
         lastPanPoint: { x: event.clientX, y: event.clientY },
       }));
     }
   },
 
   handlePanEnd: () => {
-    const svgElement = get().svgRef;
+    const viewportElement = get().viewportRef;
     set(() => ({
       isPanning: false,
       lastPanPoint: null,
     }));
-    if (svgElement) svgElement.classList.remove('cursor-grabbing');
+    if (viewportElement) viewportElement.classList.remove('cursor-grabbing');
   },
 
   centerViewOnPoint: (point, durationMs = 420) => {

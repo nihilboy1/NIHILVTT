@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
 
+import { getStoredAccessToken } from '@/features/auth/model/authSlice';
+import { useAuthStore } from '@/features/auth/model/authStore';
+import { InitiativeTrack } from '@/features/combat/ui/InitiativeTrack';
+import { TokenActionBar } from '@/features/combat/ui/TokenActionBar';
 import { fetchGameSessionSnapshot } from '@/features/game/model/gameSessionApi';
 import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
 import { hydrateGameSessionSnapshot, resetGameSessionClientState } from '@/features/game/model/gameSessionHydrator';
 import { useGameStore } from '@/features/game/model/gameStore';
 import { GameSessionRealtimeClient } from '@/features/game/model/realtime/gameSessionRealtimeClient';
 import { getGameSessionWebSocketUrl } from '@/features/game/model/realtime/websocketUrl';
-import { useAuthStore } from '@/features/auth/model/authStore';
-import { getStoredAccessToken } from '@/features/auth/model/authSlice';
 import { AppButton } from '@/shared/ui/AppButton';
 import { Spinner } from '@/shared/ui/Spinner';
 import { RightSidebar } from '@/widgets/rightSidebar/ui/RightSidebar';
@@ -23,8 +24,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '../shared/ui/Icons';
 import { useGameBoardInteraction } from '../widgets/gameBoard/model/hooks/useGameBoardInteraction';
 import { GameBoard } from '../widgets/gameBoard/ui/GameBoard';
 import { SessionModalManager } from '../widgets/sessionModalManager/ui/SessionModalManager';
-import { TokenActionBar } from '@/features/combat/ui/TokenActionBar';
-import { InitiativeTrack } from '@/features/combat/ui/InitiativeTrack';
+
 
 export default function GamePage() {
   const navigate = useNavigate();
@@ -51,6 +51,7 @@ export default function GamePage() {
     useUIStore();
 
   const {
+    draggingVisuals,
     copiedTokenId,
     pasteTargetCell,
     selectedActionTokenId,
@@ -65,13 +66,13 @@ export default function GamePage() {
     handleClearMultiSelection,
     handleBoardPointerMove,
     handleBoardPointerLeave,
+    handleBoardSelectAtPoint,
     handleArmAttack,
     handleCancelPendingAttack,
   } = useGameBoardInteraction();
 
   const handleBoardBackgroundClick = () => {
-    if (pendingAttack) {
-      toast.error('Selecione um alvo válido.');
+    if (pendingAttack != null) {
       return;
     }
 
@@ -229,6 +230,8 @@ export default function GamePage() {
       {isToolbarVisible && <Toolbar />}
       <GameBoard
         onBackgroundClick={handleBoardBackgroundClick}
+        onBoardSelectAtPoint={handleBoardSelectAtPoint}
+        draggingVisuals={draggingVisuals}
         onTokenDragStart={handleTokenDragStart}
         copiedTokenId={copiedTokenId}
         pasteTargetCell={pasteTargetCell}
