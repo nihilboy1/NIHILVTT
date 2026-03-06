@@ -33,8 +33,8 @@ start "%BACKEND_TITLE%" powershell -NoExit -NoProfile -ExecutionPolicy Bypass -C
   "$root = '%ROOT%'; $logPath = '%BACKEND_LOG%'; Set-Location -LiteralPath $root; $pomPath = Join-Path $root 'BACKEND-JAVA\pom.xml'; mvn -f $pomPath spring-boot:run *>&1 | Tee-Object -FilePath $logPath -Append"
 
 echo [NIHILVTT] Subindo frontend...
-start "%FRONTEND_TITLE%" powershell -NoExit -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$launcher = '%LAUNCHERS_DIR%run-frontend-dev.bat'; cmd /c call $launcher"
+start "%FRONTEND_TITLE%" powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$host.UI.RawUI.WindowTitle = '%FRONTEND_TITLE%'; $root = '%ROOT%'; Set-Location -LiteralPath (Join-Path $root 'FRONTEND'); pnpm dev"
 
 echo [NIHILVTT] Backend e frontend iniciados em janelas separadas.
 echo [NIHILVTT] Log do backend: %BACKEND_LOG%
