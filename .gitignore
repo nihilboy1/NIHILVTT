@@ -1,2 +1,5 @@
 node_modules
 SCRIPTS/launchers/*.lnk
+
+# Local runtime logs
+backend.log
