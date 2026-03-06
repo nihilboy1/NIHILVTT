@@ -7,6 +7,11 @@ import { useAuthStore } from '@/features/auth/model/authStore';
 import { useBoardZoomStore } from '@/features/boardZoom/model/store'; // Import the new zoom store
 import { useCombatStore } from '@/features/combat/model/store';
 import {
+  computeMovementRange,
+  isCellReachable,
+  reconstructPathToCell,
+} from '@/features/combat/model/movement/movementPathfinding';
+import {
   sendGameCreateToken,
   sendGameMoveToken,
   sendGameSpawnMonster,
@@ -140,6 +145,111 @@ export function GameBoard({
     })
     .map((token) => token.id);
 
+  const movementRangeModel = useMemo(() => {
+    if (!combatState || activeCombatTurnTokenId == null) {
+      return null;
+    }
+
+    if (multiSelectedTokenIds.length !== 1) {
+      return null;
+    }
+
+    const selectedTokenId = multiSelectedTokenIds[0];
+    if (!selectedTokenId || selectedTokenId !== activeCombatTurnTokenId) {
+      return null;
+    }
+
+    if (!controllableTokenIds.includes(selectedTokenId)) {
+      return null;
+    }
+
+    const selectedToken = tokensOnBoard.find((token) => token.id === selectedTokenId);
+    if (!selectedToken) {
+      return null;
+    }
+
+    const selectedCharacter = characters.find(
+      (character) => character.id === selectedToken.characterId,
+    );
+    const selectedTokenSize = parseTokenSize(selectedCharacter?.size);
+
+    const tokenSizesById: Record<string, [number, number]> = {};
+    tokensOnBoard.forEach((token) => {
+      const tokenCharacter = characters.find((character) => character.id === token.characterId);
+      tokenSizesById[token.id] = parseTokenSize(tokenCharacter?.size);
+    });
+
+    const collisionMap = {
+      blockedCells: [] as Point[],
+      blockedEdges: [],
+    };
+
+    const boundedRange = computeMovementRange({
+      startCell: selectedToken.position,
+      tokenSizeInCells: selectedTokenSize,
+      movementBudgetCells: combatState.turnResources.remainingMovementCells,
+      pageSettings,
+      collisionMap,
+      tokensOnBoard,
+      tokenSizesById,
+      movingTokenId: selectedToken.id,
+    });
+
+    const fullBoardBudget = pageSettings.widthInUnits * pageSettings.heightInUnits;
+    const unboundedRange = computeMovementRange({
+      startCell: selectedToken.position,
+      tokenSizeInCells: selectedTokenSize,
+      movementBudgetCells: fullBoardBudget,
+      pageSettings,
+      collisionMap,
+      tokensOnBoard,
+      tokenSizesById,
+      movingTokenId: selectedToken.id,
+    });
+
+    return {
+      selectedTokenId,
+      selectedToken,
+      boundedRange,
+      unboundedRange,
+    };
+  }, [
+    activeCombatTurnTokenId,
+    characters,
+    combatState,
+    controllableTokenIds,
+    multiSelectedTokenIds,
+    pageSettings,
+    tokensOnBoard,
+  ]);
+
+  const movementRangeCells = useMemo(
+    () => movementRangeModel?.boundedRange.reachableCells ?? [],
+    [movementRangeModel],
+  );
+
+  const movementPreviewPathCells = useMemo(() => {
+    if (!movementRangeModel || !pasteTargetCell || pendingAttack != null) {
+      return [] as Point[];
+    }
+
+    const isReachableWithinBudget = isCellReachable(
+      movementRangeModel.boundedRange.costByCell,
+      pasteTargetCell,
+    );
+    if (!isReachableWithinBudget) {
+      return [] as Point[];
+    }
+
+    const path = reconstructPathToCell(
+      movementRangeModel.boundedRange.previousByCell,
+      movementRangeModel.selectedToken.position,
+      pasteTargetCell,
+    );
+
+    return path.length > 1 ? path : [];
+  }, [movementRangeModel, pasteTargetCell, pendingAttack]);
+
   const handleTokenMove = useCallback(
     (tokenId: string, newPosition: Point) => {
       const parsedGameId = Number(gameId);
@@ -156,6 +266,124 @@ export function GameBoard({
         });
     },
     [gameId, updateTokenPosition],
+  );
+
+  const animatePathAndMoveToken = useCallback(
+    async (tokenId: string, path: Point[], initialPosition: Point) => {
+      if (path.length <= 1) {
+        return;
+      }
+
+      const parsedGameId = Number(gameId);
+      const isValidGameId = Number.isInteger(parsedGameId) && parsedGameId > 0;
+      if (!isValidGameId) {
+        return;
+      }
+
+      clickMoveInFlightRef.current = true;
+      try {
+        for (let index = 1; index < path.length; index += 1) {
+          const nextCell = path[index];
+          if (!nextCell) {
+            continue;
+          }
+          updateTokenPosition(tokenId, nextCell);
+          // Keeps each tile step visible while preserving snappy interaction.
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => {
+            window.setTimeout(resolve, 55);
+          });
+        }
+
+        const finalCell = path[path.length - 1];
+        if (!finalCell) {
+          return;
+        }
+
+        await sendGameMoveToken(parsedGameId, tokenId, finalCell.x, finalCell.y);
+      } catch (error) {
+        updateTokenPosition(tokenId, initialPosition);
+        const message =
+          typeof error === 'object' &&
+          error !== null &&
+          'formError' in error &&
+          typeof (error as { formError?: unknown }).formError === 'string'
+            ? (error as { formError: string }).formError
+            : 'Falha ao mover token.';
+        toast.error(message);
+      } finally {
+        clickMoveInFlightRef.current = false;
+      }
+    },
+    [gameId, updateTokenPosition],
+  );
+
+  const tryHandleCombatClickMove = useCallback(
+    (point: Point) => {
+      if (!combatState || pendingAttack != null || clickMoveInFlightRef.current) {
+        return false;
+      }
+
+      if (!movementRangeModel) {
+        return false;
+      }
+
+      const targetCell = worldPointToGridCell({
+        worldPoint: point,
+        cellSize: gridSettings.visualCellSize,
+        roundMode: 'floor',
+      });
+
+      const isInsideBoard =
+        targetCell.x >= 0 &&
+        targetCell.y >= 0 &&
+        targetCell.x < pageSettings.widthInUnits &&
+        targetCell.y < pageSettings.heightInUnits;
+      if (!isInsideBoard) {
+        toast.error('Local invalido para movimento.');
+        return true;
+      }
+
+      const isReachableWithoutBudget = isCellReachable(
+        movementRangeModel.unboundedRange.costByCell,
+        targetCell,
+      );
+      if (!isReachableWithoutBudget) {
+        toast.error('Local invalido para movimento.');
+        return true;
+      }
+
+      const isReachableWithinBudget = isCellReachable(
+        movementRangeModel.boundedRange.costByCell,
+        targetCell,
+      );
+      if (!isReachableWithinBudget) {
+        toast.error('Voce nao tem deslocamento suficiente.');
+        return true;
+      }
+
+      const path = reconstructPathToCell(
+        movementRangeModel.boundedRange.previousByCell,
+        movementRangeModel.selectedToken.position,
+        targetCell,
+      );
+      if (path.length <= 1) {
+        return true;
+      }
+
+      const initialPosition = { ...movementRangeModel.selectedToken.position };
+      void animatePathAndMoveToken(movementRangeModel.selectedTokenId, path, initialPosition);
+      return true;
+    },
+    [
+      animatePathAndMoveToken,
+      combatState,
+      gridSettings.visualCellSize,
+      movementRangeModel,
+      pageSettings.heightInUnits,
+      pageSettings.widthInUnits,
+      pendingAttack,
+    ],
   );
 
   const handleTokenCreate = useCallback(
@@ -205,6 +433,7 @@ export function GameBoard({
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastAutoCenteredTurnKeyRef = useRef<string | null>(null);
+  const clickMoveInFlightRef = useRef(false);
   const pixiDragRef = useRef<{
     tokenId: string;
     offsetX: number;
@@ -372,6 +601,13 @@ export function GameBoard({
       });
 
       if (!tokenId) {
+        if (combatState) {
+          return tryHandleCombatClickMove(point);
+        }
+        return false;
+      }
+
+      if (combatState) {
         return false;
       }
 
@@ -406,11 +642,13 @@ export function GameBoard({
       activeCombatTurnTokenId,
       activeTool,
       characters,
+      combatState,
       combatParticipantTokenIds,
       controllableTokenIds,
       gridSettings.visualCellSize,
       multiSelectedTokenIds,
       pendingAttack,
+      tryHandleCombatClickMove,
       tokensOnBoard,
     ],
   );
@@ -584,6 +822,8 @@ export function GameBoard({
         copiedTokenId={copiedTokenId}
         pasteTargetCell={pasteTargetCell}
         pendingAttack={pendingAttack}
+        movementRangeCells={movementRangeCells}
+        movementPreviewPathCells={movementPreviewPathCells}
         multiSelectedTokenIds={multiSelectedTokenIds}
         onBoardPointerMove={onBoardPointerMove}
         onBoardPointerLeave={onBoardPointerLeave}

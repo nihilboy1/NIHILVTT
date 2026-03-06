@@ -12,10 +12,14 @@ import com.nihilvtt.auth.game.entity.GameSessionStateEntity;
 import com.nihilvtt.auth.game.repository.GameMemberRepository;
 import com.nihilvtt.auth.game.repository.GameSessionStateRepository;
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -197,7 +201,7 @@ public class GameSessionCommandService {
 
     ObjectNode combatState = getActiveCombatState(rootNode);
     if (combatState != null) {
-      consumeMovementForActiveParticipant(combatState, movedToken, x, y);
+      consumeMovementForActiveParticipant(combatState, rootNode, tokensNode, movedToken, x, y);
     }
 
     ObjectNode positionNode = objectMapper.createObjectNode();
@@ -2121,6 +2125,8 @@ public class GameSessionCommandService {
 
   private void consumeMovementForActiveParticipant(
       ObjectNode combatState,
+      ObjectNode rootNode,
+      ArrayNode tokensNode,
       ObjectNode movedToken,
       int nextX,
       int nextY
@@ -2141,13 +2147,29 @@ public class GameSessionCommandService {
     JsonNode currentPositionNode = movedToken.path("position");
     int currentX = currentPositionNode.path("x").asInt(nextX);
     int currentY = currentPositionNode.path("y").asInt(nextY);
-    int movementCostCells = Math.max(Math.abs(nextX - currentX), Math.abs(nextY - currentY));
+    ObjectNode turnResources = resolveCombatTurnResources(combatState);
+    int remainingMovementCells = Math.max(0, turnResources.path("remainingMovementCells").asInt(0));
+
+    MovementPathEvaluation movementPath = evaluateMovementPathCost(
+        rootNode,
+        tokensNode,
+        movedToken.path("id").asText("").trim(),
+        currentX,
+        currentY,
+        nextX,
+        nextY,
+        remainingMovementCells
+    );
+
+    if (!movementPath.reachable()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Local inválido para movimento.");
+    }
+
+    int movementCostCells = movementPath.costCells();
     if (movementCostCells <= 0) {
       return;
     }
 
-    ObjectNode turnResources = resolveCombatTurnResources(combatState);
-    int remainingMovementCells = Math.max(0, turnResources.path("remainingMovementCells").asInt(0));
     if (movementCostCells > remainingMovementCells) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -2157,6 +2179,421 @@ public class GameSessionCommandService {
 
     turnResources.put("remainingMovementCells", remainingMovementCells - movementCostCells);
     autoAdvanceCombatTurnIfExhausted(combatState);
+  }
+
+  private MovementPathEvaluation evaluateMovementPathCost(
+      ObjectNode rootNode,
+      ArrayNode tokensNode,
+      String movingTokenId,
+      int startX,
+      int startY,
+      int targetX,
+      int targetY,
+      int remainingMovementCells
+  ) {
+    ObjectNode movingTokenNode = findTokenById(tokensNode, movingTokenId);
+    if (movingTokenNode == null) {
+      return new MovementPathEvaluation(false, 0);
+    }
+
+    GridSize movingTokenSize = resolveTokenGridSize(rootNode, movingTokenNode);
+    GridBounds boardBounds = parseBoardBounds(rootNode);
+
+    int searchRadius = Math.max(
+        40,
+        Math.max(
+            Math.max(Math.abs(targetX - startX), Math.abs(targetY - startY)) + 20,
+            remainingMovementCells + 20
+        )
+    );
+
+    int minX = Math.min(startX, targetX) - searchRadius;
+    int maxX = Math.max(startX, targetX) + searchRadius;
+    int minY = Math.min(startY, targetY) - searchRadius;
+    int maxY = Math.max(startY, targetY) + searchRadius;
+
+    Set<String> blockedCellKeys = parseBlockedCellKeys(rootNode);
+    Set<String> blockedEdgeKeys = parseBlockedEdgeKeys(rootNode);
+    Set<String> occupiedCellKeys = parseOccupiedCellKeys(rootNode, tokensNode, movingTokenId);
+
+    String targetKey = gridKey(targetX, targetY);
+    String startKey = gridKey(startX, startY);
+    if (!canOccupyAnchor(
+        targetX,
+        targetY,
+        movingTokenSize,
+        boardBounds,
+        blockedCellKeys,
+        occupiedCellKeys
+    )) {
+      return new MovementPathEvaluation(false, 0);
+    }
+
+    ArrayDeque<GridCell> queue = new ArrayDeque<>();
+    Map<String, Integer> costByCell = new HashMap<>();
+    queue.addLast(new GridCell(startX, startY));
+    costByCell.put(startKey, 0);
+
+    while (!queue.isEmpty()) {
+      GridCell current = queue.removeFirst();
+      String currentKey = gridKey(current.x(), current.y());
+      Integer currentCost = costByCell.get(currentKey);
+      if (currentCost == null) {
+        continue;
+      }
+
+      if (current.x() == targetX && current.y() == targetY) {
+        return new MovementPathEvaluation(true, currentCost);
+      }
+
+      for (int deltaX = -1; deltaX <= 1; deltaX += 1) {
+        for (int deltaY = -1; deltaY <= 1; deltaY += 1) {
+          if (deltaX == 0 && deltaY == 0) {
+            continue;
+          }
+
+          int nextX = current.x() + deltaX;
+          int nextY = current.y() + deltaY;
+          if (nextX < minX || nextX > maxX || nextY < minY || nextY > maxY) {
+            continue;
+          }
+
+            if (!isTraversalAllowed(
+              current.x(),
+              current.y(),
+              nextX,
+              nextY,
+              movingTokenSize,
+              boardBounds,
+              blockedCellKeys,
+              blockedEdgeKeys,
+              occupiedCellKeys
+          )) {
+            continue;
+          }
+
+          String nextKey = gridKey(nextX, nextY);
+          int nextCost = currentCost + 1;
+          Integer previousCost = costByCell.get(nextKey);
+          if (previousCost != null && previousCost <= nextCost) {
+            continue;
+          }
+
+          costByCell.put(nextKey, nextCost);
+          queue.addLast(new GridCell(nextX, nextY));
+        }
+      }
+    }
+
+    return new MovementPathEvaluation(false, 0);
+  }
+
+  private boolean isTraversalAllowed(
+      int fromX,
+      int fromY,
+      int toX,
+      int toY,
+      GridSize movingTokenSize,
+      GridBounds boardBounds,
+      Set<String> blockedCellKeys,
+      Set<String> blockedEdgeKeys,
+      Set<String> occupiedCellKeys
+  ) {
+    if (!canStepToAnchor(
+        fromX,
+        fromY,
+        toX,
+        toY,
+        movingTokenSize,
+        boardBounds,
+        blockedCellKeys,
+        blockedEdgeKeys,
+        occupiedCellKeys
+    )) {
+      return false;
+    }
+
+    int deltaX = toX - fromX;
+    int deltaY = toY - fromY;
+    boolean diagonal = Math.abs(deltaX) == 1 && Math.abs(deltaY) == 1;
+    if (!diagonal) {
+      return true;
+    }
+
+    int horizontalX = fromX + deltaX;
+    int horizontalY = fromY;
+    int verticalX = fromX;
+    int verticalY = fromY + deltaY;
+
+    return canStepToAnchor(
+        fromX,
+        fromY,
+        horizontalX,
+        horizontalY,
+        movingTokenSize,
+        boardBounds,
+        blockedCellKeys,
+        blockedEdgeKeys,
+        occupiedCellKeys
+    ) && canStepToAnchor(
+        fromX,
+        fromY,
+        verticalX,
+        verticalY,
+        movingTokenSize,
+        boardBounds,
+        blockedCellKeys,
+        blockedEdgeKeys,
+        occupiedCellKeys
+    );
+  }
+
+  private boolean canStepToAnchor(
+      int fromX,
+      int fromY,
+      int toX,
+      int toY,
+      GridSize movingTokenSize,
+      GridBounds boardBounds,
+      Set<String> blockedCellKeys,
+      Set<String> blockedEdgeKeys,
+      Set<String> occupiedCellKeys
+  ) {
+    if (!canOccupyAnchor(toX, toY, movingTokenSize, boardBounds, blockedCellKeys, occupiedCellKeys)) {
+      return false;
+    }
+
+    return canCrossEdges(fromX, fromY, toX, toY, movingTokenSize, blockedEdgeKeys);
+  }
+
+  private boolean canOccupyAnchor(
+      int anchorX,
+      int anchorY,
+      GridSize size,
+      GridBounds boardBounds,
+      Set<String> blockedCellKeys,
+      Set<String> occupiedCellKeys
+  ) {
+    if (boardBounds != null) {
+      if (
+          anchorX < 0 ||
+              anchorY < 0 ||
+              anchorX + size.width() > boardBounds.widthInUnits() ||
+              anchorY + size.height() > boardBounds.heightInUnits()
+      ) {
+        return false;
+      }
+    }
+
+    for (int offsetY = 0; offsetY < size.height(); offsetY += 1) {
+      for (int offsetX = 0; offsetX < size.width(); offsetX += 1) {
+        String key = gridKey(anchorX + offsetX, anchorY + offsetY);
+        if (blockedCellKeys.contains(key) || occupiedCellKeys.contains(key)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  private boolean canCrossEdges(
+      int fromX,
+      int fromY,
+      int toX,
+      int toY,
+      GridSize size,
+      Set<String> blockedEdgeKeys
+  ) {
+    int deltaX = toX - fromX;
+    int deltaY = toY - fromY;
+
+    Set<String> fromFootprint = new HashSet<>();
+    for (int offsetY = 0; offsetY < size.height(); offsetY += 1) {
+      for (int offsetX = 0; offsetX < size.width(); offsetX += 1) {
+        fromFootprint.add(gridKey(fromX + offsetX, fromY + offsetY));
+      }
+    }
+
+    for (int offsetY = 0; offsetY < size.height(); offsetY += 1) {
+      for (int offsetX = 0; offsetX < size.width(); offsetX += 1) {
+        int destinationCellX = toX + offsetX;
+        int destinationCellY = toY + offsetY;
+        int sourceCellX = destinationCellX - deltaX;
+        int sourceCellY = destinationCellY - deltaY;
+
+        if (!fromFootprint.contains(gridKey(sourceCellX, sourceCellY))) {
+          continue;
+        }
+
+        int manhattanDistance = Math.abs(sourceCellX - destinationCellX) + Math.abs(sourceCellY - destinationCellY);
+        if (manhattanDistance != 1) {
+          continue;
+        }
+
+        if (blockedEdgeKeys.contains(edgeKey(sourceCellX, sourceCellY, destinationCellX, destinationCellY))) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  private Set<String> parseOccupiedCellKeys(ObjectNode rootNode, ArrayNode tokensNode, String movingTokenId) {
+    Set<String> occupied = new HashSet<>();
+    for (int index = 0; index < tokensNode.size(); index += 1) {
+      JsonNode tokenNode = tokensNode.get(index);
+      if (!(tokenNode instanceof ObjectNode tokenObject)) {
+        continue;
+      }
+
+      String tokenId = tokenObject.path("id").asText("").trim();
+      if (tokenId.isBlank() || tokenId.equals(movingTokenId)) {
+        continue;
+      }
+
+      JsonNode positionNode = tokenObject.path("position");
+      int tokenX = positionNode.path("x").asInt(Integer.MIN_VALUE);
+      int tokenY = positionNode.path("y").asInt(Integer.MIN_VALUE);
+      if (tokenX == Integer.MIN_VALUE || tokenY == Integer.MIN_VALUE) {
+        continue;
+      }
+
+      GridSize tokenSize = resolveTokenGridSize(rootNode, tokenObject);
+      for (int offsetY = 0; offsetY < tokenSize.height(); offsetY += 1) {
+        for (int offsetX = 0; offsetX < tokenSize.width(); offsetX += 1) {
+          occupied.add(gridKey(tokenX + offsetX, tokenY + offsetY));
+        }
+      }
+    }
+    return occupied;
+  }
+
+  private GridSize resolveTokenGridSize(ObjectNode rootNode, ObjectNode tokenNode) {
+    String characterId = tokenNode.path("characterId").asText("").trim();
+    if (characterId.isBlank()) {
+      return new GridSize(1, 1);
+    }
+
+    ArrayNode charactersNode = ensureArray(rootNode, "characters");
+    ObjectNode characterNode = findCharacterById(charactersNode, characterId);
+    return resolveCharacterGridSize(characterNode);
+  }
+
+  private GridSize resolveCharacterGridSize(ObjectNode characterNode) {
+    if (characterNode == null) {
+      return new GridSize(1, 1);
+    }
+
+    String explicitSize = characterNode.path("size").asText("").trim();
+    if (!explicitSize.isBlank()) {
+      return toGridSize(explicitSize);
+    }
+
+    String characterType = characterNode.path("type").asText("").trim();
+    if (!"NPC".equals(characterType)) {
+      return new GridSize(1, 1);
+    }
+
+    MonsterCatalogManifestService.MonsterCatalogEntry monsterEntry = resolveMonsterCatalogEntry(characterNode);
+    return toGridSize(monsterEntry.size());
+  }
+
+  private GridSize toGridSize(String sizeRaw) {
+    if (sizeRaw == null) {
+      return new GridSize(1, 1);
+    }
+
+    String normalized = sizeRaw.trim().toLowerCase(Locale.ROOT);
+    return switch (normalized) {
+      case "large" -> new GridSize(2, 2);
+      case "huge" -> new GridSize(3, 3);
+      case "gargantuan" -> new GridSize(4, 4);
+      case "tiny", "small", "medium" -> new GridSize(1, 1);
+      default -> new GridSize(1, 1);
+    };
+  }
+
+  private GridBounds parseBoardBounds(ObjectNode rootNode) {
+    JsonNode pageSettingsNode = rootNode.path("pageSettings");
+    if (!(pageSettingsNode instanceof ObjectNode pageSettingsObject)) {
+      return null;
+    }
+
+    int widthInUnits = pageSettingsObject.path("widthInUnits").asInt(0);
+    int heightInUnits = pageSettingsObject.path("heightInUnits").asInt(0);
+    if (widthInUnits <= 0 || heightInUnits <= 0) {
+      return null;
+    }
+
+    return new GridBounds(widthInUnits, heightInUnits);
+  }
+
+  private Set<String> parseBlockedCellKeys(ObjectNode rootNode) {
+    Set<String> blocked = new HashSet<>();
+    JsonNode blockedCellsNode = rootNode.path("collision").path("blockedCells");
+    if (!(blockedCellsNode instanceof ArrayNode blockedCellsArray)) {
+      return blocked;
+    }
+
+    for (int index = 0; index < blockedCellsArray.size(); index += 1) {
+      JsonNode cellNode = blockedCellsArray.get(index);
+      int cellX = cellNode.path("x").asInt(Integer.MIN_VALUE);
+      int cellY = cellNode.path("y").asInt(Integer.MIN_VALUE);
+      if (cellX == Integer.MIN_VALUE || cellY == Integer.MIN_VALUE) {
+        continue;
+      }
+      blocked.add(gridKey(cellX, cellY));
+    }
+
+    return blocked;
+  }
+
+  private Set<String> parseBlockedEdgeKeys(ObjectNode rootNode) {
+    Set<String> blocked = new HashSet<>();
+    JsonNode blockedEdgesNode = rootNode.path("collision").path("blockedEdges");
+    if (!(blockedEdgesNode instanceof ArrayNode blockedEdgesArray)) {
+      return blocked;
+    }
+
+    for (int index = 0; index < blockedEdgesArray.size(); index += 1) {
+      JsonNode edgeNode = blockedEdgesArray.get(index);
+      JsonNode fromNode = edgeNode.path("from");
+      JsonNode toNode = edgeNode.path("to");
+
+      int fromX = fromNode.path("x").asInt(Integer.MIN_VALUE);
+      int fromY = fromNode.path("y").asInt(Integer.MIN_VALUE);
+      int toX = toNode.path("x").asInt(Integer.MIN_VALUE);
+      int toY = toNode.path("y").asInt(Integer.MIN_VALUE);
+      if (
+          fromX == Integer.MIN_VALUE ||
+              fromY == Integer.MIN_VALUE ||
+              toX == Integer.MIN_VALUE ||
+              toY == Integer.MIN_VALUE
+      ) {
+        continue;
+      }
+
+      int manhattanDistance = Math.abs(toX - fromX) + Math.abs(toY - fromY);
+      if (manhattanDistance != 1) {
+        continue;
+      }
+
+      blocked.add(edgeKey(fromX, fromY, toX, toY));
+    }
+
+    return blocked;
+  }
+
+  private String gridKey(int x, int y) {
+    return x + ":" + y;
+  }
+
+  private String edgeKey(int fromX, int fromY, int toX, int toY) {
+    String first = gridKey(fromX, fromY);
+    String second = gridKey(toX, toY);
+    return first.compareTo(second) <= 0 ? first + "|" + second : second + "|" + first;
   }
 
   private void autoAdvanceCombatTurnIfExhausted(ObjectNode combatState) {
@@ -3013,5 +3450,17 @@ public class GameSessionCommandService {
   }
 
   private record SpawnTokenRequest(String sceneId, int x, int y) {
+  }
+
+  private record MovementPathEvaluation(boolean reachable, int costCells) {
+  }
+
+  private record GridCell(int x, int y) {
+  }
+
+  private record GridSize(int width, int height) {
+  }
+
+  private record GridBounds(int widthInUnits, int heightInUnits) {
   }
 }

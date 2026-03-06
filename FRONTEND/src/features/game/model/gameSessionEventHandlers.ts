@@ -1,7 +1,13 @@
 import { z } from 'zod';
 
 import { useCharactersStore } from '@/entities/character/model/store';
+import { parseTokenSize } from '@/entities/token/model/utils/tokenUtils';
 import { useTokenStore } from '@/entities/token/model/store/tokenStore';
+import {
+  computeMovementRange,
+  reconstructPathToCell,
+} from '@/features/combat/model/movement/movementPathfinding';
+import { useBoardSettingsStore } from '@/features/boardSettings/model/store';
 import { useChatStore } from '@/features/chat/model/store';
 import { useAttackFeedbackStore } from '@/features/combat/model/attackFeedbackStore';
 import { useCombatStore } from '@/features/combat/model/store';
@@ -10,8 +16,125 @@ import { Message } from '@/shared/api/types';
 import { GameSessionEvent } from './gameSessionApi';
 
 const APPLIED_EVENT_IDS_MAX_SIZE = 2000;
+const TOKEN_MOVE_ANIMATION_STEP_MS = 55;
 const appliedEventIds = new Set<string>();
 const appliedEventIdQueue: string[] = [];
+const tokenMoveAnimationTimeoutsByTokenId = new Map<string, number[]>();
+
+function clearTokenMoveAnimation(tokenId: string): void {
+  const timeoutIds = tokenMoveAnimationTimeoutsByTokenId.get(tokenId);
+  if (!timeoutIds || timeoutIds.length === 0) {
+    return;
+  }
+
+  timeoutIds.forEach((timeoutId) => {
+    window.clearTimeout(timeoutId);
+  });
+  tokenMoveAnimationTimeoutsByTokenId.delete(tokenId);
+}
+
+function buildFallbackChebyshevPath(
+  start: { x: number; y: number },
+  end: { x: number; y: number },
+) {
+  const path = [{ x: start.x, y: start.y }];
+  let currentX = start.x;
+  let currentY = start.y;
+
+  while (currentX !== end.x || currentY !== end.y) {
+    if (currentX < end.x) {
+      currentX += 1;
+    } else if (currentX > end.x) {
+      currentX -= 1;
+    }
+
+    if (currentY < end.y) {
+      currentY += 1;
+    } else if (currentY > end.y) {
+      currentY -= 1;
+    }
+
+    path.push({ x: currentX, y: currentY });
+  }
+
+  return path;
+}
+
+function animateTokenMoveFromRealtime(
+  tokenId: string,
+  destination: { x: number; y: number },
+): void {
+  const tokenStoreState = useTokenStore.getState();
+  const token = tokenStoreState.tokensOnBoard.find((entry) => entry.id === tokenId);
+  if (!token) {
+    return;
+  }
+
+  const startPosition = token.position;
+  if (startPosition.x === destination.x && startPosition.y === destination.y) {
+    return;
+  }
+
+  const characters = useCharactersStore.getState().characters;
+  const pageSettings = useBoardSettingsStore.getState().pageSettings;
+
+  const tokenSizesById: Record<string, [number, number]> = {};
+  tokenStoreState.tokensOnBoard.forEach((entry) => {
+    const character = characters.find((characterEntry) => characterEntry.id === entry.characterId);
+    tokenSizesById[entry.id] = parseTokenSize(character?.size);
+  });
+
+  const movingCharacter = characters.find((entry) => entry.id === token.characterId);
+  const movingSize = parseTokenSize(movingCharacter?.size);
+  const fullBoardBudget = pageSettings.widthInUnits * pageSettings.heightInUnits;
+  const movementRange = computeMovementRange({
+    startCell: startPosition,
+    tokenSizeInCells: movingSize,
+    movementBudgetCells: fullBoardBudget,
+    pageSettings,
+    collisionMap: {
+      blockedCells: [],
+      blockedEdges: [],
+    },
+    tokensOnBoard: tokenStoreState.tokensOnBoard,
+    tokenSizesById,
+    movingTokenId: tokenId,
+  });
+
+  const computedPath = reconstructPathToCell(
+    movementRange.previousByCell,
+    startPosition,
+    destination,
+  );
+  const path =
+    computedPath.length > 0 ? computedPath : buildFallbackChebyshevPath(startPosition, destination);
+  if (path.length <= 1) {
+    useTokenStore.getState().updateTokenPosition(tokenId, destination);
+    return;
+  }
+
+  clearTokenMoveAnimation(tokenId);
+
+  const timeoutIds: number[] = [];
+  for (let index = 1; index < path.length; index += 1) {
+    const step = path[index];
+    if (!step) {
+      continue;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      useTokenStore.getState().updateTokenPosition(tokenId, step);
+      if (index === path.length - 1) {
+        tokenMoveAnimationTimeoutsByTokenId.delete(tokenId);
+      }
+    }, TOKEN_MOVE_ANIMATION_STEP_MS * index);
+    timeoutIds.push(timeoutId);
+  }
+
+  if (timeoutIds.length > 0) {
+    tokenMoveAnimationTimeoutsByTokenId.set(tokenId, timeoutIds);
+  }
+}
 
 function rememberAppliedEventId(eventId: string): void {
   if (appliedEventIds.has(eventId)) {
@@ -37,6 +160,13 @@ function rememberAppliedEventId(eventId: string): void {
 export function resetAppliedGameSessionEventIds(): void {
   appliedEventIds.clear();
   appliedEventIdQueue.length = 0;
+  tokenMoveAnimationTimeoutsByTokenId.forEach((timeoutIds, tokenId) => {
+    void tokenId;
+    timeoutIds.forEach((timeoutId) => {
+      window.clearTimeout(timeoutId);
+    });
+  });
+  tokenMoveAnimationTimeoutsByTokenId.clear();
 }
 
 const rollPartSchema = z.union([
@@ -62,7 +192,11 @@ const chatTextMessageSchema = z.object({
   id: z.string().min(1),
   sender: z.string().min(1),
   senderUserId: z.number().int().positive().nullable().optional(),
-  senderColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable().optional(),
+  senderColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .nullable()
+    .optional(),
   text: z.string(),
   timestamp: z.string(),
   isDiceRoll: z.literal(false),
@@ -72,7 +206,11 @@ const chatDiceMessageSchema = z.object({
   id: z.string().min(1),
   sender: z.string().min(1),
   senderUserId: z.number().int().positive().nullable().optional(),
-  senderColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable().optional(),
+  senderColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .nullable()
+    .optional(),
   text: z.string(),
   timestamp: z.string(),
   isDiceRoll: z.literal(true),
@@ -185,11 +323,7 @@ const combatPayloadSchema = z.object({
   combat: combatStateSchema.nullable(),
 });
 
-function requireEventPayload<T>(
-  event: GameSessionEvent,
-  schema: z.ZodType<T>,
-  context: string,
-): T {
+function requireEventPayload<T>(event: GameSessionEvent, schema: z.ZodType<T>, context: string): T {
   const parsed = schema.safeParse(event.payload);
   if (!parsed.success) {
     const formattedError = JSON.stringify(z.treeifyError(parsed.error), null, 2);
@@ -207,7 +341,9 @@ function resolveTokenDisplayName(tokenId: string): string {
     return `Token ${tokenId}`;
   }
 
-  const character = useCharactersStore.getState().characters.find((entry) => entry.id === token.characterId);
+  const character = useCharactersStore
+    .getState()
+    .characters.find((entry) => entry.id === token.characterId);
   return character?.name ?? `Token ${tokenId}`;
 }
 
@@ -257,8 +393,14 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
   }
 
   if (event.type === 'CHARACTER_HP_UPDATED') {
-    const parsed = requireEventPayload(event, characterHpUpdatedPayloadSchema, 'CHARACTER_HP_UPDATED');
-    useCharactersStore.getState().updateCharacterHp(parsed.characterId, parsed.currentHp, parsed.tempHp);
+    const parsed = requireEventPayload(
+      event,
+      characterHpUpdatedPayloadSchema,
+      'CHARACTER_HP_UPDATED',
+    );
+    useCharactersStore
+      .getState()
+      .updateCharacterHp(parsed.characterId, parsed.currentHp, parsed.tempHp);
     return;
   }
 
@@ -267,7 +409,11 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
 
     useCharactersStore
       .getState()
-      .updateCharacterHp(parsed.targetCharacterId, parsed.remainingCurrentHp, parsed.remainingTempHp);
+      .updateCharacterHp(
+        parsed.targetCharacterId,
+        parsed.remainingCurrentHp,
+        parsed.remainingTempHp,
+      );
     useCombatStore.getState().setCombatState(parsed.combat);
     useAttackFeedbackStore.getState().pushFeedback({
       id: event.eventId,
@@ -319,11 +465,7 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
     event.type === 'CHARACTER_EQUIPMENT_UPDATED' ||
     event.type === 'CHARACTER_INVENTORY_UPDATED'
   ) {
-    const parsed = requireEventPayload(
-      event,
-      characterCreatedPayloadSchema,
-      event.type,
-    );
+    const parsed = requireEventPayload(event, characterCreatedPayloadSchema, event.type);
 
     useCharactersStore.getState().addCharacterFromSession(parsed.character);
     return;
@@ -363,7 +505,7 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
 
   if (event.type === 'TOKEN_MOVED') {
     const parsed = requireEventPayload(event, tokenMovedPayloadSchema, 'TOKEN_MOVED');
-    useTokenStore.getState().updateTokenPosition(parsed.tokenId, parsed.position);
+    animateTokenMoveFromRealtime(parsed.tokenId, parsed.position);
     if (parsed.combatChanged) {
       useCombatStore.getState().setCombatState(parsed.combat);
     }

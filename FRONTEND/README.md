@@ -52,7 +52,6 @@ Regra editorial do modulo:
 - Picking de token por coordenada de mundo/celula fica centralizado em `tokenPicking.ts`; o board deve preferir essa trilha para selecao/alvo em vez de depender de hit-test de elementos SVG.
 - Novos fluxos de board devem ser implementados diretamente no pipeline Pixi, sem introduzir fallback SVG.
 
-
 ### Runtime Boundary
 
 O frontend projeta dados de sessao a partir do runtime compartilhado e usa view models apenas como camada de renderizacao. A entrada canonica de personagens vindos da sessao e o schema compartilhado `SessionCharacterStateSchema` de `@nihilvtt/datamodeling/runtime`.
@@ -258,6 +257,12 @@ Regra atual:
 - O handle de drag desses painéis flutuantes (`InitiativeTrack`, `hpControl` e `Ações do Token`) agora deve aparecer como um header fino integrado à borda superior do bloco, usando um tom de `surface` próximo ao próprio painel e com o ícone de `six dots` preto no canto direito.
 - O combate so pode ser iniciado por comando explicito do mestre com os tokens previamente selecionados (`Iniciar combate`); o frontend nao deve introduzir gatilho automatico, trigger por proximidade nem qualquer outro atalho alternativo.
 - Ao iniciar combate, a `InitiativeTrack` abre a partir do `combatState` autoritativo e lista exclusivamente os participantes enviados pelo backend; a UI nunca recalcula ordem localmente, apenas projeta `round`, `turnIndex` e `participants[]`.
+- O alcance de deslocamento em combate deve ser calculado por caminho valido (nao por raio), considerando orcamento de movimento e mapa de colisao; a base do frontend fica em `src/features/combat/model/movement/movementPathfinding.ts`.
+- O contrato de colisao para deslocamento ja considera dois tipos de bloqueio: celula bloqueada (`blockedCells`) e parede por aresta (`blockedEdges`); novos objetos de cenario devem alimentar esse contrato.
+- O overlay de range no board (Pixi) deve refletir apenas celulas alcancaveis pelo algoritmo de caminho; cliques futuros de movimento devem reutilizar o mesmo resultado para evitar divergencia entre UX e validacao.
+- Enquanto houver combate ativo, deslocamento de token participante segue fluxo de `click-to-move`: selecionar token do turno e clicar em uma celula valida do range; drag-and-drop de deslocamento fica desabilitado nesse contexto.
+- O movimento por clique no combate deve animar passo a passo (celula por celula) antes da confirmacao autoritativa, e cliques fora do alcance devem exibir feedback explicito de deslocamento insuficiente/local invalido.
+- Durante o hover em combate, o board deve exibir pre-visualizacao da rota (trilha de celulas e linha) ate o destino valido selecionado, reaproveitando o mesmo resultado de pathfinding usado na confirmacao do clique.
 - O `combatState` passa a carregar tambem os recursos do turno atual (`turnResources`), para que a UI apenas projete a economia autoritativa de combate.
 - A rolagem de iniciativa acontece no backend no momento da entrada em combate e cada resultado deve aparecer no chat como log de sistema para auditoria.
 - Enquanto houver combate ativo, tokens participantes ficam sob lock de turno: so o participante do turno atual pode mover e iniciar acoes; participantes fora do turno devem permanecer bloqueados no board.

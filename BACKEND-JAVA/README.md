@@ -20,6 +20,7 @@ Regra editorial do modulo:
 ## Endpoints
 
 Auth:
+
 - `POST /auth/register`
 - `POST /auth/login`
 - `POST /auth/reauth`
@@ -31,6 +32,7 @@ Auth:
 - `POST /auth/account/delete`
 
 Jogos:
+
 - `GET /games/active`
 - `POST /games`
   - capacidade fixa: `1 mestre + 5 jogadores` (`6` participantes no total)
@@ -115,6 +117,7 @@ Jogos:
   - `createToken` agora aplica regra explicita por tipo: `NPC` e sempre exclusivo do mestre; para `Player`, se `controlledByUserId` estiver `null`, só o mestre pode instanciar token, e se estiver definido, apenas aquele usuário pode instanciar novos tokens da ficha
   - cliente envia `POST /games/{gameId}/session/tokens/move`
   - backend atualiza `state.tokens[].position`, incrementa `version` e publica `TOKEN_MOVED`
+  - em combate ativo, o backend valida o deslocamento por caminho (passo a passo em grade), bloqueando destino ocupado e respeitando colisao estrutural quando `state.collision.blockedCells`/`state.collision.blockedEdges` estiverem presentes; o custo consumido em `turnResources.remainingMovementCells` passa a refletir o custo real do caminho valido, nao apenas distancia direta
   - cliente envia `POST /games/{gameId}/session/tokens/remove`
   - apenas o mestre pode executar a remocao de token
   - backend remove token de `state.tokens[]`, incrementa `version` e publica `TOKEN_REMOVED`

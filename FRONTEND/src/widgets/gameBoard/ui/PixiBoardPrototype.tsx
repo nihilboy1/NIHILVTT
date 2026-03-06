@@ -29,6 +29,8 @@ type PixiBoardPrototypeProps = {
   copiedTokenId: string | null;
   pasteTargetCell: Point | null;
   pendingAttackAreaCells: Point[];
+  movementRangeCells: Point[];
+  movementPreviewPathCells: Point[];
   multiSelectBoundingBox: {
     x: number;
     y: number;
@@ -387,6 +389,8 @@ export function PixiBoardPrototype({
   copiedTokenId,
   pasteTargetCell,
   pendingAttackAreaCells,
+  movementRangeCells,
+  movementPreviewPathCells,
   multiSelectBoundingBox,
   marqueeSelection,
   rulerPath,
@@ -572,6 +576,61 @@ export function PixiBoardPrototype({
               }}
             />
           ))}
+          {movementRangeCells.map((cell) => (
+            <Graphics
+              key={`pixi-movement-range-cell-${cell.x}-${cell.y}`}
+              draw={(graphics) => {
+                graphics.clear();
+                const size = gridSettings.visualCellSize;
+                const x = cell.x * size;
+                const y = cell.y * size;
+                graphics.lineStyle({
+                  width: Math.max(0.9 / cameraTransform.scaleY, 0.3),
+                  color: theme.feedbackPositive,
+                  alpha: 0.58,
+                });
+                graphics.beginFill(theme.feedbackPositive, 0.09);
+                graphics.drawRect(x, y, size, size);
+                graphics.endFill();
+              }}
+            />
+          ))}
+          {movementPreviewPathCells.map((cell) => (
+            <Graphics
+              key={`pixi-movement-preview-cell-${cell.x}-${cell.y}`}
+              draw={(graphics) => {
+                graphics.clear();
+                const size = gridSettings.visualCellSize;
+                const x = cell.x * size;
+                const y = cell.y * size;
+                graphics.beginFill(theme.accentPrimary, 0.16);
+                graphics.drawRect(x, y, size, size);
+                graphics.endFill();
+              }}
+            />
+          ))}
+          {movementPreviewPathCells.length > 1 ? (
+            <Graphics
+              draw={(graphics) => {
+                graphics.clear();
+                graphics.lineStyle({
+                  width: Math.max(2.1 / cameraTransform.scaleY, 0.7),
+                  color: theme.accentPrimary,
+                  alpha: 0.94,
+                });
+
+                movementPreviewPathCells.forEach((cell, index) => {
+                  const centerX = (cell.x + 0.5) * gridSettings.visualCellSize;
+                  const centerY = (cell.y + 0.5) * gridSettings.visualCellSize;
+                  if (index === 0) {
+                    graphics.moveTo(centerX, centerY);
+                    return;
+                  }
+                  graphics.lineTo(centerX, centerY);
+                });
+              }}
+            />
+          ) : null}
           {orderedTokenSprites.map((tokenSprite) => (
             <Container
               key={`pixi-token-${tokenSprite.id}`}

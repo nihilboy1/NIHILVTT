@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import { parseCharacterSize } from "@/entities/character/lib/utils/characterUtils";
-import { type Character } from "@/entities/character/model/schemas/character.schema";
-import { useUIStore } from "@/features/layoutControls/model/store";
+import { parseCharacterSize } from '@/entities/character/lib/utils/characterUtils';
+import { type Character } from '@/entities/character/model/schemas/character.schema';
+import { useUIStore } from '@/features/layoutControls/model/store';
 import {
   GridSettings,
   MarqueeSelectionState,
@@ -11,15 +11,14 @@ import {
   Point,
   RulerPathState,
   Token,
-} from "@/shared/api/types";
-import aimCursorUrl from "@/shared/assets/aim.png";
+} from '@/shared/api/types';
+import aimCursorUrl from '@/shared/assets/aim.png';
 
-import { PageSettingsModal } from "../../../features/boardSettings/ui/PageSettingsModal";
-import { pickTopmostTokenIdAtWorldPoint } from "../model/renderer";
+import { PageSettingsModal } from '../../../features/boardSettings/ui/PageSettingsModal';
+import { pickTopmostTokenIdAtWorldPoint } from '../model/renderer';
 
-import { GameBoardSideOption } from "./GameBoardSideOption";
+import { GameBoardSideOption } from './GameBoardSideOption';
 import { PixiBoardPrototype } from './PixiBoardPrototype';
-
 
 interface GameBoardContentProps {
   viewportRef: React.RefObject<HTMLDivElement>;
@@ -32,9 +31,7 @@ interface GameBoardContentProps {
   handleBoardTokenDoubleClick: (tokenId: string, altKey: boolean) => void;
   draggingVisuals: { tokenId: string | null; visualWorldPoint: Point | null };
   isPageAndGridSettingsModalOpen: boolean;
-  setIsPageAndGridSettingsModalOpen: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
+  setIsPageAndGridSettingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   canManageBoardSettings: boolean;
   multiSelectBoundingBox: {
     x: number;
@@ -45,6 +42,8 @@ interface GameBoardContentProps {
   copiedTokenId: string | null;
   pasteTargetCell: Point | null;
   pendingAttack: PendingAttackSelection | null;
+  movementRangeCells: Point[];
+  movementPreviewPathCells: Point[];
   multiSelectedTokenIds: string[];
   onBoardPointerMove: (worldPoint: Point) => void;
   onBoardPointerLeave: () => void;
@@ -76,6 +75,8 @@ export function GameBoardContent({
   copiedTokenId,
   pasteTargetCell,
   pendingAttack,
+  movementRangeCells,
+  movementPreviewPathCells,
   multiSelectedTokenIds,
   onBoardPointerMove,
   onBoardPointerLeave,
@@ -88,7 +89,7 @@ export function GameBoardContent({
   activeCombatTurnTokenId,
   activeCombatNextTurnTokenId,
   combatParticipantTokenIds,
-}:GameBoardContentProps) {
+}: GameBoardContentProps) {
   const { isRightSidebarVisible } = useUIStore();
   const handleBoardDoubleClick = (event: React.MouseEvent<Element>) => {
     const point = getWorldPoint(event.clientX, event.clientY);
@@ -99,7 +100,7 @@ export function GameBoardContent({
       preferredTopTokenIds: multiSelectedTokenIds,
       getTokenSizeInCells: (token) => {
         const character = characters.find((entry) => entry.id === token.characterId);
-        return parseCharacterSize(character?.size ?? "Medium");
+        return parseCharacterSize(character?.size ?? 'Medium');
       },
     });
 
@@ -122,7 +123,7 @@ export function GameBoardContent({
   };
 
   const pendingAttackToken = pendingAttack
-    ? tokensOnBoard.find((token) => token.id === pendingAttack.attackerTokenId) ?? null
+    ? (tokensOnBoard.find((token) => token.id === pendingAttack.attackerTokenId) ?? null)
     : null;
   const pendingAttackAreaCells =
     pendingAttackToken && pendingAttack && gridSettings.metersPerSquare > 0
@@ -179,11 +180,11 @@ export function GameBoardContent({
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       ref={viewportRef}
-      className="flex-grow bg-surface-0 relative overflow-hidden"
+      className="bg-surface-0 relative flex-grow overflow-hidden"
       role="application"
       aria-label="Tabuleiro do jogo"
       style={{
-        cursor: pendingAttack ? `url(${aimCursorUrl}) 32 32, crosshair` : "default",
+        cursor: pendingAttack ? `url(${aimCursorUrl}) 32 32, crosshair` : 'default',
       }}
       onMouseDown={handleMouseDown}
       onWheel={handleWheel}
@@ -204,6 +205,8 @@ export function GameBoardContent({
         copiedTokenId={copiedTokenId}
         pasteTargetCell={pasteTargetCell}
         pendingAttackAreaCells={pendingAttackAreaCells}
+        movementRangeCells={movementRangeCells}
+        movementPreviewPathCells={movementPreviewPathCells}
         multiSelectBoundingBox={multiSelectBoundingBox}
         marqueeSelection={marqueeSelection}
         rulerPath={rulerPath}
@@ -227,4 +230,4 @@ export function GameBoardContent({
       ) : null}
     </div>
   );
-};
+}
