@@ -2,7 +2,6 @@ import { forwardRef, InputHTMLAttributes } from 'react';
 
 import eyeClosedIcon from '@/shared/assets/eye-closed.svg';
 import eyeIcon from '@/shared/assets/eye.svg';
-
 import { cn } from '@/shared/lib/utils/cn';
 
 type PasswordInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {

@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
-import { ProcessedEffect } from '../../../../types/effectTypes';
-import { PlusCircleIcon, MinimizeIcon } from '@/shared/ui/Icons';
-import { cn } from '@/shared/lib/utils/cn';
-import { Button } from '../../../ui/Button';
-import { controlButtonVariants, statusIndicatorVariants } from '@/features/characterBuilder/styles';
+
 import { useCharacterBuilderEffectsProcessor } from '@/features/characterBuilder/model/context/effectsProcessorContext';
+import { controlButtonVariants, statusIndicatorVariants } from '@/features/characterBuilder/styles';
+import { cn } from '@/shared/lib/utils/cn';
+import { PlusCircleIcon, MinimizeIcon } from '@/shared/ui/Icons';
+
 import { getAttributeNameTranslation } from '../../../../lib/translationHelpers';
+import { ProcessedEffect } from '../../../../types/effectTypes';
+import { Button } from '../../../ui/Button';
+
+
 
 interface AbilityScoreControlsProps {
   effect: ProcessedEffect & {

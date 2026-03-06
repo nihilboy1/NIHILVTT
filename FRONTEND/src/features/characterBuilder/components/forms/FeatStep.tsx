@@ -1,18 +1,17 @@
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { Card } from '../ui/Card';
-import { FeatEffectControls } from '../ui/FeatEffectControls';
-import { FeatEffectRenderer } from '../ui/FeatEffectRenderer';
 import { useCharacterBuilderEffectsProcessor } from '../../model/context/effectsProcessorContext';
 import { getOriginById } from '../../schemas/characterBuilderSchema';
 import { CharacterBuilderFormData } from '../../schemas/characterBuilderSchema';
+import { Card } from '../ui/Card';
+import { FeatEffectControls } from '../ui/FeatEffectControls';
+import { FeatEffectRenderer } from '../ui/FeatEffectRenderer';
 
 interface FeatStepProps {
   className?: string;
 }
 
-export const FeatStep: React.FC<FeatStepProps> = ({ className }) => {
+export function FeatStep({ className }: FeatStepProps) {
   const { watch } = useFormContext<CharacterBuilderFormData>();
   const effectsProcessor = useCharacterBuilderEffectsProcessor();
   const selectedOriginId = watch('origin');
@@ -151,4 +150,4 @@ export const FeatStep: React.FC<FeatStepProps> = ({ className }) => {
       </div>
     </div>
   );
-};
+}

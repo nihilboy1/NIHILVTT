@@ -1,9 +1,9 @@
-import { ProcessedEffect } from '../../../../types/effectTypes';
-import { ProficiencyTag } from '../../OriginOptionCard/components/ProficiencyTag';
 import {
   getSkillNameTranslation,
   getToolNameTranslation,
 } from '../../../../lib/translationHelpers';
+import { ProcessedEffect } from '../../../../types/effectTypes';
+import { ProficiencyTag } from '../../OriginOptionCard/components/ProficiencyTag';
 
 interface ProficiencyControlsFeatProps {
   effect: ProcessedEffect & {

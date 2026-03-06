@@ -21,9 +21,9 @@ export function HealthSection({ combatViewModel }: HealthSectionProps) {
 
       <div className="grid grid-cols-1 gap-1">
         <div>
-          <label className="mb-1 block text-center text-[0.56rem] font-semibold tracking-[0.08em] text-text-secondary">
+          <div className="mb-1 text-center text-[0.56rem] font-semibold tracking-[0.08em] text-text-secondary">
             ATUAL
-          </label>
+          </div>
           <div className="flex h-7 items-center justify-center rounded-md bg-surface-1/55 px-2 text-[0.82rem] font-semibold text-text-primary">
             {currentHp}
           </div>
@@ -31,17 +31,17 @@ export function HealthSection({ combatViewModel }: HealthSectionProps) {
 
         <div className="grid grid-cols-2 gap-1">
           <div>
-            <label className="mb-1 block text-center text-[0.56rem] font-semibold tracking-[0.08em] text-text-secondary">
+            <div className="mb-1 text-center text-[0.56rem] font-semibold tracking-[0.08em] text-text-secondary">
               TEMPORÁRIO
-            </label>
+            </div>
             <div className="flex h-7 items-center justify-center rounded-md bg-surface-1/55 px-2 text-[0.82rem] font-semibold text-text-primary">
               {tempHp}
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-center text-[0.56rem] font-semibold tracking-[0.08em] text-text-secondary">
+            <div className="mb-1 text-center text-[0.56rem] font-semibold tracking-[0.08em] text-text-secondary">
               MÁXIMO
-            </label>
+            </div>
             <div className="flex h-7 items-center justify-center rounded-md bg-surface-1/55 px-2 text-[0.82rem] font-semibold text-text-primary">
               {maxHp}
             </div>

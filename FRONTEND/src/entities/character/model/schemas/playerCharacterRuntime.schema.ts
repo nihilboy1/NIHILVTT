@@ -1,9 +1,9 @@
-import { z } from 'zod';
 import {
   MonsterCharacterStateSchema,
   PlayerCharacterStateSchema,
   SessionCharacterStateSchema,
 } from '@nihilvtt/datamodeling/runtime';
+import { z } from 'zod';
 
 export const playerCharacterRuntimeSchema = PlayerCharacterStateSchema;
 export const monsterCharacterRuntimeSchema = MonsterCharacterStateSchema;

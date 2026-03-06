@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { useCharactersStore } from '@/entities/character/model/store';
 import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
+import { useCharactersStore } from '@/entities/character/model/store';
 import {
   buildPlayerCharacterEquipmentViewModel,
   type PlayerCharacterEquipmentViewModel,

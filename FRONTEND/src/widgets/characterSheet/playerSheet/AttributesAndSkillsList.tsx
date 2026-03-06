@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 
-import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
 import { ATTRIBUTES_CONFIG } from "@/entities/character/constants";
-import { useCharactersStore } from "@/entities/character/model/store";
-import { isPlayerCharacterRuntime } from "@/entities/character/model/schemas/playerCharacterRuntime.schema";
-import { buildPlayerCharacterSkillsViewModel } from "@/entities/character/model/view-models/playerCharacterSkillsViewModel";
+import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
 import { PlayerCharacter } from "@/entities/character/model/schemas/character.schema";
+import { isPlayerCharacterRuntime } from "@/entities/character/model/schemas/playerCharacterRuntime.schema";
+import { useCharactersStore } from "@/entities/character/model/store";
+import { buildPlayerCharacterSkillsViewModel } from "@/entities/character/model/view-models/playerCharacterSkillsViewModel";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
 
 import { AttributeBlock } from "./AttributeBlock";

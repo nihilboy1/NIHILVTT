@@ -1,10 +1,11 @@
-import React from 'react';
-import { ProcessedEffect } from '../../types/effectTypes';
-import { Badge } from './Badge';
 import { cn } from '@/shared/lib/utils/cn';
-import { proficiencyTagVariants } from '../../styles';
+
 import { useCharacterBuilderEffectsProcessor } from '../../model/context/effectsProcessorContext';
 import { getFeatById } from '../../schemas/characterBuilderSchema';
+import { proficiencyTagVariants } from '../../styles';
+import { ProcessedEffect } from '../../types/effectTypes';
+
+import { Badge } from './Badge';
 
 interface FeatEffectControlsProps {
   effect: ProcessedEffect & {
@@ -15,7 +16,7 @@ interface FeatEffectControlsProps {
   };
 }
 
-export const FeatEffectControls: React.FC<FeatEffectControlsProps> = ({ effect }) => {
+export function FeatEffectControls({ effect }: FeatEffectControlsProps) {
   const { chooseFeat, removeFeat, selectedChoices } = useCharacterBuilderEffectsProcessor();
 
   // Se é um talento específico (automaticamente concedido)
@@ -110,8 +111,9 @@ export const FeatEffectControls: React.FC<FeatEffectControlsProps> = ({ effect }
             const featName = Array.isArray(feat.name) ? feat.name[0] : feat.name;
 
             return (
-              <div
+              <button
                 key={featId}
+                type="button"
                 className={cn(
                   'cursor-pointer rounded-lg border p-3 transition-colors',
                   isSelected
@@ -147,7 +149,7 @@ export const FeatEffectControls: React.FC<FeatEffectControlsProps> = ({ effect }
                     {feat.traits.length > 1 && ` (+${feat.traits.length - 1} outros)`}
                   </div>
                 )}
-              </div>
+              </button>
             );
           })}
         </div>
@@ -156,4 +158,4 @@ export const FeatEffectControls: React.FC<FeatEffectControlsProps> = ({ effect }
   }
 
   return null;
-};
+}

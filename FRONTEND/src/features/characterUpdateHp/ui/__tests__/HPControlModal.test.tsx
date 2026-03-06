@@ -8,15 +8,15 @@ jest.mock('@/shared/lib/hooks/useDismissable', () => ({
 }));
 
 jest.mock('@/shared/ui/DraggablePanel', () => ({
-  DraggablePanel: (props: {
+  DraggablePanel: ({ children, ...props }: {
     children: React.ReactNode;
     className?: string;
     initialPosition: { x: number; y: number };
     safeArea: { bottom: number; left: number; right: number; top: number };
     style?: React.CSSProperties;
   }) => {
-    mockDraggablePanel(props);
-    return <div data-testid="draggable-panel">{props.children}</div>;
+    mockDraggablePanel({ children, ...props });
+    return <div data-testid="draggable-panel">{children}</div>;
   },
 }));
 

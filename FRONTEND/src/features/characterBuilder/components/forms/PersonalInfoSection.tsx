@@ -1,8 +1,10 @@
 import { useFormContext } from 'react-hook-form';
-import { CharacterBuilderFormData } from '../../schemas/characterBuilderSchema';
+
 import { FormSection, CharacterNameField, ImageUrlField, FormField } from '@/shared/components';
-import { textareaVariants } from '@/shared/styles/inputVariants';
 import { cn } from '@/shared/lib/utils/cn';
+import { textareaVariants } from '@/shared/styles/inputVariants';
+
+import { CharacterBuilderFormData } from '../../schemas/characterBuilderSchema';
 
 export function PersonalInfoSection() {
   const {

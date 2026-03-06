@@ -1,7 +1,9 @@
 import { forwardRef } from 'react';
-import { FormField } from './FormField';
-import { inputVariants } from '../styles/inputVariants';
+
 import { cn } from '../lib/utils/cn';
+import { inputVariants } from '../styles/inputVariants';
+
+import { FormField } from './FormField';
 
 interface CharacterNameFieldProps {
   value: string;

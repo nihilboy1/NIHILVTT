@@ -8,6 +8,8 @@ import { useAuthStore } from '@/features/auth/model/authStore';
 import caretLeftIcon from '@/shared/assets/caret-left.svg';
 import signOutIcon from '@/shared/assets/sign-out.svg';
 import trashIcon from '@/shared/assets/trash.svg';
+import { getCroppedImageBlob } from '@/shared/lib/utils/imageCrop';
+import { formatUserTag } from '@/shared/lib/utils/nameUtils';
 import { AppButton } from '@/shared/ui/AppButton';
 import { CardSection } from '@/shared/ui/CardSection';
 import { Modal } from '@/shared/ui/Modal';
@@ -15,8 +17,6 @@ import { PageShell } from '@/shared/ui/PageShell';
 import { PasswordInput } from '@/shared/ui/PasswordInput';
 import { Spinner } from '@/shared/ui/Spinner';
 import { StatusAlert } from '@/shared/ui/StatusAlert';
-import { getCroppedImageBlob } from '@/shared/lib/utils/imageCrop';
-import { formatUserTag } from '@/shared/lib/utils/nameUtils';
 
 import 'react-easy-crop/react-easy-crop.css';
 
@@ -545,7 +545,6 @@ export default function ProfilePage() {
               onFocus={(event) => event.currentTarget.removeAttribute('readonly')}
               aria-describedby={saveModalError ? SAVE_MODAL_ERROR_ID : undefined}
               aria-invalid={Boolean(saveModalError)}
-              autoFocus
               className="rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
             />
           </div>
@@ -615,7 +614,6 @@ export default function ProfilePage() {
               onFocus={(event) => event.currentTarget.removeAttribute('readonly')}
               aria-describedby={deleteModalError ? DELETE_MODAL_ERROR_ID : undefined}
               aria-invalid={Boolean(deleteModalError)}
-              autoFocus
               className="rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
             />
           </div>
@@ -689,8 +687,9 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm text-text-secondary">Zoom</label>
+            <label htmlFor="profile-avatar-zoom" className="mb-1 block text-sm text-text-secondary">Zoom</label>
             <input
+              id="profile-avatar-zoom"
               type="range"
               min={1}
               max={3}

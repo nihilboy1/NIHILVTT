@@ -7,16 +7,16 @@ import { motion } from 'framer-motion';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { useAuthFormServerErrors } from '@/features/auth/model/hooks/useAuthFormServerErrors';
 import { RegisterFormInputs, registerSchema } from '@/features/auth/model/authSchemas';
 import { useAuthStore } from '@/features/auth/model/authStore';
+import { useAuthFormServerErrors } from '@/features/auth/model/hooks/useAuthFormServerErrors';
 import { useAuthModalStore } from '@/features/modalManager/model/authModalStore';
-import { AuthPageLayout } from '@/widgets/authPageLayout/ui/AuthPageLayout';
 import { AppButton } from '@/shared/ui/AppButton';
 import { FormInput } from '@/shared/ui/FormInput';
 import { MotionLink } from '@/shared/ui/MotionLink';
 import { StatusAlert } from '@/shared/ui/StatusAlert';
 import { AuthModalManager } from '@/widgets/authModalManager/ui/AuthModalManager';
+import { AuthPageLayout } from '@/widgets/authPageLayout/ui/AuthPageLayout';
 
 export default function RegisterPage() {
   const methods = useForm<RegisterFormInputs>({

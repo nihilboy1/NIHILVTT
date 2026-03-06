@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 
 import { useAuthStore } from '@/features/auth/model/authStore';
 import { useChatStore } from '@/features/chat/model/store';
-import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
 import { sendGameChatMessage, sendGameDiceRoll } from '@/features/game/model/gameSessionApi';
+import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
 import { useGameStore } from '@/features/game/model/gameStore';
 import { DEFAULTS } from '@/shared/config/constants';
 

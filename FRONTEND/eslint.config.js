@@ -1,3 +1,6 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
@@ -9,6 +12,9 @@ import pluginImport from 'eslint-plugin-import';
 import pluginJest from 'eslint-plugin-jest';
 import pluginTestingLibrary from 'eslint-plugin-testing-library';
 import eslintConfigPrettier from 'eslint-config-prettier';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default [
   {

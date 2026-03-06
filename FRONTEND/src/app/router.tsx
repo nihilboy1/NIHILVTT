@@ -5,8 +5,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AUTH_SESSION_EXPIRED_EVENT } from '@/features/auth/model/authSlice';
 import { useAuthStore } from '@/features/auth/model/authStore';
 import ProtectedRoute from '@/features/auth/ui/ProtectedRoute';
-import { Spinner } from '@/shared/ui/Spinner';
 import SessionPolicyBanner from '@/features/auth/ui/SessionPolicyBanner';
+import { Spinner } from '@/shared/ui/Spinner';
 
 // essas linhas fazem o carregamento dinâmico do componente HomePage e outros, permitindo que eles só sejam baixados quando necessário, o que melhora a performance da aplicação.
 const HomePage = lazy(() => import('../pages/HomePage'));

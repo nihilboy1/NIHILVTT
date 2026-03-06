@@ -1,5 +1,6 @@
-import { useCharactersStore } from '@/entities/character/model/store';
 import { CharacterTypeEnum } from '@nihilvtt/datamodeling/primitives';
+
+import { useCharactersStore } from '@/entities/character/model/store';
 
 export function usePlayerCharacter(characterId: string) {
   const { characters } = useCharactersStore();

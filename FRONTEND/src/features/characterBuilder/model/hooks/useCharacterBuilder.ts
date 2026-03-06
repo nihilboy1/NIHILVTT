@@ -7,15 +7,37 @@ import { PlayerCharacter } from '@/entities/character/model/schemas/character.sc
 import { Attributes } from '@/shared/constants/characterData/attributes';
 import { DEFAULT_ATTRIBUTES } from '@/shared/constants/characterData/attributes';
 
-import { useEffectsProcessor } from './useEffectsProcessor';
-import { buildPlayerCharacterFromBuilder } from '../../lib/buildPlayerCharacterFromBuilder';
 import { Step, STEPS } from '../../constants/steps';
+import { buildPlayerCharacterFromBuilder } from '../../lib/buildPlayerCharacterFromBuilder';
 import {
   CharacterBuilderFormData,
   characterBuilderSchema,
   getOriginById,
   getFeatById,
 } from '../../schemas/characterBuilderSchema';
+
+import { useEffectsProcessor } from './useEffectsProcessor';
+
+type FeatSelection = {
+  mode: 'specific' | 'choose';
+  feats: string[];
+};
+
+function isFeatSelection(value: unknown): value is FeatSelection {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const selection = value as { mode?: unknown; feats?: unknown };
+  if (selection.mode !== 'specific' && selection.mode !== 'choose') {
+    return false;
+  }
+
+  return (
+    Array.isArray(selection.feats) &&
+    selection.feats.every((entry) => typeof entry === 'string')
+  );
+}
 
 export function useCharacterBuilder() {
   const [currentStep, setCurrentStep] = useState<Step>('species');
@@ -128,7 +150,7 @@ export function useCharacterBuilder() {
       | string
       | Attributes
       | { name: string; tokenUrl?: string; splashartUrl?: string; lore: string }
-      | Record<string, any>,
+      | Record<string, unknown>,
   ) => {
     // Evita validação desnecessária se o valor for igual ao anterior
     const currentValue =
@@ -171,7 +193,7 @@ export function useCharacterBuilder() {
       }, 100);
     } else if (step === 'feat') {
       // Para talentos, tratamos como um objeto de seleções
-      setValue(step, value as Record<string, any>, {
+      setValue(step, value as Record<string, unknown>, {
         shouldValidate: true,
         shouldDirty: true,
       });
@@ -244,29 +266,17 @@ export function useCharacterBuilder() {
   ): Promise<boolean> => {
     const isValid = await trigger();
     if (!isValid) {
-      console.warn('[CharacterBuilder] Finalização bloqueada por validação.', {
-        errors: methods.formState.errors,
-      });
       return false;
     }
 
     const data = getValues();
-    console.info('[CharacterBuilder] Dados válidos para finalização.', {
-      step: currentStep,
-      formData: data,
-      effectChoices: effectsProcessor.effectChoices,
-    });
     const playerCharacterData = buildPlayerCharacterFromBuilder(data, effectsProcessor.effectChoices);
-    console.info('[CharacterBuilder] Personagem mapeado para persistência.', {
-      characterPreview: playerCharacterData,
-    });
     if (persistCharacter) {
       const persisted = await persistCharacter(playerCharacterData);
       if (!persisted) {
         console.error('[CharacterBuilder] Falha ao persistir personagem por pipeline externo.');
         return false;
       }
-      console.info('[CharacterBuilder] Personagem persistido por pipeline externo.');
     } else {
       console.error(
         '[CharacterBuilder] Fluxo local bloqueado: o builder exige pipeline autoritativo de persistência.',
@@ -311,9 +321,14 @@ export function useCharacterBuilder() {
     return processedEffects
       .filter((effect) => effect.type === 'passive_providesFeat')
       .flatMap((effect) => {
-        // Para efeitos específicos, retorna os talentos automaticamente
-        if (effect.selection?.mode === 'specific') {
-          return effect.selection.feats
+        const selection = isFeatSelection(effect.selection) ? effect.selection : null;
+        if (!selection) {
+          return [];
+        }
+
+        // Para efeitos específicos e de escolha, retorna as opções de talento disponíveis.
+        if (selection.mode === 'specific' || selection.mode === 'choose') {
+          return selection.feats
             .map((featId: string) => {
               const feat = getFeatById(featId);
               return feat
@@ -327,22 +342,7 @@ export function useCharacterBuilder() {
             })
             .filter(Boolean);
         }
-        // Para efeitos de escolha, retorna as opções disponíveis
-        if (effect.selection?.mode === 'choose') {
-          return effect.selection.feats
-            .map((featId: string) => {
-              const feat = getFeatById(featId);
-              return feat
-                ? {
-                    id: feat.id,
-                    name: Array.isArray(feat.name) ? feat.name[0] : feat.name,
-                    description: feat.description,
-                    effect,
-                  }
-                : null;
-            })
-            .filter(Boolean);
-        }
+
         return [];
       });
   };

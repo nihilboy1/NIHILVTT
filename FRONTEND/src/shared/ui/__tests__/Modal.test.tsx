@@ -37,7 +37,7 @@ describe('Modal accessibility', () => {
       </Modal>,
     );
 
-    const overlay = document.querySelector('div[role="button"][tabindex="-1"]') as Element;
+    const [overlay] = screen.getAllByRole('button');
     const closeButton = screen.getByRole('button', { name: /fechar modal/i });
     const confirmButton = screen.getByRole('button', { name: /confirmar/i });
 

@@ -1,8 +1,8 @@
 import { PHB2024CLASSES, PHB2024ORIGINS, PHB2024SPECIES } from '@nihilvtt/datamodeling/data';
 
+import { getPlayerProficiencyBonusFromLevel } from '@/entities/character/model/rules/characterDerivedRules';
 import type { PlayerCharacter } from '@/entities/character/model/schemas/character.schema';
 import type { PlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
-import { getPlayerProficiencyBonusFromLevel } from '@/entities/character/model/rules/characterDerivedRules';
 
 export type PlayerCharacterViewModel = {
   id: string;

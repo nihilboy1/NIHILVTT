@@ -2,13 +2,13 @@ import { useMemo, useState } from 'react';
 
 import { PHB2024ITEMS, PHB2024MONSTERS } from '@nihilvtt/datamodeling/data';
 
-import { useAuthStore } from '@/features/auth/model/authStore';
-import { useGameStore } from '@/features/game/model/gameStore';
+import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 import { useCharactersStore } from '@/entities/character/model/store';
+import { useAuthStore } from '@/features/auth/model/authStore';
 import { sendGameAddCharacterInventoryItem } from '@/features/game/model/gameSessionApi';
+import { useGameStore } from '@/features/game/model/gameStore';
 import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
 import { Modal } from '@/shared/ui/Modal';
-import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 
 interface CompendiumPanelProps {
   gameId: number | null;

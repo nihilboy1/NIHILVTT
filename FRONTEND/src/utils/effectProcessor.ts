@@ -1,11 +1,12 @@
 import { OriginType, FeatType } from '@nihilvtt/datamodeling/domain';
+
 import { EffectChoices } from '../features/characterBuilder/types/effectTypes';
 
 interface EntityEffect {
   type: string;
   name: string;
   description?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 type ProcessedEffectBase = {
@@ -14,8 +15,28 @@ type ProcessedEffectBase = {
   name: string;
   description?: string;
   requiresChoice: boolean;
-  selected: any;
-  [key: string]: any;
+  selected: unknown;
+  [key: string]: unknown;
+};
+
+type AbilityScoreLikeEffect = EntityEffect & {
+  choices?: Array<{ pick?: { amount?: number } }>;
+  maxScore?: number;
+};
+
+type FeatSelection = {
+  mode?: 'specific' | 'choose';
+  feats?: string[];
+};
+
+type ProvidesFeatLikeEffect = EntityEffect & {
+  selection?: FeatSelection;
+};
+
+type ProficiencyLikeEffect = EntityEffect & {
+  on?: string;
+  proficiencies?: string[];
+  choose?: { count: number | 'all'; from?: string[] };
 };
 
 
@@ -38,8 +59,8 @@ function processEntityEffects(
         return {
           ...baseProcessedEffect,
           requiresChoice: true,
-          choices: (effect as any).choices,
-          maxScore: (effect as any).maxScore,
+          choices: (effect as AbilityScoreLikeEffect).choices,
+          maxScore: (effect as AbilityScoreLikeEffect).maxScore,
           description: effect.description,
           selected: effectChoices[effectId] || [],
         } as ProcessedEffectBase;
@@ -47,18 +68,18 @@ function processEntityEffects(
       case 'passive_providesFeat':
         return {
           ...baseProcessedEffect,
-          requiresChoice: (effect as any).selection?.mode !== 'specific',
-          selection: (effect as any).selection,
+          requiresChoice: (effect as ProvidesFeatLikeEffect).selection?.mode !== 'specific',
+          selection: (effect as ProvidesFeatLikeEffect).selection,
           description: effect.description,
           selected:
             effectChoices[effectId] ||
-            ((effect as any).selection?.mode === 'specific'
-              ? (effect as any).selection.feats[0]
+            ((effect as ProvidesFeatLikeEffect).selection?.mode === 'specific'
+              ? (effect as ProvidesFeatLikeEffect).selection?.feats?.[0]
               : null),
         } as ProcessedEffectBase;
 
       case 'passive_grantProficiency':
-        const profEffect = effect as any;
+        const profEffect = effect as ProficiencyLikeEffect;
 
         const isOriginEffect =
           effectId.includes('-origin-effect-') && effectId.split('-origin-effect-')[0].length > 0;
@@ -140,7 +161,7 @@ export function areAllEffectsSelected(processedEffects: ProcessedEffectBase[]): 
     .filter((effect) => effect.requiresChoice)
     .every((effect) => {
       if (effect.type === 'passive_grantProficiency') {
-        const profEffect = effect as any;
+        const profEffect = effect as ProficiencyLikeEffect;
 
         if (
           (profEffect.proficiencies && Array.isArray(profEffect.proficiencies)) ||
@@ -158,7 +179,7 @@ export function areAllEffectsSelected(processedEffects: ProcessedEffectBase[]): 
         }
 
         if (effect.type === 'passive_grantProficiency') {
-          const profEffect = effect as any;
+          const profEffect = effect as ProficiencyLikeEffect;
           if (profEffect.choose) {
             const requiredCount =
               typeof profEffect.choose.count === 'number' ? profEffect.choose.count : 0;
@@ -174,12 +195,12 @@ export function areAllEffectsSelected(processedEffects: ProcessedEffectBase[]): 
 
 
 export function getTotalAllowedPoints(effect: ProcessedEffectBase): number {
-  const effectAny = effect as any;
-  if (effect.type !== 'passive_modifyAbilityScore' || !effectAny.choices) {
+  const abilityEffect = effect as AbilityScoreLikeEffect;
+  if (effect.type !== 'passive_modifyAbilityScore' || !abilityEffect.choices) {
     return 0;
   }
 
-  const firstChoice = effectAny.choices[0];
+  const firstChoice = abilityEffect.choices[0];
   if (!firstChoice || !firstChoice.pick) {
     return 0;
   }

@@ -1,13 +1,13 @@
 import { ATTRIBUTE_LIST } from '@/shared/constants/characterData/attributes';
+import { cn } from '@/shared/lib/utils/cn';
 import { XMarkIcon } from '@/shared/ui/Icons';
 import { Tooltip } from '@/shared/ui/Tooltip';
-import { cn } from '@/shared/lib/utils/cn';
 
 import { usePointBuy } from '../../model/hooks/usePointBuy';
-
-import { AttributeSelector } from './AttributeSelector';
 import { statusIndicatorVariants } from '../../styles';
 import { Button } from '../ui/Button';
+
+import { AttributeSelector } from './AttributeSelector';
 
 interface AttributesPointBuyProps {
   attributes: import('@/shared/constants/characterData/attributes').Attributes;

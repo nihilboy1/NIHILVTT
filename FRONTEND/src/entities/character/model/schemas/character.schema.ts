@@ -1,10 +1,10 @@
-import { z } from 'zod';
 import {
   CreatureSizeEnum,
   DiceTypeEnum,
   ProficiencyLevelEnum,
   CharacterTypeEnum,
 } from '@nihilvtt/datamodeling/primitives';
+import { z } from 'zod';
 export { CharacterTypeEnum };
 
 // =================================================================

@@ -1,5 +1,5 @@
-import { cn } from '@/shared/lib/utils/cn';
 import { proficiencyTagVariants } from '@/features/characterBuilder/styles';
+import { cn } from '@/shared/lib/utils/cn';
 
 interface ProficiencyTagProps {
   name: string;

@@ -6,7 +6,6 @@ import { useCharactersStore } from '@/entities/character/model/store';
 import { useAuthStore } from '@/features/auth/model/authStore';
 import { useGameStore } from '@/features/game/model/gameStore';
 import { useUIStore } from '@/features/layoutControls/model/store';
-
 import { ModalEntry } from '@/features/modalManager/model/baseModalConfig';
 import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
 import { type Token } from '@/shared/api/types';

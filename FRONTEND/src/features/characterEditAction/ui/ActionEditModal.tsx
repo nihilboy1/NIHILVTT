@@ -36,8 +36,8 @@ export function ActionEditModal({
     },
   });
 
-  const onSubmit = (data: ActionFormInputs) => {
-    console.log("Form submitted:", data);
+  const onSubmit = (_data: ActionFormInputs) => {
+    void _data;
     // Here you would typically save the data, e.g., to global state
     onClose();
   };

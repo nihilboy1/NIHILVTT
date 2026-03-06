@@ -13,6 +13,35 @@ jest.mock('@hookform/resolvers/zod', () => ({
   zodResolver: () => jest.fn(),
 }));
 
+jest.mock('@nihilvtt/datamodeling/data', () => ({
+  PHB2024SPECIES: [
+    {
+      id: 'specie-aasimar',
+      name: ['Aasimar'],
+      description: 'Specie mock',
+      source: 'test',
+    },
+  ],
+  PHB2024ORIGINS: [
+    {
+      id: 'origin-acolyte',
+      name: ['Acólito'],
+      description: 'Origin mock',
+      source: 'test',
+      effects: [],
+    },
+  ],
+  PHB2024CLASSES: [
+    {
+      id: 'class-fighter',
+      name: ['Guerreiro'],
+      description: 'Class mock',
+      source: 'test',
+    },
+  ],
+  PHB2024FEATS: [],
+}));
+
 jest.mock('react-hook-form', () => ({
   useForm: () => ({
     watch: mockWatch,

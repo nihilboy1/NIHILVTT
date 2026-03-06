@@ -1,6 +1,6 @@
 import {
   CSSProperties,
-  HTMLAttributes,
+  ButtonHTMLAttributes,
   ReactNode,
   useCallback,
   createContext,
@@ -52,7 +52,7 @@ function clampPosition(position: Position, bounds: Bounds): Position {
   };
 }
 
-interface DraggableHandleProps extends HTMLAttributes<HTMLDivElement> {
+interface DraggableHandleProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
@@ -62,7 +62,7 @@ export function DraggableHandle({ children, onMouseDown, ...props }: DraggableHa
     throw new Error('DraggableHandle must be used inside DraggablePanel.');
   }
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLButtonElement>) => {
     onMouseDown?.(event);
     if (event.defaultPrevented) {
       return;
@@ -72,12 +72,13 @@ export function DraggableHandle({ children, onMouseDown, ...props }: DraggableHa
   };
 
   return (
-    <div
+    <button
       {...props}
+      type={props.type ?? 'button'}
       onMouseDown={handleMouseDown}
     >
       {children}
-    </div>
+    </button>
   );
 }
 
@@ -162,7 +163,7 @@ function DraggablePanelInner({
     };
   }, []);
 
-  const handleDragHandleMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+  const handleDragHandleMouseDown = useCallback((event: React.MouseEvent<HTMLElement>) => {
     if (event.button !== 0 || !node) {
       return;
     }
@@ -200,7 +201,7 @@ function DraggablePanelInner({
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
     event.preventDefault();
-  };
+  }, [bounds, node]);
 
   const mergedStyle: CSSProperties = {
     left: `${position.x}px`,

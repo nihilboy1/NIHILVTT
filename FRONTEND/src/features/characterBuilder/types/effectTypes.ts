@@ -36,9 +36,6 @@ export type EntityEffect =
   | VisionEffect
   | ModifyUserHPEffect;
 
-// Manter o alias para compatibilidade com o código existente
-export type OriginEffect = EntityEffect;
-
 // Tipos para as escolhas do usuário
 export type AbilityScoreChoice = Record<string, number>;
 export type FeatChoice = string;
@@ -52,9 +49,9 @@ export interface ProcessedEffect {
   name: string;
   description?: string;
   requiresChoice: boolean;
-  selected: any;
-  onSelect: (choice: any) => void;
-  [key: string]: any; // Propriedades adicionais específicas para cada tipo
+  selected: unknown;
+  onSelect: (choice: unknown) => void;
+  [key: string]: unknown; // Propriedades adicionais específicas para cada tipo
 }
 
 export interface EffectChoices {

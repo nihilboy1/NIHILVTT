@@ -4,11 +4,12 @@ import { useCharactersStore } from '@/entities/character/model/store';
 import { useSelectedTokenStore } from '@/entities/token/model/store/selectedTokenStore';
 import { useTokenStore } from '@/entities/token/model/store/tokenStore';
 import { useChatStore } from '@/features/chat/model/store';
-import { useCombatStore } from '@/features/combat/model/store';
 import { useAttackFeedbackStore } from '@/features/combat/model/attackFeedbackStore';
+import { useCombatStore } from '@/features/combat/model/store';
 import type { CombatState } from '@/shared/api/types';
 
 import { type GameSessionSnapshot } from './gameSessionApi';
+import { resetAppliedGameSessionEventIds } from './gameSessionEventHandlers';
 
 const tokenSchema = z.object({
   id: z.string().min(1),
@@ -88,6 +89,7 @@ const combatStateSchema = z.object({
 });
 
 export function resetGameSessionClientState(): void {
+  resetAppliedGameSessionEventIds();
   useSelectedTokenStore.getState().setSelectedTokenId(null);
   useTokenStore.getState().resetTokens();
   useCharactersStore.getState().replaceCharacters([]);
@@ -152,12 +154,7 @@ function parseSnapshotCombat(entry: unknown): CombatState | null {
 }
 
 export function hydrateGameSessionSnapshot(snapshot: GameSessionSnapshot): void {
-  console.debug('[gameSession] hydrate snapshot begin', {
-    characters: snapshot.state.characters?.length ?? 0,
-    tokens: snapshot.state.tokens?.length ?? 0,
-    messages: snapshot.state.messages?.length ?? 0,
-    hasCombat: snapshot.state.combat != null,
-  });
+  resetAppliedGameSessionEventIds();
   const rawCharacters = snapshot.state.characters;
   const parsedTokens = parseSnapshotTokens(snapshot.state.tokens);
   const parsedMessages = parseSnapshotMessages(snapshot.state.messages);
@@ -169,11 +166,4 @@ export function hydrateGameSessionSnapshot(snapshot: GameSessionSnapshot): void 
   useCombatStore.getState().setCombatState(parsedCombat);
   useAttackFeedbackStore.getState().clearAllFeedback();
   useSelectedTokenStore.getState().setSelectedTokenId(null);
-  console.debug('[gameSession] hydrate snapshot complete', {
-    characters: rawCharacters.length,
-    tokens: parsedTokens.length,
-    messages: parsedMessages.length,
-    combatParticipants: parsedCombat?.participants.length ?? 0,
-    combatTurnIndex: parsedCombat?.turnIndex ?? null,
-  });
 }

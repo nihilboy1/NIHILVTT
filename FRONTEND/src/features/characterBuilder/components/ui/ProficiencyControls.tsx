@@ -1,10 +1,12 @@
-import React from 'react';
-import { ProcessedEffect } from '../../types/effectTypes';
-import { Badge } from './Badge';
-import { getSkillNameTranslation } from '../../lib/translationHelpers';
 import { cn } from '@/shared/lib/utils/cn';
-import { proficiencyTagVariants, selectionButtonVariants } from '../../styles';
+
+import { getSkillNameTranslation } from '../../lib/translationHelpers';
 import { useCharacterBuilderEffectsProcessor } from '../../model/context/effectsProcessorContext';
+import { proficiencyTagVariants, selectionButtonVariants } from '../../styles';
+import { ProcessedEffect } from '../../types/effectTypes';
+
+import { Badge } from './Badge';
+
 
 interface ProficiencyControlsProps {
   effect: ProcessedEffect & {
@@ -18,7 +20,7 @@ interface ProficiencyControlsProps {
   };
 }
 
-export const ProficiencyControls: React.FC<ProficiencyControlsProps> = ({ effect }) => {
+export function ProficiencyControls({ effect }: ProficiencyControlsProps) {
   const { chooseProficiency, removeProficiency, selectedChoices } =
     useCharacterBuilderEffectsProcessor();
 
@@ -112,4 +114,4 @@ export const ProficiencyControls: React.FC<ProficiencyControlsProps> = ({ effect
   }
 
   return null;
-};
+}

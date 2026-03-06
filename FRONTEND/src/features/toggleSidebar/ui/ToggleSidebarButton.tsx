@@ -17,7 +17,8 @@ export function ToggleSidebarButton({
   icon,
   position,
 }: ToggleSidebarButtonProps) {
-  const baseClasses = "border border-surface-2 hover:bg-accent-primary-hover absolute top-1/2 -translate-y-1/2 bg-surface-1 p-2 shadow-lg z-10";
+  const baseClasses =
+    "border border-surface-2 hover:bg-accent-primary-hover absolute top-1/2 -translate-y-1/2 bg-surface-1 p-2 shadow-lg z-[60] pointer-events-auto";
   const positionClasses = position === 'left'
     ? "left-0 border-l-0 rounded-r-md"
     : "right-0 border-r-0 rounded-l-md";

@@ -1,10 +1,14 @@
 import { useEffect } from 'react';
+
+import { useCharacterBuilderEffectsProcessor } from '@/features/characterBuilder/model/context/effectsProcessorContext';
+import { characterCardVariants, selectionBadgeVariants } from '@/features/characterBuilder/styles';
+import { cn } from '@/shared/lib/utils/cn';
+
 import { CharacterOption, getOriginById } from '../../../schemas/characterBuilderSchema';
 import { ProcessedEffect } from '../../../types/effectTypes';
-import { cn } from '@/shared/lib/utils/cn';
-import { characterCardVariants, selectionBadgeVariants } from '@/features/characterBuilder/styles';
 import { Badge } from '../../ui/Badge';
-import { useCharacterBuilderEffectsProcessor } from '@/features/characterBuilder/model/context/effectsProcessorContext';
+
+
 import { EffectSection } from './components/EffectSection';
 import { AbilityScoreControls } from './EffectControls/AbilityScoreControls';
 import { FeatControls } from './EffectControls/FeatControls';
@@ -113,6 +117,8 @@ export function OriginOptionCard({
   return (
     <div
       id={`origin-card-${id}`}
+      role="button"
+      tabIndex={0}
       className={cn(
         characterCardVariants({
           state: isSelected ? 'selected' : 'default',
@@ -122,6 +128,12 @@ export function OriginOptionCard({
         isSelected && 'cursor-default',
       )}
       onClick={() => !isSelected && onSelect()}
+      onKeyDown={(event) => {
+        if (!isSelected && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
     >
       {/* Header do card - mesmo layout que OptionCard */}
       <div className="mb-3 flex items-center justify-between">

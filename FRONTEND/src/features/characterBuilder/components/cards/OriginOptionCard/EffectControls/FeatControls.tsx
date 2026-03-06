@@ -1,8 +1,10 @@
-import { ProcessedEffect } from '../../../../types/effectTypes';
-import { getFeatById } from '../../../../schemas/characterBuilderSchema';
-import { cn } from '@/shared/lib/utils/cn';
-import { Button } from '../../../ui/Button';
 import { selectionButtonVariants } from '@/features/characterBuilder/styles';
+import { cn } from '@/shared/lib/utils/cn';
+
+import { getFeatById } from '../../../../schemas/characterBuilderSchema';
+import { ProcessedEffect } from '../../../../types/effectTypes';
+import { Button } from '../../../ui/Button';
+
 
 interface FeatControlsProps {
   effect: ProcessedEffect & {

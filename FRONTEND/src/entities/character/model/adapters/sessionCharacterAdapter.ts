@@ -1,14 +1,16 @@
-import { z } from 'zod';
-import { type MonsterCharacterStateType } from '@nihilvtt/datamodeling/runtime';
 import { PHB2024MONSTERS } from '@nihilvtt/datamodeling/data';
-import type { MonsterType } from '@nihilvtt/datamodeling/domain';
+import { type MonsterCharacterStateType } from '@nihilvtt/datamodeling/runtime';
+import { z } from 'zod';
 
+
+import { DEFAULT_PLAYER_DATA, DEFAULT_TOKEN_IMAGE } from '@/entities/character/config/sheetDefaults';
+import { getArmorClassFromEquipment } from '@/entities/character/model/rules/itemDerivedRules';
+import { getBaseWalkSpeedFromSpecieId } from '@/entities/character/model/rules/specieDerivedRules';
 import {
   Character,
   MonsterNpcCharacter,
   PlayerCharacter,
 } from '@/entities/character/model/schemas/character.schema';
-import { DEFAULT_PLAYER_DATA, DEFAULT_TOKEN_IMAGE } from '@/entities/character/config/sheetDefaults';
 import {
   isMonsterCharacterRuntime,
   isPlayerCharacterRuntime,
@@ -18,8 +20,8 @@ import {
   playerCharacterRuntimeSchema,
   type PlayerCharacterRuntime,
 } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
-import { getArmorClassFromEquipment } from '@/entities/character/model/rules/itemDerivedRules';
-import { getBaseWalkSpeedFromSpecieId } from '@/entities/character/model/rules/specieDerivedRules';
+
+import type { MonsterType } from '@nihilvtt/datamodeling/domain';
 
 export type NormalizedCharacterEntry = {
   character: Character;

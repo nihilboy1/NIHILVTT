@@ -1,17 +1,19 @@
+import { useState } from 'react';
+
+import { toast } from 'sonner';
+
 import { usePlayerCharacter } from '@/entities/character/lib/hooks/usePlayerCharacter';
-import { useCharactersStore } from '@/entities/character/model/store';
-import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 import {
   CharacterTypeEnum,
   characterTypeTranslations,
 } from '@/entities/character/model/schemas/character.schema';
-import { useAuthStore } from '@/features/auth/model/authStore';
-import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
-import { sendGameUpdateCharacterController } from '@/features/game/model/gameSessionApi';
-import { useGameStore } from '@/features/game/model/gameStore';
+import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
+import { useCharactersStore } from '@/entities/character/model/store';
 import { PlayerCharacterViewModel } from '@/entities/character/model/view-models/playerCharacterViewModel';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useAuthStore } from '@/features/auth/model/authStore';
+import { sendGameUpdateCharacterController } from '@/features/game/model/gameSessionApi';
+import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
+import { useGameStore } from '@/features/game/model/gameStore';
 
 interface PlayerSheetConfigTabProps {
   characterId: string;

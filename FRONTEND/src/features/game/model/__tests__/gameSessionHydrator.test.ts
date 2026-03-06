@@ -1,4 +1,8 @@
 import type { GameSessionSnapshot } from '@/features/game/model/gameSessionApi';
+import {
+  hydrateGameSessionSnapshot,
+  resetGameSessionClientState,
+} from '@/features/game/model/gameSessionHydrator';
 
 const replaceCharacters = jest.fn();
 const replaceTokens = jest.fn();
@@ -51,11 +55,6 @@ jest.mock('@/entities/token/model/store/selectedTokenStore', () => ({
     }),
   },
 }));
-
-import {
-  hydrateGameSessionSnapshot,
-  resetGameSessionClientState,
-} from '@/features/game/model/gameSessionHydrator';
 
 describe('gameSessionHydrator', () => {
   beforeEach(() => {
@@ -203,7 +202,9 @@ describe('gameSessionHydrator', () => {
 
   it('fails fast when the character contract boundary rejects the snapshot payload', () => {
     replaceCharacters.mockImplementationOnce(() => {
-      throw new Error('Violação de contrato de sessão em replaceCharacters[0]: runtime de personagem inválido.');
+      throw new Error(
+        'Violação de contrato de sessão em replaceCharacters[0]: runtime de personagem inválido.',
+      );
     });
 
     const snapshot: GameSessionSnapshot = {

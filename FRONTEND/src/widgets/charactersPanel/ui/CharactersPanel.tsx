@@ -1,13 +1,14 @@
 import { GiAncientSword } from 'react-icons/gi';
 import { useParams } from 'react-router-dom';
-import { useAuthStore } from '@/features/auth/model/authStore';
+
 import { useCharactersStore } from '@/entities/character/model/store';
 import { CharacterCard } from '@/entities/character/ui/CharacterCard';
-import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
+import { useAuthStore } from '@/features/auth/model/authStore';
 import {
   sendGameDuplicateCharacter,
   sendGameRemoveCharacter,
 } from '@/features/game/model/gameSessionApi';
+import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
 import { useGameStore } from '@/features/game/model/gameStore';
 import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
 

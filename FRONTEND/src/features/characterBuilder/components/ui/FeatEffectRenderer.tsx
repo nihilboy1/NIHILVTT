@@ -1,8 +1,9 @@
-import React from 'react';
-import { ProcessedEffect } from '../../types/effectTypes';
-import { Badge } from './Badge';
 import { cn } from '@/shared/lib/utils/cn';
+
 import { proficiencyTagVariants } from '../../styles';
+import { ProcessedEffect } from '../../types/effectTypes';
+
+import { Badge } from './Badge';
 import { ProficiencyControls } from './ProficiencyControls';
 
 interface FeatEffectRendererProps {
@@ -13,7 +14,7 @@ interface FeatEffectRendererProps {
   };
 }
 
-export const FeatEffectRenderer: React.FC<FeatEffectRendererProps> = ({ effect }) => {
+export function FeatEffectRenderer({ effect }: FeatEffectRendererProps) {
   // Renderiza diferentes tipos de efeitos de talentos
 
   if (effect.type === 'passive_grantProficiency') {
@@ -134,4 +135,4 @@ export const FeatEffectRenderer: React.FC<FeatEffectRendererProps> = ({ effect }
       )}
     </div>
   );
-};
+}

@@ -2,10 +2,10 @@
 
 import { PHB2024MONSTERS } from '@nihilvtt/datamodeling/data';
 
-import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
-import { adaptMonsterCatalogToSheetModel } from '@/entities/character/model/adapters/sessionCharacterAdapter';
-import { useCharactersStore } from "@/entities/character/model/store";
 import { usePlayerCharacterViewModel } from "@/entities/character/lib/hooks/usePlayerCharacterViewModel";
+import { adaptMonsterCatalogToSheetModel } from '@/entities/character/model/adapters/sessionCharacterAdapter';
+import { CharacterTypeEnum } from "@/entities/character/model/schemas/character.schema";
+import { useCharactersStore } from "@/entities/character/model/store";
 import { useUIStore } from "@/features/layoutControls/model/store";
 import { MonsterSheetContent } from "@/widgets/characterSheet/monsterNpcSheet/MonsterSheetContent";
 import { PlayerSheetContent } from "@/widgets/characterSheet/playerSheet/PlayerSheetContent";

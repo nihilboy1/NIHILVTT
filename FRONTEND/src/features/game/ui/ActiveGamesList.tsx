@@ -2,10 +2,10 @@ import {
   FIXED_GAME_SYSTEM_LABEL,
   type Game,
 } from '@/entities/game/model/schemas/game.schema';
+import { formatUserTag } from '@/shared/lib/utils/nameUtils';
 import { AppButton } from '@/shared/ui/AppButton';
 import { DeleteIcon } from '@/shared/ui/Icons';
 import { Spinner } from '@/shared/ui/Spinner';
-import { formatUserTag } from '@/shared/lib/utils/nameUtils';
 
 type ActiveGamesListProps = {
   games: Game[];

@@ -144,7 +144,7 @@ export interface CombatState {
 
 export interface DraggingVisuals {
   tokenId: string | null;
-  visualSVGPoint: Point | null;
+  visualWorldPoint: Point | null;
 }
 
 export interface MarqueeSelectionState {

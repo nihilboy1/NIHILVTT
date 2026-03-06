@@ -1,6 +1,7 @@
 import { ATTRIBUTE_COST } from '@/shared/constants/characterData/attributes';
-import { MinimizeIcon, PlusCircleIcon } from '@/shared/ui/Icons';
 import { cn } from '@/shared/lib/utils/cn';
+import { MinimizeIcon, PlusCircleIcon } from '@/shared/ui/Icons';
+
 import { attributeSectionVariants, controlButtonVariants } from '../../styles';
 
 export interface AttributeSelectorProps {

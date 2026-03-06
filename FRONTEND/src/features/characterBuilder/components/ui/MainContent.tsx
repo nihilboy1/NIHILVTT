@@ -1,23 +1,27 @@
 import { useState, useRef, useMemo } from 'react';
+
+import { PHB2024ORIGINS, PHB2024SPECIES } from '@nihilvtt/datamodeling/data';
+import { animateScroll as scroll } from 'react-scroll';
+
 import { DEFAULT_ATTRIBUTES } from '@/shared/constants/characterData/attributes';
 import { CLASSES } from '@/shared/constants/characterData/classes';
-import { CustomScrollbar } from '@/shared/ui/CustomScrollbar';
 import { cn } from '@/shared/lib/utils/cn';
+import { CustomScrollbar } from '@/shared/ui/CustomScrollbar';
+
 import { Selection, Step, STEPS } from '../../constants/steps';
-import { PHB2024ORIGINS, PHB2024SPECIES } from '@nihilvtt/datamodeling/data';
 import {
   CharacterOption,
   specieToCharacterOption,
   originToCharacterOption,
   getRequiredFeats,
 } from '../../schemas/characterBuilderSchema';
-import { animateScroll as scroll } from 'react-scroll';
-
-import { CardsContainer } from './CardsContainer';
-import { Button } from './Button';
-import { AttributesPointBuySection } from '../selectors/AttributesPointBuySection';
-import { PersonalInfoSection } from '../forms/PersonalInfoSection';
 import { navigationButtonVariants } from '../../styles';
+import { PersonalInfoSection } from '../forms/PersonalInfoSection';
+import { AttributesPointBuySection } from '../selectors/AttributesPointBuySection';
+
+import { Button } from './Button';
+import { CardsContainer } from './CardsContainer';
+
 
 interface MainContentProps {
   currentStep: Step;

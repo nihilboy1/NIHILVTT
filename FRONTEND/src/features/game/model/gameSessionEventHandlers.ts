@@ -1,13 +1,43 @@
 import { z } from 'zod';
 
-import { Message } from '@/shared/api/types';
-import { useChatStore } from '@/features/chat/model/store';
-import { useTokenStore } from '@/entities/token/model/store/tokenStore';
 import { useCharactersStore } from '@/entities/character/model/store';
-import { useCombatStore } from '@/features/combat/model/store';
+import { useTokenStore } from '@/entities/token/model/store/tokenStore';
+import { useChatStore } from '@/features/chat/model/store';
 import { useAttackFeedbackStore } from '@/features/combat/model/attackFeedbackStore';
+import { useCombatStore } from '@/features/combat/model/store';
+import { Message } from '@/shared/api/types';
 
 import { GameSessionEvent } from './gameSessionApi';
+
+const APPLIED_EVENT_IDS_MAX_SIZE = 2000;
+const appliedEventIds = new Set<string>();
+const appliedEventIdQueue: string[] = [];
+
+function rememberAppliedEventId(eventId: string): void {
+  if (appliedEventIds.has(eventId)) {
+    return;
+  }
+  appliedEventIds.add(eventId);
+  appliedEventIdQueue.push(eventId);
+
+  if (appliedEventIdQueue.length <= APPLIED_EVENT_IDS_MAX_SIZE) {
+    return;
+  }
+
+  const overflowCount = appliedEventIdQueue.length - APPLIED_EVENT_IDS_MAX_SIZE;
+  for (let index = 0; index < overflowCount; index += 1) {
+    const staleEventId = appliedEventIdQueue.shift();
+    if (!staleEventId) {
+      break;
+    }
+    appliedEventIds.delete(staleEventId);
+  }
+}
+
+export function resetAppliedGameSessionEventIds(): void {
+  appliedEventIds.clear();
+  appliedEventIdQueue.length = 0;
+}
 
 const rollPartSchema = z.union([
   z.object({
@@ -182,12 +212,11 @@ function resolveTokenDisplayName(tokenId: string): string {
 }
 
 export function applyGameSessionEvent(event: GameSessionEvent): void {
-  console.info('[gameSession] applying event', {
-    type: event.type,
-    eventId: event.eventId,
-    createdAt: event.createdAt,
-    gameId: event.gameId,
-  });
+  if (appliedEventIds.has(event.eventId)) {
+    return;
+  }
+  rememberAppliedEventId(event.eventId);
+
   if (event.type === 'TOKEN_CREATED') {
     const parsed = requireEventPayload(event, tokenCreatedPayloadSchema, 'TOKEN_CREATED');
     if (parsed.character !== null) {
@@ -235,15 +264,6 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
 
   if (event.type === 'ATTACK_RESOLVED') {
     const parsed = requireEventPayload(event, attackResolvedPayloadSchema, 'ATTACK_RESOLVED');
-    console.info('[attack-feedback] ATTACK_RESOLVED parsed', {
-      eventId: event.eventId,
-      attackerTokenId: parsed.attackerTokenId,
-      targetTokenId: parsed.targetTokenId,
-      hit: parsed.hit,
-      attackTotal: parsed.attackTotal,
-      targetArmorClass: parsed.targetArmorClass,
-      damageApplied: parsed.damageApplied,
-    });
 
     useCharactersStore
       .getState()

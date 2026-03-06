@@ -1,6 +1,7 @@
+import { PHB2024ORIGINS, PHB2024SPECIES } from '@nihilvtt/datamodeling/data';
+
 import { CLASSES } from '@/shared/constants/characterData/classes';
 import { CustomScrollbar } from '@/shared/ui/CustomScrollbar';
-import { PHB2024ORIGINS, PHB2024SPECIES } from '@nihilvtt/datamodeling/data';
 
 import { Selection, Step, STEPS } from '../../constants/steps';
 
@@ -26,7 +27,7 @@ export function Sidebar({ currentStep, selections, onStepChange }: SidebarProps)
         if (typeof selections[stepId] === 'string') {
           return selections[stepId].length > 0;
         }
-        return Object.keys(selections[stepId] as Record<string, any>).length > 0;
+        return Object.keys(selections[stepId] as Record<string, unknown>).length > 0;
       case 'class':
         return !!selections[stepId] && String(selections[stepId]).length > 0;
       case 'attributes':

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
 
 import { PHB2024ITEMS } from '@nihilvtt/datamodeling/data';
+import { useParams } from 'react-router-dom';
 
 import { usePlayerCharacterEquipmentViewModel } from '@/entities/character/lib/hooks/usePlayerCharacterEquipmentViewModel';
 import { useCharactersStore } from '@/entities/character/model/store';
@@ -26,6 +26,10 @@ export function PlayerSheetEquipmentTab({
   const addCharacterFromSession = useCharactersStore((state) => state.addCharacterFromSession);
   const [pendingSlot, setPendingSlot] = useState<RuntimeEquipmentCommandSlot | null>(null);
   const equipmentViewModel = usePlayerCharacterEquipmentViewModel(characterId);
+  const itemCatalogById = useMemo(
+    () => new Map<string, (typeof PHB2024ITEMS)[number]>(PHB2024ITEMS.map((item) => [item.id, item])),
+    [],
+  );
 
   if (!equipmentViewModel) {
     return null;
@@ -33,10 +37,6 @@ export function PlayerSheetEquipmentTab({
 
   const slotById = Object.fromEntries(
     equipmentViewModel.slots.map((slot) => [slot.id, slot]),
-  );
-  const itemCatalogById = useMemo(
-    () => new Map<string, (typeof PHB2024ITEMS)[number]>(PHB2024ITEMS.map((item) => [item.id, item])),
-    [],
   );
 
   const canSendEquipmentCommand = Number.isInteger(gameId) && gameId > 0;

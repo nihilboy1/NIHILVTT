@@ -1,6 +1,8 @@
 import { ReactNode } from 'react';
-import { cn } from '@/shared/lib/utils/cn';
+
 import { effectCardVariants } from '@/features/characterBuilder/styles';
+import { cn } from '@/shared/lib/utils/cn';
+
 import { Badge } from '../../../ui/Badge';
 
 interface EffectSectionProps {

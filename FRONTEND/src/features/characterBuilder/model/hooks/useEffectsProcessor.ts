@@ -1,13 +1,16 @@
 import { useState, useCallback } from 'react';
+
+import { PHB2024ORIGINS, PHB2024FEATS } from '@nihilvtt/datamodeling/data';
+import { OriginType, FeatType } from '@nihilvtt/datamodeling/domain';
+
 import {
   processOriginEffects as processOriginEffectsUtil,
   processFeatEffects as processFeatEffectsUtil,
   areAllEffectsSelected as checkEffectsSelected,
   getTotalAllowedPoints,
 } from '@/utils/effectProcessor';
-import { OriginType, FeatType } from '@nihilvtt/datamodeling/domain';
-import { PHB2024ORIGINS, PHB2024FEATS } from '@nihilvtt/datamodeling/data';
-import { EffectChoices, ProcessedEffect } from '../../types/effectTypes';
+
+import { EffectChoices, ProcessedEffect, EntityEffect } from '../../types/effectTypes';
 
 export function useEffectsProcessor() {
   // Estado para armazenar as escolhas do usuário para os efeitos
@@ -15,7 +18,7 @@ export function useEffectsProcessor() {
 
   // Função genérica para pré-processar efeitos automáticos
   const preProcessEffects = useCallback(
-    (entity: { id: string; effects: any[] }, entityPrefix: string) => {
+    (entity: { id: string; effects: EntityEffect[] }, entityPrefix: string) => {
       const updatedEffectChoices = { ...effectChoices };
 
       entity.effects.forEach((effect, index) => {
@@ -81,10 +84,10 @@ export function useEffectsProcessor() {
   );
 
   // Função genérica para adicionar onSelect aos efeitos processados
-  const addSelectHandlers = useCallback((processedEffects: any[]): ProcessedEffect[] => {
+  const addSelectHandlers = useCallback((processedEffects: ProcessedEffect[]): ProcessedEffect[] => {
     return processedEffects.map((effect) => ({
       ...effect,
-      onSelect: (choice: any) => {
+      onSelect: (choice: unknown) => {
         // Para efeitos de atributos, valida a distribuição de pontos antes de atualizar
         if (effect.type === 'passive_modifyAbilityScore') {
           const totalPoints = getTotalAllowedPoints(effect);
@@ -214,12 +217,12 @@ export function useEffectsProcessor() {
       // Busca o efeito correspondente para obter o total de pontos permitidos
       const origin = PHB2024ORIGINS.find((o) =>
         o.effects.some(
-          (_effect: any, index: number) => `${o.id}-origin-effect-${index}` === effectId,
+          (_effect: EntityEffect, index: number) => `${o.id}-origin-effect-${index}` === effectId,
         ),
       );
       const feat = PHB2024FEATS.find((f) =>
         f.effects.some(
-          (_effect: any, index: number) => `${f.id}-feat-effect-${index}` === effectId,
+          (_effect: EntityEffect, index: number) => `${f.id}-feat-effect-${index}` === effectId,
         ),
       );
 

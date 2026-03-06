@@ -1,11 +1,11 @@
+import type { ProficiencyLevel } from '@/entities/character/model/rules/characterDerivedRules';
+import { getArmorClassFromEquipment } from '@/entities/character/model/rules/itemDerivedRules';
+import { getBaseWalkSpeedFromSpecieId } from '@/entities/character/model/rules/specieDerivedRules';
 import type {
   HitDiceEntry,
   PlayerCharacter,
 } from '@/entities/character/model/schemas/character.schema';
 import type { PlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
-import type { ProficiencyLevel } from '@/entities/character/model/rules/characterDerivedRules';
-import { getArmorClassFromEquipment } from '@/entities/character/model/rules/itemDerivedRules';
-import { getBaseWalkSpeedFromSpecieId } from '@/entities/character/model/rules/specieDerivedRules';
 
 export type PlayerCharacterCombatViewModel = {
   level: number;

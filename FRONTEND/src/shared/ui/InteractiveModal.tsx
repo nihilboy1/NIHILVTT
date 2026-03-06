@@ -1,8 +1,8 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
-import { cn } from "@/shared/lib/utils/cn";
+import { cn } from '@/shared/lib/utils/cn';
 
-import { XMarkIcon } from "./Icons";
+import { XMarkIcon } from './Icons';
 
 interface InteractiveModalProps {
   id: string;
@@ -16,7 +16,7 @@ interface InteractiveModalProps {
   initialOffsetY?: number;
   dialogClassName?: string;
   contentClassName?: string;
-  safeArea?: Partial<Record<"top" | "right" | "bottom" | "left", number>>;
+  safeArea?: Partial<Record<'top' | 'right' | 'bottom' | 'left', number>>;
 }
 
 type ModalPosition = {
@@ -24,7 +24,7 @@ type ModalPosition = {
   top: number;
 };
 
-type ModalSafeArea = Record<"top" | "right" | "bottom" | "left", number>;
+type ModalSafeArea = Record<'top' | 'right' | 'bottom' | 'left', number>;
 
 function clamp(value: number, min: number, max: number): number {
   if (value < min) {
@@ -76,24 +76,27 @@ export function InteractiveModal({
   const safeAreaRight = Math.max(0, safeArea?.right ?? 0);
   const safeAreaBottom = Math.max(0, safeArea?.bottom ?? 0);
   const safeAreaLeft = Math.max(0, safeArea?.left ?? 0);
-  const normalizedSafeArea: ModalSafeArea = {
-    top: safeAreaTop,
-    right: safeAreaRight,
-    bottom: safeAreaBottom,
-    left: safeAreaLeft,
-  };
+  const normalizedSafeArea: ModalSafeArea = useMemo(
+    () => ({
+      top: safeAreaTop,
+      right: safeAreaRight,
+      bottom: safeAreaBottom,
+      left: safeAreaLeft,
+    }),
+    [safeAreaBottom, safeAreaLeft, safeAreaRight, safeAreaTop],
+  );
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         onClose();
       }
     };
     if (isOpen) {
-      document.addEventListener("keydown", handleEsc);
+      document.addEventListener('keydown', handleEsc);
     }
     return () => {
-      document.removeEventListener("keydown", handleEsc);
+      document.removeEventListener('keydown', handleEsc);
     };
   }, [isOpen, onClose]);
 
@@ -127,7 +130,7 @@ export function InteractiveModal({
     return () => {
       window.cancelAnimationFrame(frame);
     };
-  }, [initialOffsetX, initialOffsetY, isOpen]);
+  }, [initialOffsetX, initialOffsetY, isOpen, normalizedSafeArea]);
 
   useEffect(() => {
     if (!isOpen || position === null) {
@@ -145,16 +148,13 @@ export function InteractiveModal({
       }
 
       const nextPosition = clampModalPosition(modal, currentPosition, normalizedSafeArea);
-      if (
-        nextPosition.left === currentPosition.left &&
-        nextPosition.top === currentPosition.top
-      ) {
+      if (nextPosition.left === currentPosition.left && nextPosition.top === currentPosition.top) {
         return currentPosition;
       }
 
       return nextPosition;
     });
-  }, [isOpen, position, safeAreaBottom, safeAreaLeft, safeAreaRight, safeAreaTop]);
+  }, [isOpen, normalizedSafeArea, position]);
 
   useEffect(() => {
     if (!isOpen || position === null) {
@@ -184,19 +184,29 @@ export function InteractiveModal({
       });
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
-  }, [isOpen, position, safeAreaBottom, safeAreaLeft, safeAreaRight, safeAreaTop]);
+  }, [isOpen, normalizedSafeArea, position]);
+
+  const handleHeaderKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!draggable) {
+      return;
+    }
+
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+    }
+  };
 
   const handleHeaderMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!draggable) {
       return;
     }
 
-    if (event.target instanceof HTMLElement && event.target.closest("button")) {
+    if (event.target instanceof HTMLElement && event.target.closest('button')) {
       return;
     }
 
@@ -224,12 +234,12 @@ export function InteractiveModal({
     };
 
     const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
     event.preventDefault();
   };
 
@@ -239,14 +249,14 @@ export function InteractiveModal({
     <div
       ref={modalRef}
       style={{
-        position: "fixed",
+        position: 'fixed',
         top: position?.top ?? undefined,
         left: position?.left ?? undefined,
-        transform: position ? "none" : "translate(-50%, -50%)",
+        transform: position ? 'none' : 'translate(-50%, -50%)',
         zIndex,
       }}
       className={cn(
-        "bg-surface-0 flex max-h-[min(92vh,64rem)] w-[min(92vw,78rem)] max-w-[92vw] flex-col overflow-hidden rounded-xl border border-surface-2/70 shadow-2xl",
+        'bg-surface-0 border-surface-2/70 flex max-h-[min(92vh,64rem)] w-[min(92vw,78rem)] max-w-[92vw] flex-col overflow-hidden rounded-xl border shadow-2xl',
         dialogClassName,
       )}
       role="dialog"
@@ -255,29 +265,31 @@ export function InteractiveModal({
     >
       <div
         className={cn(
-          "flex items-center justify-between border-b border-surface-2/70 px-4 py-3",
-          draggable ? "cursor-move select-none" : undefined,
+          'border-surface-2/70 flex items-center justify-between border-b px-4 py-3',
+          draggable ? 'cursor-move select-none' : undefined,
         )}
-        onMouseDown={handleHeaderMouseDown}
+        onMouseDown={draggable ? handleHeaderMouseDown : undefined}
+        onKeyDown={draggable ? handleHeaderKeyDown : undefined}
+        role={draggable ? 'button' : undefined}
+        tabIndex={draggable ? 0 : undefined}
       >
-        <h2
-          id={`modal-title-${id}`}
-          className="min-w-0 truncate pr-3 text-lg font-semibold"
-        >
+        <h2 id={`modal-title-${id}`} className="min-w-0 truncate pr-3 text-lg font-semibold">
           {title}
         </h2>
         <div className="flex items-center space-x-2">
           <button
             onClick={onClose}
-            className="rounded-full p-1 transition-colors hover:bg-surface-1 focus:outline-none focus:ring-1"
+            className="hover:bg-surface-1 rounded-full p-1 transition-colors focus:ring-1 focus:outline-none"
             aria-label="Fechar modal"
           >
-            <XMarkIcon className="w-5 h-5" />
+            <XMarkIcon className="h-5 w-5" />
           </button>
         </div>
       </div>
 
-      <div className={cn("flex min-h-0 flex-grow overflow-hidden p-4", contentClassName)}>{children}</div>
+      <div className={cn('flex min-h-0 flex-grow overflow-hidden p-4', contentClassName)}>
+        {children}
+      </div>
     </div>
   );
 }

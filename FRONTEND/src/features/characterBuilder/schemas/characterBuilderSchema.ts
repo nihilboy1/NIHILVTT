@@ -1,9 +1,8 @@
+import { PHB2024SPECIES, PHB2024ORIGINS, PHB2024FEATS } from '@nihilvtt/datamodeling/data';
+import { FeatType, OriginType, SpecieType } from '@nihilvtt/datamodeling/domain';
 import { z } from 'zod';
 
 import { ATTRIBUTE_LIST } from '@/shared/constants/characterData/attributes';
-// Importações do datamodeling
-import { PHB2024SPECIES, PHB2024ORIGINS, PHB2024FEATS } from '@nihilvtt/datamodeling/data';
-import { FeatType, OriginType, SpecieType } from '@nihilvtt/datamodeling/domain';
 import { CLASSES } from '@/shared/constants/characterData/classes';
 
 export type CharacterOption = {

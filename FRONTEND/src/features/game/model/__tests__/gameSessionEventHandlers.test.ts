@@ -1,4 +1,8 @@
 import type { GameSessionEvent } from '@/features/game/model/gameSessionApi';
+import {
+  applyGameSessionEvent,
+  resetAppliedGameSessionEventIds,
+} from '@/features/game/model/gameSessionEventHandlers';
 
 const addCharacterFromSession = jest.fn();
 const removeCharacterFromSession = jest.fn();
@@ -50,11 +54,16 @@ jest.mock('@/features/combat/model/store', () => ({
   },
 }));
 
-import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
+let eventSequence = 0;
 
-function createEvent(type: string, payload: Record<string, unknown>, actorUserId: number | null = 1): GameSessionEvent {
+function createEvent(
+  type: string,
+  payload: Record<string, unknown>,
+  actorUserId: number | null = 1,
+): GameSessionEvent {
+  eventSequence += 1;
   return {
-    eventId: 'evt-1',
+    eventId: `evt-${eventSequence}`,
     gameId: 1,
     serverVersion: 1,
     type,
@@ -67,6 +76,8 @@ function createEvent(type: string, payload: Record<string, unknown>, actorUserId
 describe('applyGameSessionEvent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetAppliedGameSessionEventIds();
+    eventSequence = 0;
   });
 
   it('aplica TOKEN_CREATED com character no payload e sincroniza ficha + token', () => {

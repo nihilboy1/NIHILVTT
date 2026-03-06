@@ -1,5 +1,7 @@
 import type React from 'react';
 
+import { parseCreatureSizeToGrid } from '@/shared/lib/geometry/creatureSize';
+
 export function handleNumericInputKeyDown(
   e: React.KeyboardEvent<HTMLInputElement>,
   range: { min: number; max: number },
@@ -58,14 +60,5 @@ export const getContrastingTextColor = (hexColor: string | null | undefined): st
 };
 
 export const parseCharacterSize = (sizeString: string): [number, number] => {
-  const match = sizeString.trim().match(/^(\d+)x(\d+)$/);
-  if (match) {
-    const width = parseInt(match[1], 10);
-    const height = parseInt(match[2], 10);
-    if (width > 0 && height > 0) {
-      return [width, height];
-    }
-  }
-
-  return [1, 1];
+  return parseCreatureSizeToGrid(sizeString);
 };

@@ -7,12 +7,12 @@ import {
   type Game,
 } from '@/entities/game/model/schemas/game.schema';
 import { useAuthStore } from '@/features/auth/model/authStore';
-import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
 import { clearGameChatHistory } from '@/features/game/model/gameSessionApi';
+import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
 import { useGameStore } from '@/features/game/model/gameStore';
+import { formatUserTag } from '@/shared/lib/utils/nameUtils';
 import { AppButton } from '@/shared/ui/AppButton';
 import { ConfirmationModal } from '@/shared/ui/ConfirmationModal';
-import { formatUserTag } from '@/shared/lib/utils/nameUtils';
 
 type GameSettingsPanelProps = {
   game: Game | null;

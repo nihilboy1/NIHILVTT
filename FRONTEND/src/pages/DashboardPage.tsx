@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useRef, useState, useEffect } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import Cropper, { Area, Point } from 'react-easy-crop';
 import { FaRegUser } from 'react-icons/fa';
@@ -8,14 +8,14 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/features/auth/model/authStore';
 import { useGameStore } from '@/features/game/model/gameStore';
 import { ActiveGamesList } from '@/features/game/ui/ActiveGamesList';
+import { getCroppedImageBlob } from '@/shared/lib/utils/imageCrop';
+import { formatUserTag } from '@/shared/lib/utils/nameUtils';
 import { AppButton } from '@/shared/ui/AppButton';
 import { CardSection } from '@/shared/ui/CardSection';
 import { Modal } from '@/shared/ui/Modal';
 import { PageShell } from '@/shared/ui/PageShell';
-import { StatusAlert } from '@/shared/ui/StatusAlert';
 import { Spinner } from '@/shared/ui/Spinner';
-import { getCroppedImageBlob } from '@/shared/lib/utils/imageCrop';
-import { formatUserTag } from '@/shared/lib/utils/nameUtils';
+import { StatusAlert } from '@/shared/ui/StatusAlert';
 
 import 'react-easy-crop/react-easy-crop.css';
 
@@ -93,14 +93,6 @@ export default function DashboardPage() {
   }, [coverCropImageSrc]);
 
   useEffect(() => {
-    console.info('[DashboardPage][cover] crop modal state changed', {
-      isCoverCropOpen,
-      hasImageSrc: Boolean(coverCropImageSrc),
-      gamePendingCoverUpload,
-    });
-  }, [isCoverCropOpen, coverCropImageSrc, gamePendingCoverUpload]);
-
-  useEffect(() => {
     if (!error) {
       return;
     }
@@ -136,9 +128,9 @@ export default function DashboardPage() {
     }
   };
 
-  const onCoverCropComplete = useCallback((_: Area, areaPixels: Area) => {
+  const onCoverCropComplete = (_: Area, areaPixels: Area) => {
     setCoverCroppedAreaPixels(areaPixels);
-  }, []);
+  };
 
   const handleDeleteGameRequest = (gameId: number, title: string) => {
     clearError();
@@ -171,19 +163,11 @@ export default function DashboardPage() {
 
   const handleCoverFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.info('[DashboardPage][cover] file input changed', {
-      hasFile: Boolean(file),
-      fileName: file?.name,
-      fileType: file?.type,
-      fileSize: file?.size,
-      gamePendingCoverUpload,
-    });
     if (!file) {
       return;
     }
 
     if (!file.type.startsWith('image/')) {
-      console.warn('[DashboardPage][cover] invalid file type', { fileType: file.type });
       setCoverModalError('Selecione um arquivo de imagem valido.');
       toast.error('Selecione um arquivo de imagem válido para a capa da mesa.', { duration: 2200 });
       event.target.value = '';
@@ -191,7 +175,6 @@ export default function DashboardPage() {
     }
 
     if (file.size > MAX_GAME_COVER_FILE_SIZE_BYTES) {
-      console.warn('[DashboardPage][cover] file too large', { fileSize: file.size });
       setCoverModalError(`A imagem deve ter no máximo ${MAX_GAME_COVER_FILE_SIZE_LABEL}.`);
       toast.error(`A imagem selecionada excede o limite de ${MAX_GAME_COVER_FILE_SIZE_LABEL}. Escolha um arquivo menor.`, { duration: 2600 });
       event.target.value = '';
@@ -199,10 +182,6 @@ export default function DashboardPage() {
     }
 
     const nextPreviewUrl = URL.createObjectURL(file);
-    console.info('[DashboardPage][cover] created preview url', {
-      nextPreviewUrl,
-      gamePendingCoverUpload,
-    });
     setCoverCropImageSrc((previous) => {
       revokeIfBlobUrl(previous);
       return nextPreviewUrl;
@@ -211,17 +190,12 @@ export default function DashboardPage() {
     setCoverZoom(1);
     setCoverCroppedAreaPixels(null);
     setCoverModalError(null);
-    console.info('[DashboardPage][cover] opening crop modal');
     setIsCoverCropOpen(true);
 
     event.target.value = '';
   };
 
   const handleCoverUploadRequest = (game: { id: number; title: string }) => {
-    console.info('[DashboardPage][cover] upload requested', {
-      game,
-      hasFileInput: Boolean(fileInputRef.current),
-    });
     clearError();
     setCoverModalError(null);
     setGamePendingCoverUpload({ id: game.id, title: game.title });
@@ -235,10 +209,6 @@ export default function DashboardPage() {
     }
 
     try {
-      console.info('[DashboardPage][cover] confirming crop', {
-        gamePendingCoverUpload,
-        coverCroppedAreaPixels,
-      });
       const blob = await getCroppedImageBlob(coverCropImageSrc, coverCroppedAreaPixels);
       const file = new File([blob], `game-cover-${Date.now()}.jpg`, { type: 'image/jpeg' });
       const updated = await uploadGameCover(gamePendingCoverUpload.id, file);
@@ -506,8 +476,9 @@ export default function DashboardPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm text-text-secondary">Zoom</label>
+            <label htmlFor="dashboard-cover-zoom" className="mb-1 block text-sm text-text-secondary">Zoom</label>
             <input
+              id="dashboard-cover-zoom"
               type="range"
               min={1}
               max={3}

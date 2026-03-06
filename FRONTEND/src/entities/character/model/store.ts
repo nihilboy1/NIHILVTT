@@ -1,14 +1,15 @@
 import { create } from 'zustand';
 
 import {
+  requireNormalizedCharacterEntry,
+} from './adapters/sessionCharacterAdapter';
+import {
   Character,
   PlayerCharacter,
   MonsterNpcCharacter,
   characterSchema,
 } from './schemas/character.schema';
-import {
-  requireNormalizedCharacterEntry,
-} from './adapters/sessionCharacterAdapter';
+
 import type { SessionCharacterRuntime } from './schemas/playerCharacterRuntime.schema';
 
 export interface CharactersState {
@@ -49,6 +50,7 @@ export const useCharactersStore = create<CharactersState>((set, get) => ({
   runtimeCharactersById: {},
 
   addCharacter: (_characterData) => {
+    void _characterData;
     return throwBlockedLocalCharacterMutation('addCharacter');
   },
 

@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react';
 
 import type { Game } from '@/entities/game/model/schemas/game.schema';
+
 import { SidebarTab } from '../../../shared/api/types';
 import { Spinner } from '../../../shared/ui/Spinner';
 

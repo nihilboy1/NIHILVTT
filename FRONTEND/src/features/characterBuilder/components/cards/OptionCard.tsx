@@ -1,6 +1,8 @@
 import { forwardRef } from 'react';
-import { CharacterOption } from '../../schemas/characterBuilderSchema';
+
 import { cn } from '@/shared/lib/utils/cn';
+
+import { CharacterOption } from '../../schemas/characterBuilderSchema';
 import { characterCardVariants, selectionBadgeVariants } from '../../styles';
 import { Badge } from '../ui/Badge';
 
@@ -20,6 +22,8 @@ export const OptionCard = forwardRef<HTMLDivElement, OptionCardProps>(
       <div
         ref={ref}
         id={`option-card-${id}`}
+        role="button"
+        tabIndex={0}
         className={cn(
           characterCardVariants({
             state: isSelected ? 'selected' : 'default',
@@ -30,6 +34,12 @@ export const OptionCard = forwardRef<HTMLDivElement, OptionCardProps>(
           !isReordering && 'scale-100 opacity-100',
         )}
         onClick={onSelect}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onSelect();
+          }
+        }}
         style={{
           transition: `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${transitionDelay}ms`,
         }}

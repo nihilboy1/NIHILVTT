@@ -11,12 +11,12 @@ import {
 } from 'react-icons/fa';
 
 import BookBookmarkBoldIconComponent from '../assets/book-bookmark-bold.svg?react';
-import DotsSixBoldIconComponent from '../assets/dots-six-bold.svg?react';
-import GearSixBoldIconComponent from '../assets/gear-six-bold.svg?react';
 import chatWhite from '../assets/chat-white.svg';
 import d20 from '../assets/d20.png';
 import DetatchIconComponent from '../assets/detach-svgrepo-com.svg?react';
+import DotsSixBoldIconComponent from '../assets/dots-six-bold.svg?react';
 import folderUserFillWhite from '../assets/folder-user-fill-white.svg';
+import GearSixBoldIconComponent from '../assets/gear-six-bold.svg?react';
 import HandIconComponent from '../assets/hand.svg?react';
 import NavigationArrowIconComponent from '../assets/navigation-arrow.svg?react';
 import RulerIconComponent from '../assets/ruler.svg?react';

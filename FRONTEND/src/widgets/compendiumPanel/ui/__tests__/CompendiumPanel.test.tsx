@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 const mockAddCharacterFromSession = jest.fn();
 const mockOpenModal = jest.fn();
@@ -150,7 +150,8 @@ jest.mock('@/entities/character/model/schemas/playerCharacterRuntime.schema', ()
 }));
 
 jest.mock('@/features/game/model/gameSessionApi', () => ({
-  sendGameAddCharacterInventoryItem: (...args: unknown[]) => mockSendGameAddCharacterInventoryItem(...args),
+  sendGameAddCharacterInventoryItem: (...args: unknown[]) =>
+    mockSendGameAddCharacterInventoryItem(...args),
 }));
 
 jest.mock('@/shared/ui/Modal', () => ({
@@ -220,10 +221,11 @@ describe('CompendiumPanel', () => {
   it('abre a própria ficha do monstro ao clicar em Detalhes', () => {
     render(<CompendiumPanel gameId={1} />);
 
-    const commonerCard = screen.getByText('Plebeu').closest('[draggable="true"]');
-    expect(commonerCard).not.toBeNull();
+    fireEvent.change(screen.getByPlaceholderText('Buscar item ou monstro'), {
+      target: { value: 'plebeu' },
+    });
 
-    fireEvent.click(within(commonerCard as HTMLElement).getByRole('button', { name: 'Detalhes' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Detalhes' }));
 
     expect(mockOpenModal).toHaveBeenCalledWith('sheet', { monsterId: 'monster-commoner' });
   });

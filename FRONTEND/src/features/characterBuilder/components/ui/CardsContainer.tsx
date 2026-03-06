@@ -1,12 +1,12 @@
-import { CharacterOption } from '../../schemas/characterBuilderSchema';
 import { Step } from '../../constants/steps';
+import { CharacterOption } from '../../schemas/characterBuilderSchema';
+import { FeatOptionCard } from '../cards/FeatOptionCard/FeatOptionCard';
 import { OptionCard } from '../cards/OptionCard';
 import { OriginOptionCard } from '../cards/OriginOptionCard/OriginOptionCard';
-import { FeatOptionCard } from '../cards/FeatOptionCard/FeatOptionCard';
 
 interface CardsContainerProps {
   options: CharacterOption[];
-  selectedId: string | Record<string, number> | any | null;
+  selectedId: string | Record<string, number> | Record<string, unknown> | null;
   currentStep: Step;
   onSelect: (step: Step, id: string) => void;
   scrollToTop: (delay?: number) => void;

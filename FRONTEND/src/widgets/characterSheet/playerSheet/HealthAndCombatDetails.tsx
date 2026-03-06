@@ -1,18 +1,19 @@
 import { useMemo } from "react";
 
 import { useCharacterCalculations } from "@/entities/character/lib/hooks/useCharacterCalculations";
+import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
 import { usePlayerCharacterCombatViewModel } from "@/entities/character/lib/hooks/usePlayerCharacterCombatViewModel";
-import { useCharactersStore } from "@/entities/character/model/store";
-import { isPlayerCharacterRuntime } from "@/entities/character/model/schemas/playerCharacterRuntime.schema";
 import {
   getAbilityModifier,
   getPlayerProficiencyBonusFromLevel,
 } from "@/entities/character/model/rules/characterDerivedRules";
 import { buildWeaponAttackAction } from "@/entities/character/model/rules/weaponAttackDerivedRules";
 import { Action } from "@/entities/character/model/schemas/character.schema";
+import { isPlayerCharacterRuntime } from "@/entities/character/model/schemas/playerCharacterRuntime.schema";
+import { useCharactersStore } from "@/entities/character/model/store";
 import { buildPlayerCharacterCalculationsViewModel } from "@/entities/character/model/view-models/playerCharacterCalculationsViewModel";
 import { DiceFormula, RollCategory } from "@/shared/api/types";
-import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
+
 import { CombatStats } from "./CombatStats";
 import { HealthSection } from "./HealthSection";
 

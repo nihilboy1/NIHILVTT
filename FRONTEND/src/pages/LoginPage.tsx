@@ -4,14 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { useAuthFormServerErrors } from '@/features/auth/model/hooks/useAuthFormServerErrors';
 import { LoginFormInputs, loginSchema } from '@/features/auth/model/authSchemas';
 import { useAuthStore } from '@/features/auth/model/authStore';
-import { AuthPageLayout } from '@/widgets/authPageLayout/ui/AuthPageLayout';
+import { useAuthFormServerErrors } from '@/features/auth/model/hooks/useAuthFormServerErrors';
 import { AppButton } from '@/shared/ui/AppButton';
 import { FormInput } from '@/shared/ui/FormInput';
 import { MotionLink } from '@/shared/ui/MotionLink';
 import { StatusAlert } from '@/shared/ui/StatusAlert';
+import { AuthPageLayout } from '@/widgets/authPageLayout/ui/AuthPageLayout';
 
 export default function LoginPage() {
   const methods = useForm<LoginFormInputs>({

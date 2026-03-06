@@ -1,16 +1,18 @@
+import axios from 'axios';
 import { FormProvider } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 
-import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
-import { sendGameCreateCharacter } from '@/features/game/model/gameSessionApi';
 import { PlayerCharacter } from '@/entities/character/model/schemas/character.schema';
+import { sendGameCreateCharacter } from '@/features/game/model/gameSessionApi';
+import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
 import { Modal } from '@/shared/ui/Modal';
+
 import { buildPlayerCharacterRuntimeFromSheetState } from '../../lib/buildPlayerCharacterRuntimeFromSheetState';
-import { useCharacterBuilder } from '../../model/hooks/useCharacterBuilder';
 import { CharacterBuilderEffectsProvider } from '../../model/context/effectsProcessorContext';
-import { Sidebar } from './Sidebar';
+import { useCharacterBuilder } from '../../model/hooks/useCharacterBuilder';
+
 import { MainContent } from './MainContent';
+import { Sidebar } from './Sidebar';
 
 
 
@@ -48,17 +50,8 @@ export function CharacterBuilderModal({
       const persistCharacter = isValidGameId
         ? async (characterData: Omit<PlayerCharacter, 'id' | 'type'>) => {
             const runtimeCharacter = buildPlayerCharacterRuntimeFromSheetState(characterData);
-            console.info('[CharacterBuilderModal] Enviando criação autoritativa de personagem.', {
-              gameId: parsedGameId,
-              runtimeCharacter,
-            });
             try {
               const event = await sendGameCreateCharacter(parsedGameId, runtimeCharacter);
-              console.info('[CharacterBuilderModal] Evento recebido para personagem criado.', {
-                eventType: event.type,
-                eventId: event.eventId,
-                serverVersion: event.serverVersion,
-              });
               applyGameSessionEvent(event);
               return true;
             } catch (error) {
@@ -78,8 +71,6 @@ export function CharacterBuilderModal({
       const finished = await handleFinish(persistCharacter);
       if (finished) {
         onClose();
-      } else {
-        console.warn('[CharacterBuilderModal] Finalização não concluída. Verifique logs acima.');
       }
     }
   };

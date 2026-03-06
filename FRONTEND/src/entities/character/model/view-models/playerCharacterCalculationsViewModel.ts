@@ -1,7 +1,8 @@
+import type { PlayerCharacter } from '@/entities/character/model/schemas/character.schema';
+
 import type { ProficiencyLevelEnum } from '@nihilvtt/datamodeling/primitives';
 import type { z } from 'zod';
 
-import type { PlayerCharacter } from '@/entities/character/model/schemas/character.schema';
 
 export type ProficiencyLevel = z.infer<typeof ProficiencyLevelEnum>;
 
