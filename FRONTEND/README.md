@@ -36,6 +36,22 @@ Regra editorial do modulo:
 
 - o frontend do NIHILVTT esta em pre-versao; a documentacao e o codigo devem assumir apenas contratos atuais, sem qualquer nocao de suporte legado
 
+### Renderer do board (migracao SVG -> Pixi)
+
+- O board usa renderer unico em runtime: `Pixi` (sem branch por querystring).
+- O path SVG foi descontinuado para reduzir superficie de manutencao e eliminar regressao cruzada entre dois renderers.
+- Stores e interacoes do board nao mantem mais fallback de referencia SVG (`svgRef`); `viewportRef` e a unica referencia valida para camera/zoom/input.
+- O contrato de matematica do board permanece em `src/widgets/gameBoard/model/renderer` para camera, grade, geometria e picking.
+- `BoardRendererAdapter` define o contrato minimo de transformacao de mundo/tela; o estado canonico de sessao, combate e interacao permanece fora do renderer.
+- A matematica de camera para Pixi fica centralizada em `pixiCamera.ts` (`createPixiWorldTransform`, `worldToScreenPoint`, `screenToWorldPoint`), evitando duplicacao em componentes de UI.
+- Conversoes de camera usadas por stores (`client -> viewport -> world`, zoom focado no cursor e pan delta) ficam centralizadas em `cameraMath.ts`, reduzindo logica duplicada entre `board store` e `board zoom store`.
+- Nomenclatura de coordenadas/interacao no board deve ser neutra de renderer (`worldPoint`, `visualWorldPoint`, `getWorldPoint`), sem termos herdados de SVG.
+- Regras de grade (conversao `world -> cell`, clamp por limites da pagina e tamanho de token, validacao de ponto dentro do board) ficam centralizadas em `gridMath.ts`, usadas por drag/snap e drop de token.
+- Geometria de token (bounds em grid/mundo, intersecao de retangulos e distancia de alcance por Chebyshev) fica centralizada em `tokenGeometry.ts`, reutilizada em marquee e validacao de alcance de ataque.
+- Conversao de tamanho de criatura para celulas de grid fica centralizada em `shared/lib/geometry/creatureSize.ts`; parsers de personagem/token nao devem manter tabelas duplicadas.
+- Picking de token por coordenada de mundo/celula fica centralizado em `tokenPicking.ts`; o board deve preferir essa trilha para selecao/alvo em vez de depender de hit-test de elementos SVG.
+- Novos fluxos de board devem ser implementados diretamente no pipeline Pixi, sem introduzir fallback SVG.
+
 
 ### Runtime Boundary
 

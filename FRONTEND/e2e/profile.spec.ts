@@ -6,7 +6,9 @@ const ONE_PIXEL_PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO0wA1sAAAAASUVORK5CYII=';
 
 async function uploadAvatarAndCrop(page: Page, file: { name: string; mimeType: string; buffer: Buffer }) {
-  await page.locator('input[type="file"]').setInputFiles(file);
+  await page.getByRole('button', { name: /Enviar Foto|Trocar Foto/i }).click();
+  await page.locator('input[type="file"][accept="image/*"]').setInputFiles(file);
+  await expect(page.getByRole('dialog', { name: /Ajustar foto de perfil/i })).toBeVisible();
   await page.getByRole('button', { name: /Confirmar enquadramento/i }).click();
 }
 
@@ -132,7 +134,8 @@ test('avatar com tipo inválido mostra erro', async ({ page }) => {
   await page.getByRole('button', { name: 'Perfil' }).click();
   await expect(page).toHaveURL(/\/profile$/);
 
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByRole('button', { name: /Enviar Foto|Trocar Foto/i }).click();
+  await page.locator('input[type="file"][accept="image/*"]').setInputFiles({
     name: 'avatar.txt',
     mimeType: 'text/plain',
     buffer: Buffer.from('not-an-image', 'utf-8'),
@@ -148,7 +151,8 @@ test('avatar acima de 3MB mostra erro', async ({ page }) => {
   await page.getByRole('button', { name: 'Perfil' }).click();
   await expect(page).toHaveURL(/\/profile$/);
 
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByRole('button', { name: /Enviar Foto|Trocar Foto/i }).click();
+  await page.locator('input[type="file"][accept="image/*"]').setInputFiles({
     name: 'avatar-large.png',
     mimeType: 'image/png',
     buffer: Buffer.alloc(3_100_000, 1),

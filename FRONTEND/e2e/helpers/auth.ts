@@ -9,10 +9,14 @@ export type TestUser = {
 export const DELETE_PHRASE = 'eu desejo excluir minha conta';
 
 export function buildUser(prefix: string): TestUser {
-  const nonce = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  // Keep identifiers short to respect backend nickname limits when creating memberships.
+  const shortPrefix = prefix.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 12) || 'user';
+  const nonce = `${Date.now().toString(36).slice(-4)}${Math.random().toString(36).slice(2, 6)}`;
+  const identifier = `${shortPrefix}-${nonce}`;
+
   return {
-    name: `${prefix}-${nonce}`,
-    email: `${prefix}-${nonce}@test.com`,
+    name: identifier,
+    email: `${identifier}@test.com`,
     password: '12345678',
   };
 }
