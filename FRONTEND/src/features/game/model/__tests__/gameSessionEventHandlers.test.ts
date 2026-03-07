@@ -14,10 +14,13 @@ const updateTokenPosition = jest.fn();
 const addIncomingMessage = jest.fn();
 const clearAllMessages = jest.fn();
 const setCombatState = jest.fn();
+const mockCharacters: Array<{ id: string; name: string }> = [];
+const mockTokens: Array<{ id: string; characterId: string }> = [];
 
 jest.mock('@/entities/character/model/store', () => ({
   useCharactersStore: {
     getState: () => ({
+      characters: mockCharacters,
       addCharacterFromSession,
       removeCharacterFromSession,
       updateCharacterHp,
@@ -28,6 +31,7 @@ jest.mock('@/entities/character/model/store', () => ({
 jest.mock('@/entities/token/model/store/tokenStore', () => ({
   useTokenStore: {
     getState: () => ({
+      tokensOnBoard: mockTokens,
       addTokenFromSession,
       removeTokenFromSession,
       removeTokensByCharacterIdFromSession,
@@ -78,6 +82,8 @@ describe('applyGameSessionEvent', () => {
     jest.clearAllMocks();
     resetAppliedGameSessionEventIds();
     eventSequence = 0;
+    mockCharacters.length = 0;
+    mockTokens.length = 0;
   });
 
   it('aplica TOKEN_CREATED com character no payload e sincroniza ficha + token', () => {
@@ -178,7 +184,10 @@ describe('applyGameSessionEvent', () => {
       }),
     );
 
-    expect(updateCharacterHp).toHaveBeenCalledWith('char-1', 3, 2);
+    expect(updateCharacterHp).toHaveBeenCalledWith('char-1', 3, 2, {
+      deadConditionApplied: false,
+      deadConditionRemoved: false,
+    });
   });
 
   it('aplica TOKENS_REMOVED e sincroniza todos os tokens removidos em um único evento', () => {
@@ -332,5 +341,104 @@ describe('applyGameSessionEvent', () => {
     ).toThrow('Violação de contrato realtime em TOKEN_CREATED: payload inválido.');
 
     expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it('gera mensagem de ataque com dano condicional e condicoes aplicadas explicitos', () => {
+    mockCharacters.push(
+      { id: 'char-attacker', name: 'Cabra Gigante' },
+      { id: 'char-target', name: 'Aventureiro' },
+    );
+    mockTokens.push(
+      { id: 'token-attacker', characterId: 'char-attacker' },
+      { id: 'token-target', characterId: 'char-target' },
+    );
+
+    applyGameSessionEvent(
+      createEvent('ATTACK_RESOLVED', {
+        attackerTokenId: 'token-attacker',
+        targetTokenId: 'token-target',
+        targetCharacterId: 'char-target',
+        attackId: 'act-attack',
+        attackName: 'Investida',
+        attackDamageType: 'bludgeoning',
+        attackRoll: 15,
+        attackTotal: 20,
+        targetArmorClass: 12,
+        hit: true,
+        damageTotal: 8,
+        conditionalDamageTotal: 3,
+        conditionalDamageBreakdown: [{ damageType: 'bludgeoning', damage: 3 }],
+        damageApplied: 8,
+        remainingCurrentHp: 2,
+        remainingTempHp: 0,
+        attackerMovedMeters: 6,
+        appliedConditions: ['prone'],
+        deadConditionApplied: false,
+        combat: null,
+      }),
+    );
+
+    expect(addIncomingMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sender: 'Sistema',
+        text: expect.stringContaining('Dano condicional: +3 (movimento no turno: 6.0m)'),
+      }),
+    );
+    expect(addIncomingMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sender: 'Sistema',
+        text: expect.stringContaining('Condições aplicadas: prone'),
+      }),
+    );
+    expect(addIncomingMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sender: 'Sistema',
+        text: expect.stringContaining('Detalhe dano condicional: bludgeoning +3'),
+      }),
+    );
+  });
+
+  it('gera mensagem de ataque com dano apos defesas explicito', () => {
+    mockCharacters.push(
+      { id: 'char-attacker', name: 'Aventureiro' },
+      { id: 'char-target', name: 'Arbusto Desperto' },
+    );
+    mockTokens.push(
+      { id: 'token-attacker', characterId: 'char-attacker' },
+      { id: 'token-target', characterId: 'char-target' },
+    );
+
+    applyGameSessionEvent(
+      createEvent('ATTACK_RESOLVED', {
+        attackerTokenId: 'token-attacker',
+        targetTokenId: 'token-target',
+        targetCharacterId: 'char-target',
+        attackId: 'manual-attack',
+        attackName: 'Ataque de Teste',
+        attackDamageType: 'piercing',
+        attackRoll: 18,
+        attackTotal: 22,
+        targetArmorClass: 9,
+        hit: true,
+        damageTotal: 8,
+        damageAfterDefenses: 4,
+        conditionalDamageTotal: 0,
+        conditionalDamageBreakdown: [],
+        damageApplied: 4,
+        remainingCurrentHp: 6,
+        remainingTempHp: 0,
+        attackerMovedMeters: 0,
+        appliedConditions: [],
+        deadConditionApplied: false,
+        combat: null,
+      }),
+    );
+
+    expect(addIncomingMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sender: 'Sistema',
+        text: expect.stringContaining('Dano aplicado: 4 (rolado: 8; após defesas: 4)'),
+      }),
+    );
   });
 });

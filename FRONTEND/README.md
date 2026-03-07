@@ -49,8 +49,12 @@ Regra editorial do modulo:
 - Regras de grade (conversao `world -> cell`, clamp por limites da pagina e tamanho de token, validacao de ponto dentro do board) ficam centralizadas em `gridMath.ts`, usadas por drag/snap e drop de token.
 - Geometria de token (bounds em grid/mundo, intersecao de retangulos e distancia de alcance por Chebyshev) fica centralizada em `tokenGeometry.ts`, reutilizada em marquee e validacao de alcance de ataque.
 - Conversao de tamanho de criatura para celulas de grid fica centralizada em `shared/lib/geometry/creatureSize.ts`; parsers de personagem/token nao devem manter tabelas duplicadas.
+- Escala visual atual de tamanhos no board: `tiny = 0.25x` (1/4 da celula), `small = 0.85x`, `medium = 1x`, mantendo ocupacao logica minima de 1 celula para regras de grid/picking.
 - Picking de token por coordenada de mundo/celula fica centralizado em `tokenPicking.ts`; o board deve preferir essa trilha para selecao/alvo em vez de depender de hit-test de elementos SVG.
 - Novos fluxos de board devem ser implementados diretamente no pipeline Pixi, sem introduzir fallback SVG.
+- Animacoes de ataque em mesa devem ser disparadas por eventos autoritativos (`ATTACK_RESOLVED`) e renderizadas no Pixi; metadados canonicos (`attackDamageType`, `attackerTokenId`) devem ser propagados pela trilha de feedback para habilitar presets data-driven (ex.: `bludgeoning` para concussao), sem heuristica por nome de ataque.
+- `attackDamageType` deve obedecer estritamente ao enum canonico de dano do `DATAMODELING` em toda a borda (`TokenActionBar` -> comando HTTP -> backend -> evento realtime -> animação), com falha explicita para valores fora do conjunto permitido.
+- Tipagem e validacao de `attackDamageType` no frontend devem derivar do enum canonico compartilhado (`@nihilvtt/datamodeling/primitives`) via `shared/api/damageTypes.ts`, evitando listas literais duplicadas.
 
 ### Runtime Boundary
 
@@ -245,6 +249,7 @@ Regra atual:
 - Falhas ao adicionar item permanecem visíveis dentro do próprio popup, para nao ficarem escondidas atras do modal durante a distribuicao.
 - O popup oferece controle simples de quantidade (`+1`, `+5` e input curto), e cada envio usa essa quantidade atual sem fechar o fluxo de distribuicao.
 - A seção `Acoes` sempre inclui `Ataque desarmado` como ação base derivada na UI, mesmo sem armas equipadas.
+- O contrato de `Ataque desarmado` (id, label, alcance e `damageType` base/overrides) deve vir do `DATAMODELING` (`UNARMED_ATTACK_PROFILE` + `resolveUnarmedAttackDamageType`), evitando hardcode local duplicado; overrides por `specieId` (ex.: `specie-lizardfolk`) devem alterar o `attackDamageType` enviado ao backend.
 - Quando houver runtime de equipamento, a seção `Acoes` também deriva ataques das armas equipadas (`mainHand` e `offHand`) a partir do catálogo de itens.
 - Para personagens runtime-backed, a seção `Acoes` nao deve misturar fallback local de `character.actions`; o runtime e os derivados passam a ser a fonte primária.
 - O bônus de ataque dessas armas só soma bônus de proficiência quando o runtime conseguir provar, pelo catálogo da classe, proficiência automática no `weaponType` da arma (`simple`/`martial`).
@@ -256,11 +261,13 @@ Regra atual:
 - Painéis flutuantes arrastáveis da mesa (como `InitiativeTrack`) seguem o mesmo padrão de drag manual da ficha: arraste direto por uma área de header/handle ampliada, com `mousemove` document-level, `safeArea` da viewport e `reclamp` em resize/mudança de layout.
 - O handle de drag desses painéis flutuantes (`InitiativeTrack`, `hpControl` e `Ações do Token`) agora deve aparecer como um header fino integrado à borda superior do bloco, usando um tom de `surface` próximo ao próprio painel e com o ícone de `six dots` preto no canto direito.
 - O combate so pode ser iniciado por comando explicito do mestre com os tokens previamente selecionados (`Iniciar combate`); o frontend nao deve introduzir gatilho automatico, trigger por proximidade nem qualquer outro atalho alternativo.
+- Ao iniciar combate, o frontend deve filtrar tokens selecionados com condicao runtime `dead`: se restarem menos de dois vivos, o painel de iniciar combate nao deve aparecer; se houver mortos e ao menos dois vivos, o comando deve iniciar combate apenas com os vivos.
 - Ao iniciar combate, a `InitiativeTrack` abre a partir do `combatState` autoritativo e lista exclusivamente os participantes enviados pelo backend; a UI nunca recalcula ordem localmente, apenas projeta `round`, `turnIndex` e `participants[]`.
 - O alcance de deslocamento em combate deve ser calculado por caminho valido (nao por raio), considerando orcamento de movimento e mapa de colisao; a base do frontend fica em `src/features/combat/model/movement/movementPathfinding.ts`.
 - O contrato de colisao para deslocamento ja considera dois tipos de bloqueio: celula bloqueada (`blockedCells`) e parede por aresta (`blockedEdges`); novos objetos de cenario devem alimentar esse contrato.
 - O overlay de range no board (Pixi) deve refletir apenas celulas alcancaveis pelo algoritmo de caminho; cliques futuros de movimento devem reutilizar o mesmo resultado para evitar divergencia entre UX e validacao.
 - Enquanto houver combate ativo, deslocamento de token participante segue fluxo de `click-to-move`: selecionar token do turno e clicar em uma celula valida do range; drag-and-drop de deslocamento fica desabilitado nesse contexto.
+- O deslocamento em combate deve ser um modo de acao explicito na barra do token (`Mover`); o board so aceita clique de destino quando esse modo estiver armado, e `Esc` deve cancelar o modo.
 - O movimento por clique no combate deve animar passo a passo (celula por celula) antes da confirmacao autoritativa, e cliques fora do alcance devem exibir feedback explicito de deslocamento insuficiente/local invalido.
 - Durante o hover em combate, o board deve exibir pre-visualizacao da rota (trilha de celulas e linha) ate o destino valido selecionado, reaproveitando o mesmo resultado de pathfinding usado na confirmacao do clique.
 - O `combatState` passa a carregar tambem os recursos do turno atual (`turnResources`), para que a UI apenas projete a economia autoritativa de combate.
@@ -273,6 +280,9 @@ Regra atual:
 - O `hpControl` deve abrir com largura ajustada ao próprio conteúdo (sem largura fixa desnecessária) e respeitar a `safe area` da toolbar esquerda na posição inicial, no mesmo padrão dos demais painéis flutuantes.
 - Enquanto houver combate ativo, a `InitiativeTrack` permite ao mestre avançar o turno (`Proximo turno`) ou encerrar o combate.
 - No MVP atual, o frontend envia `attackBonus` e `damageFormula`, enquanto o backend deriva a CA do alvo a partir do runtime + catálogo (via manifest canônico de itens), resolve a aleatoriedade (`d20`, hit/miss e dano), aplica HP/THP e publica `ATTACK_RESOLVED`, que atualiza HP e registra um log de sistema no chat.
+- O payload de `ATTACK_RESOLVED` pode incluir `damageAfterDefenses`; quando presente, o chat deve projetar explicitamente o valor pós-defesas sem inferência local de resistência/vulnerabilidade.
+- Para ataques canonicos de monstro com bonus condicionais, o handler de `ATTACK_RESOLVED` deve consumir `conditionalDamageTotal` e `conditionalDamageBreakdown[]` (`damageType` + `damage`) como contrato explicito; o chat nao deve inferir tipo de dano por nome de ataque.
+- Quando um alvo `NPC` sofre dano e chega a `0` HP via `ATTACK_RESOLVED`, ele é considerado morto imediatamente no backend: sai da lista de participantes do combate (ordem de turnos), mas o token permanece no grid até remoção explícita do mestre.
 - Ataques fora de combate formal devem falhar; o frontend nao tenta abrir combate implicitamente a partir de ataque.
 
 ## Documentacao do frontend

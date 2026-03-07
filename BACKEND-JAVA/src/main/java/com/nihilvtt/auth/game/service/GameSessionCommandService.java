@@ -41,6 +41,7 @@ public class GameSessionCommandService {
   private static final int MAX_DICE_COUNT = 100;
   private static final int MAX_DICE_SIDES = 100;
   private static final int MAX_TOTAL_DICE_ROLLS = 500;
+  private static final double MOVEMENT_METERS_PER_CELL = 1.5;
   private static final Pattern TERM_PATTERN = Pattern.compile("[+-]?[^+-]+");
   private static final Pattern DICE_TERM_PATTERN = Pattern.compile("^\\d+d\\d+$");
   private static final Pattern INTEGER_PATTERN = Pattern.compile("^\\d+$");
@@ -494,7 +495,8 @@ public class GameSessionCommandService {
       String attackIdRaw,
       String attackNameRaw,
       Integer attackBonusRaw,
-      String damageFormulaRaw
+      String damageFormulaRaw,
+      String attackDamageTypeRaw
   ) {
     GameEntity game = gameAccessService.requireGameWithAccess(gameId, userId);
 
@@ -503,6 +505,7 @@ public class GameSessionCommandService {
     String attackId = attackIdRaw == null ? "" : attackIdRaw.trim();
     String attackName = attackNameRaw == null ? "" : attackNameRaw.trim();
     String damageFormula = normalizeFormula(damageFormulaRaw);
+    CombatDamageType attackDamageType = normalizeDamageType(attackDamageTypeRaw);
     int attackBonus = attackBonusRaw == null ? 0 : attackBonusRaw;
 
     if (attackerTokenId.isBlank() || targetTokenId.isBlank()) {
@@ -517,7 +520,6 @@ public class GameSessionCommandService {
     if (attackName.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do ataque é obrigatório.");
     }
-
     GameSessionStateEntity sessionState = gameSessionStateRepository.findByGameId(gameId)
         .orElseGet(() -> initializeSessionState(game));
     ObjectNode rootNode = parseStateAsObject(sessionState, gameId);
@@ -554,6 +556,11 @@ public class GameSessionCommandService {
         damageFormula
     );
 
+    if (resolvedAttackData.expectedDamageType() != null
+        && resolvedAttackData.expectedDamageType() != attackDamageType) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de dano divergente do ataque autoritativo.");
+    }
+
     ObjectNode targetTokenNode = findTokenById(tokensNode, targetTokenId);
     if (targetTokenNode == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token alvo não encontrado na sessão.");
@@ -573,7 +580,12 @@ public class GameSessionCommandService {
     int naturalRoll = ThreadLocalRandom.current().nextInt(1, 21);
     int attackTotal = naturalRoll + resolvedAttackData.attackBonus();
     boolean hit = naturalRoll == 20 || (naturalRoll != 1 && attackTotal >= targetArmorClass);
+    CombatDamageType payloadDamageType = resolvedAttackData.expectedDamageType() == null
+      ? attackDamageType
+      : resolvedAttackData.expectedDamageType();
     int damageTotal = 0;
+    int damageAfterDefenses = 0;
+    int conditionalDamageTotal = 0;
     int damageApplied = 0;
     int remainingCurrentHp;
     int remainingTempHp;
@@ -585,6 +597,10 @@ public class GameSessionCommandService {
     int currentHp = hitPointContainer.path(currentHpField).asInt(0);
     int tempHp = Math.max(0, hitPointContainer.path(tempHpField).asInt(0));
     int maxHp = resolveCharacterHitPointMaximum(targetCharacterNode, hitPointContainer);
+    double attackerMovedMeters = resolveCurrentTurnMovedDistanceMeters(combatState);
+    ArrayNode appliedConditionsNode = objectMapper.createArrayNode();
+    ArrayNode conditionalDamageBreakdownNode = objectMapper.createArrayNode();
+    TargetDamageDefenses targetDamageDefenses = resolveTargetDamageDefenses(targetCharacterNode);
 
     if (hit) {
       DiceRollResult damageRoll = rollDiceFormula(
@@ -592,9 +608,54 @@ public class GameSessionCommandService {
           resolvedAttackData.attackName(),
           "Damage"
       );
-      damageTotal = Math.max(0, damageRoll.detailsNode().path("finalResult").asInt(0));
+      int baseDamageRollTotal = Math.max(0, damageRoll.detailsNode().path("finalResult").asInt(0));
+      damageTotal = baseDamageRollTotal;
+      damageAfterDefenses = applyDamageDefenses(baseDamageRollTotal, payloadDamageType, targetDamageDefenses);
 
-      int remainingDamage = damageTotal;
+      for (ResolvedConditionalDamage conditionalDamage : resolvedAttackData.conditionalDamageBonuses()) {
+        if (attackerMovedMeters + 1e-9 < conditionalDamage.requiresUserMovementAtLeastMeters()) {
+          continue;
+        }
+
+        DiceRollResult conditionalDamageRoll = rollDiceFormula(
+            conditionalDamage.damageFormula(),
+            resolvedAttackData.attackName(),
+            "Conditional Damage"
+        );
+        int conditionalDamageRollTotal = Math.max(0, conditionalDamageRoll.detailsNode().path("finalResult").asInt(0));
+        int conditionalDamageAfterDefenses = applyDamageDefenses(
+            conditionalDamageRollTotal,
+            conditionalDamage.damageType(),
+            targetDamageDefenses
+        );
+
+        damageTotal += conditionalDamageRollTotal;
+        conditionalDamageTotal += conditionalDamageAfterDefenses;
+
+        ObjectNode conditionalDamageNode = objectMapper.createObjectNode();
+        conditionalDamageNode.put("damageType", conditionalDamage.damageType().wireValue());
+        conditionalDamageNode.put("damage", conditionalDamageAfterDefenses);
+        conditionalDamageBreakdownNode.add(conditionalDamageNode);
+      }
+
+      damageAfterDefenses += conditionalDamageTotal;
+
+      for (ResolvedConditionalCondition conditionalCondition : resolvedAttackData.conditionalAppliedConditions()) {
+        if (attackerMovedMeters + 1e-9 < conditionalCondition.requiresUserMovementAtLeastMeters()) {
+          continue;
+        }
+
+        boolean applied = applyConditionFromAttackIfNeeded(
+            targetCharacterNode,
+            conditionalCondition.condition(),
+            attackId
+        );
+        if (applied) {
+          appliedConditionsNode.add(conditionalCondition.condition());
+        }
+      }
+
+      int remainingDamage = damageAfterDefenses;
       int tempAfter = tempHp;
       if (tempAfter > 0) {
         int absorbedByTemp = Math.min(tempAfter, remainingDamage);
@@ -617,6 +678,13 @@ public class GameSessionCommandService {
 
     consumeActionForActiveParticipant(combatState);
 
+    boolean deadConditionApplied = false;
+    if (hit && remainingCurrentHp == 0 && isNpcCharacter(targetCharacterNode)) {
+      deadConditionApplied = applyNpcDeadConditionIfNeeded(targetCharacterNode);
+      removeCombatParticipantByTokenId(rootNode, combatState, targetTokenId);
+      combatState = getActiveCombatState(rootNode);
+    }
+
     Instant createdAt = Instant.now();
     sessionState.setVersion(sessionState.getVersion() + 1);
     sessionState.setStateJson(toJson(rootNode));
@@ -628,15 +696,26 @@ public class GameSessionCommandService {
     payloadNode.put("targetCharacterId", targetCharacterId);
     payloadNode.put("attackId", attackId);
     payloadNode.put("attackName", resolvedAttackData.attackName());
+    payloadNode.put("attackDamageType", payloadDamageType.wireValue());
     payloadNode.put("attackRoll", naturalRoll);
     payloadNode.put("attackTotal", attackTotal);
     payloadNode.put("targetArmorClass", targetArmorClass);
     payloadNode.put("hit", hit);
     payloadNode.put("damageTotal", damageTotal);
+    payloadNode.put("damageAfterDefenses", damageAfterDefenses);
+    payloadNode.put("conditionalDamageTotal", conditionalDamageTotal);
     payloadNode.put("damageApplied", damageApplied);
     payloadNode.put("remainingCurrentHp", remainingCurrentHp);
     payloadNode.put("remainingTempHp", remainingTempHp);
-    payloadNode.set("combat", combatState.deepCopy());
+    payloadNode.put("attackerMovedMeters", attackerMovedMeters);
+    payloadNode.set("appliedConditions", appliedConditionsNode);
+    payloadNode.set("conditionalDamageBreakdown", conditionalDamageBreakdownNode);
+    payloadNode.put("deadConditionApplied", deadConditionApplied);
+    if (combatState == null) {
+      payloadNode.putNull("combat");
+    } else {
+      payloadNode.set("combat", combatState.deepCopy());
+    }
 
     GameSessionEventResponse event = new GameSessionEventResponse(
         UUID.randomUUID().toString(),
@@ -863,6 +942,34 @@ public class GameSessionCommandService {
     hitPointContainer.put(currentHpField, normalizedHp);
     hitPointContainer.put(tempHpField, normalizedTempHp);
 
+    boolean combatChanged = false;
+    JsonNode combatNodeForPayload = null;
+    boolean deadConditionApplied = false;
+    boolean deadConditionRemoved = false;
+    if ("damage".equals(mode)) {
+      deadConditionApplied = applyNpcDeadConditionIfNeeded(characterNode);
+
+      if (isNpcCharacter(characterNode) && normalizedHp == 0) {
+        ArrayNode tokensNode = ensureArray(rootNode, "tokens");
+        java.util.List<String> tokenIdsForCharacter = findTokenIdsByCharacterId(tokensNode, characterId);
+        ObjectNode combatState = getActiveCombatState(rootNode);
+        if (combatState != null && !tokenIdsForCharacter.isEmpty()) {
+          for (String tokenId : tokenIdsForCharacter) {
+            ObjectNode currentCombatState = getActiveCombatState(rootNode);
+            if (currentCombatState == null) {
+              break;
+            }
+            removeCombatParticipantByTokenId(rootNode, currentCombatState, tokenId);
+          }
+          combatChanged = true;
+          ObjectNode updatedCombatState = getActiveCombatState(rootNode);
+          combatNodeForPayload = updatedCombatState == null ? null : updatedCombatState.deepCopy();
+        }
+      }
+    } else if (normalizedHp > 0) {
+      deadConditionRemoved = removeConditionFromCharacterIfPresent(characterNode, "dead");
+    }
+
     return persistAndPublishCharacterHpUpdated(
         userId,
         gameId,
@@ -870,7 +977,11 @@ public class GameSessionCommandService {
         rootNode,
         characterId,
         normalizedHp,
-        normalizedTempHp
+        normalizedTempHp,
+        combatChanged,
+        combatNodeForPayload,
+        deadConditionApplied,
+        deadConditionRemoved
     );
   }
 
@@ -911,7 +1022,7 @@ public class GameSessionCommandService {
 
     int currentHp = hitPointContainer.path(currentHpField).asInt(0);
     int currentTempHp = Math.max(0, hitPointContainer.path(tempHpField).asInt(0));
-    int normalizedTempHp = Math.max(currentTempHp, amount);
+    int normalizedTempHp = Math.max(0, currentTempHp + amount);
     hitPointContainer.put(tempHpField, normalizedTempHp);
 
     return persistAndPublishCharacterHpUpdated(
@@ -921,7 +1032,11 @@ public class GameSessionCommandService {
         rootNode,
         characterId,
         currentHp,
-        normalizedTempHp
+      normalizedTempHp,
+      false,
+        null,
+        false,
+        false
     );
   }
 
@@ -1579,6 +1694,35 @@ public class GameSessionCommandService {
     return normalized;
   }
 
+  private CombatDamageType normalizeDamageType(String attackDamageTypeRaw) {
+    String normalized = attackDamageTypeRaw == null
+        ? ""
+        : attackDamageTypeRaw.trim().toLowerCase(Locale.ROOT);
+
+    if (normalized.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de dano é obrigatório.");
+    }
+
+    return CombatDamageType.fromWireValue(normalized)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de dano inválido."));
+  }
+
+  private CombatDamageType parseCanonicalDamageType(String rawDamageType) {
+    String normalized = rawDamageType == null ? "" : rawDamageType.trim().toLowerCase(Locale.ROOT);
+    if (normalized.isBlank()) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Catálogo canônico do monstro está sem tipo de dano válido."
+      );
+    }
+
+    return CombatDamageType.fromWireValue(normalized)
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Catálogo canônico do monstro está com tipo de dano inválido."
+        ));
+  }
+
   private int parsePositiveInt(String raw) {
     try {
       return Integer.parseInt(raw);
@@ -1686,6 +1830,13 @@ public class GameSessionCommandService {
       ObjectNode characterNode = findCharacterById(charactersNode, characterId);
       if (characterNode == null) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Personagem não encontrado para o token em combate.");
+      }
+
+      if (characterHasCondition(characterNode, "dead")) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Token com personagem morto não pode participar do combate."
+        );
       }
 
       int dexterityScore = resolveBaseAbilityScore(characterNode, "dexterity");
@@ -2607,6 +2758,163 @@ public class GameSessionCommandService {
     advanceCombatStateInPlace(combatState);
   }
 
+  private boolean isNpcCharacter(ObjectNode characterNode) {
+    return "NPC".equals(characterNode.path("type").asText("").trim());
+  }
+
+  private boolean characterHasCondition(ObjectNode characterNode, String conditionId) {
+    if (characterNode == null || conditionId == null || conditionId.isBlank()) {
+      return false;
+    }
+
+    JsonNode activeEffectsNode = characterNode.path("activeEffects").path("effects");
+    if (!(activeEffectsNode instanceof ArrayNode effectsArray)) {
+      return false;
+    }
+
+    for (int i = 0; i < effectsArray.size(); i += 1) {
+      JsonNode effectNode = effectsArray.get(i);
+      if (!(effectNode instanceof ObjectNode effectObject)) {
+        continue;
+      }
+
+      String linkedCondition = effectObject.path("linkedCondition").asText("").trim();
+      if (conditionId.equals(linkedCondition)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private boolean applyNpcDeadConditionIfNeeded(ObjectNode characterNode) {
+    if (!isNpcCharacter(characterNode)) {
+      return false;
+    }
+
+    ObjectNode hitPointContainer = resolveHitPointContainer(characterNode);
+    int currentHp = Math.max(0, hitPointContainer.path("current").asInt(0));
+    if (currentHp > 0) {
+      return false;
+    }
+
+    ArrayNode effects = resolveCharacterActiveEffectsArray(characterNode);
+    for (int i = 0; i < effects.size(); i += 1) {
+      JsonNode effectNode = effects.get(i);
+      if (!(effectNode instanceof ObjectNode effectObject)) {
+        continue;
+      }
+
+      String linkedCondition = effectObject.path("linkedCondition").asText("").trim();
+      if ("dead".equals(linkedCondition)) {
+        return false;
+      }
+    }
+
+    int nextEffectIndex = 0;
+    for (int i = 0; i < effects.size(); i += 1) {
+      JsonNode effectNode = effects.get(i);
+      if (!(effectNode instanceof ObjectNode effectObject)) {
+        continue;
+      }
+      nextEffectIndex = Math.max(nextEffectIndex, effectObject.path("effectIndex").asInt(-1) + 1);
+    }
+
+    ObjectNode deadEffect = objectMapper.createObjectNode();
+    deadEffect.put("instanceId", UUID.randomUUID().toString());
+
+    ObjectNode sourceNode = objectMapper.createObjectNode();
+    sourceNode.put("sourceType", "action");
+    sourceNode.put("sourceId", "act-apply-effect");
+    deadEffect.set("source", sourceNode);
+
+    deadEffect.put("effectIndex", nextEffectIndex);
+    deadEffect.put("linkedCondition", "dead");
+    deadEffect.put("stackCount", 1);
+    deadEffect.put("isSuppressed", false);
+    effects.add(deadEffect);
+    return true;
+  }
+
+  private boolean removeConditionFromCharacterIfPresent(ObjectNode characterNode, String conditionId) {
+    if (characterNode == null || conditionId == null || conditionId.isBlank()) {
+      return false;
+    }
+
+    ArrayNode effects = resolveCharacterActiveEffectsArray(characterNode);
+    boolean removed = false;
+    for (int i = effects.size() - 1; i >= 0; i -= 1) {
+      JsonNode effectNode = effects.get(i);
+      if (!(effectNode instanceof ObjectNode effectObject)) {
+        continue;
+      }
+
+      String linkedCondition = effectObject.path("linkedCondition").asText("").trim();
+      if (!conditionId.equals(linkedCondition)) {
+        continue;
+      }
+
+      effects.remove(i);
+      removed = true;
+    }
+
+    return removed;
+  }
+
+  private ArrayNode resolveCharacterActiveEffectsArray(ObjectNode characterNode) {
+    JsonNode activeEffectsNode = characterNode.get("activeEffects");
+    if (activeEffectsNode instanceof ObjectNode activeEffectsObject) {
+      JsonNode effectsNode = activeEffectsObject.get("effects");
+      if (effectsNode instanceof ArrayNode effectsArray) {
+        return effectsArray;
+      }
+      return activeEffectsObject.putArray("effects");
+    }
+
+    ObjectNode activeEffectsObject = objectMapper.createObjectNode();
+    ArrayNode effectsArray = activeEffectsObject.putArray("effects");
+    characterNode.set("activeEffects", activeEffectsObject);
+    return effectsArray;
+  }
+
+  private void removeCombatParticipantByTokenId(ObjectNode rootNode, ObjectNode combatState, String tokenId) {
+    ArrayNode participants = resolveCombatParticipants(combatState);
+    int previousTurnIndex = Math.max(0, combatState.path("turnIndex").asInt(0));
+
+    int removedIndex = -1;
+    for (int i = 0; i < participants.size(); i += 1) {
+      JsonNode participantNode = participants.get(i);
+      if (tokenId.equals(participantNode.path("tokenId").asText("").trim())) {
+        removedIndex = i;
+        break;
+      }
+    }
+
+    if (removedIndex < 0) {
+      return;
+    }
+
+    participants.remove(removedIndex);
+
+    if (participants.isEmpty()) {
+      rootNode.putNull("combat");
+      return;
+    }
+
+    int adjustedTurnIndex = previousTurnIndex;
+    if (removedIndex < previousTurnIndex) {
+      adjustedTurnIndex = previousTurnIndex - 1;
+    }
+    if (adjustedTurnIndex >= participants.size()) {
+      adjustedTurnIndex = 0;
+    }
+
+    combatState.put("turnIndex", Math.max(0, adjustedTurnIndex));
+    if (removedIndex == previousTurnIndex) {
+      combatState.set("turnResources", buildTurnResourcesFromParticipants(combatState, participants));
+    }
+  }
+
   private void advanceCombatStateInPlace(ObjectNode combatState) {
     ArrayNode participants = resolveCombatParticipants(combatState);
     if (participants.isEmpty()) {
@@ -2866,6 +3174,27 @@ public class GameSessionCommandService {
       }
     }
     return null;
+  }
+
+  private java.util.List<String> findTokenIdsByCharacterId(ArrayNode tokensNode, String characterId) {
+    java.util.List<String> tokenIds = new java.util.ArrayList<>();
+    for (int i = 0; i < tokensNode.size(); i += 1) {
+      JsonNode tokenNode = tokensNode.get(i);
+      if (!(tokenNode instanceof ObjectNode tokenObject)) {
+        continue;
+      }
+
+      String tokenCharacterId = tokenObject.path("characterId").asText("").trim();
+      if (!characterId.equals(tokenCharacterId)) {
+        continue;
+      }
+
+      String tokenId = tokenObject.path("id").asText("").trim();
+      if (!tokenId.isBlank()) {
+        tokenIds.add(tokenId);
+      }
+    }
+    return tokenIds;
   }
 
   private int findTokenIndexById(ArrayNode tokensNode, String tokenId) {
@@ -3203,15 +3532,28 @@ public class GameSessionCommandService {
       int fallbackAttackBonus,
       String fallbackDamageFormula
   ) {
-    if ("builtin-unarmed-strike".equals(attackId)) {
+    if (isNpcCharacter(attackerCharacterNode)) {
+      return resolveMonsterAttackData(attackerCharacterNode, attackId);
+    }
+
+    if (UnarmedAttackProfile.ATTACK_ID.equals(attackId)) {
       int strengthScore = resolveBaseAbilityScore(attackerCharacterNode, "strength");
       int level = Math.max(1, attackerCharacterNode.path("progression").path("currentLevel").asInt(1));
       int strengthModifier = getAbilityModifier(strengthScore);
       int proficiencyBonus = 2 + Math.max(0, (level - 1) / 4);
       int attackBonus = proficiencyBonus + strengthModifier;
       int flatDamage = Math.max(1, 1 + strengthModifier);
+      String specieId = resolvePlayerSpecieId(attackerCharacterNode);
+      CombatDamageType expectedDamageType = UnarmedAttackProfile.resolveDamageTypeForSpecie(specieId);
 
-      return new ResolvedAttackData("Ataque desarmado", attackBonus, String.valueOf(flatDamage));
+      return new ResolvedAttackData(
+          UnarmedAttackProfile.LABEL,
+          attackBonus,
+          String.valueOf(flatDamage),
+          expectedDamageType,
+          List.of(),
+          List.of()
+      );
     }
 
     if (attackId.startsWith("builtin-")) {
@@ -3222,7 +3564,189 @@ public class GameSessionCommandService {
       validateEquippedBuiltinWeapon(attackerCharacterNode, builtinItemId);
     }
 
-    return new ResolvedAttackData(fallbackAttackName, fallbackAttackBonus, fallbackDamageFormula);
+    return new ResolvedAttackData(
+      fallbackAttackName,
+      fallbackAttackBonus,
+      fallbackDamageFormula,
+      null,
+      List.of(),
+      List.of()
+    );
+  }
+
+  private ResolvedAttackData resolveMonsterAttackData(ObjectNode attackerCharacterNode, String attackId) {
+    MonsterCatalogManifestService.MonsterCatalogEntry monsterEntry = resolveMonsterCatalogEntry(attackerCharacterNode);
+    MonsterCatalogManifestService.MonsterCatalogAttackAction attackAction =
+        monsterCatalogManifestService.requireKnownMonsterAttackAction(monsterEntry.id(), attackId);
+
+    String attackName = attackAction.name() == null ? "" : attackAction.name().trim();
+    if (attackName.isBlank()) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Catálogo canônico do monstro está sem nome de ação válido."
+      );
+    }
+
+    Integer attackBonus = attackAction.attackBonus();
+    if (attackBonus == null) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Catálogo canônico do monstro está sem bônus de ataque válido."
+      );
+    }
+
+    String damageFormula = attackAction.damageFormula() == null ? "" : attackAction.damageFormula().trim();
+    if (damageFormula.isBlank()) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Catálogo canônico do monstro está sem fórmula de dano válida."
+      );
+    }
+
+    CombatDamageType damageType = parseCanonicalDamageType(attackAction.damageType());
+    List<ResolvedConditionalDamage> conditionalDamageBonuses = parseConditionalDamageBonuses(attackAction);
+    List<ResolvedConditionalCondition> conditionalAppliedConditions = parseConditionalAppliedConditions(attackAction);
+
+    return new ResolvedAttackData(
+        attackName,
+        attackBonus,
+        damageFormula,
+        damageType,
+        conditionalDamageBonuses,
+        conditionalAppliedConditions
+    );
+  }
+
+  private List<ResolvedConditionalDamage> parseConditionalDamageBonuses(
+      MonsterCatalogManifestService.MonsterCatalogAttackAction attackAction
+  ) {
+    List<MonsterCatalogManifestService.MonsterCatalogConditionalDamage> rawBonuses =
+        attackAction.conditionalDamageBonuses();
+    if (rawBonuses == null || rawBonuses.isEmpty()) {
+      return List.of();
+    }
+
+    List<ResolvedConditionalDamage> parsed = new ArrayList<>();
+    for (MonsterCatalogManifestService.MonsterCatalogConditionalDamage rawBonus : rawBonuses) {
+      if (rawBonus == null) {
+        continue;
+      }
+
+      String rawFormula = rawBonus.damageFormula() == null ? "" : rawBonus.damageFormula().trim();
+      if (rawFormula.isBlank()) {
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Catálogo canônico do monstro está sem fórmula de dano condicional válida."
+        );
+      }
+
+      String normalizedFormula = normalizeFormula(rawFormula);
+      CombatDamageType conditionalDamageType = parseCanonicalDamageType(rawBonus.damageType());
+      double requiredMovementMeters = parseRequiredMovementMeters(rawBonus.requiresUserMovementAtLeastMeters());
+      parsed.add(new ResolvedConditionalDamage(normalizedFormula, conditionalDamageType, requiredMovementMeters));
+    }
+
+    return List.copyOf(parsed);
+  }
+
+  private List<ResolvedConditionalCondition> parseConditionalAppliedConditions(
+      MonsterCatalogManifestService.MonsterCatalogAttackAction attackAction
+  ) {
+    List<MonsterCatalogManifestService.MonsterCatalogConditionalCondition> rawConditions =
+        attackAction.conditionalAppliedConditions();
+    if (rawConditions == null || rawConditions.isEmpty()) {
+      return List.of();
+    }
+
+    List<ResolvedConditionalCondition> parsed = new ArrayList<>();
+    for (MonsterCatalogManifestService.MonsterCatalogConditionalCondition rawCondition : rawConditions) {
+      if (rawCondition == null) {
+        continue;
+      }
+
+      String condition = rawCondition.condition() == null ? "" : rawCondition.condition().trim();
+      if (condition.isBlank()) {
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Catálogo canônico do monstro está sem condição condicional válida."
+        );
+      }
+
+      double requiredMovementMeters = parseRequiredMovementMeters(rawCondition.requiresUserMovementAtLeastMeters());
+      parsed.add(new ResolvedConditionalCondition(condition, requiredMovementMeters));
+    }
+
+    return List.copyOf(parsed);
+  }
+
+  private double parseRequiredMovementMeters(Double requiredMovementMetersRaw) {
+    if (requiredMovementMetersRaw == null || !Double.isFinite(requiredMovementMetersRaw)) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Catálogo canônico do monstro está sem requisito de deslocamento válido."
+      );
+    }
+
+    double requiredMovementMeters = Math.max(0, requiredMovementMetersRaw);
+    if (requiredMovementMeters <= 0) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Catálogo canônico do monstro está com requisito de deslocamento inválido."
+      );
+    }
+
+    return requiredMovementMeters;
+  }
+
+  private double resolveCurrentTurnMovedDistanceMeters(ObjectNode combatState) {
+    if (combatState == null) {
+      return 0;
+    }
+
+    ObjectNode turnResources = resolveCombatTurnResources(combatState);
+    int totalMovementCells = Math.max(0, turnResources.path("totalMovementCells").asInt(0));
+    int remainingMovementCells = Math.max(0, turnResources.path("remainingMovementCells").asInt(0));
+    int movedCells = Math.max(0, totalMovementCells - remainingMovementCells);
+    return movedCells * MOVEMENT_METERS_PER_CELL;
+  }
+
+  private boolean applyConditionFromAttackIfNeeded(
+      ObjectNode characterNode,
+      String conditionId,
+      String sourceAttackId
+  ) {
+    if (characterNode == null || conditionId == null || conditionId.isBlank()) {
+      return false;
+    }
+
+    if (characterHasCondition(characterNode, conditionId)) {
+      return false;
+    }
+
+    ArrayNode effects = resolveCharacterActiveEffectsArray(characterNode);
+    int nextEffectIndex = 0;
+    for (int i = 0; i < effects.size(); i += 1) {
+      JsonNode effectNode = effects.get(i);
+      if (!(effectNode instanceof ObjectNode effectObject)) {
+        continue;
+      }
+      nextEffectIndex = Math.max(nextEffectIndex, effectObject.path("effectIndex").asInt(-1) + 1);
+    }
+
+    ObjectNode conditionEffect = objectMapper.createObjectNode();
+    conditionEffect.put("instanceId", UUID.randomUUID().toString());
+
+    ObjectNode sourceNode = objectMapper.createObjectNode();
+    sourceNode.put("sourceType", "action");
+    sourceNode.put("sourceId", sourceAttackId == null ? "act-apply-effect" : sourceAttackId);
+    conditionEffect.set("source", sourceNode);
+
+    conditionEffect.put("effectIndex", nextEffectIndex);
+    conditionEffect.put("linkedCondition", conditionId);
+    conditionEffect.put("stackCount", 1);
+    conditionEffect.put("isSuppressed", false);
+    effects.add(conditionEffect);
+    return true;
   }
 
   private void validateEquippedBuiltinWeapon(ObjectNode attackerCharacterNode, String itemId) {
@@ -3238,6 +3762,26 @@ public class GameSessionCommandService {
     if (!itemId.equals(mainHandWeaponId) && !itemId.equals(offHandWeaponId)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A arma do ataque não está equipada pelo atacante.");
     }
+  }
+
+  private String resolvePlayerSpecieId(ObjectNode characterNode) {
+    String characterType = characterNode.path("type").asText("").trim();
+    if (!"Player".equals(characterType)) {
+      return null;
+    }
+
+    JsonNode buildNode = characterNode.get("build");
+    if (!(buildNode instanceof ObjectNode buildObject)) {
+      return null;
+    }
+
+    JsonNode specieIdNode = buildObject.get("specieId");
+    if (specieIdNode == null || specieIdNode.isNull()) {
+      return null;
+    }
+
+    String specieId = specieIdNode.asText("").trim();
+    return specieId.isBlank() ? null : specieId;
   }
 
   private int resolveCharacterArmorClass(ObjectNode characterNode) {
@@ -3355,6 +3899,66 @@ public class GameSessionCommandService {
     return monsterCatalogManifestService.requireKnownMonster(monsterId);
   }
 
+  private TargetDamageDefenses resolveTargetDamageDefenses(ObjectNode characterNode) {
+    if (!isNpcCharacter(characterNode)) {
+      return new TargetDamageDefenses(Set.of(), Set.of(), Set.of());
+    }
+
+    MonsterCatalogManifestService.MonsterCatalogDefenses defenses =
+        resolveMonsterCatalogEntry(characterNode).defenses();
+    if (defenses == null) {
+      return new TargetDamageDefenses(Set.of(), Set.of(), Set.of());
+    }
+
+    return new TargetDamageDefenses(
+        parseCanonicalDamageTypeSet(defenses.resistances()),
+        parseCanonicalDamageTypeSet(defenses.vulnerabilities()),
+        parseCanonicalDamageTypeSet(defenses.damageImmunities())
+    );
+  }
+
+  private Set<CombatDamageType> parseCanonicalDamageTypeSet(List<String> rawDamageTypes) {
+    if (rawDamageTypes == null || rawDamageTypes.isEmpty()) {
+      return Set.of();
+    }
+
+    Set<CombatDamageType> parsed = new HashSet<>();
+    for (String rawDamageType : rawDamageTypes) {
+      parsed.add(parseCanonicalDamageType(rawDamageType));
+    }
+
+    return Set.copyOf(parsed);
+  }
+
+  private int applyDamageDefenses(
+      int rolledDamage,
+      CombatDamageType damageType,
+      TargetDamageDefenses targetDamageDefenses
+  ) {
+    int normalizedDamage = Math.max(0, rolledDamage);
+    if (normalizedDamage == 0) {
+      return 0;
+    }
+
+    if (targetDamageDefenses.damageImmunities().contains(damageType)) {
+      return 0;
+    }
+
+    boolean resistant = targetDamageDefenses.resistances().contains(damageType);
+    boolean vulnerable = targetDamageDefenses.vulnerabilities().contains(damageType);
+    if (resistant && vulnerable) {
+      return normalizedDamage;
+    }
+    if (resistant) {
+      return Math.floorDiv(normalizedDamage, 2);
+    }
+    if (vulnerable) {
+      return normalizedDamage * 2;
+    }
+
+    return normalizedDamage;
+  }
+
   private ObjectNode resolveHitPointContainer(ObjectNode characterNode) {
     JsonNode hitPointsNode = characterNode.get("hitPoints");
     if (hitPointsNode instanceof ObjectNode hitPointsObject) {
@@ -3403,7 +4007,11 @@ public class GameSessionCommandService {
       ObjectNode rootNode,
       String characterId,
       int currentHp,
-      int tempHp
+      int tempHp,
+      boolean combatChanged,
+        JsonNode combatNode,
+        boolean deadConditionApplied,
+        boolean deadConditionRemoved
   ) {
     Instant createdAt = Instant.now();
     sessionState.setVersion(sessionState.getVersion() + 1);
@@ -3414,6 +4022,16 @@ public class GameSessionCommandService {
     payloadNode.put("characterId", characterId);
     payloadNode.put("currentHp", currentHp);
     payloadNode.put("tempHp", tempHp);
+    payloadNode.put("combatChanged", combatChanged);
+    payloadNode.put("deadConditionApplied", deadConditionApplied);
+    payloadNode.put("deadConditionRemoved", deadConditionRemoved);
+    if (combatChanged) {
+      if (combatNode == null || combatNode.isNull()) {
+        payloadNode.putNull("combat");
+      } else {
+        payloadNode.set("combat", combatNode);
+      }
+    }
 
     GameSessionEventResponse event = new GameSessionEventResponse(
         UUID.randomUUID().toString(),
@@ -3443,8 +4061,35 @@ public class GameSessionCommandService {
   private record SenderInfo(String name, String colorHex) {
   }
 
-  private record ResolvedAttackData(String attackName, int attackBonus, String damageFormula) {
+  private record ResolvedAttackData(
+      String attackName,
+      int attackBonus,
+      String damageFormula,
+      CombatDamageType expectedDamageType,
+      List<ResolvedConditionalDamage> conditionalDamageBonuses,
+      List<ResolvedConditionalCondition> conditionalAppliedConditions
+    ) {
+    }
+
+    private record ResolvedConditionalDamage(
+      String damageFormula,
+      CombatDamageType damageType,
+      double requiresUserMovementAtLeastMeters
+    ) {
+    }
+
+    private record ResolvedConditionalCondition(
+      String condition,
+      double requiresUserMovementAtLeastMeters
+  ) {
   }
+
+      private record TargetDamageDefenses(
+        Set<CombatDamageType> resistances,
+        Set<CombatDamageType> vulnerabilities,
+        Set<CombatDamageType> damageImmunities
+      ) {
+      }
 
   private record CombatSyncResult(boolean touched, JsonNode combatNode) {
   }

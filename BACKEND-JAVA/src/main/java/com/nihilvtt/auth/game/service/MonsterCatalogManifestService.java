@@ -30,6 +30,24 @@ public class MonsterCatalogManifestService {
     return entry;
   }
 
+  public MonsterCatalogAttackAction requireKnownMonsterAttackAction(String monsterId, String actionIdRaw) {
+    MonsterCatalogEntry monsterEntry = requireKnownMonster(monsterId);
+    String actionId = actionIdRaw == null ? "" : actionIdRaw.trim();
+    if (actionId.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ação de monstro é obrigatória.");
+    }
+
+    MonsterCatalogAttackAction action = monsterEntry.actions().stream()
+        .filter(entry -> actionId.equals(entry.actionId()))
+        .findFirst()
+        .orElse(null);
+    if (action == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ação de monstro não existe no catálogo canônico.");
+    }
+
+    return action;
+  }
+
   private MonsterCatalogManifest loadManifest(ObjectMapper objectMapper) {
     ClassPathResource resource = new ClassPathResource("catalog/monster-catalog-manifest.json");
     try (InputStream inputStream = resource.getInputStream()) {
@@ -56,7 +74,101 @@ public class MonsterCatalogManifestService {
       Integer armorClass,
       Integer hitPointMaximum,
       MonsterCatalogSpeed speed,
-      String challengeRating
+        MonsterCatalogDefenses defenses,
+      String challengeRating,
+      List<MonsterCatalogAttackAction> actions
+  ) {
+    public MonsterCatalogEntry(
+        String id,
+        String primaryName,
+        List<String> names,
+        String tokenUrl,
+        String splashArtUrl,
+        String size,
+        String creatureType,
+        String alignment,
+        MonsterCatalogAbilityScores abilityScores,
+        Integer armorClass,
+        Integer hitPointMaximum,
+        MonsterCatalogSpeed speed,
+        String challengeRating
+    ) {
+      this(
+          id,
+          primaryName,
+          names,
+          tokenUrl,
+          splashArtUrl,
+          size,
+          creatureType,
+          alignment,
+          abilityScores,
+          armorClass,
+          hitPointMaximum,
+          speed,
+          new MonsterCatalogDefenses(List.of(), List.of(), List.of()),
+          challengeRating,
+          List.of()
+      );
+    }
+  }
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public record MonsterCatalogDefenses(
+      List<String> resistances,
+      List<String> vulnerabilities,
+      List<String> damageImmunities
+  ) {
+    public MonsterCatalogDefenses {
+      resistances = resistances == null ? List.of() : List.copyOf(resistances);
+      vulnerabilities = vulnerabilities == null ? List.of() : List.copyOf(vulnerabilities);
+      damageImmunities = damageImmunities == null ? List.of() : List.copyOf(damageImmunities);
+    }
+  }
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public record MonsterCatalogAttackAction(
+      String actionId,
+      String name,
+      Integer attackBonus,
+      String damageFormula,
+      String damageType,
+      Double rangeMeters,
+      List<MonsterCatalogConditionalDamage> conditionalDamageBonuses,
+      List<MonsterCatalogConditionalCondition> conditionalAppliedConditions
+  ) {
+    public MonsterCatalogAttackAction(
+        String actionId,
+        String name,
+        Integer attackBonus,
+        String damageFormula,
+        String damageType,
+        Double rangeMeters
+    ) {
+      this(
+          actionId,
+          name,
+          attackBonus,
+          damageFormula,
+          damageType,
+          rangeMeters,
+          List.of(),
+          List.of()
+      );
+    }
+  }
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public record MonsterCatalogConditionalDamage(
+      String damageFormula,
+      String damageType,
+      Double requiresUserMovementAtLeastMeters
+  ) {}
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public record MonsterCatalogConditionalCondition(
+      String condition,
+      Double requiresUserMovementAtLeastMeters
   ) {}
 
   @JsonIgnoreProperties(ignoreUnknown = true)

@@ -146,7 +146,7 @@ Jogos:
   - o backend nao deve tentar reparar estados em runtime: contratos invalidos ou incompletos devem falhar cedo, em vez de serem corrigidos automaticamente
   - dano em runtime passa a consumir `hitPoints.temporary` antes de reduzir `hitPoints.current`
   - cliente envia `POST /games/{gameId}/session/characters/temp-hp`
-  - o comando recebe `amount` e concede HP temporario de forma autoritativa, mantendo o maior valor entre o HP temporario atual e o novo valor concedido
+  - o comando recebe `amount` e concede HP temporario de forma autoritativa por soma incremental (`tempAtual + amount`) a cada execucao
   - apenas o mestre pode executar esse comando
   - backend atualiza `state.characters[].hitPoints.current`/`temporary`, incrementa `version` e publica `CHARACTER_HP_UPDATED`
   - cliente envia `POST /games/{gameId}/session/characters/equipment`
@@ -155,11 +155,19 @@ Jogos:
   - backend valida ownership do mestre, exige personagem runtime compatível, adiciona/empilha o item em `state.characters[].inventory.items[]`, incrementa `version` e publica `CHARACTER_INVENTORY_UPDATED`
   - o estado da mesa agora pode carregar `combat`, com `active`, `round`, `turnIndex` e `participants[]` (ordem formal de iniciativa)
   - mestre pode iniciar combate explicitamente com `POST /games/{gameId}/session/combat/start`; o backend rola iniciativa (`1d20 + DEX mod`), ordena por total/DEX/tokenId e publica `COMBAT_STARTED`
+  - tokens cujo personagem tenha condicao runtime `dead` nao podem entrar em combate; a tentativa deve falhar cedo com erro de contrato
   - mestre pode avançar turno com `POST /games/{gameId}/session/combat/next-turn`; o backend atualiza `turnIndex`/`round` e publica `COMBAT_TURN_ADVANCED`
   - mestre pode encerrar combate com `POST /games/{gameId}/session/combat/end`; o backend limpa `combat` e publica `COMBAT_ENDED`
   - membro com acesso ao jogo pode enviar `POST /games/{gameId}/session/combat/attacks`
   - ataques fora de combate formal devem falhar; o backend nao deve instanciar combate implicitamente a partir de ataque
   - no MVP atual, o frontend envia `attackBonus` e `damageFormula`, e o backend deriva a CA do alvo a partir do runtime + catálogo (via `catalog/item-catalog-manifest.json`), rederiva `Ataque desarmado` internamente, valida que ataques `builtin-*` de arma só usem itens realmente equipados pelo atacante, resolve a rolagem de ataque (`1d20`), aplica hit/miss, rola dano, consome `hitPoints.temporary` antes de `hitPoints.current` e publica `ATTACK_RESOLVED`
+  - para alvos `NPC`, o backend aplica `resistances`, `vulnerabilities` e `damageImmunities` a partir do `monster-catalog-manifest.json` antes de consumir HP/THP; `traits` permanecem descritivos (sem execução automática no runtime atual)
+  - o `ATTACK_RESOLVED` agora expõe `damageAfterDefenses` (dano após ajuste por defesas e antes da absorção por THP) para permitir projeção fiel no cliente
+  - para ataques canonicos de monstro com bonus condicionais, o backend publica no `ATTACK_RESOLVED` os campos `conditionalDamageTotal` e `conditionalDamageBreakdown[]` (com `damageType` + `damage`) sempre de forma explicita, evitando heuristica do cliente para inferir tipo de dano condicional
+  - `Ataque desarmado` usa contrato canonico interno (`UnarmedAttackProfile`) com `defaultDamageType` e override por `specieId` (ex.: `specie-lizardfolk -> slashing`), com fallback explicito para `bludgeoning`
+  - `attackDamageType` deve seguir estritamente o conjunto canônico; a validação no backend usa enum único (`CombatDamageType`) para evitar listas duplicadas em múltiplas bordas
+  - quando um `NPC` chega a `0` HP por dano, o backend aplica a condicao runtime `dead` em `activeEffects.effects[].linkedCondition`; em combate ativo, esse participante sai de `combat.participants[]`, mas o token permanece no grid ate remocao explicita do mestre
+  - no comando manual do mestre (`POST /games/{gameId}/session/characters/hp`), cura (`mode=heal`) remove a condicao `dead` para `NPC` e `Player`; essa regra e deliberadamente restrita ao HP control administrativo para permitir testes/ajustes de mesa. Fluxos futuros de cura de jogo (magias/itens/acoes) nao devem reviver `NPC` mortos automaticamente sem regra explicita
   - quando tokens/personagens saem da mesa, o backend sincroniza `combat.participants[]`; se nao restar participante, o estado de combate e limpo
 - o fluxo de concessão de item e a compatibilidade de slots passam a usar o manifest canônico `catalog/item-catalog-manifest.json`, gerado pelo `DATAMODELING`, sem heurística de prefixo no backend
 - a trilha autoritativa de monstros segue o mesmo padrao: o backend consome `catalog/monster-catalog-manifest.json`, gerado pelo `DATAMODELING`, e a instanciacao de `MonsterCharacterState` deve nascer por `monsterId`, sem confiar em payload estrutural de monstro vindo do frontend

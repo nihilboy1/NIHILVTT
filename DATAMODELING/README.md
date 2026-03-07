@@ -37,7 +37,14 @@ No diretorio `DATAMODELING/`:
 - `pnpm monsters`
 - `pnpm export:backend-item-manifest`
 - `pnpm export:backend-monster-manifest`
+- `pnpm check:backend-monster-manifest-sync`
 - `pnpm lint`
+
+## Manifest de Monstros (Backend)
+
+- `export:backend-monster-manifest` gera o arquivo canônico consumido pelo backend em `BACKEND-JAVA/src/main/resources/catalog/monster-catalog-manifest.json`.
+- o manifest canônico de monstros exporta também `defenses` de dano (`resistances`, `vulnerabilities`, `damageImmunities`) para cálculo autoritativo de dano no backend.
+- `check:backend-monster-manifest-sync` valida que o manifest atual do backend esta sincronizado com o catalogo em `DATAMODELING`; o comando falha quando houver drift.
 
 ## Fluxo recomendado
 
@@ -215,6 +222,8 @@ Exemplos:
 - o runtime guarda `currentLevel`; a progressao da classe continua no catalogo
 - o runtime guarda cargas atuais de um recurso; limite e recarga continuam definidos pelos dados da classe/acao
 
+- o contrato base de ataque desarmado deve morar no catalogo (`src/data/combat/unarmed-attack.ts`), com `defaultDamageType` e `damageTypeOverrides` por `specieId`; consumidores nao devem hardcodear `builtin-unarmed-strike` em multiplos pontos.
+
 Diretriz explicita:
 
 - o projeto nao deve manter suporte legado dentro do runtime tipado
@@ -262,7 +271,7 @@ Regra atual:
 - a composicao de `PHB2024ITEMS` deve permanecer alinhada aos enums gerados em `src/shared/data-based-enums.ts` (especialmente `AllItemsEnum`)
 - itens validos ja modelados no pacote nao devem ficar fora do export principal por omissao na uniao
 - o script `pnpm export:backend-item-manifest` gera um manifest JSON consumido pelo backend Java para validacao de inventario/equipamento sem heuristica por prefixo
-- o script `pnpm export:backend-monster-manifest` gera o manifest JSON canônico de monstros para o backend Java, incluindo identidade base, `primaryName`, `abilityScores`, AC, HP máximo e deslocamentos necessarios para spawn/validacao/combate sem confiar em payload montado pelo frontend
+- o script `pnpm export:backend-monster-manifest` gera o manifest JSON canônico de monstros para o backend Java, incluindo identidade base, `primaryName`, `abilityScores`, AC, HP máximo, deslocamentos e `actions` de ataque canônicas (por `actionId`) com metadados condicionais (`movesAtLeast`, dano adicional e condições aplicadas) para resolução autoritativa de combate sem confiar em payload montado pelo frontend
 - o script `pnpm enums` deve classificar familias de item pela origem canonica dos arquivos de dados (e metadado associado), nao por prefixo textual de `id`
 - o script `pnpm enums` deve apontar para os diretórios reais de dados publicados (`items`, `actions`, `spells`, `feats`, `summonedTokens`, `monsters`), respeitando também a extensão real dos módulos publicados (`.ts` ou `.js`) para evitar enums vazios
 

@@ -145,7 +145,6 @@ function convertDistanceToMeters(normal: number, unit: unknown): number {
     }
   }
 
-  // Default to feet because monster data currently uses imperial units.
   return convertFeetToMeters(normal);
 }
 
@@ -353,7 +352,7 @@ function buildMonsterAttackActions(
           const movementDelta =
             left.requiresUserMovementAtLeastMeters -
             right.requiresUserMovementAtLeastMeters;
-          if (movementDelta !== 0) {
+          if (movementDelta != 0) {
             return movementDelta;
           }
 
@@ -431,13 +430,8 @@ function buildMonsterAttackActions(
     .sort((left, right) => left.actionId.localeCompare(right.actionId));
 }
 
-async function main() {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const projectRoot = path.resolve(__dirname, "../..");
-  const monorepoRoot = path.resolve(projectRoot, "..");
-
-  const manifest: MonsterCatalogManifest = {
+function buildExpectedManifest(): MonsterCatalogManifest {
+  return {
     monsters: [...PHB2024MONSTERS]
       .map((monster) => ({
         id: monster.id,
@@ -458,8 +452,14 @@ async function main() {
       }))
       .sort((left, right) => left.id.localeCompare(right.id)),
   };
+}
 
-  const outputPath = path.resolve(
+async function main() {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const projectRoot = path.resolve(__dirname, "../..");
+  const monorepoRoot = path.resolve(projectRoot, "..");
+  const manifestPath = path.resolve(
     monorepoRoot,
     "BACKEND-JAVA",
     "src",
@@ -469,13 +469,21 @@ async function main() {
     "monster-catalog-manifest.json",
   );
 
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
-  await fs.writeFile(
-    outputPath,
-    JSON.stringify(manifest, null, 2) + "\n",
-    "utf-8",
+  const expectedManifest = buildExpectedManifest();
+  const expectedJson = JSON.stringify(expectedManifest, null, 2) + "\n";
+  const currentJson = await fs.readFile(manifestPath, "utf-8");
+
+  if (currentJson !== expectedJson) {
+    console.error(
+      "monster-catalog-manifest.json está fora de sincronização com DATAMODELING. Rode: pnpm export:backend-monster-manifest",
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log(
+    "monster-catalog-manifest.json está sincronizado com DATAMODELING.",
   );
-  console.log(`Monster catalog manifest gerado em: ${outputPath}`);
 }
 
 main().catch((error) => {

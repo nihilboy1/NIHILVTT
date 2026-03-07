@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { DamageTypeEnum } from '@nihilvtt/datamodeling/primitives';
+
 import { useCharactersStore } from '@/entities/character/model/store';
 import { parseTokenSize } from '@/entities/token/model/utils/tokenUtils';
 import { useTokenStore } from '@/entities/token/model/store/tokenStore';
@@ -235,6 +237,13 @@ const characterHpUpdatedPayloadSchema = z.object({
   characterId: z.string().min(1),
   currentHp: z.number().int().nonnegative(),
   tempHp: z.number().int().nonnegative(),
+  combatChanged: z.boolean().optional().default(false),
+  combat: z
+    .lazy(() => combatStateSchema)
+    .nullable()
+    .optional(),
+  deadConditionApplied: z.boolean().optional().default(false),
+  deadConditionRemoved: z.boolean().optional().default(false),
 });
 
 const tokenSchema = z.object({
@@ -258,8 +267,8 @@ const combatParticipantSchema = z.object({
   initiativeRoll: z.number().int(),
   initiativeTotal: z.number().int(),
   dexterityScore: z.number().int(),
-  movementBudgetCells: z.number().int().min(1),
-  status: z.literal('active'),
+  movementBudgetCells: z.number().int().min(0),
+  status: z.string().trim().min(1),
 });
 
 const combatTurnResourcesSchema = z.object({
@@ -283,15 +292,30 @@ const attackResolvedPayloadSchema = z.object({
   targetCharacterId: z.string().min(1),
   attackId: z.string().min(1),
   attackName: z.string().min(1),
+  attackDamageType: DamageTypeEnum,
   attackRoll: z.number().int().min(1).max(20),
   attackTotal: z.number().int(),
   targetArmorClass: z.number().int().nonnegative(),
   hit: z.boolean(),
   damageTotal: z.number().int().nonnegative(),
+  damageAfterDefenses: z.number().int().nonnegative().optional(),
+  conditionalDamageTotal: z.number().int().nonnegative().optional().default(0),
+  conditionalDamageBreakdown: z
+    .array(
+      z.object({
+        damageType: DamageTypeEnum,
+        damage: z.number().int().nonnegative(),
+      }),
+    )
+    .optional()
+    .default([]),
   damageApplied: z.number().int().nonnegative(),
   remainingCurrentHp: z.number().int().nonnegative(),
   remainingTempHp: z.number().int().nonnegative(),
-  combat: combatStateSchema,
+  attackerMovedMeters: z.number().nonnegative().optional().default(0),
+  appliedConditions: z.array(z.string().min(1)).optional().default([]),
+  deadConditionApplied: z.boolean().optional().default(false),
+  combat: combatStateSchema.nullable(),
 });
 
 const tokenRemovedPayloadSchema = z.object({
@@ -398,9 +422,18 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
       characterHpUpdatedPayloadSchema,
       'CHARACTER_HP_UPDATED',
     );
+
     useCharactersStore
       .getState()
-      .updateCharacterHp(parsed.characterId, parsed.currentHp, parsed.tempHp);
+      .updateCharacterHp(parsed.characterId, parsed.currentHp, parsed.tempHp, {
+        deadConditionApplied: parsed.deadConditionApplied,
+        deadConditionRemoved: parsed.deadConditionRemoved,
+      });
+
+    if (parsed.combatChanged) {
+      useCombatStore.getState().setCombatState(parsed.combat ?? null);
+    }
+
     return;
   }
 
@@ -413,11 +446,19 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
         parsed.targetCharacterId,
         parsed.remainingCurrentHp,
         parsed.remainingTempHp,
+        {
+          deadConditionApplied: parsed.deadConditionApplied,
+          deadConditionRemoved: false,
+        },
       );
     useCombatStore.getState().setCombatState(parsed.combat);
     useAttackFeedbackStore.getState().pushFeedback({
       id: event.eventId,
       tokenId: parsed.targetTokenId,
+      attackerTokenId: parsed.attackerTokenId,
+      attackName: parsed.attackName,
+      attackDamageType: parsed.attackDamageType,
+      triggeredAtMs: Date.now(),
       hit: parsed.hit,
       attackTotal: parsed.attackTotal,
       targetArmorClass: parsed.targetArmorClass,
@@ -434,6 +475,26 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
     const compactSummary = parsed.hit
       ? `${attackerName} usou ${parsed.attackName} em ${targetName}: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> ACERTO, ${parsed.damageApplied} dano`
       : `${attackerName} usou ${parsed.attackName} em ${targetName}: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> ERRO`;
+    const damageAfterDefenses = parsed.damageAfterDefenses ?? parsed.damageTotal;
+    const damageDefenseSuffix =
+      parsed.hit && damageAfterDefenses !== parsed.damageTotal
+        ? `; após defesas: ${damageAfterDefenses}`
+        : '';
+    const conditionalDamageLine = parsed.hit
+      ? parsed.conditionalDamageTotal > 0
+        ? `Dano condicional: +${parsed.conditionalDamageTotal} (movimento no turno: ${parsed.attackerMovedMeters.toFixed(1)}m)`
+        : 'Dano condicional: +0'
+      : 'Dano condicional: +0';
+    const conditionalDamageBreakdownLine =
+      parsed.hit && parsed.conditionalDamageBreakdown.length > 0
+        ? `Detalhe dano condicional: ${parsed.conditionalDamageBreakdown
+            .map((entry) => `${entry.damageType} +${entry.damage}`)
+            .join(', ')}`
+        : 'Detalhe dano condicional: nenhum';
+    const appliedConditionsLine =
+      parsed.hit && parsed.appliedConditions.length > 0
+        ? `Condições aplicadas: ${parsed.appliedConditions.join(', ')}`
+        : 'Condições aplicadas: nenhuma';
     const summary = [
       compactSummary,
       '---',
@@ -442,8 +503,11 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
       `Alvo(s): ${targetName}`,
       `Resultado: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> ${hitStatus}`,
       parsed.hit
-        ? `Dano aplicado: ${parsed.damageApplied} (rolado: ${parsed.damageTotal})`
+        ? `Dano aplicado: ${parsed.damageApplied} (rolado: ${parsed.damageTotal}${damageDefenseSuffix})`
         : 'Dano aplicado: 0',
+      conditionalDamageLine,
+      conditionalDamageBreakdownLine,
+      appliedConditionsLine,
       `HP do alvo: ${remainingHpSummary}`,
     ].join('\n');
 

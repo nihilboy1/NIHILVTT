@@ -7,8 +7,8 @@
         "Macaco",
         "Ape"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -30,7 +30,34 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Soco",
+          "attackBonus": 5,
+          "damageFormula": "1d4+3",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        },
+        {
+          "actionId": "act-throw",
+          "name": "Pedra",
+          "attackBonus": 5,
+          "damageFormula": "2d6+3",
+          "damageType": "bludgeoning",
+          "rangeMeters": 7.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-awakened-shrub",
@@ -39,8 +66,8 @@
         "Arbusto Desperto",
         "Awakened Shrub"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "plant",
       "alignment": "trueNeutral",
@@ -62,7 +89,28 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [
+          "piercing"
+        ],
+        "vulnerabilities": [
+          "fire"
+        ],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Rastrar",
+          "attackBonus": 1,
+          "damageFormula": "1",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-baboon",
@@ -71,8 +119,8 @@
         "Babuíno",
         "Baboon"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -94,7 +142,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 1,
+          "damageFormula": "1d4-1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-badger",
@@ -103,8 +168,8 @@
         "Texugo",
         "Badger"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -126,7 +191,26 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [
+          "poison"
+        ],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-bat",
@@ -135,8 +219,8 @@
         "Morcego",
         "Bat"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -158,7 +242,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 4,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-black-bear",
@@ -167,8 +268,8 @@
         "Urso Negro",
         "Black Bear"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -190,7 +291,24 @@
         "swim": 30,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Dilacerar",
+          "attackBonus": 4,
+          "damageFormula": "1d6+2",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-cat",
@@ -199,8 +317,8 @@
         "Gato",
         "Cat"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -222,7 +340,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Garras",
+          "attackBonus": 4,
+          "damageFormula": "1",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-cockatrice",
@@ -231,8 +366,8 @@
         "Cocatriz",
         "Cockatrice"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "monstrosity",
       "alignment": "unaligned",
@@ -254,7 +389,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida Petrificante",
+          "attackBonus": 3,
+          "damageFormula": "1d4+1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-commoner",
@@ -286,7 +438,13 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": []
     },
     {
       "id": "monster-crab",
@@ -295,8 +453,8 @@
         "Caranguejo",
         "Crab"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -318,7 +476,24 @@
         "swim": 20,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Garra",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-crawling-claw",
@@ -327,8 +502,8 @@
         "Garra Rastejante",
         "Crawling Claw"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "undead",
       "alignment": "neutralEvil",
@@ -350,7 +525,27 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": [
+          "necrotic",
+          "poison"
+        ]
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Pancada",
+          "attackBonus": 3,
+          "damageFormula": "2",
+          "damageType": "necrotic",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-crocodile",
@@ -359,8 +554,8 @@
         "Crocodilo",
         "Crocodile"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "large",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -382,7 +577,24 @@
         "swim": 30,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 4,
+          "damageFormula": "1d8+2",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-darkmantle",
@@ -391,8 +603,8 @@
         "Manto Sombrio",
         "Darkmantle"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "aberration",
       "alignment": "unaligned",
@@ -414,7 +626,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Esmagar",
+          "attackBonus": 5,
+          "damageFormula": "1d6+3",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-deer",
@@ -423,8 +652,8 @@
         "Cervo",
         "Deer"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -446,7 +675,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Chifres",
+          "attackBonus": 3,
+          "damageFormula": "1d4",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-dust-mephit",
@@ -455,8 +701,8 @@
         "Mefit de Poeira",
         "Dust Mephit"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "elemental",
       "alignment": "neutralEvil",
@@ -478,7 +724,28 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [
+          "fire"
+        ],
+        "damageImmunities": [
+          "poison"
+        ]
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Garra",
+          "attackBonus": 4,
+          "damageFormula": "1d4+2",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-eagle",
@@ -487,8 +754,8 @@
         "Águia",
         "Eagle"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -510,7 +777,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Garras",
+          "attackBonus": 4,
+          "damageFormula": "1d4+2",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-frog",
@@ -519,8 +803,8 @@
         "Sapo",
         "Frog"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -542,7 +826,24 @@
         "swim": 20,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-gas-spore-fungus",
@@ -551,8 +852,8 @@
         "Fungo Esporo de Gás",
         "Gas Spore Fungus"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "large",
       "creatureType": "plant",
       "alignment": "unaligned",
@@ -574,7 +875,26 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": [
+          "poison"
+        ]
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Tentáculo",
+          "attackBonus": 0,
+          "damageFormula": "1d6",
+          "damageType": "poison",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-giant-fire-beetle",
@@ -583,8 +903,8 @@
         "Besouro de Fogo Gigante",
         "Giant Fire Beetle"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -606,7 +926,26 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [
+          "fire"
+        ],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 1,
+          "damageFormula": "1",
+          "damageType": "fire",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-giant-goat",
@@ -615,8 +954,8 @@
         "Cabra Gigante",
         "Giant Goat"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/ewI8XsF.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "large",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -638,7 +977,35 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Investida",
+          "attackBonus": 5,
+          "damageFormula": "1d6+3",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [
+            {
+              "damageFormula": "2d4",
+              "damageType": "bludgeoning",
+              "requiresUserMovementAtLeastMeters": 6
+            }
+          ],
+          "conditionalAppliedConditions": [
+            {
+              "condition": "prone",
+              "requiresUserMovementAtLeastMeters": 6
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "monster-giant-seahorse",
@@ -647,8 +1014,8 @@
         "Cavalo-Marinho Gigante",
         "Giant Seahorse"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "large",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -670,7 +1037,30 @@
         "swim": 40,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Investida",
+          "attackBonus": 4,
+          "damageFormula": "2d6+2",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [
+            {
+              "damageFormula": "2d8+2",
+              "damageType": "bludgeoning",
+              "requiresUserMovementAtLeastMeters": 6
+            }
+          ],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-giant-wasp",
@@ -679,8 +1069,8 @@
         "Vespa Gigante",
         "Giant Wasp"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -702,7 +1092,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Ferrão",
+          "attackBonus": 4,
+          "damageFormula": "1d6+2",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-gnoll-warrior",
@@ -711,8 +1118,8 @@
         "Gnoll Guerreiro",
         "Gnoll Warrior"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "fiend",
       "alignment": "chaoticEvil",
@@ -734,7 +1141,34 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Rasgar",
+          "attackBonus": 4,
+          "damageFormula": "1d6+2",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        },
+        {
+          "actionId": "act-attack",
+          "name": "Arco de Ossos",
+          "attackBonus": 3,
+          "damageFormula": "1d10+1",
+          "damageType": "piercing",
+          "rangeMeters": 45,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-goat",
@@ -743,8 +1177,8 @@
         "Cabra",
         "Goat"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -766,7 +1200,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Chifres",
+          "attackBonus": 3,
+          "damageFormula": "1d4",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-gray-ooze",
@@ -775,8 +1226,8 @@
         "Lodo Cinzento",
         "Gray Ooze"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "ooze",
       "alignment": "unaligned",
@@ -798,7 +1249,28 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [
+          "acid",
+          "cold",
+          "fire"
+        ],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Pseudópode",
+          "attackBonus": 3,
+          "damageFormula": "2d8+1",
+          "damageType": "acid",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-hawk",
@@ -807,8 +1279,8 @@
         "Falcão",
         "Hawk"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -830,7 +1302,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Garras",
+          "attackBonus": 4,
+          "damageFormula": "1",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-hobgoblin-warrior",
@@ -839,8 +1328,8 @@
         "Hobgoblin Guerreiro",
         "Hobgoblin Warrior"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "fey",
       "alignment": "lawfulEvil",
@@ -862,7 +1351,34 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Espada Longa",
+          "attackBonus": 3,
+          "damageFormula": "2d10+1",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        },
+        {
+          "actionId": "act-attack",
+          "name": "Arco Longo",
+          "attackBonus": 3,
+          "damageFormula": "1d8+1",
+          "damageType": "piercing",
+          "rangeMeters": 45,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-homunculus",
@@ -871,8 +1387,8 @@
         "Homúnculo",
         "Homunculus"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "construct",
       "alignment": "trueNeutral",
@@ -894,7 +1410,26 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": [
+          "poison"
+        ]
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 4,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-hyena",
@@ -903,8 +1438,8 @@
         "Hiena",
         "Hyena"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -926,7 +1461,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 3,
+          "damageFormula": "1d6",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-ice-mephit",
@@ -935,8 +1487,8 @@
         "Mefit de Gelo",
         "Ice Mephit"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "elemental",
       "alignment": "neutralEvil",
@@ -958,7 +1510,29 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [
+          "fire"
+        ],
+        "damageImmunities": [
+          "cold",
+          "poison"
+        ]
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Garra",
+          "attackBonus": 3,
+          "damageFormula": "1d4+1",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-jackal",
@@ -967,8 +1541,8 @@
         "Chacal",
         "Jackal"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -990,7 +1564,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 1,
+          "damageFormula": "1d4-1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-jackalwere",
@@ -999,8 +1590,8 @@
         "Homem-Chacal",
         "Jackalwere"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "fiend",
       "alignment": "chaoticEvil",
@@ -1022,7 +1613,34 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Rasgar",
+          "attackBonus": 4,
+          "damageFormula": "1d6+2",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        },
+        {
+          "actionId": "act-attack",
+          "name": "Slam",
+          "attackBonus": 4,
+          "damageFormula": "1d4+2",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-larva",
@@ -1031,8 +1649,8 @@
         "Larva",
         "Larva"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "fiend",
       "alignment": "neutralEvil",
@@ -1054,7 +1672,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 1,
+          "damageFormula": "1d4-1",
+          "damageType": "necrotic",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-lemure",
@@ -1063,8 +1698,8 @@
         "Lêmure",
         "Lemure"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "fiend",
       "alignment": "lawfulEvil",
@@ -1086,7 +1721,29 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [
+          "cold"
+        ],
+        "vulnerabilities": [],
+        "damageImmunities": [
+          "fire",
+          "poison"
+        ]
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Limo Vil",
+          "attackBonus": 3,
+          "damageFormula": "1d4",
+          "damageType": "poison",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-lizard",
@@ -1095,8 +1752,8 @@
         "Lagarto",
         "Lizard"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1118,7 +1775,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 1,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-magma-mephit",
@@ -1127,8 +1801,8 @@
         "Mefit de Magma",
         "Magma Mephit"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "elemental",
       "alignment": "neutralEvil",
@@ -1150,7 +1824,29 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [
+          "cold"
+        ],
+        "damageImmunities": [
+          "fire",
+          "poison"
+        ]
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Claw",
+          "attackBonus": 3,
+          "damageFormula": "1d4+1",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-magmin",
@@ -1159,8 +1855,8 @@
         "Magmin",
         "Magmin"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "elemental",
       "alignment": "chaoticNeutral",
@@ -1182,7 +1878,26 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": [
+          "fire"
+        ]
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Toque",
+          "attackBonus": 4,
+          "damageFormula": "2d4+2",
+          "damageType": "fire",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-modron-tridrone",
@@ -1191,8 +1906,8 @@
         "Modron Tridrone",
         "Modron Tridrone"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "construct",
       "alignment": "lawfulNeutral",
@@ -1214,7 +1929,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Lança Mecânica",
+          "attackBonus": 3,
+          "damageFormula": "1d6+1",
+          "damageType": "force",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-myconid-adult",
@@ -1223,8 +1955,8 @@
         "Miconídeo Adulto",
         "Myconid Adult"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "plant",
       "alignment": "lawfulNeutral",
@@ -1246,7 +1978,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Esmagamento",
+          "attackBonus": 2,
+          "damageFormula": "1d8",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-myconid-sprout",
@@ -1255,8 +2004,8 @@
         "Brote de Miconídeo",
         "Myconid Sprout"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "plant",
       "alignment": "lawfulNeutral",
@@ -1278,7 +2027,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Pancada",
+          "attackBonus": 3,
+          "damageFormula": "1d4-1",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-octopus",
@@ -1287,8 +2053,8 @@
         "Polvo",
         "Octopus"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1310,7 +2076,24 @@
         "swim": 30,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Tentáculos",
+          "attackBonus": 4,
+          "damageFormula": "1",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-owl",
@@ -1319,8 +2102,8 @@
         "Coruja",
         "Owl"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1342,7 +2125,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Garras",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-performer",
@@ -1351,8 +2151,8 @@
         "Artista",
         "Performer"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "humanoid",
       "alignment": "unaligned",
@@ -1374,7 +2174,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Shortsword",
+          "attackBonus": 5,
+          "damageFormula": "1d6+3",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-piercer",
@@ -1383,8 +2200,8 @@
         "Perfurador",
         "Piercer"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "aberration",
       "alignment": "unaligned",
@@ -1406,7 +2223,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 3,
+          "damageFormula": "1d8+1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-piranha",
@@ -1415,8 +2249,8 @@
         "Piranha",
         "Piranha"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1438,7 +2272,24 @@
         "swim": 40,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 5,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-rat",
@@ -1447,8 +2298,8 @@
         "Rato",
         "Rat"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1470,7 +2321,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-raven",
@@ -1479,8 +2347,8 @@
         "Corvo",
         "Raven"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1502,7 +2370,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Bico",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-reef-shark",
@@ -1511,8 +2396,8 @@
         "Tubarão de Recife",
         "Reef Shark"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1534,7 +2419,24 @@
         "swim": 30,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Bite",
+          "attackBonus": 4,
+          "damageFormula": "2d4+2",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-rust-monster",
@@ -1543,8 +2445,8 @@
         "Monstro da Ferrugem",
         "Rust Monster"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "monstrosity",
       "alignment": "unaligned",
@@ -1566,7 +2468,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Bite",
+          "attackBonus": 3,
+          "damageFormula": "1d8+1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-sahuagin-warrior",
@@ -1575,8 +2494,8 @@
         "Sahuagin Guerreiro",
         "Sahuagin Warrior"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "fiend",
       "alignment": "lawfulEvil",
@@ -1598,7 +2517,27 @@
         "swim": 40,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [
+          "acid",
+          "cold"
+        ],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Garra",
+          "attackBonus": 3,
+          "damageFormula": "1d6+1",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-satyr",
@@ -1607,8 +2546,8 @@
         "Sátiro",
         "Satyr"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "fey",
       "alignment": "chaoticNeutral",
@@ -1630,7 +2569,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Hooves",
+          "attackBonus": 5,
+          "damageFormula": "1d4+3",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-scorpion",
@@ -1639,8 +2595,8 @@
         "Escorpião",
         "Scorpion"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1662,7 +2618,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Ferrão",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-scout",
@@ -1671,8 +2644,8 @@
         "Batedor",
         "Scout"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "humanoid",
       "alignment": "unaligned",
@@ -1694,7 +2667,34 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Espada Curta",
+          "attackBonus": 4,
+          "damageFormula": "1d6+2",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        },
+        {
+          "actionId": "act-attack",
+          "name": "Arco Longo",
+          "attackBonus": 4,
+          "damageFormula": "1d8+2",
+          "damageType": "piercing",
+          "rangeMeters": 45,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-seahorse",
@@ -1703,8 +2703,8 @@
         "Cavalo-Marinho",
         "Seahorse"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1726,7 +2726,13 @@
         "swim": 20,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": []
     },
     {
       "id": "monster-shadow",
@@ -1735,8 +2741,8 @@
         "Sombra",
         "Shadow"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "undead",
       "alignment": "chaoticEvil",
@@ -1758,7 +2764,35 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [
+          "acid",
+          "cold",
+          "fire",
+          "lightning",
+          "thunder"
+        ],
+        "vulnerabilities": [
+          "radiant"
+        ],
+        "damageImmunities": [
+          "necrotic",
+          "poison"
+        ]
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Toque Drenante",
+          "attackBonus": 4,
+          "damageFormula": "1d6+2",
+          "damageType": "necrotic",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-shrieker-fungus",
@@ -1767,8 +2801,8 @@
         "Fungo Berrador",
         "Shrieker Fungus"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "plant",
       "alignment": "unaligned",
@@ -1790,7 +2824,13 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": []
     },
     {
       "id": "monster-spider",
@@ -1799,8 +2839,8 @@
         "Aranha",
         "Spider"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1822,7 +2862,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-swarm-of-insects",
@@ -1831,8 +2888,8 @@
         "Enxame de Insetos",
         "Swarm of Insects"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1854,7 +2911,28 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [
+          "bludgeoning",
+          "piercing",
+          "slashing"
+        ],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordidas",
+          "attackBonus": 3,
+          "damageFormula": "2d4+1",
+          "damageType": "poison",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-tough",
@@ -1863,8 +2941,8 @@
         "Durão",
         "Tough"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "humanoid",
       "alignment": "unaligned",
@@ -1886,7 +2964,34 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Maça",
+          "attackBonus": 4,
+          "damageFormula": "1d6+2",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        },
+        {
+          "actionId": "act-attack",
+          "name": "Besta Pesada",
+          "attackBonus": 3,
+          "damageFormula": "1d10+1",
+          "damageType": "piercing",
+          "rangeMeters": 30,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-troll-limb",
@@ -1895,8 +3000,8 @@
         "Membro de Troll",
         "Troll Limb"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "small",
       "creatureType": "giant",
       "alignment": "chaoticEvil",
@@ -1918,7 +3023,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Rasgar",
+          "attackBonus": 6,
+          "damageFormula": "2d4+4",
+          "damageType": "slashing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-vine-blight",
@@ -1927,8 +3049,8 @@
         "Praga de Videira",
         "Vine Blight"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "plant",
       "alignment": "neutralEvil",
@@ -1950,7 +3072,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Vinha Constritora",
+          "attackBonus": 4,
+          "damageFormula": "1d8+2",
+          "damageType": "bludgeoning",
+          "rangeMeters": 3,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-vulture",
@@ -1959,8 +3098,8 @@
         "Abutre",
         "Vulture"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "medium",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -1982,7 +3121,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Bico",
+          "attackBonus": 4,
+          "damageFormula": "1d4",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-warhorse",
@@ -1991,8 +3147,8 @@
         "Cavalo de Guerra",
         "Warhorse"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "large",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -2014,7 +3170,35 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Casco",
+          "attackBonus": 6,
+          "damageFormula": "2d4+4",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [
+            {
+              "damageFormula": "2d4",
+              "damageType": "bludgeoning",
+              "requiresUserMovementAtLeastMeters": 6
+            }
+          ],
+          "conditionalAppliedConditions": [
+            {
+              "condition": "prone",
+              "requiresUserMovementAtLeastMeters": 6
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "monster-warhorse-skeleton",
@@ -2023,8 +3207,8 @@
         "Cavalo de Guerra Esqueleto",
         "Warhorse Skeleton"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "large",
       "creatureType": "undead",
       "alignment": "lawfulEvil",
@@ -2046,7 +3230,33 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [
+          "bludgeoning"
+        ],
+        "damageImmunities": [
+          "poison"
+        ]
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Casco",
+          "attackBonus": 6,
+          "damageFormula": "1d6+4",
+          "damageType": "bludgeoning",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": [
+            {
+              "condition": "prone",
+              "requiresUserMovementAtLeastMeters": 6
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "monster-weasel",
@@ -2055,8 +3265,8 @@
         "Doninha",
         "Weasel"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "tiny",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -2078,7 +3288,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "0"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "0",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 3,
+          "damageFormula": "1",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     },
     {
       "id": "monster-worg",
@@ -2087,8 +3314,8 @@
         "Worg",
         "Worg"
       ],
-      "tokenUrl": "https://i.imgur.com/TtwflB2.png",
-      "splashArtUrl": "https://i.imgur.com/MW6e0c1.png",
+      "tokenUrl": "https://i.imgur.com/Tpbf6Zf.png",
+      "splashArtUrl": "https://i.imgur.com/5ly1RRh.png",
       "size": "large",
       "creatureType": "fey",
       "alignment": "neutralEvil",
@@ -2110,7 +3337,24 @@
         "swim": null,
         "unit": "ft"
       },
-      "challengeRating": "1/2"
+      "defenses": {
+        "resistances": [],
+        "vulnerabilities": [],
+        "damageImmunities": []
+      },
+      "challengeRating": "1/2",
+      "actions": [
+        {
+          "actionId": "act-attack",
+          "name": "Mordida",
+          "attackBonus": 5,
+          "damageFormula": "1d8+3",
+          "damageType": "piercing",
+          "rangeMeters": 1.5,
+          "conditionalDamageBonuses": [],
+          "conditionalAppliedConditions": []
+        }
+      ]
     }
   ]
 }
