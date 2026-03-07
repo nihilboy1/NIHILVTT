@@ -47,7 +47,7 @@ export default function NewGamePage() {
 
   return (
     <PageShell className="flex items-center justify-center p-4 text-text-primary sm:p-8" withSquares={false}>
-      <CardSection className="w-full max-w-2xl border-transparent bg-surface-1/90 shadow-[0_20px_60px_rgba(0,0,0,0.65)] backdrop-blur-md">
+      <CardSection className="w-full max-w-2xl border-transparent bg-surface-1/90 surface-elevated-shadow backdrop-blur-md">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div>
             <h1 className="iceberg-regular text-4xl text-text-primary">Criar Novo Jogo</h1>

@@ -33,15 +33,8 @@ function revokeIfBlobUrl(url: string) {
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const {
-    user,
-    isLoading,
-    authError,
-    clearAuthError,
-    updateProfile,
-    deleteAccount,
-    logout,
-  } = useAuthStore();
+  const { user, isLoading, authError, clearAuthError, updateProfile, deleteAccount, logout } =
+    useAuthStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -165,7 +158,7 @@ export default function ProfilePage() {
     try {
       await updateProfile({
         name: saveMode === 'profile' && hasNameChanged ? name.trim() : undefined,
-        avatarFile: saveMode === 'avatar' ? avatarFile ?? undefined : undefined,
+        avatarFile: saveMode === 'avatar' ? (avatarFile ?? undefined) : undefined,
         avatarUrl: saveMode === 'avatar' && avatarMarkedForRemoval ? '' : undefined,
         password: saveMode === 'profile' && hasPasswordChange ? newPassword : undefined,
         currentPassword: savePassword,
@@ -183,7 +176,11 @@ export default function ProfilePage() {
 
       setSavePassword('');
       setIsSaveConfirmOpen(false);
-      setLocalSuccess(saveMode === 'avatar' ? 'Foto de perfil atualizada com sucesso.' : 'Perfil atualizado com sucesso.');
+      setLocalSuccess(
+        saveMode === 'avatar'
+          ? 'Foto de perfil atualizada com sucesso.'
+          : 'Perfil atualizado com sucesso.',
+      );
     } catch (error) {
       const parsedError = normalizeAuthError(error, 'Falha ao salvar alterações.');
       const fieldError =
@@ -295,18 +292,20 @@ export default function ProfilePage() {
   }
 
   return (
-    <PageShell
-      className="p-4 text-text-primary sm:p-8"
-      withSquares={false}
-    >
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 rounded-xl bg-surface-1/90 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.65)] backdrop-blur-md sm:p-10">
+    <PageShell className="text-text-primary p-4 sm:p-8" withSquares={false}>
+      <div className="bg-surface-1/90 surface-elevated-shadow mx-auto flex w-full max-w-5xl flex-col gap-8 rounded-xl p-6 backdrop-blur-md sm:p-10">
         <div className="flex items-center justify-between gap-4">
           <AppButton
             onClick={() => navigate('/dashboard')}
             variant="secondary"
             className="flex items-center gap-2 text-sm"
           >
-            <img src={caretLeftIcon} alt="" aria-hidden="true" className="h-4 w-4 brightness-0 invert drop-shadow-[0_0_0.35px_rgba(255,255,255,0.95)]" />
+            <img
+              src={caretLeftIcon}
+              alt=""
+              aria-hidden="true"
+              className="icon-invert-shadow h-4 w-4"
+            />
             <span>Voltar para o dashboard</span>
           </AppButton>
 
@@ -321,16 +320,24 @@ export default function ProfilePage() {
             isLoading={isLoggingOut}
             loadingText="SAINDO..."
           >
-            <img src={signOutIcon} alt="" aria-hidden="true" className="h-4 w-4 brightness-0 invert drop-shadow-[0_0_0.35px_rgba(255,255,255,0.95)]" />
+            <img
+              src={signOutIcon}
+              alt=""
+              aria-hidden="true"
+              className="icon-invert-shadow h-4 w-4"
+            />
             <span>Sair da conta</span>
           </AppButton>
         </div>
 
-        <p className="text-center text-sm text-text-secondary">
+        <p className="text-text-secondary text-center text-sm">
           Gerencie suas informações pessoais e configurações de conta.
         </p>
-        <p className="text-center text-sm text-text-secondary">
-          Identificador: <span className="font-semibold text-text-primary">{formatUserTag(user.name, user.id)}</span>
+        <p className="text-text-secondary text-center text-sm">
+          Identificador:{' '}
+          <span className="text-text-primary font-semibold">
+            {formatUserTag(user.name, user.id)}
+          </span>
         </p>
 
         {(pageError || (!isSaveConfirmOpen && !isDeleteConfirmOpen && authError?.formError)) && (
@@ -339,19 +346,17 @@ export default function ProfilePage() {
           </StatusAlert>
         )}
 
-        {localSuccess && (
-          <StatusAlert tone="success">{localSuccess}</StatusAlert>
-        )}
+        {localSuccess && <StatusAlert tone="success">{localSuccess}</StatusAlert>}
 
         <section className="grid grid-cols-1 gap-8 lg:grid-cols-[320px_1fr]">
           <CardSection>
             <h2 className="mb-4 text-xl font-semibold">Foto de Perfil</h2>
 
-            <div className="mx-auto mb-4 flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border border-surface-2 bg-surface-2">
+            <div className="border-surface-2 bg-surface-2 mx-auto mb-4 flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border">
               {avatarPreviewUrl ? (
                 <img src={avatarPreviewUrl} alt="Avatar" className="h-full w-full object-cover" />
               ) : (
-                <span className="text-sm text-text-secondary">Sem foto</span>
+                <span className="text-text-secondary text-sm">Sem foto</span>
               )}
             </div>
 
@@ -408,7 +413,9 @@ export default function ProfilePage() {
 
             <div className="space-y-4">
               <div>
-                <label htmlFor="profile-name" className="mb-1 block text-sm text-text-secondary">Nome</label>
+                <label htmlFor="profile-name" className="text-text-secondary mb-1 block text-sm">
+                  Nome
+                </label>
                 <input
                   id="profile-name"
                   type="text"
@@ -416,23 +423,30 @@ export default function ProfilePage() {
                   onChange={(event) => setName(event.target.value)}
                   aria-describedby={pageError ? PAGE_ERROR_ID : undefined}
                   aria-invalid={Boolean(pageError)}
-                  className="w-full rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
+                  className="border-surface-2 bg-text-primary text-surface-0 w-full rounded-sm border p-2"
                 />
               </div>
 
               <div>
-                <label htmlFor="profile-email" className="mb-1 block text-sm text-text-secondary">Email</label>
+                <label htmlFor="profile-email" className="text-text-secondary mb-1 block text-sm">
+                  Email
+                </label>
                 <input
                   id="profile-email"
                   type="email"
                   value={user.email}
                   disabled
-                  className="w-full cursor-not-allowed rounded-sm border border-surface-2 bg-surface-2 p-2 text-text-secondary"
+                  className="border-surface-2 bg-surface-2 text-text-secondary w-full cursor-not-allowed rounded-sm border p-2"
                 />
               </div>
 
               <div>
-                <label htmlFor="profile-new-password" className="mb-1 block text-sm text-text-secondary">Nova senha</label>
+                <label
+                  htmlFor="profile-new-password"
+                  className="text-text-secondary mb-1 block text-sm"
+                >
+                  Nova senha
+                </label>
                 <PasswordInput
                   id="profile-new-password"
                   visible={showNewPassword}
@@ -443,12 +457,17 @@ export default function ProfilePage() {
                   autoComplete="new-password"
                   aria-describedby={pageError ? PAGE_ERROR_ID : undefined}
                   aria-invalid={Boolean(pageError)}
-                  className="rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
+                  className="border-surface-2 bg-text-primary text-surface-0 rounded-sm border p-2"
                 />
               </div>
 
               <div>
-                <label htmlFor="profile-confirm-new-password" className="mb-1 block text-sm text-text-secondary">Confirmar nova senha</label>
+                <label
+                  htmlFor="profile-confirm-new-password"
+                  className="text-text-secondary mb-1 block text-sm"
+                >
+                  Confirmar nova senha
+                </label>
                 <PasswordInput
                   id="profile-confirm-new-password"
                   visible={showConfirmNewPassword}
@@ -459,7 +478,7 @@ export default function ProfilePage() {
                   autoComplete="new-password"
                   aria-describedby={pageError ? PAGE_ERROR_ID : undefined}
                   aria-invalid={Boolean(pageError)}
-                  className="rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
+                  className="border-surface-2 bg-text-primary text-surface-0 rounded-sm border p-2"
                 />
               </div>
             </div>
@@ -480,8 +499,8 @@ export default function ProfilePage() {
         </section>
 
         <CardSection variant="danger">
-          <h2 className="mb-2 text-xl font-semibold text-feedback-negative">Zona de Perigo</h2>
-          <p className="mb-4 text-sm text-text-secondary">
+          <h2 className="text-feedback-negative mb-2 text-xl font-semibold">Zona de Perigo</h2>
+          <p className="text-text-secondary mb-4 text-sm">
             Esta ação é irreversível. Todos os seus dados de conta serão removidos.
           </p>
 
@@ -496,7 +515,7 @@ export default function ProfilePage() {
             variant="danger"
             className="flex items-center gap-2 px-5"
           >
-            <img src={trashIcon} alt="" aria-hidden="true" className="h-4 w-4 brightness-0 invert drop-shadow-[0_0_0.35px_rgba(255,255,255,0.95)]" />
+            <img src={trashIcon} alt="" aria-hidden="true" className="icon-invert-shadow h-4 w-4" />
             <span>EXCLUIR CONTA PERMANENTEMENTE</span>
           </AppButton>
         </CardSection>
@@ -514,7 +533,7 @@ export default function ProfilePage() {
         hideFooter
       >
         <div className="space-y-4">
-          <p className="text-sm text-text-secondary">
+          <p className="text-text-secondary text-sm">
             {saveMode === 'avatar'
               ? 'Para salvar a nova foto de perfil, confirme sua senha atual.'
               : 'Para salvar as alterações, confirme sua senha atual.'}
@@ -527,10 +546,20 @@ export default function ProfilePage() {
           )}
 
           <input type="text" name="save_username" autoComplete="username" className="hidden" />
-          <input type="password" name="save_fake_password" autoComplete="new-password" className="hidden" />
+          <input
+            type="password"
+            name="save_fake_password"
+            autoComplete="new-password"
+            className="hidden"
+          />
 
           <div>
-            <label htmlFor="save-current-password" className="mb-1 block text-sm text-text-secondary">Senha atual</label>
+            <label
+              htmlFor="save-current-password"
+              className="text-text-secondary mb-1 block text-sm"
+            >
+              Senha atual
+            </label>
             <PasswordInput
               id="save-current-password"
               visible={showSavePassword}
@@ -545,7 +574,7 @@ export default function ProfilePage() {
               onFocus={(event) => event.currentTarget.removeAttribute('readonly')}
               aria-describedby={saveModalError ? SAVE_MODAL_ERROR_ID : undefined}
               aria-invalid={Boolean(saveModalError)}
-              className="rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
+              className="border-surface-2 bg-text-primary text-surface-0 rounded-sm border p-2"
             />
           </div>
 
@@ -576,7 +605,7 @@ export default function ProfilePage() {
 
       <Modal
         isOpen={isDeleteConfirmOpen}
-        overlayClassName="bg-red-950/30"
+        overlayClassName="overlay-danger"
         onClose={() => {
           if (isDeleting) return;
           setIsDeleteConfirmOpen(false);
@@ -587,8 +616,13 @@ export default function ProfilePage() {
       >
         <form className="space-y-4" autoComplete="off" onSubmit={(event) => event.preventDefault()}>
           <input type="text" name="username" autoComplete="username" className="hidden" />
-          <input type="password" name="fake_password" autoComplete="new-password" className="hidden" />
-          <p className="text-sm text-text-secondary">
+          <input
+            type="password"
+            name="fake_password"
+            autoComplete="new-password"
+            className="hidden"
+          />
+          <p className="text-text-secondary text-sm">
             Digite sua senha atual e confirme o texto para excluir sua conta permanentemente.
           </p>
 
@@ -599,7 +633,12 @@ export default function ProfilePage() {
           )}
 
           <div>
-            <label htmlFor="delete-current-password" className="mb-1 block text-sm text-text-secondary">Senha atual</label>
+            <label
+              htmlFor="delete-current-password"
+              className="text-text-secondary mb-1 block text-sm"
+            >
+              Senha atual
+            </label>
             <PasswordInput
               id="delete-current-password"
               visible={showDeletePassword}
@@ -614,12 +653,15 @@ export default function ProfilePage() {
               onFocus={(event) => event.currentTarget.removeAttribute('readonly')}
               aria-describedby={deleteModalError ? DELETE_MODAL_ERROR_ID : undefined}
               aria-invalid={Boolean(deleteModalError)}
-              className="rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
+              className="border-surface-2 bg-text-primary text-surface-0 rounded-sm border p-2"
             />
           </div>
 
           <div>
-            <label htmlFor="delete-confirm-phrase" className="mb-1 block text-sm text-text-secondary">
+            <label
+              htmlFor="delete-confirm-phrase"
+              className="text-text-secondary mb-1 block text-sm"
+            >
               Digite exatamente: <span className="font-semibold">{DELETE_PHRASE}</span>
             </label>
             <input
@@ -629,7 +671,7 @@ export default function ProfilePage() {
               onChange={(event) => setDeletePhrase(event.target.value)}
               aria-describedby={deleteModalError ? DELETE_MODAL_ERROR_ID : undefined}
               aria-invalid={Boolean(deleteModalError)}
-              className="w-full rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
+              className="border-surface-2 bg-text-primary text-surface-0 w-full rounded-sm border p-2"
             />
           </div>
 
@@ -668,9 +710,11 @@ export default function ProfilePage() {
         hideFooter
       >
         <div className="space-y-4">
-          <p className="text-sm text-text-secondary">Arraste a imagem e ajuste o zoom para definir o enquadramento.</p>
+          <p className="text-text-secondary text-sm">
+            Arraste a imagem e ajuste o zoom para definir o enquadramento.
+          </p>
 
-          <div className="relative h-[320px] w-full overflow-hidden rounded-xl border border-surface-2 bg-surface-0">
+          <div className="border-surface-2 bg-surface-0 relative h-[320px] w-full overflow-hidden rounded-xl border">
             {cropImageSrc && (
               <Cropper
                 image={cropImageSrc}
@@ -687,7 +731,9 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label htmlFor="profile-avatar-zoom" className="mb-1 block text-sm text-text-secondary">Zoom</label>
+            <label htmlFor="profile-avatar-zoom" className="text-text-secondary mb-1 block text-sm">
+              Zoom
+            </label>
             <input
               id="profile-avatar-zoom"
               type="range"

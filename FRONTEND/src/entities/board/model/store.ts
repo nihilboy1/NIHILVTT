@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import { calculateInitialViewBox } from '@/entities/board/model/utils/boardUtils';
 import { GridSettings, PageSettings, Point } from '@/shared/api/types';
-import { ZOOM_CONFIG } from '@/shared/config/constants';
+import { GRID_CONFIG, THEME_COLORS, ZOOM_CONFIG } from '@/shared/config/constants';
 import {
   applyPanDeltaToViewBox,
   clientToViewportPoint,
@@ -34,8 +34,16 @@ interface BoardActions {
 
 export const useBoardStore = create<BoardState & BoardActions>()((set, get) => ({
   viewportRef: null,
-  gridSettings: { visualCellSize: 50, lineColor: '#788475', metersPerSquare: 1.5 }, // Default values
-  pageSettings: { widthInUnits: 30, heightInUnits: 30, backgroundColor: '#FFFFFF' }, // Default values
+  gridSettings: {
+    visualCellSize: GRID_CONFIG.CELL_SIZE,
+    lineColor: GRID_CONFIG.LINE_COLOR,
+    metersPerSquare: GRID_CONFIG.DEFAULT_METERS_PER_SQUARE,
+  },
+  pageSettings: {
+    widthInUnits: 30,
+    heightInUnits: 30,
+    backgroundColor: THEME_COLORS.PAGE_BACKGROUND,
+  },
   viewBox: { x: 0, y: 0, width: 1000, height: 800 },
   isPanning: false,
   lastPanPoint: null,

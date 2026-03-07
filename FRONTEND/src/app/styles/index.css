@@ -39,10 +39,12 @@
   --color-surface-2: #4e4e50;
   --color-surface-3: #1b1f23;
   --color-overlay: rgba(0, 0, 0, 0.3);
+  --color-surface-0-transparent: rgba(17, 17, 17, 0);
 
   /* Texto */
   --color-text-primary: #e4e8e8; /* Platinum - texto principal */
   --color-text-secondary: #a9a9a9; /* Um tom de cinza para texto secundário */
+  --color-text-inverse: #ffffff;
 
   /* Acentos */
 
@@ -55,9 +57,78 @@
   --color-feedback-positive: #50fa7b; /* Verde para ações positivas */
   --color-feedback-positive-hover: #45d96a; /* Verde mais escuro para hover */
   --color-hp-bar-fill: #5f9a72; /* Verde pastel inspirado em #087829 */
+  --color-feedback-warning: #f59e0b; /* Amarelo para avisos e erros leves */
 
   --color-feedback-negative: #942222; /* Vermelho principal padronizado */
   --color-feedback-negative-hover: #7f2222; /* Variação de hover na mesma família */
+  --color-overlay-danger: rgba(127, 34, 34, 0.3);
+  --color-hp-tick: var(--color-surface-0);
+
+  /* Cores de board/Pixi para manter tema único via CSS vars */
+  --color-board-bg: #f3f4f6;
+  --color-board-grid: #c3cad6;
+  --color-board-page-background-default: #ffffff;
+  --color-board-grid-line-default: #788475;
+  --color-info: #60a5fa;
+  --color-shadow: #020617;
+
+  /* Sombras compartilhadas */
+  --shadow-elevation-strong: 0 20px 60px rgba(0, 0, 0, 0.65);
+  --shadow-tooltip: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-icon-contrast: 0 0 0.35px rgba(255, 255, 255, 0.95);
+
+  /* Monster badges (role tokens) */
+  --color-monster-tone-cool-border: #7dd3fc;
+  --color-monster-tone-cool-bg: rgba(186, 230, 253, 0.8);
+  --color-monster-tone-cool-text: #0c4a6e;
+
+  --color-monster-tone-dark-border: #52525b;
+  --color-monster-tone-dark-bg: #3f3f46;
+  --color-monster-tone-dark-text: var(--color-text-inverse);
+
+  --color-monster-tone-arcane-border: #c4b5fd;
+  --color-monster-tone-arcane-bg: rgba(221, 214, 254, 0.8);
+  --color-monster-tone-arcane-text: #4c1d95;
+
+  --color-monster-tone-warm-border: #fdba74;
+  --color-monster-tone-warm-bg: rgba(254, 215, 170, 0.8);
+  --color-monster-tone-warm-text: #9a3412;
+
+  --color-monster-tone-nature-border: #6ee7b7;
+  --color-monster-tone-nature-bg: rgba(110, 231, 183, 0.8);
+  --color-monster-tone-nature-text: #064e3b;
+
+  --color-monster-tone-beast-border: #bef264;
+  --color-monster-tone-beast-bg: rgba(217, 249, 157, 0.8);
+  --color-monster-tone-beast-text: #365314;
+
+  --color-monster-tone-fiend-border: #fda4af;
+  --color-monster-tone-fiend-bg: rgba(254, 205, 211, 0.8);
+  --color-monster-tone-fiend-text: #881337;
+
+  --color-monster-tone-evil-border: #f87171;
+  --color-monster-tone-evil-bg: rgba(252, 165, 165, 0.8);
+  --color-monster-tone-evil-text: #450a0a;
+
+  --color-monster-tone-lawful-neutral-border: #93c5fd;
+  --color-monster-tone-lawful-neutral-bg: rgba(191, 219, 254, 0.8);
+  --color-monster-tone-lawful-neutral-text: #1e3a8a;
+
+  --color-monster-tone-stone-border: #d6d3d1;
+  --color-monster-tone-stone-bg: rgba(231, 229, 228, 0.8);
+  --color-monster-tone-stone-text: #292524;
+
+  --color-monster-tone-neutral-border: #d4d4d8;
+  --color-monster-tone-neutral-bg: rgba(228, 228, 231, 0.8);
+  --color-monster-tone-neutral-text: #18181b;
+
+  --color-monster-tone-forest-border: #86efac;
+  --color-monster-tone-forest-bg: rgba(187, 247, 208, 0.8);
+  --color-monster-tone-forest-text: #14532d;
+
+  --color-monster-tone-underdark-border: #818cf8;
+  --color-monster-tone-underdark-bg: rgba(165, 180, 252, 0.8);
+  --color-monster-tone-underdark-text: #312e81;
 }
 
 .iceberg-regular {
@@ -90,6 +161,138 @@
     }
 
     scrollbar-width: none;
+  }
+
+  .themed-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-surface-3) var(--color-surface-1);
+  }
+
+  .themed-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .themed-scrollbar::-webkit-scrollbar-track {
+    background: var(--color-surface-1);
+  }
+
+  .themed-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-surface-3);
+    border-radius: 4px;
+  }
+
+  .themed-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-primary);
+  }
+
+  .surface-elevated-shadow {
+    box-shadow: var(--shadow-elevation-strong);
+  }
+
+  .icon-invert-shadow {
+    filter: brightness(0) invert(1) drop-shadow(var(--shadow-icon-contrast));
+  }
+
+  .overlay-danger {
+    background: var(--color-overlay-danger);
+  }
+
+  .monster-badge-tone-default {
+    border-color: var(--color-surface-3);
+    background: var(--color-surface-2);
+    color: var(--color-text-primary);
+  }
+
+  .monster-badge-tone-sense-passive,
+  .monster-badge-tone-environment-coast,
+  .monster-badge-tone-environment-arctic,
+  .monster-badge-tone-type-construct {
+    border-color: var(--color-monster-tone-cool-border);
+    background: var(--color-monster-tone-cool-bg);
+    color: var(--color-monster-tone-cool-text);
+  }
+
+  .monster-badge-tone-sense-darkvision,
+  .monster-badge-tone-type-undead {
+    border-color: var(--color-monster-tone-dark-border);
+    background: var(--color-monster-tone-dark-bg);
+    color: var(--color-monster-tone-dark-text);
+  }
+
+  .monster-badge-tone-sense-blindsight {
+    border-color: var(--color-monster-tone-arcane-border);
+    background: var(--color-monster-tone-arcane-bg);
+    color: var(--color-monster-tone-arcane-text);
+  }
+
+  .monster-badge-tone-sense-tremorsense,
+  .monster-badge-tone-environment-desert,
+  .monster-badge-tone-type-humanoid {
+    border-color: var(--color-monster-tone-warm-border);
+    background: var(--color-monster-tone-warm-bg);
+    color: var(--color-monster-tone-warm-text);
+  }
+
+  .monster-badge-tone-sense-truesight,
+  .monster-badge-tone-type-plant,
+  .monster-badge-tone-environment-swamp {
+    border-color: var(--color-monster-tone-nature-border);
+    background: var(--color-monster-tone-nature-bg);
+    color: var(--color-monster-tone-nature-text);
+  }
+
+  .monster-badge-tone-type-beast,
+  .monster-badge-tone-environment-grassland {
+    border-color: var(--color-monster-tone-beast-border);
+    background: var(--color-monster-tone-beast-bg);
+    color: var(--color-monster-tone-beast-text);
+  }
+
+  .monster-badge-tone-type-fiend,
+  .monster-badge-tone-alignment-neutralevil {
+    border-color: var(--color-monster-tone-fiend-border);
+    background: var(--color-monster-tone-fiend-bg);
+    color: var(--color-monster-tone-fiend-text);
+  }
+
+  .monster-badge-tone-alignment-lawfulevil {
+    border-color: var(--color-monster-tone-evil-border);
+    background: var(--color-monster-tone-evil-bg);
+    color: var(--color-monster-tone-evil-text);
+  }
+
+  .monster-badge-tone-alignment-lawfulneutral {
+    border-color: var(--color-monster-tone-lawful-neutral-border);
+    background: var(--color-monster-tone-lawful-neutral-bg);
+    color: var(--color-monster-tone-lawful-neutral-text);
+  }
+
+  .monster-badge-tone-alignment-unaligned,
+  .monster-badge-tone-environment-mountain {
+    border-color: var(--color-monster-tone-stone-border);
+    background: var(--color-monster-tone-stone-bg);
+    color: var(--color-monster-tone-stone-text);
+  }
+
+  .monster-badge-tone-alignment-trueneutral,
+  .monster-badge-tone-environment-any,
+  .monster-badge-tone-environment-urban {
+    border-color: var(--color-monster-tone-neutral-border);
+    background: var(--color-monster-tone-neutral-bg);
+    color: var(--color-monster-tone-neutral-text);
+  }
+
+  .monster-badge-tone-environment-forest {
+    border-color: var(--color-monster-tone-forest-border);
+    background: var(--color-monster-tone-forest-bg);
+    color: var(--color-monster-tone-forest-text);
+  }
+
+  .monster-badge-tone-environment-underdark {
+    border-color: var(--color-monster-tone-underdark-border);
+    background: var(--color-monster-tone-underdark-bg);
+    color: var(--color-monster-tone-underdark-text);
   }
 }
 

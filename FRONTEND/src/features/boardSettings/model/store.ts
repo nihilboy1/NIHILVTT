@@ -22,7 +22,7 @@ export interface BoardSettingsState {
 export const useBoardSettingsStore = create<BoardSettingsState>((set) => ({
   gridSettings: {
     visualCellSize: GRID_CONFIG.CELL_SIZE,
-    lineColor: '#788475', // Corresponds to 'grid-line' in Tailwind config
+    lineColor: GRID_CONFIG.LINE_COLOR,
     metersPerSquare: GRID_CONFIG.DEFAULT_METERS_PER_SQUARE,
   },
   pageSettings: DEFAULTS.PAGE_SETTINGS,

@@ -10,6 +10,7 @@ import {
 import { getArmorClassFromEquipment } from '@/entities/character/model/rules/itemDerivedRules';
 import { getBaseWalkSpeedFromSpecieId } from '@/entities/character/model/rules/specieDerivedRules';
 import {
+  Action,
   Character,
   MonsterNpcCharacter,
   PlayerCharacter,
@@ -106,7 +107,7 @@ function formatMonsterDamageFormula(formula: unknown): string | undefined {
   return `${count}d${faces}${sign}${bonusValue}`;
 }
 
-function extractMonsterDamageType(formula: unknown): string | undefined {
+function extractMonsterDamageType(formula: unknown): Action['damageType'] {
   if (!formula || typeof formula !== 'object') {
     return undefined;
   }
@@ -129,6 +130,79 @@ function extractMonsterDamageType(formula: unknown): string | undefined {
 function convertFeetToMeters(feet: number): number {
   const meters = feet * 0.3;
   return Number.isInteger(meters) ? meters : Number(meters.toFixed(1));
+}
+
+function formatHitPointsFormula(formula: MonsterType['hitPoints']['formula']): string {
+  const base = `${formula.count}d${formula.faces}`;
+  const bonus = formula.bonus?.value ?? 0;
+
+  if (bonus === 0) {
+    return base;
+  }
+
+  const sign = bonus > 0 ? '+' : '';
+  return `${base}${sign}${bonus}`;
+}
+
+function buildMonsterSpeedSummary(monster: MonsterType): string {
+  const movementModes: Array<{ key: keyof MonsterType['speed']; label: string }> = [
+    { key: 'walk', label: 'walk' },
+    { key: 'climb', label: 'climb' },
+    { key: 'fly', label: 'fly' },
+    { key: 'swim', label: 'swim' },
+    { key: 'burrow', label: 'burrow' },
+  ];
+
+  const speedParts = movementModes.flatMap(({ key, label }) => {
+    const value = monster.speed[key];
+    return typeof value === 'number' ? [`${label} ${value}${monster.speed.unit}`] : [];
+  });
+
+  return speedParts.join(', ');
+}
+
+function buildMonsterSenses(monster: MonsterType): MonsterNpcCharacter['senses'] {
+  if (!monster.senses) {
+    return undefined;
+  }
+
+  return {
+    passivePerception: monster.senses.passivePerception,
+    vision: monster.senses.vision ? { ...monster.senses.vision } : undefined,
+  };
+}
+
+function buildMonsterDefenses(monster: MonsterType): MonsterNpcCharacter['defenses'] {
+  return {
+    resistances: monster.defenses?.resistances ? [...monster.defenses.resistances] : [],
+    vulnerabilities: monster.defenses?.vulnerabilities ? [...monster.defenses.vulnerabilities] : [],
+    damageImmunities: monster.defenses?.immunities?.damage
+      ? [...monster.defenses.immunities.damage]
+      : [],
+    conditionImmunities: monster.defenses?.immunities?.condition
+      ? [...monster.defenses.immunities.condition]
+      : [],
+  };
+}
+
+function parseMonsterChallengeRating(challengeRating: MonsterType['challengeRating']): number {
+  const raw = String(challengeRating).trim();
+  const numericValue = Number(raw);
+  if (Number.isFinite(numericValue)) {
+    return numericValue;
+  }
+
+  const fractionMatch = raw.match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (fractionMatch) {
+    const numerator = Number(fractionMatch[1]);
+    const denominator = Number(fractionMatch[2]);
+
+    if (denominator > 0) {
+      return numerator / denominator;
+    }
+  }
+
+  throw new Error(`Violação de contrato de catálogo: challengeRating inválido em ${raw}.`);
 }
 
 function buildMonsterActionsFromCatalog(monster: MonsterType): MonsterNpcCharacter['actions'] {
@@ -198,6 +272,17 @@ export function adaptMonsterCatalogToSheetModel(monster: MonsterType): MonsterNp
     image: monster.tokenUrl ?? DEFAULT_TOKEN_IMAGE,
     size: monster.size,
     notes: monster.description,
+    source: monster.source,
+    monsterSheetImage: monster.splashArtUrl ?? monster.tokenUrl ?? DEFAULT_TOKEN_IMAGE,
+    hitPointsFormula: formatHitPointsFormula(monster.hitPoints.formula),
+    monsterType: monster.type,
+    alignment: monster.alignment,
+    environments: [...monster.environment],
+    languages: monster.languages ? [...monster.languages] : [],
+    isFamiliar: monster.isFamiliar === true,
+    speedSummary: buildMonsterSpeedSummary(monster),
+    senses: buildMonsterSenses(monster),
+    defenses: buildMonsterDefenses(monster),
     attributes: { ...monster.abilityScores },
     proficiencies: {
       savingThrows: {
@@ -247,7 +332,7 @@ export function adaptMonsterCatalogToSheetModel(monster: MonsterType): MonsterNp
         description: trait.description,
       }),
     ),
-    challengeRating: Number(monster.challengeRating),
+    challengeRating: parseMonsterChallengeRating(monster.challengeRating),
   };
 }
 

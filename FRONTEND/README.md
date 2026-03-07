@@ -36,6 +36,13 @@ Regra editorial do modulo:
 
 - o frontend do NIHILVTT esta em pre-versao; a documentacao e o codigo devem assumir apenas contratos atuais, sem qualquer nocao de suporte legado
 
+### SSOT de cores (tema)
+
+- `src/app/styles/index.css` e a **SSOT (Single Source of Truth)** de cores do frontend.
+- Qualquer cor de UI/board/Pixi deve nascer de token CSS declarado nesse arquivo.
+- Componentes, stores e utilitarios nao devem introduzir hex/rgb hardcoded para tema fora de `index.css`.
+- Trilhas criticas de renderizacao devem ler tokens com validacao fail-fast: token ausente/invalido e violacao de contrato.
+
 ### Renderer do board (migracao SVG -> Pixi)
 
 - O board usa renderer unico em runtime: `Pixi` (sem branch por querystring).
@@ -88,6 +95,8 @@ Regra atual:
 - quando o payload estiver no formato runtime, ele e adaptado para o modelo transitorio de UI da ficha
 - a sessao agora preserva no cliente tanto `PlayerCharacterState` quanto `MonsterCharacterState` em `runtimeCharactersById`; componentes e view models especificos de jogador devem discriminar por `type` antes de consumir campos exclusivos de `Player`
 - o modelo interno transitório da UI continua existindo apenas para renderizacao, mas ele nao substitui mais o runtime compartilhado de `NPC`
+- cores de UI e renderer de board (`Pixi`) devem vir de tokens de tema em `src/app/styles/index.css` (SSOT); componentes nao devem manter hex/rgb hardcoded para tema
+- leitura de cor por CSS var em trilhas de renderizacao critica (ex.: `PixiBoardPrototype`, `SquaresBackground`) deve operar em fail-fast: var ausente/invalida e violacao de contrato de tema
 
 ## Regras de mesa
 
@@ -284,6 +293,10 @@ Regra atual:
 - Para ataques canonicos de monstro com bonus condicionais, o handler de `ATTACK_RESOLVED` deve consumir `conditionalDamageTotal` e `conditionalDamageBreakdown[]` (`damageType` + `damage`) como contrato explicito; o chat nao deve inferir tipo de dano por nome de ataque.
 - Quando um alvo `NPC` sofre dano e chega a `0` HP via `ATTACK_RESOLVED`, ele é considerado morto imediatamente no backend: sai da lista de participantes do combate (ordem de turnos), mas o token permanece no grid até remoção explícita do mestre.
 - Ataques fora de combate formal devem falhar; o frontend nao tenta abrir combate implicitamente a partir de ataque.
+- A ficha de monstro no frontend deve projetar metadados canonicos do catalogo (tipo, alinhamento, source, ambientes, idiomas, senses e defenses) como informacao de leitura, sem inferencia local de regra e sem alterar a autoridade de combate do backend.
+- Termos canonicos de monstro em ingles (como ambientes, movement modes, senses, damage types e conditions) devem passar pelo glossario PT-BR canonico do `DATAMODELING` (`@nihilvtt/datamodeling/shared`, com adaptador em `shared/lib/utils/monsterGlossary.ts`) antes da renderizacao na UI.
+- A UI nao deve aplicar fallback de traducao por heuristica (`Title Case`/normalizacao livre): termos ausentes no glossario canonico devem falhar cedo para manter disciplina data-driven.
+- Distancias canonicas data-driven continuam em `feet` no contrato; toda exibicao de distancia na UI deve converter para metros (`m`) antes de renderizar.
 
 ## Documentacao do frontend
 

@@ -44,7 +44,7 @@ export function handleNumericInputKeyDown(
 
 export const getContrastingTextColor = (hexColor: string | null | undefined): string => {
   if (!hexColor || !hexColor.startsWith('#') || hexColor.length !== 7) {
-    return 'var(--color-foreground)';
+    return 'var(--color-text-primary)';
   }
 
   const r = parseInt(hexColor.slice(1, 3), 16);
@@ -52,11 +52,11 @@ export const getContrastingTextColor = (hexColor: string | null | undefined): st
   const b = parseInt(hexColor.slice(5, 7), 16);
 
   if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) {
-    return 'var(--color-foreground)';
+    return 'var(--color-text-primary)';
   }
 
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.5 ? 'var(--color-raisin-black)' : 'var(--color-platinum)';
+  return luminance > 0.5 ? 'var(--color-surface-0)' : 'var(--color-text-primary)';
 };
 
 export const parseCharacterSize = (sizeString: string): [number, number] => {

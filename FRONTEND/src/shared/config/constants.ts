@@ -1,8 +1,9 @@
 import { PageSettings } from '../api/types';
+import { readRequiredThemeHexColor } from '../lib/theme/cssThemeVar';
 
 export const GRID_CONFIG = {
   CELL_SIZE: 50,
-  LINE_COLOR: '#000',
+  LINE_COLOR: readRequiredThemeHexColor('--color-board-grid-line-default'),
   DEFAULT_METERS_PER_SQUARE: 1.5,
 } as const;
 
@@ -14,8 +15,8 @@ export const ZOOM_CONFIG = {
 } as const;
 
 export const THEME_COLORS = {
-  PAGE_BACKGROUND: '#FFFFFF',
-  GRID_LINE: '#CCCCCC',
+  PAGE_BACKGROUND: readRequiredThemeHexColor('--color-board-page-background-default'),
+  GRID_LINE: readRequiredThemeHexColor('--color-board-grid'),
 } as const;
 
 export const DEFAULTS = {

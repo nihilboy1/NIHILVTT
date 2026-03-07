@@ -32,22 +32,25 @@ export function FeatEffectControls({ effect }: FeatEffectControlsProps) {
             const featName = Array.isArray(feat.name) ? feat.name[0] : feat.name;
 
             return (
-              <div key={featId} className="rounded-lg border border-green-200 bg-green-50 p-3">
+              <div
+                key={featId}
+                className="border-feedback-positive/50 bg-feedback-positive/10 rounded-lg border p-3"
+              >
                 <div className="mb-2 flex items-start gap-2">
                   <Badge className={cn(proficiencyTagVariants({ state: 'granted' }))}>
                     {featName}
                   </Badge>
                 </div>
-                <p className="mb-2 text-sm text-gray-700">{feat.description}</p>
+                <p className="text-text-secondary mb-2 text-sm">{feat.description}</p>
 
                 {/* Mostra traits do talento */}
                 {feat.traits && feat.traits.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-xs font-medium text-gray-600">Benefícios:</div>
+                    <div className="text-text-secondary text-xs font-medium">Benefícios:</div>
                     {feat.traits.map((trait, index) => (
-                      <div key={index} className="rounded border border-gray-200 bg-white p-2">
-                        <div className="text-xs font-medium text-gray-800">{trait.name}</div>
-                        <div className="mt-1 text-xs text-gray-600">{trait.description}</div>
+                      <div key={index} className="border-surface-3 bg-surface-0 rounded border p-2">
+                        <div className="text-text-primary text-xs font-medium">{trait.name}</div>
+                        <div className="text-text-secondary mt-1 text-xs">{trait.description}</div>
                       </div>
                     ))}
                   </div>
@@ -56,14 +59,14 @@ export function FeatEffectControls({ effect }: FeatEffectControlsProps) {
                 {/* Mostra efeitos do talento */}
                 {feat.effects && feat.effects.length > 0 && (
                   <div className="mt-2 space-y-1">
-                    <div className="text-xs font-medium text-gray-600">Efeitos:</div>
+                    <div className="text-text-secondary text-xs font-medium">Efeitos:</div>
                     {feat.effects.map((featEffect, index) => (
-                      <div key={index} className="rounded border border-blue-200 bg-blue-50 p-2">
-                        <div className="text-xs font-medium text-blue-800">
+                      <div key={index} className="border-info/50 bg-info/10 rounded border p-2">
+                        <div className="text-info text-xs font-medium">
                           {featEffect.name || `Efeito ${index + 1}`}
                         </div>
                         {featEffect.description && (
-                          <div className="mt-1 text-xs text-blue-600">{featEffect.description}</div>
+                          <div className="text-info mt-1 text-xs">{featEffect.description}</div>
                         )}
                       </div>
                     ))}
@@ -73,7 +76,7 @@ export function FeatEffectControls({ effect }: FeatEffectControlsProps) {
             );
           })}
         </div>
-        <p className="mt-2 text-xs text-gray-600">
+        <p className="text-text-secondary mt-2 text-xs">
           Este talento é aplicado automaticamente ao seu personagem.
         </p>
       </div>
@@ -94,11 +97,11 @@ export function FeatEffectControls({ effect }: FeatEffectControlsProps) {
         <div className="mb-2 text-sm font-medium">
           Escolha {maxSelections} talento{maxSelections > 1 ? 's' : ''}:
           {remainingSelections > 0 ? (
-            <span className="ml-2 text-blue-600">
+            <span className="text-info ml-2">
               ({remainingSelections} restante{remainingSelections > 1 ? 's' : ''})
             </span>
           ) : (
-            <span className="ml-2 text-green-600">(Selecionado)</span>
+            <span className="text-feedback-positive ml-2">(Selecionado)</span>
           )}
         </div>
 
@@ -117,10 +120,10 @@ export function FeatEffectControls({ effect }: FeatEffectControlsProps) {
                 className={cn(
                   'cursor-pointer rounded-lg border p-3 transition-colors',
                   isSelected
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-accent-secondary bg-accent-secondary/15'
                     : remainingSelections > 0
-                      ? 'hover:bg-blue-25 border-gray-200 bg-white hover:border-blue-300'
-                      : 'cursor-not-allowed border-gray-200 bg-gray-50 opacity-50',
+                      ? 'border-surface-3 bg-surface-0 hover:border-accent-secondary/60 hover:bg-accent-secondary/10'
+                      : 'border-surface-3 bg-surface-1/70 cursor-not-allowed opacity-50',
                 )}
                 onClick={() => {
                   if (isSelected) {
@@ -132,8 +135,8 @@ export function FeatEffectControls({ effect }: FeatEffectControlsProps) {
               >
                 <div className="mb-2 flex items-start justify-between gap-2">
                   <div>
-                    <div className="font-medium text-gray-800">{featName}</div>
-                    <div className="text-sm text-gray-600">{feat.description}</div>
+                    <div className="text-text-primary font-medium">{featName}</div>
+                    <div className="text-text-secondary text-sm">{feat.description}</div>
                   </div>
                   {isSelected && (
                     <Badge className={cn(proficiencyTagVariants({ state: 'granted' }))}>
@@ -144,7 +147,7 @@ export function FeatEffectControls({ effect }: FeatEffectControlsProps) {
 
                 {/* Preview dos benefícios principais */}
                 {feat.traits && feat.traits.length > 0 && (
-                  <div className="text-xs text-gray-600">
+                  <div className="text-text-secondary text-xs">
                     <strong>Benefícios:</strong> {feat.traits[0].name}
                     {feat.traits.length > 1 && ` (+${feat.traits.length - 1} outros)`}
                   </div>

@@ -1,7 +1,13 @@
 import React, { useMemo, useRef, useState } from 'react';
 
 import { Container, Graphics, Sprite, Stage, Text, useTick } from '@pixi/react';
-import { Container as PixiContainer, Graphics as PixiGraphics, TextStyle, Texture } from 'pixi.js';
+import {
+  Container as PixiContainer,
+  Graphics as PixiGraphics,
+  Sprite as PixiSprite,
+  TextStyle,
+  Texture,
+} from 'pixi.js';
 
 import { calculateDistanceInMeters } from '@/entities/board/model/utils/boardUtils';
 import { parseCharacterSize } from '@/entities/character/lib/utils/characterUtils';
@@ -18,6 +24,7 @@ import {
   Token,
 } from '@/shared/api/types';
 import nextTurnIcon from '@/shared/assets/next.png';
+import missAttackIcon from '@/shared/assets/missattack.png';
 import skullDeadIcon from '@/shared/assets/skulldead.png';
 
 import { createPixiWorldTransform } from '../model/renderer';
@@ -65,33 +72,19 @@ type PixiThemeColors = {
   boardGrid: number;
   info: number;
   shadow: number;
+  hpTick: number;
 };
 
-const DEFAULT_PIXI_THEME: PixiThemeColors = {
-  accentPrimary: 0x8b5cf6,
-  accentSecondary: 0xc4b5fd,
-  selectionNeutral: 0xa9a9a9,
-  feedbackPositive: 0x22c55e,
-  hpBarFill: 0x6fa68b,
-  feedbackNegative: 0x942222,
-  textPrimary: 0xffffff,
-  textSecondary: 0xa9a9a9,
-  surface0: 0x0b0b0d,
-  surface1: 0x0f1218,
-  warning: 0xf59e0b,
-  boardBg: 0xf3f4f6,
-  boardGrid: 0xc3cad6,
-  info: 0x60a5fa,
-  shadow: 0x020617,
-};
-
-const HP_TICK_COLOR = 0x111111;
-const DEAD_SKULL_ALPHA = 0.58;
+const DEAD_SKULL_ALPHA = 0.7;
 const NEXT_ICON_SOURCE_SIZE = 1024;
 const TOKEN_MELEE_ANIMATION_DURATION_MS = 420;
 const CURRENT_TURN_MARKER_EXTRA_DELAY_MS = 1000;
 const CLUB_IMPACT_EFFECT_DELAY_MS = 170;
 const CLUB_IMPACT_EFFECT_DURATION_MS = 250;
+const MISS_FEEDBACK_FADEOUT_MS = 1040;
+const HP_DAMAGE_TRAIL_DELAY_MS = 250;
+const HP_DAMAGE_TRAIL_DURATION_MS = 250;
+const HP_HEAL_FLASH_DURATION_MS = 250;
 
 let cachedImpactAudioContext: AudioContext | null = null;
 
@@ -228,6 +221,280 @@ function drawHpBarWithTicks({
   }
 }
 
+function tintColorTowardsWhite(color: number, amount: number): number {
+  const clampedAmount = Math.max(0, Math.min(1, amount));
+  const r = (color >> 16) & 0xff;
+  const g = (color >> 8) & 0xff;
+  const b = color & 0xff;
+
+  const nextR = Math.round(r + (255 - r) * clampedAmount);
+  const nextG = Math.round(g + (255 - g) * clampedAmount);
+  const nextB = Math.round(b + (255 - b) * clampedAmount);
+
+  return (nextR << 16) | (nextG << 8) | nextB;
+}
+
+function TokenHpBars({
+  width,
+  maxHp,
+  currentHp,
+  tempHp,
+  cameraScaleY,
+  theme,
+}: {
+  width: number;
+  maxHp: number;
+  currentHp: number;
+  tempHp: number;
+  cameraScaleY: number;
+  theme: Pick<
+    PixiThemeColors,
+    | 'surface0'
+    | 'surface1'
+    | 'hpBarFill'
+    | 'hpTick'
+    | 'info'
+    | 'feedbackNegative'
+    | 'feedbackPositive'
+  >;
+}) {
+  const graphicsRef = useRef<PixiGraphics | null>(null);
+  const previousCurrentHpRef = useRef(currentHp);
+  const trailStartHpRef = useRef(currentHp);
+  const trailCurrentHpRef = useRef(currentHp);
+  const trailStartMsRef = useRef<number | null>(null);
+  const healStartHpRef = useRef(currentHp);
+  const healEndHpRef = useRef(currentHp);
+  const healStartMsRef = useRef<number | null>(null);
+  const initialTempHp = Math.max(0, tempHp);
+  const previousTempHpRef = useRef(initialTempHp);
+  const tempTrailStartHpRef = useRef(initialTempHp);
+  const tempTrailCurrentHpRef = useRef(initialTempHp);
+  const tempTrailStartMsRef = useRef<number | null>(null);
+  const tempHealStartHpRef = useRef(initialTempHp);
+  const tempHealEndHpRef = useRef(initialTempHp);
+  const tempHealStartMsRef = useRef<number | null>(null);
+
+  React.useEffect(() => {
+    const previousCurrentHp = previousCurrentHpRef.current;
+    if (currentHp < previousCurrentHp) {
+      const trailStartHp = Math.max(trailCurrentHpRef.current, previousCurrentHp);
+      trailStartHpRef.current = trailStartHp;
+      trailCurrentHpRef.current = trailStartHp;
+      trailStartMsRef.current = Date.now();
+      healStartMsRef.current = null;
+    } else if (currentHp > previousCurrentHp) {
+      // Healing should not keep stale red damage trail.
+      trailStartHpRef.current = currentHp;
+      trailCurrentHpRef.current = currentHp;
+      trailStartMsRef.current = null;
+      healStartHpRef.current = previousCurrentHp;
+      healEndHpRef.current = currentHp;
+      healStartMsRef.current = Date.now();
+    }
+
+    previousCurrentHpRef.current = currentHp;
+
+    const safeTempHp = Math.max(0, tempHp);
+    const previousTempHp = previousTempHpRef.current;
+    if (safeTempHp < previousTempHp) {
+      const tempTrailStartHp = Math.max(tempTrailCurrentHpRef.current, previousTempHp);
+      tempTrailStartHpRef.current = tempTrailStartHp;
+      tempTrailCurrentHpRef.current = tempTrailStartHp;
+      tempTrailStartMsRef.current = Date.now();
+      tempHealStartMsRef.current = null;
+    } else if (safeTempHp > previousTempHp) {
+      // Temp HP gain should not keep stale temp trail.
+      tempTrailStartHpRef.current = safeTempHp;
+      tempTrailCurrentHpRef.current = safeTempHp;
+      tempTrailStartMsRef.current = null;
+      tempHealStartHpRef.current = previousTempHp;
+      tempHealEndHpRef.current = safeTempHp;
+      tempHealStartMsRef.current = Date.now();
+    }
+
+    previousTempHpRef.current = safeTempHp;
+  }, [currentHp, tempHp]);
+
+  useTick(() => {
+    const graphics = graphicsRef.current;
+    if (!graphics) {
+      return;
+    }
+
+    const nowMs = Date.now();
+    const safeMaxHp = Math.max(1, maxHp);
+    const safeCurrentHp = Math.max(0, Math.min(currentHp, safeMaxHp));
+
+    let trailHp = Math.max(safeCurrentHp, Math.min(trailCurrentHpRef.current, safeMaxHp));
+    const trailStartMs = trailStartMsRef.current;
+    if (trailStartMs != null && trailHp > safeCurrentHp) {
+      const elapsedMs = nowMs - trailStartMs;
+      if (elapsedMs > HP_DAMAGE_TRAIL_DELAY_MS) {
+        const rawProgress = Math.min(
+          1,
+          (elapsedMs - HP_DAMAGE_TRAIL_DELAY_MS) / HP_DAMAGE_TRAIL_DURATION_MS,
+        );
+        const easedProgress = 1 - (1 - rawProgress) ** 3;
+        const trailStartHp = Math.max(safeCurrentHp, Math.min(trailStartHpRef.current, safeMaxHp));
+        trailHp = trailStartHp + (safeCurrentHp - trailStartHp) * easedProgress;
+        if (rawProgress >= 1) {
+          trailHp = safeCurrentHp;
+          trailStartMsRef.current = null;
+        }
+      }
+    } else {
+      trailHp = safeCurrentHp;
+      trailStartMsRef.current = null;
+    }
+
+    trailCurrentHpRef.current = trailHp;
+    const damageTrailHp = Math.max(safeCurrentHp, Math.min(trailHp, safeMaxHp));
+
+    const safeTempHp = Math.max(0, tempHp);
+    let trailTempHp = Math.max(safeTempHp, tempTrailCurrentHpRef.current);
+    const tempTrailStartMs = tempTrailStartMsRef.current;
+    if (tempTrailStartMs != null && trailTempHp > safeTempHp) {
+      const elapsedMs = nowMs - tempTrailStartMs;
+      if (elapsedMs > HP_DAMAGE_TRAIL_DELAY_MS) {
+        const rawProgress = Math.min(
+          1,
+          (elapsedMs - HP_DAMAGE_TRAIL_DELAY_MS) / HP_DAMAGE_TRAIL_DURATION_MS,
+        );
+        const easedProgress = 1 - (1 - rawProgress) ** 3;
+        const tempTrailStartHp = Math.max(safeTempHp, tempTrailStartHpRef.current);
+        trailTempHp = tempTrailStartHp + (safeTempHp - tempTrailStartHp) * easedProgress;
+        if (rawProgress >= 1) {
+          trailTempHp = safeTempHp;
+          tempTrailStartMsRef.current = null;
+        }
+      }
+    } else {
+      trailTempHp = safeTempHp;
+      tempTrailStartMsRef.current = null;
+    }
+
+    tempTrailCurrentHpRef.current = trailTempHp;
+    const tempScaleMaxHp = Math.max(safeMaxHp, safeTempHp, trailTempHp);
+    const displayedTrailTempHp = Math.max(safeTempHp, Math.min(trailTempHp, tempScaleMaxHp));
+
+    const shouldRenderCurrentBar =
+      safeCurrentHp > 0 || damageTrailHp > safeCurrentHp || healStartMsRef.current != null;
+    const shouldRenderTempBar =
+      safeTempHp > 0 || displayedTrailTempHp > safeTempHp || tempHealStartMsRef.current != null;
+
+    graphics.clear();
+
+    if (!shouldRenderCurrentBar && !shouldRenderTempBar) {
+      return;
+    }
+
+    const hpBarHeight = Math.max(4 / cameraScaleY, 1.5);
+    const hpBarGap = Math.max(0.35 / cameraScaleY, 0.2);
+    const barY = -hpBarHeight - hpBarGap;
+
+    if (shouldRenderCurrentBar) {
+      drawHpBarWithTicks({
+        graphics,
+        y: barY,
+        width,
+        height: hpBarHeight,
+        currentValue: safeCurrentHp,
+        maxValue: safeMaxHp,
+        cameraScaleY,
+        backgroundColor: theme.surface1,
+        fillColor: theme.hpBarFill,
+        borderColor: theme.surface0,
+        borderAlpha: 0.72,
+        tickColor: theme.hpTick,
+      });
+
+      if (damageTrailHp > safeCurrentHp) {
+        const hpUnitWidth = width / safeMaxHp;
+        const trailX = hpUnitWidth * safeCurrentHp;
+        const trailWidth = hpUnitWidth * (damageTrailHp - safeCurrentHp);
+        const hpTrailColor = tintColorTowardsWhite(theme.feedbackNegative, 0.52);
+        graphics.beginFill(hpTrailColor, 0.5);
+        graphics.drawRect(trailX, barY, trailWidth, hpBarHeight);
+        graphics.endFill();
+      }
+
+      const healStartMs = healStartMsRef.current;
+      if (healStartMs != null) {
+        const elapsedMs = nowMs - healStartMs;
+        const rawProgress = Math.min(1, elapsedMs / HP_HEAL_FLASH_DURATION_MS);
+        const healAlpha = (1 - rawProgress) * 0.62;
+        const healFrom = Math.max(0, Math.min(healStartHpRef.current, safeMaxHp));
+        const healTo = Math.max(healFrom, Math.min(healEndHpRef.current, safeMaxHp));
+        if (healTo > healFrom && healAlpha > 0) {
+          const hpUnitWidth = width / safeMaxHp;
+          const healX = hpUnitWidth * healFrom;
+          const healWidth = hpUnitWidth * (healTo - healFrom);
+          const healColor = tintColorTowardsWhite(theme.feedbackPositive, 0.46);
+          graphics.beginFill(healColor, healAlpha);
+          graphics.drawRect(healX, barY, healWidth, hpBarHeight);
+          graphics.endFill();
+        }
+        if (rawProgress >= 1) {
+          healStartMsRef.current = null;
+        }
+      }
+    }
+
+    if (shouldRenderTempBar) {
+      const tempBarHeight = hpBarHeight;
+      const tempBarY = barY - tempBarHeight - Math.max(0.45 / cameraScaleY, 0.2);
+
+      drawHpBarWithTicks({
+        graphics,
+        y: tempBarY,
+        width,
+        height: tempBarHeight,
+        currentValue: safeTempHp,
+        maxValue: tempScaleMaxHp,
+        cameraScaleY,
+        backgroundColor: theme.surface1,
+        fillColor: theme.info,
+        borderColor: theme.surface0,
+        borderAlpha: 0.52,
+        tickColor: theme.hpTick,
+      });
+
+      if (displayedTrailTempHp > safeTempHp) {
+        const tempUnitWidth = width / tempScaleMaxHp;
+        const tempTrailX = tempUnitWidth * safeTempHp;
+        const tempTrailWidth = tempUnitWidth * (displayedTrailTempHp - safeTempHp);
+        graphics.beginFill(theme.info, 0.34);
+        graphics.drawRect(tempTrailX, tempBarY, tempTrailWidth, tempBarHeight);
+        graphics.endFill();
+      }
+
+      const tempHealStartMs = tempHealStartMsRef.current;
+      if (tempHealStartMs != null) {
+        const elapsedMs = nowMs - tempHealStartMs;
+        const rawProgress = Math.min(1, elapsedMs / HP_HEAL_FLASH_DURATION_MS);
+        const healAlpha = (1 - rawProgress) * 0.58;
+        const healFrom = Math.max(0, tempHealStartHpRef.current);
+        const healTo = Math.max(healFrom, tempHealEndHpRef.current);
+        if (healTo > healFrom && healAlpha > 0) {
+          const tempUnitWidth = width / tempScaleMaxHp;
+          const tempHealX = tempUnitWidth * healFrom;
+          const tempHealWidth = tempUnitWidth * (healTo - healFrom);
+          const tempHealColor = tintColorTowardsWhite(theme.info, 0.52);
+          graphics.beginFill(tempHealColor, healAlpha);
+          graphics.drawRect(tempHealX, tempBarY, tempHealWidth, tempBarHeight);
+          graphics.endFill();
+        }
+        if (rawProgress >= 1) {
+          tempHealStartMsRef.current = null;
+        }
+      }
+    }
+  });
+
+  return <Graphics ref={graphicsRef} alpha={1} />;
+}
+
 function hasDeadConditionFromEffects(
   effects: Array<{ linkedCondition?: string | null } | null> | undefined,
 ): boolean {
@@ -256,10 +523,10 @@ function characterHasDeadCondition(
   return hasDeadConditionFromEffects(legacyEffects);
 }
 
-function parseCssColorToPixi(cssColor: string, fallback: number): number {
+function parseCssColorToPixi(cssColor: string): number | null {
   const value = cssColor.trim();
   if (value.length === 0) {
-    return fallback;
+    return null;
   }
 
   if (value.startsWith('#')) {
@@ -270,30 +537,30 @@ function parseCssColorToPixi(cssColor: string, fallback: number): number {
         .map((part) => `${part}${part}`)
         .join('');
       const parsed = Number.parseInt(normalized, 16);
-      return Number.isNaN(parsed) ? fallback : parsed;
+      return Number.isNaN(parsed) ? null : parsed;
     }
     if (hex.length === 6) {
       const parsed = Number.parseInt(hex, 16);
-      return Number.isNaN(parsed) ? fallback : parsed;
+      return Number.isNaN(parsed) ? null : parsed;
     }
-    return fallback;
+    return null;
   }
 
   const rgbMatch = value.match(/rgba?\(([^)]+)\)/i);
   if (!rgbMatch) {
-    return fallback;
+    return null;
   }
 
   const parts = rgbMatch[1]?.split(',').map((part) => part.trim()) ?? [];
   if (parts.length < 3) {
-    return fallback;
+    return null;
   }
 
   const r = Number.parseInt(parts[0] ?? '', 10);
   const g = Number.parseInt(parts[1] ?? '', 10);
   const b = Number.parseInt(parts[2] ?? '', 10);
   if ([r, g, b].some((channel) => Number.isNaN(channel))) {
-    return fallback;
+    return null;
   }
 
   return ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
@@ -302,29 +569,41 @@ function parseCssColorToPixi(cssColor: string, fallback: number): number {
 function usePixiThemeColors(): PixiThemeColors {
   return useMemo(() => {
     if (typeof window === 'undefined') {
-      return DEFAULT_PIXI_THEME;
+      throw new Error(
+        'Violação de contrato de tema: window indisponível para leitura de CSS vars do Pixi.',
+      );
     }
 
     const styles = window.getComputedStyle(document.documentElement);
-    const read = (cssVarName: string, fallback: number) =>
-      parseCssColorToPixi(styles.getPropertyValue(cssVarName), fallback);
+    const readRequired = (cssVarName: string): number => {
+      const rawValue = styles.getPropertyValue(cssVarName);
+      const parsed = parseCssColorToPixi(rawValue);
+      if (parsed == null) {
+        throw new Error(
+          `Violação de contrato de tema: CSS var obrigatória ausente ou inválida (${cssVarName}).`,
+        );
+      }
+
+      return parsed;
+    };
 
     return {
-      accentPrimary: read('--color-accent-primary', DEFAULT_PIXI_THEME.accentPrimary),
-      accentSecondary: read('--color-accent-secondary', DEFAULT_PIXI_THEME.accentSecondary),
-      selectionNeutral: read('--color-text-secondary', DEFAULT_PIXI_THEME.selectionNeutral),
-      feedbackPositive: read('--color-feedback-positive', DEFAULT_PIXI_THEME.feedbackPositive),
-      hpBarFill: read('--color-hp-bar-fill', DEFAULT_PIXI_THEME.hpBarFill),
-      feedbackNegative: read('--color-feedback-negative', DEFAULT_PIXI_THEME.feedbackNegative),
-      textPrimary: read('--color-text-primary', DEFAULT_PIXI_THEME.textPrimary),
-      textSecondary: read('--color-text-secondary', DEFAULT_PIXI_THEME.textSecondary),
-      surface0: read('--color-surface-0', DEFAULT_PIXI_THEME.surface0),
-      surface1: read('--color-surface-1', DEFAULT_PIXI_THEME.surface1),
-      warning: DEFAULT_PIXI_THEME.warning,
-      boardBg: DEFAULT_PIXI_THEME.boardBg,
-      boardGrid: DEFAULT_PIXI_THEME.boardGrid,
-      info: DEFAULT_PIXI_THEME.info,
-      shadow: DEFAULT_PIXI_THEME.shadow,
+      accentPrimary: readRequired('--color-accent-primary'),
+      accentSecondary: readRequired('--color-accent-secondary'),
+      selectionNeutral: readRequired('--color-text-secondary'),
+      feedbackPositive: readRequired('--color-feedback-positive'),
+      hpBarFill: readRequired('--color-hp-bar-fill'),
+      feedbackNegative: readRequired('--color-feedback-negative'),
+      textPrimary: readRequired('--color-text-primary'),
+      textSecondary: readRequired('--color-text-secondary'),
+      surface0: readRequired('--color-surface-0'),
+      surface1: readRequired('--color-surface-1'),
+      warning: readRequired('--color-feedback-warning'),
+      boardBg: readRequired('--color-board-bg'),
+      boardGrid: readRequired('--color-board-grid'),
+      info: readRequired('--color-info'),
+      shadow: readRequired('--color-shadow'),
+      hpTick: readRequired('--color-hp-tick'),
     };
   }, []);
 }
@@ -429,6 +708,7 @@ function TokenTurnIndicator({
   markerWidth,
   markerHeight,
   currentMarkerHiddenUntilMs,
+  nextMarkerHiddenUntilMs,
   cameraScaleY,
   isCurrent,
   isNext,
@@ -441,6 +721,7 @@ function TokenTurnIndicator({
   markerWidth: number;
   markerHeight: number;
   currentMarkerHiddenUntilMs?: number;
+  nextMarkerHiddenUntilMs?: number;
   cameraScaleY: number;
   isCurrent: boolean;
   isNext: boolean;
@@ -485,11 +766,16 @@ function TokenTurnIndicator({
     }
 
     if (isNext && nextPulseRef.current) {
-      nextPulsePhaseRef.current += 0.045 * delta;
-      const pulse = (Math.sin(nextPulsePhaseRef.current) + 1) / 2;
-      const scale = 1 + pulse * 0.06;
-      nextPulseRef.current.scale.set(scale);
-      nextPulseRef.current.alpha = 0.7 + pulse * 0.14;
+      if (typeof nextMarkerHiddenUntilMs === 'number' && Date.now() < nextMarkerHiddenUntilMs) {
+        nextPulseRef.current.alpha = 0;
+        nextPulseRef.current.scale.set(1);
+      } else {
+        nextPulsePhaseRef.current += 0.045 * delta;
+        const pulse = (Math.sin(nextPulsePhaseRef.current) + 1) / 2;
+        const scale = 1 + pulse * 0.06;
+        nextPulseRef.current.scale.set(scale);
+        nextPulseRef.current.alpha = 0.7 + pulse * 0.14;
+      }
     }
   });
 
@@ -532,22 +818,10 @@ function TokenTurnIndicator({
                 graphics.lineTo(right, bottom - len);
               };
 
-              graphics.lineStyle({
-                width: markerShadowStrokeWidth,
-                color: theme.surface0,
-                alpha: 0.4,
-                cap: 'round',
-                join: 'round',
-              });
+              graphics.lineStyle(markerShadowStrokeWidth, theme.surface0, 0.4);
               drawCorners();
 
-              graphics.lineStyle({
-                width: markerStrokeWidth,
-                color: theme.accentPrimary,
-                alpha: 0.98,
-                cap: 'round',
-                join: 'round',
-              });
+              graphics.lineStyle(markerStrokeWidth, theme.accentPrimary, 0.98);
               drawCorners();
             }}
           />
@@ -644,13 +918,7 @@ function ClubImpactBurstEffect({
     graphics.clear();
     graphics.position.set(center.x, center.y);
 
-    graphics.lineStyle({
-      width: Math.max(2.1 / cameraScaleY, 0.7),
-      color: theme.accentPrimary,
-      alpha: 0.75 * fade,
-      cap: 'round',
-      join: 'round',
-    });
+    graphics.lineStyle(Math.max(2.1 / cameraScaleY, 0.7), theme.accentPrimary, 0.75 * fade);
     graphics.drawCircle(0, 0, Math.max(3 / cameraScaleY, 1) + travel * 0.35);
 
     vectors.forEach((vector, index) => {
@@ -659,13 +927,7 @@ function ClubImpactBurstEffect({
       const sparkX = vector.x * sparkDistance;
       const sparkY = vector.y * sparkDistance;
 
-      graphics.lineStyle({
-        width: Math.max(1.4 / cameraScaleY, 0.45),
-        color: theme.accentSecondary,
-        alpha: 0.8 * fade,
-        cap: 'round',
-        join: 'round',
-      });
+      graphics.lineStyle(Math.max(1.4 / cameraScaleY, 0.45), theme.accentSecondary, 0.8 * fade);
       graphics.moveTo(0, 0);
       graphics.lineTo(sparkX * 0.72, sparkY * 0.72);
 
@@ -713,7 +975,6 @@ function AnimatedTokenContainer({
       if (elapsedMs >= 0 && elapsedMs <= durationMs) {
         const t = elapsedMs / durationMs;
         const easeOutCubic = (value: number) => 1 - (1 - value) ** 3;
-        const easeInQuad = (value: number) => value * value;
 
         if (animation.role === 'attacker') {
           const windupEnd = 0.22;
@@ -810,6 +1071,48 @@ function CombatCrossIndicator({
   );
 }
 
+function MissFeedbackSprite({
+  x,
+  y,
+  width,
+  height,
+  triggeredAtMs,
+  baseAlpha = 0.96,
+}: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  triggeredAtMs: number;
+  baseAlpha?: number;
+}) {
+  const spriteRef = useRef<PixiSprite | null>(null);
+
+  useTick(() => {
+    const sprite = spriteRef.current;
+    if (!sprite) {
+      return;
+    }
+
+    const elapsedMs = Math.max(0, Date.now() - triggeredAtMs);
+    const progress = Math.min(1, elapsedMs / MISS_FEEDBACK_FADEOUT_MS);
+    sprite.alpha = baseAlpha * (1 - progress);
+  });
+
+  return (
+    <Sprite
+      ref={spriteRef}
+      image={missAttackIcon}
+      x={x}
+      y={y}
+      anchor={{ x: 0.5, y: 0.5 }}
+      width={width}
+      height={height}
+      alpha={baseAlpha}
+    />
+  );
+}
+
 export function PixiBoardPrototype({
   viewBox,
   gridSettings,
@@ -863,25 +1166,30 @@ export function PixiBoardPrototype({
           const selectionSizeX = Math.max(1, Math.ceil(sizeX));
           const selectionSizeY = Math.max(1, Math.ceil(sizeY));
           const runtimeCharacter = runtimeCharactersById[token.characterId] ?? null;
-          const isDead = characterHasDeadCondition(character, runtimeCharacter);
+          const hasDeadCondition = characterHasDeadCondition(character, runtimeCharacter);
+          const currentHp =
+            'combatStats' in character && typeof character.combatStats.currentHp === 'number'
+              ? character.combatStats.currentHp
+              : null;
+          const maxHp =
+            'combatStats' in character && typeof character.combatStats.maxHp === 'number'
+              ? character.combatStats.maxHp
+              : null;
+          const tempHp =
+            'combatStats' in character && typeof character.combatStats.tempHp === 'number'
+              ? character.combatStats.tempHp
+              : 0;
+          const hasEffectiveHp = (currentHp ?? 0) > 0 || tempHp > 0;
+          const isDead = hasDeadCondition && !hasEffectiveHp;
 
           return {
             id: token.id,
             imageUrl: character.image,
             name: character.name,
             isDead,
-            currentHp:
-              'combatStats' in character && typeof character.combatStats.currentHp === 'number'
-                ? character.combatStats.currentHp
-                : null,
-            maxHp:
-              'combatStats' in character && typeof character.combatStats.maxHp === 'number'
-                ? character.combatStats.maxHp
-                : null,
-            tempHp:
-              'combatStats' in character && typeof character.combatStats.tempHp === 'number'
-                ? character.combatStats.tempHp
-                : 0,
+            currentHp,
+            maxHp,
+            tempHp,
             x: token.position.x * cellSize + centeringOffsetX,
             y: token.position.y * cellSize + centeringOffsetY,
             width: sizeX * cellSize,
@@ -1188,264 +1496,204 @@ export function PixiBoardPrototype({
               }}
             />
           ) : null}
-          {orderedTokenSprites.map((tokenSprite) => (
-            <AnimatedTokenContainer
-              key={`pixi-token-${tokenSprite.id}`}
-              baseX={
-                draggingVisuals.tokenId === tokenSprite.id && draggingVisuals.visualWorldPoint
-                  ? draggingVisuals.visualWorldPoint.x
-                  : tokenSprite.x
-              }
-              baseY={
-                draggingVisuals.tokenId === tokenSprite.id && draggingVisuals.visualWorldPoint
-                  ? draggingVisuals.visualWorldPoint.y
-                  : tokenSprite.y
-              }
-              pivotX={tokenSprite.selectionX + tokenSprite.selectionWidth / 2}
-              pivotY={tokenSprite.selectionY + tokenSprite.selectionHeight / 2}
-              animation={meleeAnimationByTokenId.get(tokenSprite.id)}
-              cameraScaleY={cameraTransform.scaleY}
-            >
-              <Graphics
-                draw={(graphics) => {
-                  graphics.clear();
-                  const radius = Math.min(tokenSprite.width, tokenSprite.height) * 0.46;
-                  graphics.beginFill(theme.shadow, 0.18);
-                  graphics.drawCircle(
-                    tokenSprite.width / 2,
-                    tokenSprite.height / 2 + Math.max(1.4 / cameraTransform.scaleY, 0.5),
-                    radius,
-                  );
-                  graphics.endFill();
-                }}
-              />
-              {multiSelectedTokenIds.includes(tokenSprite.id) ? (
-                <Graphics
-                  draw={(graphics) => {
-                    graphics.clear();
-                    const strokeWidth = Math.max(1.8 / cameraTransform.scaleY, 0.7);
-                    const padding = Math.max(1 / cameraTransform.scaleY, 0.4);
-                    graphics.lineStyle({
-                      width: strokeWidth,
-                      color: theme.selectionNeutral,
-                      alpha: 0.98,
-                    });
-                    graphics.drawRect(
-                      tokenSprite.selectionX - padding,
-                      tokenSprite.selectionY - padding,
-                      tokenSprite.selectionWidth + padding * 2,
-                      tokenSprite.selectionHeight + padding * 2,
-                    );
-                  }}
-                />
-              ) : null}
-              {combatParticipantTokenIds.includes(tokenSprite.id) ? (
-                <CombatCrossIndicator
-                  tokenWidth={tokenSprite.width}
-                  tokenHeight={tokenSprite.height}
-                  color={theme.feedbackNegative}
-                />
-              ) : null}
-              <Sprite
-                image={tokenSprite.imageUrl}
-                x={0}
-                y={0}
-                width={tokenSprite.width}
-                height={tokenSprite.height}
-                alpha={tokenSprite.isDead ? 0.52 : 1}
-              />
-              {tokenSprite.isDead ? (
-                <Sprite
-                  image={skullDeadIcon}
-                  x={tokenSprite.width / 2}
-                  y={tokenSprite.height / 2}
-                  anchor={{ x: 0.5, y: 0.5 }}
-                  width={Math.max(tokenSprite.width * 0.88, 10)}
-                  height={Math.max(tokenSprite.height * 0.88, 10)}
-                  alpha={DEAD_SKULL_ALPHA}
-                />
-              ) : null}
-              <TokenTurnIndicator
-                tokenWidth={tokenSprite.width}
-                tokenHeight={tokenSprite.height}
-                markerX={tokenSprite.selectionX}
-                markerY={tokenSprite.selectionY}
-                markerWidth={tokenSprite.selectionWidth}
-                markerHeight={tokenSprite.selectionHeight}
-                currentMarkerHiddenUntilMs={
-                  meleeAnimationByTokenId.get(tokenSprite.id)
-                    ? (meleeAnimationByTokenId.get(tokenSprite.id)?.startMs ?? 0) +
-                      TOKEN_MELEE_ANIMATION_DURATION_MS +
-                      CURRENT_TURN_MARKER_EXTRA_DELAY_MS
-                    : undefined
+          {orderedTokenSprites.map((tokenSprite) => {
+            const tokenMeleeAnimation = meleeAnimationByTokenId.get(tokenSprite.id);
+            const markerHiddenUntilMs = tokenMeleeAnimation
+              ? tokenMeleeAnimation.startMs +
+                TOKEN_MELEE_ANIMATION_DURATION_MS +
+                CURRENT_TURN_MARKER_EXTRA_DELAY_MS
+              : undefined;
+
+            const nextMarkerHiddenUntilMs =
+              tokenMeleeAnimation?.role === 'target' ? markerHiddenUntilMs : undefined;
+
+            return (
+              <AnimatedTokenContainer
+                key={`pixi-token-${tokenSprite.id}`}
+                baseX={
+                  draggingVisuals.tokenId === tokenSprite.id && draggingVisuals.visualWorldPoint
+                    ? draggingVisuals.visualWorldPoint.x
+                    : tokenSprite.x
                 }
+                baseY={
+                  draggingVisuals.tokenId === tokenSprite.id && draggingVisuals.visualWorldPoint
+                    ? draggingVisuals.visualWorldPoint.y
+                    : tokenSprite.y
+                }
+                pivotX={tokenSprite.selectionX + tokenSprite.selectionWidth / 2}
+                pivotY={tokenSprite.selectionY + tokenSprite.selectionHeight / 2}
+                animation={tokenMeleeAnimation}
                 cameraScaleY={cameraTransform.scaleY}
-                isCurrent={activeCombatTurnTokenId === tokenSprite.id}
-                isNext={activeCombatNextTurnTokenId === tokenSprite.id}
-                theme={theme}
-              />
-              {tokenSprite.maxHp != null && tokenSprite.currentHp != null ? (
+              >
                 <Graphics
-                  alpha={tokenSprite.isDead ? 0.56 : 1}
                   draw={(graphics) => {
                     graphics.clear();
-                    const hpBarHeight = Math.max(4 / cameraTransform.scaleY, 1.5);
-                    const hpBarGap = Math.max(0.35 / cameraTransform.scaleY, 0.2);
-                    const barY = -hpBarHeight - hpBarGap;
-                    const safeMaxHp = Math.max(1, tokenSprite.maxHp ?? 1);
-                    const safeCurrentHp = Math.max(
-                      0,
-                      Math.min(tokenSprite.currentHp ?? 0, safeMaxHp),
+                    const radius = Math.min(tokenSprite.width, tokenSprite.height) * 0.46;
+                    graphics.beginFill(theme.shadow, 0.18);
+                    graphics.drawCircle(
+                      tokenSprite.width / 2,
+                      tokenSprite.height / 2 + Math.max(1.4 / cameraTransform.scaleY, 0.5),
+                      radius,
                     );
-                    drawHpBarWithTicks({
-                      graphics,
-                      y: barY,
-                      width: tokenSprite.width,
-                      height: hpBarHeight,
-                      currentValue: safeCurrentHp,
-                      maxValue: safeMaxHp,
-                      cameraScaleY: cameraTransform.scaleY,
-                      backgroundColor: theme.surface1,
-                      fillColor: theme.hpBarFill,
-                      borderColor: theme.surface0,
-                      borderAlpha: 0.72,
-                      tickColor: HP_TICK_COLOR,
-                    });
-
-                    const tempHp = Math.max(0, tokenSprite.tempHp ?? 0);
-                    if (tempHp > 0) {
-                      const safeTempHp = tempHp;
-                      const tempScaleMaxHp = Math.max(safeMaxHp, safeTempHp);
-                      const tempBarHeight = hpBarHeight;
-                      const tempBarY =
-                        barY - tempBarHeight - Math.max(0.45 / cameraTransform.scaleY, 0.2);
-
-                      drawHpBarWithTicks({
-                        graphics,
-                        y: tempBarY,
-                        width: tokenSprite.width,
-                        height: tempBarHeight,
-                        currentValue: safeTempHp,
-                        maxValue: tempScaleMaxHp,
-                        cameraScaleY: cameraTransform.scaleY,
-                        backgroundColor: theme.surface1,
-                        fillColor: theme.info,
-                        borderColor: theme.surface0,
-                        borderAlpha: 0.52,
-                        tickColor: HP_TICK_COLOR,
-                      });
-                    }
+                    graphics.endFill();
                   }}
                 />
-              ) : null}
-              <Text
-                text={tokenSprite.name}
-                x={Math.round(tokenSprite.width / 2)}
-                y={Math.round(tokenSprite.height + tokenLabelOffset)}
-                anchor={{ x: 0.5, y: 0 }}
-                style={tokenNameStyle}
-                alpha={tokenSprite.isDead ? 0.56 : 1}
-                resolution={Math.max(2, stageResolution * 1.5)}
-                roundPixels
-              />
-              {feedbackByTokenId[tokenSprite.id] ? (
-                <Container>
-                  <Text
-                    text={
-                      feedbackByTokenId[tokenSprite.id]?.hit
-                        ? `-${feedbackByTokenId[tokenSprite.id]?.damageApplied ?? 0}`
-                        : 'Erro'
-                    }
-                    x={tokenSprite.width / 2}
-                    y={tokenSprite.height / 2 - Math.max(4 / cameraTransform.scaleY, 2)}
-                    anchor={{ x: 0.5, y: 0.5 }}
-                    style={
-                      new TextStyle({
-                        fontSize: Math.max(
-                          18 / cameraTransform.scaleY,
-                          Math.max(tokenSprite.width, tokenSprite.height) * 0.48,
-                        ),
-                        fill: feedbackByTokenId[tokenSprite.id]?.hit
-                          ? theme.feedbackNegative
-                          : theme.warning,
-                        fontWeight: '900',
-                        stroke: theme.surface0,
-                        strokeThickness: Math.max(2 / cameraTransform.scaleY, 0.9),
-                        lineJoin: 'round',
-                      })
-                    }
-                    resolution={Math.max(2, stageResolution * 1.5)}
-                    roundPixels
-                  />
-                  {feedbackByTokenId[tokenSprite.id]?.hit ? (
-                    <Text
-                      text="Acerto"
-                      x={tokenSprite.width / 2}
-                      y={
-                        tokenSprite.height / 2 +
-                        Math.max(
-                          13 / cameraTransform.scaleY,
-                          Math.max(tokenSprite.width, tokenSprite.height) * 0.34,
-                        )
-                      }
-                      anchor={{ x: 0.5, y: 0.5 }}
-                      style={
-                        new TextStyle({
-                          fontSize: Math.max(
-                            11 / cameraTransform.scaleY,
-                            Math.max(tokenSprite.width, tokenSprite.height) * 0.24,
-                          ),
-                          fill: theme.feedbackPositive,
-                          fontWeight: '900',
-                          stroke: theme.surface0,
-                          strokeThickness: Math.max(2 / cameraTransform.scaleY, 0.9),
-                          lineJoin: 'round',
-                        })
-                      }
-                      resolution={Math.max(2, stageResolution * 1.5)}
-                      roundPixels
-                    />
-                  ) : null}
-                </Container>
-              ) : null}
-              {copiedTokenId === tokenSprite.id ? (
-                <Container>
+                {multiSelectedTokenIds.includes(tokenSprite.id) ? (
                   <Graphics
                     draw={(graphics) => {
                       graphics.clear();
-                      const badgeSize = Math.max(14 / cameraTransform.scaleY, 5);
-                      const badgeX = tokenSprite.width - badgeSize;
-                      const badgeY = -Math.max(16 / cameraTransform.scaleY, 6);
-                      const badgeRadius = Math.max(2 / cameraTransform.scaleY, 1);
+                      const strokeWidth = Math.max(1.8 / cameraTransform.scaleY, 0.7);
+                      const padding = Math.max(1 / cameraTransform.scaleY, 0.4);
                       graphics.lineStyle({
-                        width: Math.max(1 / cameraTransform.scaleY, 0.35),
-                        color: theme.surface1,
-                        alpha: 0.95,
+                        width: strokeWidth,
+                        color: theme.selectionNeutral,
+                        alpha: 0.98,
                       });
-                      graphics.beginFill(theme.accentPrimary, 0.98);
-                      graphics.drawRoundedRect(badgeX, badgeY, badgeSize, badgeSize, badgeRadius);
-                      graphics.endFill();
+                      graphics.drawRect(
+                        tokenSprite.selectionX - padding,
+                        tokenSprite.selectionY - padding,
+                        tokenSprite.selectionWidth + padding * 2,
+                        tokenSprite.selectionHeight + padding * 2,
+                      );
                     }}
                   />
-                  <Text
-                    text="C"
-                    x={tokenSprite.width - Math.max(7 / cameraTransform.scaleY, 2.5)}
-                    y={-Math.max(9 / cameraTransform.scaleY, 3)}
-                    anchor={{ x: 0.5, y: 0.5 }}
-                    style={
-                      new TextStyle({
-                        fontSize: Math.max(8 / cameraTransform.scaleY, 3),
-                        fill: theme.textPrimary,
-                        fontWeight: '700',
-                      })
-                    }
-                    resolution={Math.max(2, stageResolution)}
-                    roundPixels
+                ) : null}
+                {combatParticipantTokenIds.includes(tokenSprite.id) ? (
+                  <CombatCrossIndicator
+                    tokenWidth={tokenSprite.width}
+                    tokenHeight={tokenSprite.height}
+                    color={theme.feedbackNegative}
                   />
-                </Container>
-              ) : null}
-            </AnimatedTokenContainer>
-          ))}
+                ) : null}
+                <Sprite
+                  image={tokenSprite.imageUrl}
+                  x={0}
+                  y={0}
+                  width={tokenSprite.width}
+                  height={tokenSprite.height}
+                  alpha={tokenSprite.isDead ? 0.52 : 1}
+                />
+                {tokenSprite.isDead ? (
+                  <Sprite
+                    image={skullDeadIcon}
+                    x={tokenSprite.width / 2}
+                    y={tokenSprite.height / 2}
+                    anchor={{ x: 0.5, y: 0.5 }}
+                    width={Math.max(tokenSprite.width * 0.88, 10)}
+                    height={Math.max(tokenSprite.height * 0.88, 10)}
+                    alpha={DEAD_SKULL_ALPHA}
+                  />
+                ) : null}
+                <TokenTurnIndicator
+                  tokenWidth={tokenSprite.width}
+                  tokenHeight={tokenSprite.height}
+                  markerX={tokenSprite.selectionX}
+                  markerY={tokenSprite.selectionY}
+                  markerWidth={tokenSprite.selectionWidth}
+                  markerHeight={tokenSprite.selectionHeight}
+                  currentMarkerHiddenUntilMs={markerHiddenUntilMs}
+                  nextMarkerHiddenUntilMs={nextMarkerHiddenUntilMs}
+                  cameraScaleY={cameraTransform.scaleY}
+                  isCurrent={activeCombatTurnTokenId === tokenSprite.id}
+                  isNext={activeCombatNextTurnTokenId === tokenSprite.id}
+                  theme={theme}
+                />
+                {tokenSprite.maxHp != null && tokenSprite.currentHp != null ? (
+                  <TokenHpBars
+                    width={tokenSprite.width}
+                    maxHp={tokenSprite.maxHp}
+                    currentHp={tokenSprite.currentHp}
+                    tempHp={tokenSprite.tempHp}
+                    cameraScaleY={cameraTransform.scaleY}
+                    theme={theme}
+                  />
+                ) : null}
+                <Text
+                  text={tokenSprite.name}
+                  x={Math.round(tokenSprite.width / 2)}
+                  y={Math.round(tokenSprite.height + tokenLabelOffset)}
+                  anchor={{ x: 0.5, y: 0 }}
+                  style={tokenNameStyle}
+                  alpha={tokenSprite.isDead ? 0.56 : 1}
+                  resolution={Math.max(2, stageResolution * 1.5)}
+                  roundPixels
+                />
+                {feedbackByTokenId[tokenSprite.id] ? (
+                  <Container>
+                    {feedbackByTokenId[tokenSprite.id]?.hit ? (
+                      <Text
+                        text={`-${feedbackByTokenId[tokenSprite.id]?.damageApplied ?? 0}`}
+                        x={tokenSprite.width / 2}
+                        y={tokenSprite.height / 2 - Math.max(4 / cameraTransform.scaleY, 2)}
+                        anchor={{ x: 0.5, y: 0.5 }}
+                        style={
+                          new TextStyle({
+                            fontSize: Math.max(
+                              18 / cameraTransform.scaleY,
+                              Math.max(tokenSprite.width, tokenSprite.height) * 0.48,
+                            ),
+                            fill: theme.feedbackNegative,
+                            fontWeight: '900',
+                            stroke: theme.surface0,
+                            strokeThickness: Math.max(2 / cameraTransform.scaleY, 0.9),
+                            lineJoin: 'round',
+                          })
+                        }
+                        resolution={Math.max(2, stageResolution * 1.5)}
+                        roundPixels
+                      />
+                    ) : (
+                      <MissFeedbackSprite
+                        x={tokenSprite.width / 2}
+                        y={tokenSprite.height / 2 - Math.max(3 / cameraTransform.scaleY, 1)}
+                        width={Math.max(tokenSprite.width * 0.62, 10)}
+                        height={Math.max(tokenSprite.height * 0.62, 10)}
+                        triggeredAtMs={
+                          feedbackByTokenId[tokenSprite.id]?.triggeredAtMs ?? Date.now()
+                        }
+                      />
+                    )}
+                  </Container>
+                ) : null}
+                {copiedTokenId === tokenSprite.id ? (
+                  <Container>
+                    <Graphics
+                      draw={(graphics) => {
+                        graphics.clear();
+                        const badgeSize = Math.max(14 / cameraTransform.scaleY, 5);
+                        const badgeX = tokenSprite.width - badgeSize;
+                        const badgeY = -Math.max(16 / cameraTransform.scaleY, 6);
+                        const badgeRadius = Math.max(2 / cameraTransform.scaleY, 1);
+                        graphics.lineStyle({
+                          width: Math.max(1 / cameraTransform.scaleY, 0.35),
+                          color: theme.surface1,
+                          alpha: 0.95,
+                        });
+                        graphics.beginFill(theme.accentPrimary, 0.98);
+                        graphics.drawRoundedRect(badgeX, badgeY, badgeSize, badgeSize, badgeRadius);
+                        graphics.endFill();
+                      }}
+                    />
+                    <Text
+                      text="C"
+                      x={tokenSprite.width - Math.max(7 / cameraTransform.scaleY, 2.5)}
+                      y={-Math.max(9 / cameraTransform.scaleY, 3)}
+                      anchor={{ x: 0.5, y: 0.5 }}
+                      style={
+                        new TextStyle({
+                          fontSize: Math.max(8 / cameraTransform.scaleY, 3),
+                          fill: theme.textPrimary,
+                          fontWeight: '700',
+                        })
+                      }
+                      resolution={Math.max(2, stageResolution)}
+                      roundPixels
+                    />
+                  </Container>
+                ) : null}
+              </AnimatedTokenContainer>
+            );
+          })}
           {clubImpactEffects.map((effect) => (
             <ClubImpactBurstEffect
               key={`club-impact-${effect.id}`}

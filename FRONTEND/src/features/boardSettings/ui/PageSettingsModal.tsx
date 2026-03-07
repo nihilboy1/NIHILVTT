@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { GRID_CONFIG } from '@/shared/config/constants';
+import { GRID_CONFIG, THEME_COLORS } from '@/shared/config/constants';
 
 import { cn } from '../../../shared/lib/utils/cn';
 import { Modal } from '../../../shared/ui/Modal';
@@ -124,7 +124,7 @@ export function PageSettingsModal({ isOpen, onClose }: PageAndGridSettingsModalP
                 'bg-surface-1 border-surface-2 placeholder-text-secondary w-full rounded-md border p-2 focus:ring-1',
                 'flex-grow',
               )}
-              placeholder="#FFFFFF"
+              placeholder={THEME_COLORS.PAGE_BACKGROUND}
             />
           </div>
         </div>

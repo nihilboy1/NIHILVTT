@@ -1,9 +1,9 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { actionSchema } from "../../../entities/character/model/schemas/character.schema";
-import { InteractiveModal } from "../../../shared/ui/InteractiveModal";
+import { actionSchema } from '../../../entities/character/model/schemas/character.schema';
+import { InteractiveModal } from '../../../shared/ui/InteractiveModal';
 
 type ActionFormInputs = z.infer<typeof actionSchema>;
 
@@ -30,9 +30,9 @@ export function ActionEditModal({
     resolver: zodResolver(actionSchema),
     defaultValues: initialData || {
       id: actionId,
-      name: "",
-      bonus: "",
-      damage: "",
+      name: '',
+      bonus: '',
+      damage: '',
     },
   });
 
@@ -52,65 +52,50 @@ export function ActionEditModal({
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="p-4 space-y-4 bg-gray-800 text-white rounded-lg"
+        className="bg-surface-1 text-text-primary space-y-4 rounded-lg p-4"
       >
         <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="name" className="text-text-secondary block text-sm font-medium">
             Nome da Ação
           </label>
           <input
             type="text"
             id="name"
-            {...register("name")}
-            className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            {...register('name')}
+            className="border-surface-3 bg-surface-2 focus:border-accent-primary focus:ring-accent-primary/50 mt-1 block w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:ring-2 focus:outline-none"
           />
           {errors.name && (
-            <p className="mt-1 text-sm text-feedback-negative">
-              {errors.name.message}
-            </p>
+            <p className="text-feedback-negative mt-1 text-sm">{errors.name.message}</p>
           )}
         </div>
 
         <div>
-          <label
-            htmlFor="bonus"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="bonus" className="text-text-secondary block text-sm font-medium">
             Bônus (opcional)
           </label>
           <input
             type="text"
             id="bonus"
-            {...register("bonus")}
-            className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            {...register('bonus')}
+            className="border-surface-3 bg-surface-2 focus:border-accent-primary focus:ring-accent-primary/50 mt-1 block w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:ring-2 focus:outline-none"
           />
           {errors.bonus && (
-            <p className="mt-1 text-sm text-feedback-negative">
-              {errors.bonus.message}
-            </p>
+            <p className="text-feedback-negative mt-1 text-sm">{errors.bonus.message}</p>
           )}
         </div>
 
         <div>
-          <label
-            htmlFor="damage"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="damage" className="text-text-secondary block text-sm font-medium">
             Dano (opcional)
           </label>
           <input
             type="text"
             id="damage"
-            {...register("damage")}
-            className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            {...register('damage')}
+            className="border-surface-3 bg-surface-2 focus:border-accent-primary focus:ring-accent-primary/50 mt-1 block w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:ring-2 focus:outline-none"
           />
           {errors.damage && (
-            <p className="mt-1 text-sm text-feedback-negative">
-              {errors.damage.message}
-            </p>
+            <p className="text-feedback-negative mt-1 text-sm">{errors.damage.message}</p>
           )}
         </div>
 
@@ -118,13 +103,13 @@ export function ActionEditModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+            className="border-surface-3 bg-surface-2 hover:bg-surface-3 text-text-primary focus:ring-accent-primary/50 rounded-md border px-4 py-2 focus:ring-2 focus:outline-none"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+            className="bg-accent-primary hover:bg-accent-primary-hover text-text-primary focus:ring-accent-primary/50 rounded-md px-4 py-2 focus:ring-2 focus:outline-none"
           >
             Salvar Ação
           </button>

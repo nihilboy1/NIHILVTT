@@ -121,6 +121,27 @@ const hitDiceEntrySchema = z.object({
   quantity: z.number().int().min(1),
 });
 
+const monsterVisionSchema = z
+  .object({
+    darkvision: z.number().int().positive(),
+    blindsight: z.number().int().positive(),
+    tremorsense: z.number().int().positive(),
+    truesight: z.number().int().positive(),
+  })
+  .partial();
+
+const monsterSensesSchema = z.object({
+  passivePerception: z.number().int().min(0),
+  vision: monsterVisionSchema.optional(),
+});
+
+const monsterDefensesSchema = z.object({
+  resistances: z.array(z.string()),
+  vulnerabilities: z.array(z.string()),
+  damageImmunities: z.array(z.string()),
+  conditionImmunities: z.array(z.string()),
+});
+
 // =================================================================
 // --- 3. SCHEMAS BASE (PARA EVITAR REPETIÇÃO) ---
 // =================================================================
@@ -168,6 +189,17 @@ export const monsterNpcCharacterSchema = z.object({
   ...baseDndCharacterSchema.shape,
   type: z.literal(CharacterTypeEnum.enum['NPC']),
   challengeRating: z.number(),
+  source: z.string().optional(),
+  monsterSheetImage: z.string().optional(),
+  hitPointsFormula: z.string().optional(),
+  monsterType: z.string().optional(),
+  alignment: z.string().optional(),
+  environments: z.array(z.string()).optional(),
+  languages: z.array(z.string()).optional(),
+  isFamiliar: z.boolean().optional(),
+  speedSummary: z.string().optional(),
+  senses: monsterSensesSchema.optional(),
+  defenses: monsterDefensesSchema.optional(),
 });
 
 // Schema para Objetos

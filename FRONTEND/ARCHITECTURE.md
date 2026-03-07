@@ -152,3 +152,10 @@ Store de modais:
 
 - Alias `@` -> `src` em `vite.config.ts` e `tsconfig.app.json`.
 - Estilos globais em `src/app/styles/index.css`.
+
+### SSOT de cores (tema)
+
+- `src/app/styles/index.css` e a SSOT (Single Source of Truth) de cores do frontend.
+- Cores de UI e do renderer de board (Pixi) devem vir de tokens CSS declarados nesse arquivo.
+- Componentes, stores e utilitarios nao devem manter hex/rgb hardcoded para tema fora de `index.css`.
+- Leituras de token em trilhas criticas de renderizacao devem operar em fail-fast (token ausente/invalido = violacao de contrato).

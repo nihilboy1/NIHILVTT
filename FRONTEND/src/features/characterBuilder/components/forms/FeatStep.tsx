@@ -30,8 +30,8 @@ export function FeatStep({ className }: FeatStepProps) {
     return (
       <div className={className}>
         <Card className="p-6 text-center">
-          <h3 className="mb-2 text-lg font-medium text-gray-600">Selecione uma Origem</h3>
-          <p className="text-sm text-gray-500">
+          <h3 className="text-text-secondary mb-2 text-lg font-medium">Selecione uma Origem</h3>
+          <p className="text-text-secondary text-sm">
             Primeiro você precisa selecionar uma origem para ver os talentos disponíveis.
           </p>
         </Card>
@@ -43,8 +43,10 @@ export function FeatStep({ className }: FeatStepProps) {
     return (
       <div className={className}>
         <Card className="p-6 text-center">
-          <h3 className="mb-2 text-lg font-medium text-gray-600">Nenhum Talento Disponível</h3>
-          <p className="text-sm text-gray-500">
+          <h3 className="text-text-secondary mb-2 text-lg font-medium">
+            Nenhum Talento Disponível
+          </h3>
+          <p className="text-text-secondary text-sm">
             A origem <strong>{Array.isArray(origin.name) ? origin.name[0] : origin.name}</strong>{' '}
             não fornece talentos adicionais neste nível.
           </p>
@@ -58,8 +60,8 @@ export function FeatStep({ className }: FeatStepProps) {
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center">
-          <h2 className="mb-2 text-2xl font-bold text-gray-800">Talentos da Origem</h2>
-          <p className="text-gray-600">
+          <h2 className="text-text-primary mb-2 text-2xl font-bold">Talentos da Origem</h2>
+          <p className="text-text-secondary">
             Sua origem <strong>{Array.isArray(origin.name) ? origin.name[0] : origin.name}</strong>{' '}
             fornece os seguintes talentos:
           </p>
@@ -71,16 +73,16 @@ export function FeatStep({ className }: FeatStepProps) {
             <Card key={effect.id} className="p-4">
               <div className="flex flex-col">
                 <div className="mb-2 flex items-start justify-between">
-                  <h3 className="text-lg font-medium text-gray-800">{effect.name}</h3>
+                  <h3 className="text-text-primary text-lg font-medium">{effect.name}</h3>
                   {effect.requiresChoice && (
-                    <span className="rounded bg-blue-100 px-2 py-1 text-sm text-blue-700">
+                    <span className="bg-info/20 text-info rounded px-2 py-1 text-sm">
                       Requer Escolha
                     </span>
                   )}
                 </div>
 
                 {effect.description && (
-                  <p className="mb-3 text-sm text-gray-600">{effect.description}</p>
+                  <p className="text-text-secondary mb-3 text-sm">{effect.description}</p>
                 )}
 
                 <FeatEffectControls effect={effect} />
@@ -93,8 +95,8 @@ export function FeatStep({ className }: FeatStepProps) {
         {featInternalEffects.length > 0 && (
           <div className="space-y-4">
             <div className="border-t pt-6">
-              <h3 className="mb-4 text-xl font-bold text-gray-800">Efeitos dos Talentos</h3>
-              <p className="mb-4 text-gray-600">
+              <h3 className="text-text-primary mb-4 text-xl font-bold">Efeitos dos Talentos</h3>
+              <p className="text-text-secondary mb-4">
                 Os talentos fornecidos pela sua origem concedem os seguintes benefícios:
               </p>
             </div>
@@ -115,10 +117,10 @@ export function FeatStep({ className }: FeatStepProps) {
             ).map(([featId, effects]) => (
               <Card key={featId} className="p-4">
                 <div className="mb-4">
-                  <h4 className="text-lg font-medium text-gray-800">
+                  <h4 className="text-text-primary text-lg font-medium">
                     {effects[0]?.parentFeatName || 'Talento'}
                   </h4>
-                  <p className="text-sm text-gray-500">Efeitos do talento</p>
+                  <p className="text-text-secondary text-sm">Efeitos do talento</p>
                 </div>
 
                 <div className="space-y-3">
@@ -134,14 +136,14 @@ export function FeatStep({ className }: FeatStepProps) {
         {/* Status de validação */}
         <div className="mt-6">
           {effectsProcessor.areAllEffectsSelected([...featEffects, ...featInternalEffects]) ? (
-            <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-center">
-              <span className="font-medium text-green-700">
+            <div className="border-feedback-positive/50 bg-feedback-positive/10 rounded-lg border p-4 text-center">
+              <span className="text-feedback-positive font-medium">
                 ✓ Todos os talentos foram processados!
               </span>
             </div>
           ) : (
-            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-center">
-              <span className="font-medium text-yellow-700">
+            <div className="border-feedback-warning/50 bg-feedback-warning/10 rounded-lg border p-4 text-center">
+              <span className="text-feedback-warning font-medium">
                 ⚠ Complete as seleções de talentos para continuar
               </span>
             </div>

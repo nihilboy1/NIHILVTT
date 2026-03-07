@@ -28,6 +28,12 @@ Regra editorial do modulo:
 - `@nihilvtt/datamodeling/primitives`
 - `@nihilvtt/datamodeling/runtime`
 
+### Glossario canonico PT-BR de monstros
+
+- O pacote `shared` expoe o glossario canônico PT-BR de termos de monstro em `src/shared/monster-glossary.pt-br.ts`.
+- Frontends/consumidores devem usar esse glossario compartilhado (via `@nihilvtt/datamodeling/shared`) e nao manter mapa paralelo local para os mesmos termos.
+- Termo canonico sem traducao no glossario deve ser tratado como violacao de contrato, sem fallback silencioso.
+
 ## Scripts
 
 No diretorio `DATAMODELING/`:
@@ -44,6 +50,7 @@ No diretorio `DATAMODELING/`:
 
 - `export:backend-monster-manifest` gera o arquivo canônico consumido pelo backend em `BACKEND-JAVA/src/main/resources/catalog/monster-catalog-manifest.json`.
 - o manifest canônico de monstros exporta também `defenses` de dano (`resistances`, `vulnerabilities`, `damageImmunities`) para cálculo autoritativo de dano no backend.
+- para `effects` do tipo `activatableAction` que aplicam `modifyTargetHP` em `on: "hit"`, o catálogo deve declarar `attackBonus` em `parameters`; sem isso a ação não entra no manifest canônico e o backend rejeita o ataque por ação inexistente.
 - `check:backend-monster-manifest-sync` valida que o manifest atual do backend esta sincronizado com o catalogo em `DATAMODELING`; o comando falha quando houver drift.
 
 ## Fluxo recomendado

@@ -56,10 +56,16 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [joinCode, setJoinCode] = useState('');
-  const [gamePendingDeletion, setGamePendingDeletion] = useState<{ id: number; title: string } | null>(null);
+  const [gamePendingDeletion, setGamePendingDeletion] = useState<{
+    id: number;
+    title: string;
+  } | null>(null);
   const [deleteGamePhrase, setDeleteGamePhrase] = useState('');
   const [deleteGameError, setDeleteGameError] = useState<string | null>(null);
-  const [gamePendingCoverUpload, setGamePendingCoverUpload] = useState<{ id: number; title: string } | null>(null);
+  const [gamePendingCoverUpload, setGamePendingCoverUpload] = useState<{
+    id: number;
+    title: string;
+  } | null>(null);
   const [coverCropImageSrc, setCoverCropImageSrc] = useState<string | null>(null);
   const [isCoverCropOpen, setIsCoverCropOpen] = useState(false);
   const [coverCrop, setCoverCrop] = useState<Point>({ x: 0, y: 0 });
@@ -176,7 +182,10 @@ export default function DashboardPage() {
 
     if (file.size > MAX_GAME_COVER_FILE_SIZE_BYTES) {
       setCoverModalError(`A imagem deve ter no máximo ${MAX_GAME_COVER_FILE_SIZE_LABEL}.`);
-      toast.error(`A imagem selecionada excede o limite de ${MAX_GAME_COVER_FILE_SIZE_LABEL}. Escolha um arquivo menor.`, { duration: 2600 });
+      toast.error(
+        `A imagem selecionada excede o limite de ${MAX_GAME_COVER_FILE_SIZE_LABEL}. Escolha um arquivo menor.`,
+        { duration: 2600 },
+      );
       event.target.value = '';
       return;
     }
@@ -255,7 +264,9 @@ export default function DashboardPage() {
   };
 
   const approvedGameIds = new Set(
-    myJoinRequests.filter((request) => request.status === 'APPROVED').map((request) => request.game.id),
+    myJoinRequests
+      .filter((request) => request.status === 'APPROVED')
+      .map((request) => request.game.id),
   );
   const pendingMyJoinRequests = myJoinRequests.filter((request) => request.status === 'PENDING');
   const pendingGameIds = new Set(pendingMyJoinRequests.map((request) => request.game.id));
@@ -271,20 +282,22 @@ export default function DashboardPage() {
 
   return (
     <PageShell
-      className="flex flex-col items-center p-4 text-text-primary sm:p-8"
+      className="text-text-primary flex flex-col items-center p-4 sm:p-8"
       withSquares={false}
     >
-      <CardSection className="w-full max-w-5xl border-transparent bg-surface-1/90 shadow-[0_20px_60px_rgba(0,0,0,0.65)] backdrop-blur-md">
+      <CardSection className="bg-surface-1/90 surface-elevated-shadow w-full max-w-5xl border-transparent backdrop-blur-md">
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <h1 className="iceberg-regular mb-2 text-5xl text-text-primary">Bem-vindo, {formatUserTag(user.name, user.id)}!</h1>
-            <p className="text-lg text-text-secondary">Este é o seu Dashboard.</p>
+            <h1 className="iceberg-regular text-text-primary mb-2 text-5xl">
+              Bem-vindo, {formatUserTag(user.name, user.id)}!
+            </h1>
+            <p className="text-text-secondary text-lg">Este é o seu Dashboard.</p>
           </div>
 
           <AppButton
             onClick={() => navigate('/profile')}
             variant="primary"
-            className="flex items-center gap-2 border-accent-primary bg-accent-primary px-3 py-2 hover:scale-105 hover:bg-accent-primary-hover"
+            className="border-accent-primary bg-accent-primary hover:bg-accent-primary-hover flex items-center gap-2 px-3 py-2 hover:scale-105"
             title="Ir para o perfil"
           >
             {user.avatarUrl ? (
@@ -294,7 +307,7 @@ export default function DashboardPage() {
                 className="h-7 w-7 rounded-full border border-white object-cover"
               />
             ) : (
-              <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white bg-surface-2 text-text-secondary">
+              <span className="bg-surface-2 text-text-secondary flex h-7 w-7 items-center justify-center rounded-full border border-white">
                 <FaRegUser size={14} />
               </span>
             )}
@@ -303,15 +316,17 @@ export default function DashboardPage() {
         </div>
 
         <CardSection className="bg-surface-0/70">
-          <div className="mb-4 rounded-md border border-surface-2 bg-surface-0/60 p-3">
-            <p className="mb-2 text-sm font-semibold text-text-primary">Solicitar acesso por código</p>
+          <div className="border-surface-2 bg-surface-0/60 mb-4 rounded-md border p-3">
+            <p className="text-text-primary mb-2 text-sm font-semibold">
+              Solicitar acesso por código
+            </p>
             <div className="flex flex-wrap items-center gap-2">
               <input
                 value={joinCode}
                 onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
                 placeholder="Ex.: AB12CD"
                 maxLength={12}
-                className="w-full rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0 sm:w-52"
+                className="border-surface-2 bg-text-primary text-surface-0 w-full rounded-sm border p-2 sm:w-52"
               />
               <AppButton
                 variant="secondary"
@@ -326,15 +341,19 @@ export default function DashboardPage() {
           </div>
 
           {pendingMyJoinRequests.length > 0 ? (
-            <div className="mb-4 rounded-md border border-surface-2 bg-surface-0/60 p-3">
+            <div className="border-surface-2 bg-surface-0/60 mb-4 rounded-md border p-3">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-text-primary">Minhas solicitações pendentes</p>
-                {isLoadingJoinRequests ? <span className="text-xs text-text-secondary">Atualizando...</span> : null}
+                <p className="text-text-primary text-sm font-semibold">
+                  Minhas solicitações pendentes
+                </p>
+                {isLoadingJoinRequests ? (
+                  <span className="text-text-secondary text-xs">Atualizando...</span>
+                ) : null}
               </div>
               <div className="space-y-2">
                 {pendingMyJoinRequests.slice(0, 6).map((request) => (
-                  <div key={request.id} className="rounded border border-surface-2 p-2 text-sm">
-                    <p className="font-semibold text-text-primary">{request.game.title}</p>
+                  <div key={request.id} className="border-surface-2 rounded border p-2 text-sm">
+                    <p className="text-text-primary font-semibold">{request.game.title}</p>
                     <p className="text-text-secondary">Status: {statusLabel(request.status)}</p>
                   </div>
                 ))}
@@ -343,13 +362,20 @@ export default function DashboardPage() {
           ) : null}
 
           {ownedPendingJoinRequests.length > 0 ? (
-            <div className="mb-4 rounded-md border border-surface-2 bg-surface-0/60 p-3">
-              <p className="mb-2 text-sm font-semibold text-text-primary">Solicitações pendentes para seus jogos</p>
+            <div className="border-surface-2 bg-surface-0/60 mb-4 rounded-md border p-3">
+              <p className="text-text-primary mb-2 text-sm font-semibold">
+                Solicitações pendentes para seus jogos
+              </p>
               <div className="space-y-2">
                 {ownedPendingJoinRequests.slice(0, 10).map((request) => (
-                  <div key={request.id} className="flex flex-wrap items-center justify-between gap-2 rounded border border-surface-2 p-2 text-sm">
+                  <div
+                    key={request.id}
+                    className="border-surface-2 flex flex-wrap items-center justify-between gap-2 rounded border p-2 text-sm"
+                  >
                     <div>
-                      <p className="font-semibold text-text-primary">{formatUserTag(request.requester.name, request.requester.id)}</p>
+                      <p className="text-text-primary font-semibold">
+                        {formatUserTag(request.requester.name, request.requester.id)}
+                      </p>
                       <p className="text-text-secondary">
                         quer entrar em {request.game.title} ({request.game.joinCode})
                       </p>
@@ -383,7 +409,7 @@ export default function DashboardPage() {
           ) : null}
 
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-2xl font-semibold text-text-primary">Jogos Ativos</h2>
+            <h2 className="text-text-primary text-2xl font-semibold">Jogos Ativos</h2>
             <div className="flex items-center gap-2">
               <AppButton
                 variant="secondary"
@@ -395,10 +421,7 @@ export default function DashboardPage() {
               >
                 Atualizar
               </AppButton>
-              <AppButton
-                variant="primary"
-                onClick={() => navigate('/games/new')}
-              >
+              <AppButton variant="primary" onClick={() => navigate('/games/new')}>
                 Criar novo jogo
               </AppButton>
             </div>
@@ -450,8 +473,9 @@ export default function DashboardPage() {
         hideFooter
       >
         <div className="space-y-4">
-          <p className="text-sm text-text-secondary">
-            Arraste a imagem e ajuste o zoom para definir um enquadramento mais horizontal para a capa da mesa.
+          <p className="text-text-secondary text-sm">
+            Arraste a imagem e ajuste o zoom para definir um enquadramento mais horizontal para a
+            capa da mesa.
           </p>
 
           {coverModalError ? (
@@ -460,7 +484,7 @@ export default function DashboardPage() {
             </StatusAlert>
           ) : null}
 
-          <div className="relative h-[360px] w-full overflow-hidden rounded-xl border border-surface-2 bg-surface-0">
+          <div className="border-surface-2 bg-surface-0 relative h-[360px] w-full overflow-hidden rounded-xl border">
             {coverCropImageSrc ? (
               <Cropper
                 image={coverCropImageSrc}
@@ -476,7 +500,12 @@ export default function DashboardPage() {
           </div>
 
           <div>
-            <label htmlFor="dashboard-cover-zoom" className="mb-1 block text-sm text-text-secondary">Zoom</label>
+            <label
+              htmlFor="dashboard-cover-zoom"
+              className="text-text-secondary mb-1 block text-sm"
+            >
+              Zoom
+            </label>
             <input
               id="dashboard-cover-zoom"
               type="range"
@@ -522,7 +551,7 @@ export default function DashboardPage() {
 
       <Modal
         isOpen={Boolean(gamePendingDeletion)}
-        overlayClassName="bg-red-950/30"
+        overlayClassName="overlay-danger"
         onClose={() => {
           if (isDeletingGame) return;
           setGamePendingDeletion(null);
@@ -533,9 +562,10 @@ export default function DashboardPage() {
         hideFooter
       >
         <div className="space-y-4">
-          <p className="text-sm text-text-secondary">
-            Esta ação é irreversível e apaga a mesa, personagens, tokens, chat e todo o estado vinculado ao jogo{' '}
-            <span className="font-semibold text-text-primary">{gamePendingDeletion?.title}</span>.
+          <p className="text-text-secondary text-sm">
+            Esta ação é irreversível e apaga a mesa, personagens, tokens, chat e todo o estado
+            vinculado ao jogo{' '}
+            <span className="text-text-primary font-semibold">{gamePendingDeletion?.title}</span>.
           </p>
 
           {deleteGameError ? (
@@ -545,7 +575,7 @@ export default function DashboardPage() {
           ) : null}
 
           <div>
-            <label htmlFor="delete-game-phrase" className="mb-1 block text-sm text-text-secondary">
+            <label htmlFor="delete-game-phrase" className="text-text-secondary mb-1 block text-sm">
               Digite exatamente: <span className="font-semibold">{DELETE_GAME_PHRASE}</span>
             </label>
             <input
@@ -554,7 +584,7 @@ export default function DashboardPage() {
               value={deleteGamePhrase}
               onChange={(event) => setDeleteGamePhrase(event.target.value)}
               aria-invalid={Boolean(deleteGameError)}
-              className="w-full rounded-sm border border-surface-2 bg-text-primary p-2 text-surface-0"
+              className="border-surface-2 bg-text-primary text-surface-0 w-full rounded-sm border p-2"
             />
           </div>
 

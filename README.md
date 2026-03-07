@@ -134,6 +134,7 @@ Os demais existem para suporte operacional e validacao especializada e nao devem
 - a mesma regra vale para tokens de mesa: criacao, remocao e reposicao de tokens devem nascer de snapshot, eventos realtime e comandos autoritativos, nunca de mutacao local paralela
 - operacoes estruturais de token no board (`copy`, `paste` e `delete`) permanecem centralizadas no mestre
 - a trilha de monstro segue o mesmo padrao data-driven: catalogo canonico em `DATAMODELING`, `MonsterCharacterState` autoritativo no backend e frontend apenas como projecao do catalogo + runtime; o fluxo operacional de spawn parte da `Biblioteca`, com drag do monstro para o grid
+- no frontend, `FRONTEND/src/app/styles/index.css` e a SSOT de cores (tema): qualquer cor de UI/renderer deve vir de token CSS definido ali, sem hex/rgb hardcoded paralelo
 
 ## Contribuicao
 

@@ -7,7 +7,6 @@ import { ProcessedEffect } from '../../types/effectTypes';
 
 import { Badge } from './Badge';
 
-
 interface ProficiencyControlsProps {
   effect: ProcessedEffect & {
     proficiencyType?: string;
@@ -31,7 +30,7 @@ export function ProficiencyControls({ effect }: ProficiencyControlsProps) {
         <Badge className={cn(proficiencyTagVariants({ state: 'granted' }))}>
           Proficiência em Iniciativa
         </Badge>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="text-text-secondary mt-1 text-sm">
           Você recebe proficiência em testes de iniciativa.
         </p>
       </div>
@@ -50,7 +49,7 @@ export function ProficiencyControls({ effect }: ProficiencyControlsProps) {
             </Badge>
           ))}
         </div>
-        <p className="mt-2 text-xs text-gray-600">
+        <p className="text-text-secondary mt-2 text-xs">
           Estas proficiências são aplicadas automaticamente ao seu personagem.
         </p>
       </div>
@@ -71,11 +70,11 @@ export function ProficiencyControls({ effect }: ProficiencyControlsProps) {
         <div className="mb-2 text-sm font-medium">
           Escolha {maxSelections} proficiência{maxSelections > 1 ? 's' : ''}:
           {remainingSelections > 0 ? (
-            <span className="ml-2 text-blue-600">
+            <span className="text-info ml-2">
               ({remainingSelections} restante{remainingSelections > 1 ? 's' : ''})
             </span>
           ) : (
-            <span className="ml-2 text-green-600">(Todas selecionadas)</span>
+            <span className="text-feedback-positive ml-2">(Todas selecionadas)</span>
           )}
         </div>
 

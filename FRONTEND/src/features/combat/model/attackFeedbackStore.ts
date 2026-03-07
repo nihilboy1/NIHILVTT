@@ -22,7 +22,7 @@ interface AttackFeedbackStoreState {
   clearAllFeedback: () => void;
 }
 
-const FEEDBACK_DURATION_MS = 1600;
+const FEEDBACK_DURATION_MS = 1040;
 const feedbackTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function clearTimer(tokenId: string): void {
