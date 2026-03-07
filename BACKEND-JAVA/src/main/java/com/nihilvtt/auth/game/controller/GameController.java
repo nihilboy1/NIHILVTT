@@ -285,7 +285,8 @@ public class GameController {
             request.attackId(),
             request.attackName(),
             request.attackBonus(),
-            request.damageFormula()
+            request.damageFormula(),
+            request.attackDamageType()
         ));
   }
 

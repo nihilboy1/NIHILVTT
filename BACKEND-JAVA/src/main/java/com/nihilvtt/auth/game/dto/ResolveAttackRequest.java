@@ -21,5 +21,8 @@ public record ResolveAttackRequest(
     Integer attackBonus,
     @NotBlank(message = "Fórmula de dano é obrigatória.")
     @Size(max = 80, message = "Fórmula de dano inválida.")
-    String damageFormula
+    String damageFormula,
+    @NotBlank(message = "Tipo de dano é obrigatório.")
+    @Size(max = 40, message = "Tipo de dano inválido.")
+    String attackDamageType
 ) {}

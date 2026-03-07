@@ -2,6 +2,7 @@ import React from 'react';
 
 import { parseCharacterSize } from '@/entities/character/lib/utils/characterUtils';
 import { type Character } from '@/entities/character/model/schemas/character.schema';
+import type { SessionCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 import { useUIStore } from '@/features/layoutControls/model/store';
 import {
   GridSettings,
@@ -48,6 +49,7 @@ interface GameBoardContentProps {
   onBoardPointerMove: (worldPoint: Point) => void;
   onBoardPointerLeave: () => void;
   characters: Character[];
+  runtimeCharactersById: Record<string, SessionCharacterRuntime>;
   tokensOnBoard: Token[];
   gridSettings: GridSettings;
   pageSettings: PageSettings;
@@ -81,6 +83,7 @@ export function GameBoardContent({
   onBoardPointerMove,
   onBoardPointerLeave,
   characters,
+  runtimeCharactersById,
   tokensOnBoard,
   gridSettings,
   pageSettings,
@@ -131,9 +134,11 @@ export function GameBoardContent({
           const attackerCharacter = characters.find(
             (character) => character.id === pendingAttackToken.characterId,
           );
-          const [attackerWidth, attackerHeight] = attackerCharacter
+          const [attackerWidthRaw, attackerHeightRaw] = attackerCharacter
             ? parseCharacterSize(attackerCharacter.size)
             : [1, 1];
+          const attackerWidth = Math.max(1, Math.ceil(attackerWidthRaw));
+          const attackerHeight = Math.max(1, Math.ceil(attackerHeightRaw));
 
           const rangeSquares = Math.floor(
             (pendingAttack.attack.rangeMeters + Number.EPSILON) / gridSettings.metersPerSquare,
@@ -201,6 +206,7 @@ export function GameBoardContent({
         pageSettings={pageSettings}
         tokensOnBoard={tokensOnBoard}
         characters={characters}
+        runtimeCharactersById={runtimeCharactersById}
         multiSelectedTokenIds={multiSelectedTokenIds}
         copiedTokenId={copiedTokenId}
         pasteTargetCell={pasteTargetCell}

@@ -1,8 +1,14 @@
 import { create } from 'zustand';
 
+import type { CombatDamageType } from '@/shared/api/types';
+
 export interface AttackFeedbackEntry {
   id: string;
   tokenId: string;
+  attackerTokenId?: string;
+  attackName?: string;
+  attackDamageType: CombatDamageType;
+  triggeredAtMs?: number;
   hit: boolean;
   attackTotal: number;
   targetArmorClass: number;
@@ -32,29 +38,34 @@ export const useAttackFeedbackStore = create<AttackFeedbackStoreState>((set) => 
   feedbackByTokenId: {},
 
   pushFeedback: (entry) => {
-    clearTimer(entry.tokenId);
+    const normalizedEntry: AttackFeedbackEntry = {
+      ...entry,
+      triggeredAtMs: entry.triggeredAtMs ?? Date.now(),
+    };
+
+    clearTimer(normalizedEntry.tokenId);
 
     set((state) => ({
       feedbackByTokenId: {
         ...state.feedbackByTokenId,
-        [entry.tokenId]: entry,
+        [normalizedEntry.tokenId]: normalizedEntry,
       },
     }));
 
     const timer = setTimeout(() => {
       set((state) => {
-        if (!state.feedbackByTokenId[entry.tokenId]) {
+        if (!state.feedbackByTokenId[normalizedEntry.tokenId]) {
           return state;
         }
 
         const next = { ...state.feedbackByTokenId };
-        delete next[entry.tokenId];
+        delete next[normalizedEntry.tokenId];
         return { feedbackByTokenId: next };
       });
-      feedbackTimers.delete(entry.tokenId);
+      feedbackTimers.delete(normalizedEntry.tokenId);
     }, FEEDBACK_DURATION_MS);
 
-    feedbackTimers.set(entry.tokenId, timer);
+    feedbackTimers.set(normalizedEntry.tokenId, timer);
   },
 
   clearFeedbackForToken: (tokenId) => {

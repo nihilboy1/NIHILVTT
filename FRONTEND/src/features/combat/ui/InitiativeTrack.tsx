@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 
-
 import { useCharactersStore } from '@/entities/character/model/store';
 import { useTokenStore } from '@/entities/token/model/store/tokenStore';
 import { useAuthStore } from '@/features/auth/model/authStore';
@@ -48,10 +47,31 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
   const combatState = useCombatStore((state) => state.combatState);
   const tokensOnBoard = useTokenStore((state) => state.tokensOnBoard);
   const characters = useCharactersStore((state) => state.characters);
+  const runtimeCharactersById = useCharactersStore((state) => state.runtimeCharactersById);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isOwner = currentGame?.owner.id === currentUser?.id;
   const gameId = currentGame?.id ?? null;
+
+  const aliveSelectedTokenIds = useMemo(() => {
+    const uniqueSelectedTokenIds = Array.from(new Set(selectedTokenIds));
+    return uniqueSelectedTokenIds.filter((tokenId) => {
+      const token = tokensOnBoard.find((entry) => entry.id === tokenId);
+      if (!token) {
+        return false;
+      }
+
+      const runtimeCharacter = runtimeCharactersById[token.characterId];
+      if (!runtimeCharacter) {
+        return true;
+      }
+
+      const hasDeadCondition = runtimeCharacter.activeEffects.effects.some(
+        (effect) => effect.linkedCondition === 'dead',
+      );
+      return !hasDeadCondition;
+    });
+  }, [runtimeCharactersById, selectedTokenIds, tokensOnBoard]);
 
   const participantLabels = useMemo(() => {
     if (!combatState) {
@@ -65,7 +85,8 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
     }));
   }, [characters, combatState, tokensOnBoard]);
 
-  const canStartCombat = isOwner && !combatState && selectedTokenIds.length >= 2 && gameId != null;
+  const canStartCombat =
+    isOwner && !combatState && aliveSelectedTokenIds.length >= 2 && gameId != null;
   const canControlCombat = isOwner && combatState && gameId != null;
 
   const handleStartCombat = async () => {
@@ -75,7 +96,7 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
 
     setIsSubmitting(true);
     try {
-      const event = await sendGameStartCombat(gameId, selectedTokenIds);
+      const event = await sendGameStartCombat(gameId, aliveSelectedTokenIds);
       applyGameSessionEvent(event);
     } catch {
       console.warn('Falha ao iniciar combate.');
@@ -122,7 +143,7 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
 
   return (
     <DraggablePanel
-      className="pointer-events-auto z-40 flex w-[min(30rem,calc(100vw-2rem))] flex-col gap-3 rounded-xl border border-surface-2 bg-surface-1/95 p-3 shadow-lg backdrop-blur-sm"
+      className="border-surface-2 bg-surface-1/95 pointer-events-auto z-40 flex w-[min(30rem,calc(100vw-2rem))] flex-col gap-3 rounded-xl border p-3 shadow-lg backdrop-blur-sm"
       initialPosition={{ x: isToolbarVisible ? 80 : 16, y: 16 }}
       safeArea={{
         left: isToolbarVisible ? 80 : 16,
@@ -134,9 +155,13 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
       <FloatingPanelDragBar title={combatState ? 'Combate ativo' : 'Combate'} />
       {!combatState ? (
         <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0 flex flex-1 flex-col rounded-lg px-1 py-0.5 text-text-secondary/80">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-text-secondary">Combate</p>
-            <p className="text-sm text-text-primary">{selectedTokenIds.length} tokens selecionados</p>
+          <div className="text-text-secondary/80 flex min-w-0 flex-1 flex-col rounded-lg px-1 py-0.5">
+            <p className="text-text-secondary text-xs font-semibold tracking-[0.2em] uppercase">
+              Combate
+            </p>
+            <p className="text-text-primary text-sm">
+              {aliveSelectedTokenIds.length} tokens vivos selecionados
+            </p>
           </div>
           <AppButton disabled={isSubmitting} onClick={() => void handleStartCombat()}>
             Iniciar combate
@@ -145,15 +170,19 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
       ) : (
         <>
           <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0 flex flex-1 flex-col rounded-lg px-1 py-0.5 text-text-secondary/80">
-              <p className="text-sm font-semibold text-text-primary">Rodada {combatState.round}</p>
+            <div className="text-text-secondary/80 flex min-w-0 flex-1 flex-col rounded-lg px-1 py-0.5">
+              <p className="text-text-primary text-sm font-semibold">Rodada {combatState.round}</p>
             </div>
             {canControlCombat ? (
               <div className="flex items-center gap-2">
                 <AppButton disabled={isSubmitting} onClick={() => void handleAdvanceTurn()}>
                   Próximo turno
                 </AppButton>
-                <AppButton disabled={isSubmitting} variant="danger" onClick={() => void handleEndCombat()}>
+                <AppButton
+                  disabled={isSubmitting}
+                  variant="danger"
+                  onClick={() => void handleEndCombat()}
+                >
                   Encerrar
                 </AppButton>
               </div>
@@ -175,23 +204,24 @@ export function InitiativeTrack({ selectedTokenIds }: InitiativeTrackProps) {
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-3 gap-2 rounded-lg border border-surface-2 bg-surface-0/80 p-2 text-xs text-text-secondary">
-            <div className="rounded-md bg-surface-1 px-2 py-1">
-              <span className="block text-[0.65rem] uppercase tracking-[0.14em]">Ação</span>
-              <span className="font-semibold text-text-primary">
+          <div className="border-surface-2 bg-surface-0/80 text-text-secondary grid grid-cols-3 gap-2 rounded-lg border p-2 text-xs">
+            <div className="bg-surface-1 rounded-md px-2 py-1">
+              <span className="block text-[0.65rem] tracking-[0.14em] uppercase">Ação</span>
+              <span className="text-text-primary font-semibold">
                 {combatState.turnResources.actionAvailable ? 'Disponível' : 'Gasta'}
               </span>
             </div>
-            <div className="rounded-md bg-surface-1 px-2 py-1">
-              <span className="block text-[0.65rem] uppercase tracking-[0.14em]">Ação bônus</span>
-              <span className="font-semibold text-text-primary">
+            <div className="bg-surface-1 rounded-md px-2 py-1">
+              <span className="block text-[0.65rem] tracking-[0.14em] uppercase">Ação bônus</span>
+              <span className="text-text-primary font-semibold">
                 {combatState.turnResources.bonusActionAvailable ? 'Disponível' : 'Gasta'}
               </span>
             </div>
-            <div className="rounded-md bg-surface-1 px-2 py-1">
-              <span className="block text-[0.65rem] uppercase tracking-[0.14em]">Movimento</span>
-              <span className="font-semibold text-text-primary">
-                {combatState.turnResources.remainingMovementCells}/{combatState.turnResources.totalMovementCells}
+            <div className="bg-surface-1 rounded-md px-2 py-1">
+              <span className="block text-[0.65rem] tracking-[0.14em] uppercase">Movimento</span>
+              <span className="text-text-primary font-semibold">
+                {combatState.turnResources.remainingMovementCells}/
+                {combatState.turnResources.totalMovementCells}
               </span>
             </div>
           </div>

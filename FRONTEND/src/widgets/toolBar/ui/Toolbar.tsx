@@ -35,7 +35,7 @@ export function Toolbar() {
       <ToolbarButton
         label="Mover Mapa"
         icon={<PanIcon className="h-6 w-6" />}
-        variant={activeTool === Tool.PAN ? "active" : "default"}
+        variant={activeTool === Tool.PAN ? 'active' : 'default'}
         onClick={() => {
           setActiveTool(Tool.PAN);
           setActivePopover(null);
@@ -44,7 +44,8 @@ export function Toolbar() {
       <ToolbarButton
         label="Ferramenta de Seleção"
         icon={<SelectIcon className="h-6 w-6" />}
-        variant={activeTool === Tool.SELECT ? "active" : "default"}
+        variant={activeTool === Tool.SELECT ? 'active' : 'default'}
+        activeClassName="bg-surface-2 text-text-primary hover:bg-surface-2"
         onClick={() => {
           setActiveTool(Tool.SELECT);
           setActivePopover(null);

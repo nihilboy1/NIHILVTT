@@ -48,6 +48,7 @@ Hoje o projeto ja cobre autenticacao, dashboard, criacao e gerenciamento de mesa
 
 - `pnpm dev:front`
 - `pnpm dev:back`
+- `pnpm check:monster-manifest-sync`
 - `pnpm test:front`
 - `pnpm test:e2e:front`
 - `pnpm test:front:all`

@@ -1,5 +1,6 @@
 // Exportações dos arquivos union
 export * from "./classes/classes-union.js";
+export * from "./combat/unarmed-attack.js";
 export * from "./feats/feats-union.js";
 export * from "./items/items-union.js";
 export * from "./monsters/monsters-union.js";

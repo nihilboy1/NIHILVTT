@@ -1,20 +1,20 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import { ATTRIBUTES_CONFIG } from "@/entities/character/constants";
-import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
-import { PlayerCharacter } from "@/entities/character/model/schemas/character.schema";
-import { isPlayerCharacterRuntime } from "@/entities/character/model/schemas/playerCharacterRuntime.schema";
-import { useCharactersStore } from "@/entities/character/model/store";
-import { buildPlayerCharacterSkillsViewModel } from "@/entities/character/model/view-models/playerCharacterSkillsViewModel";
-import { DiceFormula, RollCategory } from "@/shared/api/types";
+import { ATTRIBUTES_CONFIG } from '@/entities/character/constants';
+import { usePlayerCharacter } from '@/entities/character/lib/hooks/usePlayerCharacter';
+import { PlayerCharacter } from '@/entities/character/model/schemas/character.schema';
+import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
+import { useCharactersStore } from '@/entities/character/model/store';
+import { buildPlayerCharacterSkillsViewModel } from '@/entities/character/model/view-models/playerCharacterSkillsViewModel';
+import { DiceFormula, RollCategory } from '@/shared/api/types';
 
-import { AttributeBlock } from "./AttributeBlock";
-import { SkillProficiencyItem } from "./SkillProficiencyItem";
+import { AttributeBlock } from './AttributeBlock';
+import { SkillProficiencyItem } from './SkillProficiencyItem';
 
 type AttributeName = keyof typeof ATTRIBUTES_CONFIG;
 
-type DefaultAttributes = PlayerCharacter["attributes"];
-type DefaultProficiencies = PlayerCharacter["proficiencies"];
+type DefaultAttributes = PlayerCharacter['attributes'];
+type DefaultProficiencies = PlayerCharacter['proficiencies'];
 
 const DEFAULT_ATTRIBUTES: DefaultAttributes = {
   strength: 10,
@@ -27,32 +27,32 @@ const DEFAULT_ATTRIBUTES: DefaultAttributes = {
 
 const DEFAULT_PROFICIENCIES: DefaultProficiencies = {
   savingThrows: {
-    strength: "none",
-    dexterity: "none",
-    constitution: "none",
-    intelligence: "none",
-    wisdom: "none",
-    charisma: "none",
+    strength: 'none',
+    dexterity: 'none',
+    constitution: 'none',
+    intelligence: 'none',
+    wisdom: 'none',
+    charisma: 'none',
   },
   skills: {
-    acrobatics: "none",
-    animalHandling: "none",
-    arcana: "none",
-    athletics: "none",
-    deception: "none",
-    history: "none",
-    insight: "none",
-    intimidation: "none",
-    investigation: "none",
-    medicine: "none",
-    nature: "none",
-    perception: "none",
-    performance: "none",
-    persuasion: "none",
-    religion: "none",
-    sleightOfHand: "none",
-    stealth: "none",
-    survival: "none",
+    acrobatics: 'none',
+    animalHandling: 'none',
+    arcana: 'none',
+    athletics: 'none',
+    deception: 'none',
+    history: 'none',
+    insight: 'none',
+    intimidation: 'none',
+    investigation: 'none',
+    medicine: 'none',
+    nature: 'none',
+    perception: 'none',
+    performance: 'none',
+    persuasion: 'none',
+    religion: 'none',
+    sleightOfHand: 'none',
+    stealth: 'none',
+    survival: 'none',
   },
 };
 
@@ -63,7 +63,7 @@ interface AttributesAndSkillsListProps {
     formula: DiceFormula,
     rollName: string,
     category: RollCategory,
-    characterName: string
+    characterName: string,
   ) => void;
 }
 
@@ -74,13 +74,16 @@ export function AttributesAndSkillsList({
 }: AttributesAndSkillsListProps) {
   const character = usePlayerCharacter(characterId);
   const runtimeCharacter = useCharactersStore(
-    (state) => state.runtimeCharactersById[characterId] ?? null
+    (state) => state.runtimeCharactersById[characterId] ?? null,
   );
-  const playerRuntimeCharacter = isPlayerCharacterRuntime(runtimeCharacter) ? runtimeCharacter : null;
+  const playerRuntimeCharacter = isPlayerCharacterRuntime(runtimeCharacter)
+    ? runtimeCharacter
+    : null;
 
-  const characterName = playerRuntimeCharacter?.name ?? character?.name ?? "";
+  const characterName = playerRuntimeCharacter?.name ?? character?.name ?? '';
   const level = playerRuntimeCharacter?.progression.currentLevel ?? character?.level ?? 1;
-  const attributes = playerRuntimeCharacter?.attributes.base ?? character?.attributes ?? DEFAULT_ATTRIBUTES;
+  const attributes =
+    playerRuntimeCharacter?.attributes.base ?? character?.attributes ?? DEFAULT_ATTRIBUTES;
   const proficiencies = character?.proficiencies ?? DEFAULT_PROFICIENCIES;
 
   const skillsViewModel = useMemo(
@@ -90,20 +93,16 @@ export function AttributesAndSkillsList({
         attributes,
         proficiencies,
       }),
-    [level, attributes, proficiencies]
+    [level, attributes, proficiencies],
   );
 
-  const handleSkillRoll = (
-    formula: DiceFormula,
-    rollName: string,
-    category: RollCategory
-  ) => {
+  const handleSkillRoll = (formula: DiceFormula, rollName: string, category: RollCategory) => {
     onRollDice(formula, rollName, category, characterName);
   };
 
   return (
     <div className={`grid grid-cols-1 gap-2 md:grid-cols-3 ${className}`}>
-      <div className="md:col-span-3 rounded-lg bg-surface-0/22 px-3 py-1.5 text-[0.66rem] font-medium tracking-[0.04em] text-text-secondary">
+      <div className="bg-surface-0/22 text-text-secondary rounded-lg px-3 py-1.5 text-[0.66rem] font-medium tracking-[0.04em] md:col-span-3">
         Atributos e proficiências são definidos pela construção, progressão e efeitos ativos.
       </div>
       {(Object.keys(ATTRIBUTES_CONFIG) as AttributeName[]).map((attrName) => {
@@ -113,15 +112,15 @@ export function AttributesAndSkillsList({
 
         const handleAttributeRoll = () => {
           const formula: DiceFormula = `1d20${
-            attributeModifier >= 0 ? "+" : ""
+            attributeModifier >= 0 ? '+' : ''
           }${attributeModifier}`;
-          onRollDice(formula, label, "Attribute", characterName);
+          onRollDice(formula, label, 'Attribute', characterName);
         };
 
         return (
           <div
             key={attrName}
-            className="flex w-full flex-col gap-1.5 rounded-xl bg-surface-1/55 px-2 py-2"
+            className="bg-surface-1/55 flex w-full flex-col gap-1.5 rounded-xl px-2 py-2"
             aria-label="bloco de atributo externo"
           >
             <AttributeBlock
@@ -135,6 +134,7 @@ export function AttributesAndSkillsList({
               <SkillProficiencyItem
                 key={`${attrName}-save`}
                 skillLabel={`Salva-guarda de ${label}`}
+                rollName={label}
                 isSavingThrow
                 proficiencyLevel={skillsViewModel.savingThrowBonuses[attrName].proficiencyLevel}
                 totalBonus={skillsViewModel.savingThrowBonuses[attrName].totalBonus}

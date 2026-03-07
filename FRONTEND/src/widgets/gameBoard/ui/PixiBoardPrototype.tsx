@@ -6,7 +6,9 @@ import { Container as PixiContainer, Graphics as PixiGraphics, TextStyle, Textur
 import { calculateDistanceInMeters } from '@/entities/board/model/utils/boardUtils';
 import { parseCharacterSize } from '@/entities/character/lib/utils/characterUtils';
 import { type Character } from '@/entities/character/model/schemas/character.schema';
+import type { SessionCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 import { useAttackFeedbackStore } from '@/features/combat/model/attackFeedbackStore';
+import { isBludgeoningDamageType } from '@/features/combat/model/damageTypeRules';
 import {
   GridSettings,
   MarqueeSelectionState,
@@ -15,7 +17,8 @@ import {
   RulerPathState,
   Token,
 } from '@/shared/api/types';
-import crossCombatIcon from '@/shared/assets/crosscombat.svg';
+import nextTurnIcon from '@/shared/assets/next.png';
+import skullDeadIcon from '@/shared/assets/skulldead.png';
 
 import { createPixiWorldTransform } from '../model/renderer';
 
@@ -25,6 +28,7 @@ type PixiBoardPrototypeProps = {
   pageSettings: PageSettings;
   tokensOnBoard: Token[];
   characters: Character[];
+  runtimeCharactersById: Record<string, SessionCharacterRuntime>;
   multiSelectedTokenIds: string[];
   copiedTokenId: string | null;
   pasteTargetCell: Point | null;
@@ -48,7 +52,9 @@ type PixiBoardPrototypeProps = {
 type PixiThemeColors = {
   accentPrimary: number;
   accentSecondary: number;
+  selectionNeutral: number;
   feedbackPositive: number;
+  hpBarFill: number;
   feedbackNegative: number;
   textPrimary: number;
   textSecondary: number;
@@ -64,8 +70,10 @@ type PixiThemeColors = {
 const DEFAULT_PIXI_THEME: PixiThemeColors = {
   accentPrimary: 0x8b5cf6,
   accentSecondary: 0xc4b5fd,
+  selectionNeutral: 0xa9a9a9,
   feedbackPositive: 0x22c55e,
-  feedbackNegative: 0xef4444,
+  hpBarFill: 0x6fa68b,
+  feedbackNegative: 0x942222,
   textPrimary: 0xffffff,
   textSecondary: 0xa9a9a9,
   surface0: 0x0b0b0d,
@@ -76,6 +84,177 @@ const DEFAULT_PIXI_THEME: PixiThemeColors = {
   info: 0x60a5fa,
   shadow: 0x020617,
 };
+
+const HP_TICK_COLOR = 0x111111;
+const DEAD_SKULL_ALPHA = 0.58;
+const NEXT_ICON_SOURCE_SIZE = 1024;
+const TOKEN_MELEE_ANIMATION_DURATION_MS = 420;
+const CURRENT_TURN_MARKER_EXTRA_DELAY_MS = 1000;
+const CLUB_IMPACT_EFFECT_DELAY_MS = 170;
+const CLUB_IMPACT_EFFECT_DURATION_MS = 250;
+
+let cachedImpactAudioContext: AudioContext | null = null;
+
+function getImpactAudioContext(): AudioContext | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const audioWindow = window as Window & { webkitAudioContext?: typeof AudioContext };
+  const Ctx = window.AudioContext ?? audioWindow.webkitAudioContext;
+  if (!Ctx) {
+    return null;
+  }
+
+  if (!cachedImpactAudioContext || cachedImpactAudioContext.state === 'closed') {
+    cachedImpactAudioContext = new Ctx();
+  }
+
+  return cachedImpactAudioContext;
+}
+
+function playClubImpactSound(): void {
+  const ctx = getImpactAudioContext();
+  if (!ctx) {
+    return;
+  }
+
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(180, now);
+  osc.frequency.exponentialRampToValueAtTime(78, now + 0.11);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.18, now + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.18);
+}
+
+function resolveHpTickProfile(maxHp: number): { minorStep: number; majorStep: number } {
+  if (maxHp <= 10) {
+    return { minorStep: 1, majorStep: 5 };
+  }
+  if (maxHp <= 50) {
+    return { minorStep: 5, majorStep: 10 };
+  }
+  if (maxHp <= 100) {
+    return { minorStep: 10, majorStep: 25 };
+  }
+  if (maxHp <= 250) {
+    return { minorStep: 25, majorStep: 50 };
+  }
+  if (maxHp <= 500) {
+    return { minorStep: 50, majorStep: 100 };
+  }
+
+  return { minorStep: 100, majorStep: 250 };
+}
+
+function drawHpBarWithTicks({
+  graphics,
+  y,
+  width,
+  height,
+  currentValue,
+  maxValue,
+  cameraScaleY,
+  backgroundColor,
+  fillColor,
+  borderColor,
+  borderAlpha,
+  tickColor,
+}: {
+  graphics: PixiGraphics;
+  y: number;
+  width: number;
+  height: number;
+  currentValue: number;
+  maxValue: number;
+  cameraScaleY: number;
+  backgroundColor: number;
+  fillColor: number;
+  borderColor: number;
+  borderAlpha: number;
+  tickColor: number;
+}): void {
+  const safeMaxValue = Math.max(1, maxValue);
+  const safeCurrentValue = Math.max(0, Math.min(currentValue, safeMaxValue));
+  const fillRatio = safeCurrentValue / safeMaxValue;
+  const fillWidth = width * fillRatio;
+
+  graphics.lineStyle({
+    width: Math.max(0.75 / cameraScaleY, 0.2),
+    color: borderColor,
+    alpha: borderAlpha,
+  });
+  graphics.beginFill(backgroundColor, 0.9);
+  graphics.drawRect(0, y, width, height);
+  graphics.endFill();
+
+  if (fillWidth > 0) {
+    graphics.beginFill(fillColor, 0.95);
+    graphics.drawRect(0, y, fillWidth, height);
+    graphics.endFill();
+  }
+
+  const { minorStep, majorStep } = resolveHpTickProfile(safeMaxValue);
+  const minorTickWidth = Math.max(0.85 / cameraScaleY, 0.24);
+  const majorTickWidth = Math.max(1.45 / cameraScaleY, 0.34);
+  const hpUnitWidth = width / safeMaxValue;
+
+  for (let hpIndex = minorStep; hpIndex < safeMaxValue; hpIndex += minorStep) {
+    const tickX = hpUnitWidth * hpIndex;
+    const isMajorTick = hpIndex % majorStep === 0;
+    const tickHeight = isMajorTick ? height : height * 0.76;
+    const tickWidth = isMajorTick ? majorTickWidth : minorTickWidth;
+    const tickAlpha = isMajorTick ? 0.95 : 0.68;
+    const tickY = y + (height - tickHeight) / 2;
+
+    graphics.lineStyle({
+      width: tickWidth,
+      color: tickColor,
+      alpha: tickAlpha,
+    });
+    graphics.moveTo(tickX, tickY);
+    graphics.lineTo(tickX, tickY + tickHeight);
+  }
+}
+
+function hasDeadConditionFromEffects(
+  effects: Array<{ linkedCondition?: string | null } | null> | undefined,
+): boolean {
+  if (!Array.isArray(effects)) {
+    return false;
+  }
+
+  return effects.some((effect) => effect?.linkedCondition === 'dead');
+}
+
+function characterHasDeadCondition(
+  character: Character,
+  runtimeCharacter: SessionCharacterRuntime | null,
+): boolean {
+  const runtimeEffects = runtimeCharacter?.activeEffects.effects;
+  if (hasDeadConditionFromEffects(runtimeEffects)) {
+    return true;
+  }
+
+  const legacyEffects = (
+    character as Character & {
+      activeEffects?: { effects?: Array<{ linkedCondition?: string | null } | null> };
+    }
+  ).activeEffects?.effects;
+
+  return hasDeadConditionFromEffects(legacyEffects);
+}
 
 function parseCssColorToPixi(cssColor: string, fallback: number): number {
   const value = cssColor.trim();
@@ -133,7 +312,9 @@ function usePixiThemeColors(): PixiThemeColors {
     return {
       accentPrimary: read('--color-accent-primary', DEFAULT_PIXI_THEME.accentPrimary),
       accentSecondary: read('--color-accent-secondary', DEFAULT_PIXI_THEME.accentSecondary),
+      selectionNeutral: read('--color-text-secondary', DEFAULT_PIXI_THEME.selectionNeutral),
       feedbackPositive: read('--color-feedback-positive', DEFAULT_PIXI_THEME.feedbackPositive),
+      hpBarFill: read('--color-hp-bar-fill', DEFAULT_PIXI_THEME.hpBarFill),
       feedbackNegative: read('--color-feedback-negative', DEFAULT_PIXI_THEME.feedbackNegative),
       textPrimary: read('--color-text-primary', DEFAULT_PIXI_THEME.textPrimary),
       textSecondary: read('--color-text-secondary', DEFAULT_PIXI_THEME.textSecondary),
@@ -243,6 +424,11 @@ function drawDottedLine(
 function TokenTurnIndicator({
   tokenWidth,
   tokenHeight,
+  markerX,
+  markerY,
+  markerWidth,
+  markerHeight,
+  currentMarkerHiddenUntilMs,
   cameraScaleY,
   isCurrent,
   isNext,
@@ -250,40 +436,60 @@ function TokenTurnIndicator({
 }: {
   tokenWidth: number;
   tokenHeight: number;
+  markerX: number;
+  markerY: number;
+  markerWidth: number;
+  markerHeight: number;
+  currentMarkerHiddenUntilMs?: number;
   cameraScaleY: number;
   isCurrent: boolean;
   isNext: boolean;
   theme: PixiThemeColors;
 }) {
-  const currentDottedRef = useRef<PixiContainer | null>(null);
+  const currentPulseRef = useRef<PixiContainer | null>(null);
+  const currentPulsePhaseRef = useRef(0);
+  const nextPulseRef = useRef<PixiContainer | null>(null);
+  const nextPulsePhaseRef = useRef(0);
   const minTokenSize = Math.min(tokenWidth, tokenHeight);
   const tokenScreenSize = minTokenSize * cameraScaleY;
   const centerX = tokenWidth / 2;
   const centerY = tokenHeight / 2;
-  const currentOrbitRadius = minTokenSize / 2 + Math.max(minTokenSize * 0.12, 1.1);
-  const dottedStrokeWidth = Math.max(minTokenSize * 0.03, 0.75);
-  const dotDashLength = Math.max(minTokenSize * 0.13, 1.7);
-  const dotGapLength = Math.max(minTokenSize * 0.16, 2.1);
-  const showNextLabel = tokenScreenSize >= 18;
-  const nextLabelFontSize = Math.max(8, Math.min(11, minTokenSize * 0.18));
-  const nextLabelStroke = Math.max(1.1, minTokenSize * 0.022);
-  const nextLabelStyle = useMemo(
-    () =>
-      new TextStyle({
-        fontFamily: 'Work Sans, sans-serif',
-        fontSize: nextLabelFontSize,
-        fontWeight: '700',
-        fill: theme.textPrimary,
-        stroke: theme.surface0,
-        strokeThickness: nextLabelStroke,
-        lineJoin: 'round',
-      }),
-    [nextLabelFontSize, nextLabelStroke, theme.surface0, theme.textPrimary],
+  const markerMinSide = Math.max(1, Math.min(markerWidth, markerHeight));
+  const markerCenterX = markerX + markerWidth / 2;
+  const markerCenterY = markerY + markerHeight / 2;
+  const markerStrokeWidth = Math.max(2.2 / cameraScaleY, markerMinSide * 0.05, 0.9);
+  const markerShadowStrokeWidth = markerStrokeWidth + Math.max(1.1 / cameraScaleY, 0.35);
+  const markerCornerLength = Math.min(
+    markerMinSide * 0.42,
+    Math.max(markerMinSide * 0.2, 8 / cameraScaleY, 2.8),
   );
+  const showNextIcon = tokenScreenSize >= 18;
+  const nextIconSize = Math.max(14, Math.min(70, minTokenSize * 0.624));
+  const nextIconScale = nextIconSize / NEXT_ICON_SOURCE_SIZE;
 
   useTick((delta) => {
-    if (isCurrent && currentDottedRef.current) {
-      currentDottedRef.current.rotation += 0.0042 * delta;
+    if (isCurrent && currentPulseRef.current) {
+      if (
+        typeof currentMarkerHiddenUntilMs === 'number' &&
+        Date.now() < currentMarkerHiddenUntilMs
+      ) {
+        currentPulseRef.current.alpha = 0;
+        currentPulseRef.current.scale.set(1);
+      } else {
+        currentPulsePhaseRef.current += 0.055 * delta;
+        const pulse = (Math.sin(currentPulsePhaseRef.current) + 1) / 2;
+        const scale = 1 + pulse * 0.065;
+        currentPulseRef.current.scale.set(scale);
+        currentPulseRef.current.alpha = 0.76 + pulse * 0.22;
+      }
+    }
+
+    if (isNext && nextPulseRef.current) {
+      nextPulsePhaseRef.current += 0.045 * delta;
+      const pulse = (Math.sin(nextPulsePhaseRef.current) + 1) / 2;
+      const scale = 1 + pulse * 0.06;
+      nextPulseRef.current.scale.set(scale);
+      nextPulseRef.current.alpha = 0.7 + pulse * 0.14;
     }
   });
 
@@ -294,49 +500,72 @@ function TokenTurnIndicator({
   return (
     <Container>
       {isCurrent ? (
-        <Container x={centerX} y={centerY}>
-          <Container ref={currentDottedRef}>
-            <Graphics
-              draw={(graphics) => {
-                graphics.clear();
-                graphics.lineStyle({
-                  width: dottedStrokeWidth,
-                  color: theme.accentSecondary,
-                  alpha: 0.84,
-                });
-                const circumference = 2 * Math.PI * currentOrbitRadius;
-                const stepLength = Math.max(0.0001, dotDashLength + dotGapLength);
-                const segmentCount = Math.max(10, Math.floor(circumference / stepLength));
-                const angleStep = (Math.PI * 2) / segmentCount;
-                const dashRatio = dotDashLength / (dotDashLength + dotGapLength);
-                const dashAngle = angleStep * Math.min(0.92, Math.max(0.12, dashRatio));
+        <Container ref={currentPulseRef} x={markerCenterX} y={markerCenterY}>
+          <Graphics
+            draw={(graphics) => {
+              graphics.clear();
+              const left = -markerWidth / 2;
+              const top = -markerHeight / 2;
+              const right = markerWidth / 2;
+              const bottom = markerHeight / 2;
+              const len = markerCornerLength;
 
-                for (let i = 0; i < segmentCount; i += 1) {
-                  const start = i * angleStep;
-                  const end = start + dashAngle;
-                  graphics.moveTo(
-                    Math.cos(start) * currentOrbitRadius,
-                    Math.sin(start) * currentOrbitRadius,
-                  );
-                  graphics.arc(0, 0, currentOrbitRadius, start, end);
-                }
-              }}
-            />
-          </Container>
+              const drawCorners = () => {
+                graphics.moveTo(left, top);
+                graphics.lineTo(left + len, top);
+                graphics.moveTo(left, top);
+                graphics.lineTo(left, top + len);
+
+                graphics.moveTo(right, top);
+                graphics.lineTo(right - len, top);
+                graphics.moveTo(right, top);
+                graphics.lineTo(right, top + len);
+
+                graphics.moveTo(left, bottom);
+                graphics.lineTo(left + len, bottom);
+                graphics.moveTo(left, bottom);
+                graphics.lineTo(left, bottom - len);
+
+                graphics.moveTo(right, bottom);
+                graphics.lineTo(right - len, bottom);
+                graphics.moveTo(right, bottom);
+                graphics.lineTo(right, bottom - len);
+              };
+
+              graphics.lineStyle({
+                width: markerShadowStrokeWidth,
+                color: theme.surface0,
+                alpha: 0.4,
+                cap: 'round',
+                join: 'round',
+              });
+              drawCorners();
+
+              graphics.lineStyle({
+                width: markerStrokeWidth,
+                color: theme.accentPrimary,
+                alpha: 0.98,
+                cap: 'round',
+                join: 'round',
+              });
+              drawCorners();
+            }}
+          />
         </Container>
       ) : null}
       {isNext ? (
         <Container x={centerX} y={centerY}>
-          {showNextLabel ? (
-            <Text
-              text="NEXT"
-              x={0}
-              y={0}
-              anchor={{ x: 0.5, y: 0.5 }}
-              style={nextLabelStyle}
-              resolution={2}
-              roundPixels
-            />
+          {showNextIcon ? (
+            <Container ref={nextPulseRef}>
+              <Sprite
+                image={nextTurnIcon}
+                x={0}
+                y={0}
+                anchor={{ x: 0.5, y: 0.5 }}
+                scale={{ x: -nextIconScale, y: nextIconScale }}
+                alpha={0.86}
+              />
+            </Container>
           ) : null}
         </Container>
       ) : null}
@@ -344,37 +573,239 @@ function TokenTurnIndicator({
   );
 }
 
+type TokenMeleeAnimation = {
+  role: 'attacker' | 'target';
+  startMs: number;
+  dirX: number;
+  dirY: number;
+  distance: number;
+};
+
+function ClubImpactBurstEffect({
+  center,
+  startMs,
+  cameraScaleY,
+  theme,
+  playSound,
+}: {
+  center: { x: number; y: number };
+  startMs: number;
+  cameraScaleY: number;
+  theme: PixiThemeColors;
+  playSound: boolean;
+}) {
+  const graphicsRef = useRef<PixiGraphics | null>(null);
+  const soundPlayedRef = useRef(false);
+
+  React.useEffect(() => {
+    if (!playSound || soundPlayedRef.current) {
+      return;
+    }
+
+    soundPlayedRef.current = true;
+    try {
+      playClubImpactSound();
+    } catch {
+      // Audio is optional; ignore browser/autoplay failures.
+    }
+  }, [playSound]);
+
+  useTick(() => {
+    const graphics = graphicsRef.current;
+    if (!graphics) {
+      return;
+    }
+
+    const elapsedMs = Date.now() - startMs;
+    if (elapsedMs < 0 || elapsedMs > CLUB_IMPACT_EFFECT_DURATION_MS) {
+      graphics.visible = false;
+      return;
+    }
+
+    graphics.visible = true;
+    const t = elapsedMs / CLUB_IMPACT_EFFECT_DURATION_MS;
+    const easeOutCubic = 1 - (1 - t) ** 3;
+    const fade = 1 - t;
+
+    const maxRadius = Math.max(16 / cameraScaleY, 5.8);
+    const travel = maxRadius * easeOutCubic;
+
+    const vectors = [
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: -1 },
+      { x: 0.72, y: 0.72 },
+      { x: -0.72, y: 0.72 },
+      { x: 0.72, y: -0.72 },
+      { x: -0.72, y: -0.72 },
+    ];
+
+    graphics.clear();
+    graphics.position.set(center.x, center.y);
+
+    graphics.lineStyle({
+      width: Math.max(2.1 / cameraScaleY, 0.7),
+      color: theme.accentPrimary,
+      alpha: 0.75 * fade,
+      cap: 'round',
+      join: 'round',
+    });
+    graphics.drawCircle(0, 0, Math.max(3 / cameraScaleY, 1) + travel * 0.35);
+
+    vectors.forEach((vector, index) => {
+      const v = 0.6 + (index % 3) * 0.22;
+      const sparkDistance = travel * v;
+      const sparkX = vector.x * sparkDistance;
+      const sparkY = vector.y * sparkDistance;
+
+      graphics.lineStyle({
+        width: Math.max(1.4 / cameraScaleY, 0.45),
+        color: theme.accentSecondary,
+        alpha: 0.8 * fade,
+        cap: 'round',
+        join: 'round',
+      });
+      graphics.moveTo(0, 0);
+      graphics.lineTo(sparkX * 0.72, sparkY * 0.72);
+
+      graphics.beginFill(theme.accentPrimary, 0.92 * fade);
+      graphics.drawCircle(sparkX, sparkY, Math.max((2.3 / cameraScaleY) * (1 - t * 0.4), 0.6));
+      graphics.endFill();
+    });
+  });
+
+  return <Graphics ref={graphicsRef} />;
+}
+
+function AnimatedTokenContainer({
+  baseX,
+  baseY,
+  pivotX,
+  pivotY,
+  animation,
+  cameraScaleY,
+  children,
+}: {
+  baseX: number;
+  baseY: number;
+  pivotX: number;
+  pivotY: number;
+  animation: TokenMeleeAnimation | undefined;
+  cameraScaleY: number;
+  children: React.ReactNode;
+}) {
+  const containerRef = useRef<PixiContainer | null>(null);
+
+  useTick(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    let offsetX = 0;
+    let offsetY = 0;
+    let scale = 1;
+
+    if (animation) {
+      const durationMs = TOKEN_MELEE_ANIMATION_DURATION_MS;
+      const elapsedMs = Date.now() - animation.startMs;
+      if (elapsedMs >= 0 && elapsedMs <= durationMs) {
+        const t = elapsedMs / durationMs;
+        const easeOutCubic = (value: number) => 1 - (1 - value) ** 3;
+        const easeInQuad = (value: number) => value * value;
+
+        if (animation.role === 'attacker') {
+          const windupEnd = 0.22;
+          const strikePeak = 0.52;
+          const recoilEnd = 0.78;
+          const retreat = Math.max(14 / cameraScaleY, 5);
+          const lift = Math.max(18 / cameraScaleY, 6.5);
+          const lunge = Math.min(
+            Math.max(38 / cameraScaleY, 14),
+            Math.max(10, animation.distance * 0.48),
+          );
+          const recoilBack = Math.max(13 / cameraScaleY, 4.8);
+
+          let forward = 0;
+          let verticalLift = 0;
+
+          if (t < windupEnd) {
+            const p = t / windupEnd;
+            const eased = easeOutCubic(p);
+            forward = -retreat * (1 - eased);
+            verticalLift = -lift * (1 - eased * 0.45);
+          } else if (t < strikePeak) {
+            const p = (t - windupEnd) / (strikePeak - windupEnd);
+            const eased = easeOutCubic(p);
+            forward = lunge * eased;
+            verticalLift = -lift * (1 - eased * 0.15);
+          } else if (t < recoilEnd) {
+            const p = (t - strikePeak) / (recoilEnd - strikePeak);
+            const eased = easeOutCubic(p);
+            forward = lunge - (lunge + recoilBack) * eased;
+            verticalLift = -lift * (0.15 - eased * 0.08);
+          } else {
+            const p = (t - recoilEnd) / (1 - recoilEnd);
+            const eased = easeOutCubic(p);
+            forward = -recoilBack * (1 - eased);
+            verticalLift = -lift * 0.07 * (1 - eased);
+          }
+
+          offsetX = animation.dirX * forward;
+          offsetY = animation.dirY * forward + verticalLift;
+        } else {
+          const impactStart = 0.34;
+          const impactEnd = 0.94;
+          if (t >= impactStart && t <= impactEnd) {
+            const p = (t - impactStart) / (impactEnd - impactStart);
+            offsetX = 0;
+            offsetY = 0;
+            scale = 1 - Math.sin(p * Math.PI) * 0.08;
+          } else {
+            offsetX = 0;
+            offsetY = 0;
+            scale = 1;
+          }
+        }
+      }
+    }
+
+    container.pivot.set(pivotX, pivotY);
+    container.position.set(baseX + offsetX + pivotX, baseY + offsetY + pivotY);
+    container.scale.set(scale);
+  });
+
+  return <Container ref={containerRef}>{children}</Container>;
+}
+
 function CombatCrossIndicator({
   tokenWidth,
   tokenHeight,
-  tint,
+  color,
 }: {
   tokenWidth: number;
   tokenHeight: number;
-  tint: number;
+  color: number;
 }) {
-  const rotatingRef = useRef<PixiContainer | null>(null);
-
-  useTick((delta) => {
-    if (rotatingRef.current) {
-      rotatingRef.current.rotation += 0.0022 * delta;
-    }
-  });
+  const minTokenSide = Math.min(tokenWidth, tokenHeight);
+  const ringStrokeWidth = Math.max(0.45, Math.min(minTokenSide * 0.015, 1.15));
+  // Inner edge of the stroke sits exactly on the token boundary.
+  const ringRadius = minTokenSide / 2 + ringStrokeWidth / 2;
 
   return (
-    <Container x={tokenWidth / 2} y={tokenHeight / 2 - Math.max(tokenHeight * 0.01, 0.35)}>
-      <Container ref={rotatingRef}>
-        <Sprite
-          image={crossCombatIcon}
-          x={0}
-          y={0}
-          anchor={{ x: 0.5, y: 0.5 }}
-          width={tokenWidth * 1.1}
-          height={tokenHeight * 1.1}
-          tint={tint}
-          alpha={0.9}
-        />
-      </Container>
+    <Container x={tokenWidth / 2} y={tokenHeight / 2}>
+      <Graphics
+        draw={(graphics) => {
+          graphics.clear();
+          graphics.lineStyle({
+            width: ringStrokeWidth,
+            color,
+            alpha: 0.62,
+          });
+          graphics.drawCircle(0, 0, ringRadius);
+        }}
+      />
     </Container>
   );
 }
@@ -385,6 +816,7 @@ export function PixiBoardPrototype({
   pageSettings,
   tokensOnBoard,
   characters,
+  runtimeCharactersById,
   multiSelectedTokenIds,
   copiedTokenId,
   pasteTargetCell,
@@ -425,10 +857,19 @@ export function PixiBoardPrototype({
           }
 
           const [sizeX, sizeY] = parseCharacterSize(character.size);
+          const cellSize = gridSettings.visualCellSize;
+          const centeringOffsetX = Math.max(0, 1 - sizeX) * 0.5 * cellSize;
+          const centeringOffsetY = Math.max(0, 1 - sizeY) * 0.5 * cellSize;
+          const selectionSizeX = Math.max(1, Math.ceil(sizeX));
+          const selectionSizeY = Math.max(1, Math.ceil(sizeY));
+          const runtimeCharacter = runtimeCharactersById[token.characterId] ?? null;
+          const isDead = characterHasDeadCondition(character, runtimeCharacter);
+
           return {
             id: token.id,
             imageUrl: character.image,
             name: character.name,
+            isDead,
             currentHp:
               'combatStats' in character && typeof character.combatStats.currentHp === 'number'
                 ? character.combatStats.currentHp
@@ -441,23 +882,49 @@ export function PixiBoardPrototype({
               'combatStats' in character && typeof character.combatStats.tempHp === 'number'
                 ? character.combatStats.tempHp
                 : 0,
-            x: token.position.x * gridSettings.visualCellSize,
-            y: token.position.y * gridSettings.visualCellSize,
-            width: sizeX * gridSettings.visualCellSize,
-            height: sizeY * gridSettings.visualCellSize,
+            x: token.position.x * cellSize + centeringOffsetX,
+            y: token.position.y * cellSize + centeringOffsetY,
+            width: sizeX * cellSize,
+            height: sizeY * cellSize,
+            selectionX: -centeringOffsetX,
+            selectionY: -centeringOffsetY,
+            selectionWidth: selectionSizeX * cellSize,
+            selectionHeight: selectionSizeY * cellSize,
             baseOrder: index,
           };
         })
         .filter((entry): entry is NonNullable<typeof entry> => entry != null),
-    [characters, gridSettings.visualCellSize, tokensOnBoard],
+    [characters, gridSettings.visualCellSize, runtimeCharactersById, tokensOnBoard],
   );
+  const activeMeleeAttackerTokenIds = useMemo(() => {
+    const nowMs = Date.now();
+    const ids = new Set<string>();
+
+    Object.values(feedbackByTokenId)
+      .filter((entry): entry is NonNullable<typeof entry> => entry != null)
+      .filter(
+        (entry) =>
+          Boolean(entry.attackerTokenId) && isBludgeoningDamageType(entry.attackDamageType),
+      )
+      .forEach((entry) => {
+        const startMs = entry.triggeredAtMs ?? nowMs;
+        if (nowMs <= startMs + TOKEN_MELEE_ANIMATION_DURATION_MS && entry.attackerTokenId) {
+          ids.add(entry.attackerTokenId);
+        }
+      });
+
+    return ids;
+  }, [feedbackByTokenId]);
   const orderedTokenSprites = useMemo(() => {
     const priorityByTokenId = new Map<string, number>();
     multiSelectedTokenIds.forEach((tokenId, index) => {
       priorityByTokenId.set(tokenId, 1000 + index);
     });
+    activeMeleeAttackerTokenIds.forEach((tokenId) => {
+      priorityByTokenId.set(tokenId, 3000);
+    });
     if (draggingVisuals.tokenId) {
-      priorityByTokenId.set(draggingVisuals.tokenId, 2000 + multiSelectedTokenIds.length);
+      priorityByTokenId.set(draggingVisuals.tokenId, 4000 + multiSelectedTokenIds.length);
     }
 
     return [...tokenSprites].sort((a, b) => {
@@ -468,7 +935,97 @@ export function PixiBoardPrototype({
       }
       return a.baseOrder - b.baseOrder;
     });
-  }, [draggingVisuals.tokenId, multiSelectedTokenIds, tokenSprites]);
+  }, [activeMeleeAttackerTokenIds, draggingVisuals.tokenId, multiSelectedTokenIds, tokenSprites]);
+  const tokenSpriteById = useMemo(
+    () => new Map(orderedTokenSprites.map((sprite) => [sprite.id, sprite])),
+    [orderedTokenSprites],
+  );
+  const meleeAnimationByTokenId = useMemo(() => {
+    const animations = new Map<string, TokenMeleeAnimation>();
+
+    Object.values(feedbackByTokenId)
+      .filter((entry): entry is NonNullable<typeof entry> => entry != null)
+      .filter(
+        (entry) =>
+          isBludgeoningDamageType(entry.attackDamageType) && Boolean(entry.attackerTokenId),
+      )
+      .forEach((entry) => {
+        const attackerSprite = entry.attackerTokenId
+          ? tokenSpriteById.get(entry.attackerTokenId)
+          : null;
+        const targetSprite = tokenSpriteById.get(entry.tokenId);
+        if (!attackerSprite || !targetSprite) {
+          return;
+        }
+
+        const attackerCenterX =
+          attackerSprite.x + attackerSprite.selectionX + attackerSprite.selectionWidth / 2;
+        const attackerCenterY =
+          attackerSprite.y + attackerSprite.selectionY + attackerSprite.selectionHeight / 2;
+        const targetCenterX =
+          targetSprite.x + targetSprite.selectionX + targetSprite.selectionWidth / 2;
+        const targetCenterY =
+          targetSprite.y + targetSprite.selectionY + targetSprite.selectionHeight / 2;
+
+        const dx = targetCenterX - attackerCenterX;
+        const dy = targetCenterY - attackerCenterY;
+        const distance = Math.hypot(dx, dy);
+        if (distance <= 0.001) {
+          return;
+        }
+
+        const dirX = dx / distance;
+        const dirY = dy / distance;
+        const startMs = entry.triggeredAtMs ?? Date.now();
+
+        animations.set(attackerSprite.id, {
+          role: 'attacker',
+          startMs,
+          dirX,
+          dirY,
+          distance,
+        });
+
+        animations.set(targetSprite.id, {
+          role: 'target',
+          startMs,
+          dirX,
+          dirY,
+          distance,
+        });
+      });
+
+    return animations;
+  }, [feedbackByTokenId, tokenSpriteById]);
+  const clubImpactEffects = useMemo(
+    () =>
+      Object.values(feedbackByTokenId)
+        .filter((entry): entry is NonNullable<typeof entry> => entry != null)
+        .filter(
+          (entry) =>
+            entry.hit &&
+            isBludgeoningDamageType(entry.attackDamageType) &&
+            Boolean(entry.attackerTokenId) &&
+            typeof entry.triggeredAtMs === 'number',
+        )
+        .map((entry) => {
+          const targetSprite = tokenSpriteById.get(entry.tokenId);
+          if (!targetSprite) {
+            return null;
+          }
+
+          return {
+            id: entry.id,
+            center: {
+              x: targetSprite.x + targetSprite.selectionX + targetSprite.selectionWidth / 2,
+              y: targetSprite.y + targetSprite.selectionY + targetSprite.selectionHeight / 2,
+            },
+            startMs: (entry.triggeredAtMs ?? Date.now()) + CLUB_IMPACT_EFFECT_DELAY_MS,
+          };
+        })
+        .filter((entry): entry is NonNullable<typeof entry> => entry != null),
+    [feedbackByTokenId, tokenSpriteById],
+  );
   const tokenLabelFontSize = Math.max(10, Math.round(gridSettings.visualCellSize * 0.2));
   const tokenLabelOffset = Math.round(gridSettings.visualCellSize * -0.085);
   const tokenNameStyle = useMemo(
@@ -632,18 +1189,22 @@ export function PixiBoardPrototype({
             />
           ) : null}
           {orderedTokenSprites.map((tokenSprite) => (
-            <Container
+            <AnimatedTokenContainer
               key={`pixi-token-${tokenSprite.id}`}
-              x={
+              baseX={
                 draggingVisuals.tokenId === tokenSprite.id && draggingVisuals.visualWorldPoint
                   ? draggingVisuals.visualWorldPoint.x
                   : tokenSprite.x
               }
-              y={
+              baseY={
                 draggingVisuals.tokenId === tokenSprite.id && draggingVisuals.visualWorldPoint
                   ? draggingVisuals.visualWorldPoint.y
                   : tokenSprite.y
               }
+              pivotX={tokenSprite.selectionX + tokenSprite.selectionWidth / 2}
+              pivotY={tokenSprite.selectionY + tokenSprite.selectionHeight / 2}
+              animation={meleeAnimationByTokenId.get(tokenSprite.id)}
+              cameraScaleY={cameraTransform.scaleY}
             >
               <Graphics
                 draw={(graphics) => {
@@ -666,14 +1227,14 @@ export function PixiBoardPrototype({
                     const padding = Math.max(1 / cameraTransform.scaleY, 0.4);
                     graphics.lineStyle({
                       width: strokeWidth,
-                      color: theme.accentPrimary,
+                      color: theme.selectionNeutral,
                       alpha: 0.98,
                     });
                     graphics.drawRect(
-                      -padding,
-                      -padding,
-                      tokenSprite.width + padding * 2,
-                      tokenSprite.height + padding * 2,
+                      tokenSprite.selectionX - padding,
+                      tokenSprite.selectionY - padding,
+                      tokenSprite.selectionWidth + padding * 2,
+                      tokenSprite.selectionHeight + padding * 2,
                     );
                   }}
                 />
@@ -682,7 +1243,7 @@ export function PixiBoardPrototype({
                 <CombatCrossIndicator
                   tokenWidth={tokenSprite.width}
                   tokenHeight={tokenSprite.height}
-                  tint={theme.feedbackNegative}
+                  color={theme.feedbackNegative}
                 />
               ) : null}
               <Sprite
@@ -691,10 +1252,33 @@ export function PixiBoardPrototype({
                 y={0}
                 width={tokenSprite.width}
                 height={tokenSprite.height}
+                alpha={tokenSprite.isDead ? 0.52 : 1}
               />
+              {tokenSprite.isDead ? (
+                <Sprite
+                  image={skullDeadIcon}
+                  x={tokenSprite.width / 2}
+                  y={tokenSprite.height / 2}
+                  anchor={{ x: 0.5, y: 0.5 }}
+                  width={Math.max(tokenSprite.width * 0.88, 10)}
+                  height={Math.max(tokenSprite.height * 0.88, 10)}
+                  alpha={DEAD_SKULL_ALPHA}
+                />
+              ) : null}
               <TokenTurnIndicator
                 tokenWidth={tokenSprite.width}
                 tokenHeight={tokenSprite.height}
+                markerX={tokenSprite.selectionX}
+                markerY={tokenSprite.selectionY}
+                markerWidth={tokenSprite.selectionWidth}
+                markerHeight={tokenSprite.selectionHeight}
+                currentMarkerHiddenUntilMs={
+                  meleeAnimationByTokenId.get(tokenSprite.id)
+                    ? (meleeAnimationByTokenId.get(tokenSprite.id)?.startMs ?? 0) +
+                      TOKEN_MELEE_ANIMATION_DURATION_MS +
+                      CURRENT_TURN_MARKER_EXTRA_DELAY_MS
+                    : undefined
+                }
                 cameraScaleY={cameraTransform.scaleY}
                 isCurrent={activeCombatTurnTokenId === tokenSprite.id}
                 isNext={activeCombatNextTurnTokenId === tokenSprite.id}
@@ -702,6 +1286,7 @@ export function PixiBoardPrototype({
               />
               {tokenSprite.maxHp != null && tokenSprite.currentHp != null ? (
                 <Graphics
+                  alpha={tokenSprite.isDead ? 0.56 : 1}
                   draw={(graphics) => {
                     graphics.clear();
                     const hpBarHeight = Math.max(4 / cameraTransform.scaleY, 1.5);
@@ -712,30 +1297,43 @@ export function PixiBoardPrototype({
                       0,
                       Math.min(tokenSprite.currentHp ?? 0, safeMaxHp),
                     );
-                    const currentRatio = safeCurrentHp / safeMaxHp;
-
-                    graphics.lineStyle({
-                      width: Math.max(1 / cameraTransform.scaleY, 0.25),
-                      color: theme.surface0,
-                      alpha: 0.8,
+                    drawHpBarWithTicks({
+                      graphics,
+                      y: barY,
+                      width: tokenSprite.width,
+                      height: hpBarHeight,
+                      currentValue: safeCurrentHp,
+                      maxValue: safeMaxHp,
+                      cameraScaleY: cameraTransform.scaleY,
+                      backgroundColor: theme.surface1,
+                      fillColor: theme.hpBarFill,
+                      borderColor: theme.surface0,
+                      borderAlpha: 0.72,
+                      tickColor: HP_TICK_COLOR,
                     });
-                    graphics.beginFill(theme.surface1, 0.9);
-                    graphics.drawRect(0, barY, tokenSprite.width, hpBarHeight);
-                    graphics.endFill();
-
-                    graphics.beginFill(theme.feedbackPositive, 0.95);
-                    graphics.drawRect(0, barY, tokenSprite.width * currentRatio, hpBarHeight);
-                    graphics.endFill();
 
                     const tempHp = Math.max(0, tokenSprite.tempHp ?? 0);
                     if (tempHp > 0) {
-                      const tempRatio = Math.min(1, tempHp / safeMaxHp);
+                      const safeTempHp = tempHp;
+                      const tempScaleMaxHp = Math.max(safeMaxHp, safeTempHp);
                       const tempBarHeight = hpBarHeight;
                       const tempBarY =
                         barY - tempBarHeight - Math.max(0.45 / cameraTransform.scaleY, 0.2);
-                      graphics.beginFill(theme.info, 0.95);
-                      graphics.drawRect(0, tempBarY, tokenSprite.width * tempRatio, tempBarHeight);
-                      graphics.endFill();
+
+                      drawHpBarWithTicks({
+                        graphics,
+                        y: tempBarY,
+                        width: tokenSprite.width,
+                        height: tempBarHeight,
+                        currentValue: safeTempHp,
+                        maxValue: tempScaleMaxHp,
+                        cameraScaleY: cameraTransform.scaleY,
+                        backgroundColor: theme.surface1,
+                        fillColor: theme.info,
+                        borderColor: theme.surface0,
+                        borderAlpha: 0.52,
+                        tickColor: HP_TICK_COLOR,
+                      });
                     }
                   }}
                 />
@@ -746,6 +1344,7 @@ export function PixiBoardPrototype({
                 y={Math.round(tokenSprite.height + tokenLabelOffset)}
                 anchor={{ x: 0.5, y: 0 }}
                 style={tokenNameStyle}
+                alpha={tokenSprite.isDead ? 0.56 : 1}
                 resolution={Math.max(2, stageResolution * 1.5)}
                 roundPixels
               />
@@ -845,7 +1444,17 @@ export function PixiBoardPrototype({
                   />
                 </Container>
               ) : null}
-            </Container>
+            </AnimatedTokenContainer>
+          ))}
+          {clubImpactEffects.map((effect) => (
+            <ClubImpactBurstEffect
+              key={`club-impact-${effect.id}`}
+              center={effect.center}
+              startMs={effect.startMs}
+              cameraScaleY={cameraTransform.scaleY}
+              theme={theme}
+              playSound
+            />
           ))}
           {multiSelectBoundingBox ? (
             <Graphics
@@ -854,7 +1463,7 @@ export function PixiBoardPrototype({
                 const lineWidth = Math.max(1.4 / cameraTransform.scaleY, 0.5);
                 const dashLength = Math.max(5.5 / cameraTransform.scaleY, 1.8);
                 const gapLength = Math.max(4 / cameraTransform.scaleY, 1.4);
-                graphics.beginFill(theme.accentPrimary, 0.09);
+                graphics.beginFill(theme.selectionNeutral, 0.09);
                 graphics.drawRect(
                   multiSelectBoundingBox.x,
                   multiSelectBoundingBox.y,
@@ -864,7 +1473,7 @@ export function PixiBoardPrototype({
                 graphics.endFill();
                 graphics.lineStyle({
                   width: lineWidth,
-                  color: theme.accentPrimary,
+                  color: theme.selectionNeutral,
                   alpha: 0.98,
                 });
                 drawDottedRect(
@@ -891,12 +1500,12 @@ export function PixiBoardPrototype({
                 const dashLength = Math.max(5 / cameraTransform.scaleY, 1.7);
                 const gapLength = Math.max(3.8 / cameraTransform.scaleY, 1.3);
 
-                graphics.beginFill(theme.accentPrimary, 0.08);
+                graphics.beginFill(theme.selectionNeutral, 0.08);
                 graphics.drawRect(x, y, width, height);
                 graphics.endFill();
                 graphics.lineStyle({
                   width: lineWidth,
-                  color: theme.accentPrimary,
+                  color: theme.selectionNeutral,
                   alpha: 0.98,
                 });
                 drawDottedRect(graphics, x, y, width, height, dashLength, gapLength);

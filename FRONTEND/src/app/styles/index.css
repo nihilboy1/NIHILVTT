@@ -54,9 +54,10 @@
   /* Feedback (Positivo/Negativo) */
   --color-feedback-positive: #50fa7b; /* Verde para ações positivas */
   --color-feedback-positive-hover: #45d96a; /* Verde mais escuro para hover */
+  --color-hp-bar-fill: #5f9a72; /* Verde pastel inspirado em #087829 */
 
-  --color-feedback-negative: #ff5555; /* Vermelho para ações negativas */
-  --color-feedback-negative-hover: #e04444; /* Vermelho mais escuro para hover */
+  --color-feedback-negative: #942222; /* Vermelho principal padronizado */
+  --color-feedback-negative-hover: #7f2222; /* Variação de hover na mesma família */
 }
 
 .iceberg-regular {

@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { z } from 'zod';
+import { DamageTypeEnum } from '@nihilvtt/datamodeling/primitives';
 
 import { authApi } from '@/features/auth/model/authSlice';
+import type { CombatDamageType } from '@/shared/api/types';
 
 const sessionApi = authApi;
 
@@ -129,7 +131,13 @@ export async function sendGameResolveAttack(
   attackName: string,
   attackBonus: number,
   damageFormula: string,
+  attackDamageType: CombatDamageType,
 ): Promise<GameSessionEvent> {
+  const parsedAttackDamageType = DamageTypeEnum.safeParse(attackDamageType);
+  if (!parsedAttackDamageType.success) {
+    throw { formError: 'Tipo de dano inválido.' } as GameSessionApiError;
+  }
+
   try {
     const response = await sessionApi.post<unknown>(`/games/${gameId}/session/combat/attacks`, {
       attackerTokenId,
@@ -138,6 +146,7 @@ export async function sendGameResolveAttack(
       attackName,
       attackBonus,
       damageFormula,
+      attackDamageType: parsedAttackDamageType.data,
     });
     return gameSessionEventSchema.parse(response.data);
   } catch (error) {
@@ -218,11 +227,14 @@ export async function sendGameUpdateCharacterEquipment(
   itemId: string | null,
 ): Promise<GameSessionEvent> {
   try {
-    const response = await sessionApi.post<unknown>(`/games/${gameId}/session/characters/equipment`, {
-      characterId,
-      slot,
-      itemId,
-    });
+    const response = await sessionApi.post<unknown>(
+      `/games/${gameId}/session/characters/equipment`,
+      {
+        characterId,
+        slot,
+        itemId,
+      },
+    );
     return gameSessionEventSchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error, 'Falha ao atualizar equipamento do personagem.');
@@ -235,10 +247,13 @@ export async function sendGameUpdateCharacterController(
   controlledByUserId: number | null,
 ): Promise<GameSessionEvent> {
   try {
-    const response = await sessionApi.post<unknown>(`/games/${gameId}/session/characters/controller`, {
-      characterId,
-      controlledByUserId,
-    });
+    const response = await sessionApi.post<unknown>(
+      `/games/${gameId}/session/characters/controller`,
+      {
+        characterId,
+        controlledByUserId,
+      },
+    );
     return gameSessionEventSchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error, 'Falha ao atualizar controlador do personagem.');
@@ -286,7 +301,10 @@ export async function sendGameCreateToken(
   }
 }
 
-export async function sendGameRemoveToken(gameId: number, tokenId: string): Promise<GameSessionEvent> {
+export async function sendGameRemoveToken(
+  gameId: number,
+  tokenId: string,
+): Promise<GameSessionEvent> {
   try {
     const response = await sessionApi.post<unknown>(`/games/${gameId}/session/tokens/remove`, {
       tokenId,
@@ -297,11 +315,17 @@ export async function sendGameRemoveToken(gameId: number, tokenId: string): Prom
   }
 }
 
-export async function sendGameRemoveTokens(gameId: number, tokenIds: string[]): Promise<GameSessionEvent> {
+export async function sendGameRemoveTokens(
+  gameId: number,
+  tokenIds: string[],
+): Promise<GameSessionEvent> {
   try {
-    const response = await sessionApi.post<unknown>(`/games/${gameId}/session/tokens/remove-batch`, {
-      tokenIds,
-    });
+    const response = await sessionApi.post<unknown>(
+      `/games/${gameId}/session/tokens/remove-batch`,
+      {
+        tokenIds,
+      },
+    );
     return gameSessionEventSchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error, 'Falha ao remover tokens.');
@@ -351,9 +375,12 @@ export async function sendGameDuplicateCharacter(
   characterId: string,
 ): Promise<GameSessionEvent> {
   try {
-    const response = await sessionApi.post<unknown>(`/games/${gameId}/session/characters/duplicate`, {
-      characterId,
-    });
+    const response = await sessionApi.post<unknown>(
+      `/games/${gameId}/session/characters/duplicate`,
+      {
+        characterId,
+      },
+    );
     return gameSessionEventSchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error, 'Falha ao duplicar personagem.');

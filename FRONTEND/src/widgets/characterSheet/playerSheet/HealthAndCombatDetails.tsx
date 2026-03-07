@@ -1,22 +1,21 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import { useCharacterCalculations } from "@/entities/character/lib/hooks/useCharacterCalculations";
-import { usePlayerCharacter } from "@/entities/character/lib/hooks/usePlayerCharacter";
-import { usePlayerCharacterCombatViewModel } from "@/entities/character/lib/hooks/usePlayerCharacterCombatViewModel";
+import { useCharacterCalculations } from '@/entities/character/lib/hooks/useCharacterCalculations';
+import { usePlayerCharacter } from '@/entities/character/lib/hooks/usePlayerCharacter';
+import { usePlayerCharacterCombatViewModel } from '@/entities/character/lib/hooks/usePlayerCharacterCombatViewModel';
+import { getPlayerProficiencyBonusFromLevel } from '@/entities/character/model/rules/characterDerivedRules';
 import {
-  getAbilityModifier,
-  getPlayerProficiencyBonusFromLevel,
-} from "@/entities/character/model/rules/characterDerivedRules";
-import { buildWeaponAttackAction } from "@/entities/character/model/rules/weaponAttackDerivedRules";
-import { Action } from "@/entities/character/model/schemas/character.schema";
-import { isPlayerCharacterRuntime } from "@/entities/character/model/schemas/playerCharacterRuntime.schema";
-import { useCharactersStore } from "@/entities/character/model/store";
-import { buildPlayerCharacterCalculationsViewModel } from "@/entities/character/model/view-models/playerCharacterCalculationsViewModel";
-import { DiceFormula, RollCategory } from "@/shared/api/types";
+  buildUnarmedAttackAction,
+  buildWeaponAttackAction,
+} from '@/entities/character/model/rules/weaponAttackDerivedRules';
+import { Action } from '@/entities/character/model/schemas/character.schema';
+import { isPlayerCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
+import { useCharactersStore } from '@/entities/character/model/store';
+import { buildPlayerCharacterCalculationsViewModel } from '@/entities/character/model/view-models/playerCharacterCalculationsViewModel';
+import { DiceFormula, RollCategory } from '@/shared/api/types';
 
-import { CombatStats } from "./CombatStats";
-import { HealthSection } from "./HealthSection";
-
+import { CombatStats } from './CombatStats';
+import { HealthSection } from './HealthSection';
 
 interface HealthAndCombatDetailsProps {
   characterId: string;
@@ -25,7 +24,7 @@ interface HealthAndCombatDetailsProps {
     formula: DiceFormula,
     rollName: string,
     category: RollCategory,
-    characterName: string
+    characterName: string,
   ) => void;
 }
 
@@ -39,7 +38,9 @@ export function HealthAndCombatDetails({
   const runtimeCharacter = useCharactersStore(
     (state) => state.runtimeCharactersById[characterId] ?? null,
   );
-  const playerRuntimeCharacter = isPlayerCharacterRuntime(runtimeCharacter) ? runtimeCharacter : null;
+  const playerRuntimeCharacter = isPlayerCharacterRuntime(runtimeCharacter)
+    ? runtimeCharacter
+    : null;
 
   const characterName = playerRuntimeCharacter?.name ?? character?.name ?? '-';
 
@@ -53,7 +54,7 @@ export function HealthAndCombatDetails({
         },
         proficiencies: {
           skills: {
-            perception: combatViewModel?.perceptionProficiencyLevel ?? "none",
+            perception: combatViewModel?.perceptionProficiencyLevel ?? 'none',
           },
         },
         combatStats: {
@@ -63,27 +64,17 @@ export function HealthAndCombatDetails({
     [combatViewModel],
   );
 
-  const {
-    calculatedInitiative,
-    calculatedPassivePerception,
-    speedInMeters,
-    speedInSquares,
-  } = useCharacterCalculations(calculationsViewModel);
+  const { calculatedInitiative, calculatedPassivePerception, speedInMeters, speedInSquares } =
+    useCharacterCalculations(calculationsViewModel);
 
   const strengthScore = combatViewModel?.strength ?? 10;
-  const strengthModifier = getAbilityModifier(strengthScore);
-  const unarmedAttackBonus =
-    getPlayerProficiencyBonusFromLevel(combatViewModel?.level ?? 1) + strengthModifier;
-  const unarmedDamage = Math.max(1, 1 + strengthModifier);
 
   const displayActions = useMemo<Action[]>(() => {
     const derivedActions: Action[] = [
-      {
-        id: 'builtin-unarmed-strike',
-        name: 'Ataque desarmado',
-        bonus: unarmedAttackBonus >= 0 ? `+${unarmedAttackBonus}` : `${unarmedAttackBonus}`,
-        damage: `${unarmedDamage}`,
-      },
+      buildUnarmedAttackAction({
+        strength: strengthScore,
+        proficiencyBonus: getPlayerProficiencyBonusFromLevel(combatViewModel?.level ?? 1),
+      }),
     ];
 
     if (playerRuntimeCharacter) {
@@ -124,25 +115,11 @@ export function HealthAndCombatDetails({
     }
 
     return derivedActions;
-  }, [
-    combatViewModel?.dexterity,
-    combatViewModel?.level,
-    playerRuntimeCharacter,
-    strengthScore,
-    unarmedAttackBonus,
-    unarmedDamage,
-  ]);
+  }, [combatViewModel?.dexterity, combatViewModel?.level, playerRuntimeCharacter, strengthScore]);
 
   const handleRollAction = (action: Action) => {
-    if (action.bonus)
-      onRollDice(action.bonus, action.name, "Attack", characterName);
-    if (action.damage)
-      onRollDice(
-        action.damage,
-        `${action.name} - Dano`,
-        "Damage",
-        characterName
-      );
+    if (action.bonus) onRollDice(action.bonus, action.name, 'Attack', characterName);
+    if (action.damage) onRollDice(action.damage, `${action.name} - Dano`, 'Damage', characterName);
   };
 
   return (
@@ -162,12 +139,12 @@ export function HealthAndCombatDetails({
 
         <fieldset
           id="Ações"
-          className="relative flex flex-col gap-2 rounded-xl bg-surface-1/70 px-2.5 py-2.5"
+          className="bg-surface-1/70 relative flex flex-col gap-2 rounded-xl px-2.5 py-2.5"
         >
-          <legend className="px-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-text-secondary">
+          <legend className="text-text-secondary px-1 text-[0.65rem] font-bold tracking-[0.12em] uppercase">
             AÇÕES
           </legend>
-          <div className="flex items-center justify-between px-1 text-[0.52rem] font-semibold uppercase tracking-[0.12em] text-text-secondary/80">
+          <div className="text-text-secondary/80 flex items-center justify-between px-1 text-[0.52rem] font-semibold tracking-[0.12em] uppercase">
             <span>Nome</span>
             <div className="flex items-center gap-3 text-right">
               <span>Bônus</span>
@@ -175,14 +152,14 @@ export function HealthAndCombatDetails({
             </div>
           </div>
           {displayActions.length === 0 && (
-            <div className="rounded-lg bg-surface-0/35 px-2.5 py-2 text-[0.72rem] text-text-secondary">
+            <div className="bg-surface-0/35 text-text-secondary rounded-lg px-2.5 py-2 text-[0.72rem]">
               Nenhuma ação disponível no momento.
             </div>
           )}
           {displayActions.map((action) => (
             <div
               key={action.id}
-              className="group flex items-center gap-1.5 rounded-lg bg-surface-0/40 px-2 py-1.5 hover:bg-surface-0/55"
+              className="group bg-surface-0/40 hover:bg-surface-0/55 flex items-center gap-1.5 rounded-lg px-2 py-1.5"
             >
               <button
                 type="button"
@@ -190,14 +167,14 @@ export function HealthAndCombatDetails({
                 className="flex min-w-0 flex-1 items-center gap-1.5 text-left text-[0.68rem]"
                 onClick={() => handleRollAction(action)}
               >
-                <span className="min-w-0 flex-1 truncate font-medium text-text-primary">
-                  {action.name || "-"}
+                <span className="text-text-primary min-w-0 flex-1 truncate font-medium">
+                  {action.name || '-'}
                 </span>
-                <span className="min-w-[3.25rem] rounded-md bg-surface-1/75 px-1.5 py-1 text-center font-semibold text-text-secondary">
-                  {action.bonus || "-"}
+                <span className="bg-surface-1/75 text-text-secondary min-w-[3.25rem] rounded-md px-1.5 py-1 text-center font-semibold">
+                  {action.bonus || '-'}
                 </span>
-                <span className="min-w-[4.5rem] rounded-md bg-surface-1/75 px-1.5 py-1 text-center font-semibold text-text-secondary">
-                  {action.damage || "-"}
+                <span className="bg-surface-1/75 text-text-secondary min-w-[4.5rem] rounded-md px-1.5 py-1 text-center font-semibold">
+                  {action.damage || '-'}
                 </span>
               </button>
             </div>

@@ -1,6 +1,6 @@
 const CREATURE_SIZE_TO_GRID: Record<string, [number, number]> = {
-  tiny: [1, 1],
-  small: [1, 1],
+  tiny: [0.25, 0.25],
+  small: [0.85, 0.85],
   medium: [1, 1],
   large: [2, 2],
   huge: [3, 3],
@@ -31,4 +31,3 @@ export function parseCreatureSizeToGrid(sizeString?: string): [number, number] {
 
   return [1, 1];
 }
-

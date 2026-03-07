@@ -22,15 +22,21 @@ import { FloatingPanelDragBar } from '@/shared/ui/FloatingPanelDragBar';
 interface TokenActionBarProps {
   tokenId: string | null;
   pendingAttack: PendingAttackSelection | null;
+  pendingMovementTokenId: string | null;
   onArmAttack: (attack: AttackEntry) => void;
   onCancelAttack: () => void;
+  onArmMovement: () => void;
+  onCancelMovement: () => void;
 }
 
 export function TokenActionBar({
   tokenId,
   pendingAttack,
+  pendingMovementTokenId,
   onArmAttack,
   onCancelAttack,
+  onArmMovement,
+  onCancelMovement,
 }: TokenActionBarProps) {
   const isRightSidebarVisible = useUIStore((state) => state.isRightSidebarVisible);
   const characters = useCharactersStore((state) => state.characters);
@@ -73,6 +79,7 @@ export function TokenActionBar({
       buildUnarmedAttackEntry({
         strength: combatViewModel.strength,
         proficiencyBonus,
+        specieId: playerRuntimeCharacter.build.specieId,
       }),
     ];
 
@@ -131,7 +138,7 @@ export function TokenActionBar({
     return targetCharacter?.name ?? 'Alvo';
   }, [characters, pendingAttack?.targetTokenId, tokensOnBoard]);
 
-  const canActInCombat = useMemo(() => {
+  const canTakeTurnActions = useMemo(() => {
     if (!token || !combatState) {
       return false;
     }
@@ -143,8 +150,16 @@ export function TokenActionBar({
       return false;
     }
 
-    return participantIndex === combatState.turnIndex && combatState.turnResources.actionAvailable;
+    return participantIndex === combatState.turnIndex;
   }, [combatState, token]);
+
+  const canSpendAction = useMemo(() => {
+    return canTakeTurnActions && (combatState?.turnResources.actionAvailable ?? false);
+  }, [canTakeTurnActions, combatState?.turnResources.actionAvailable]);
+
+  const canMove = useMemo(() => {
+    return canTakeTurnActions && (combatState?.turnResources.remainingMovementCells ?? 0) > 0;
+  }, [canTakeTurnActions, combatState?.turnResources.remainingMovementCells]);
 
   const canCurrentUserControlToken = useMemo(() => {
     if (!token || !currentUser || !currentGame) {
@@ -170,18 +185,13 @@ export function TokenActionBar({
     });
   }, [currentGame, currentUser, runtimeCharacter, token]);
 
-  if (
-    !token ||
-    !character ||
-    attackEntries.length === 0 ||
-    !canActInCombat ||
-    !canCurrentUserControlToken
-  ) {
+  if (!token || !character || !canTakeTurnActions || !canCurrentUserControlToken) {
     return null;
   }
 
   const activeAttackId =
     pendingAttack?.attackerTokenId === token.id ? pendingAttack.attack.id : null;
+  const isMovementArmed = pendingMovementTokenId === token.id;
   const rightInset = isRightSidebarVisible ? 400 : 16;
   const initialPosition = {
     x: typeof window !== 'undefined' ? Math.max(16, window.innerWidth - rightInset) : 16,
@@ -217,11 +227,21 @@ export function TokenActionBar({
           >
             Cancelar
           </button>
+        ) : isMovementArmed ? (
+          <button
+            type="button"
+            className="border-surface-2 text-text-secondary hover:bg-surface-1 rounded-md border px-2 py-1 text-[0.62rem] font-semibold tracking-[0.08em] uppercase"
+            data-no-panel-drag="true"
+            onMouseDown={(event) => event.stopPropagation()}
+            onClick={onCancelMovement}
+          >
+            Cancelar
+          </button>
         ) : null}
       </div>
 
       {combatState ? (
-        <div className="bg-surface-1/75 text-text-secondary grid grid-cols-3 gap-1.5 rounded-lg px-2.5 py-2 text-[0.68rem]">
+        <div className="bg-surface-1/75 text-text-secondary grid grid-cols-2 gap-1.5 rounded-lg px-2.5 py-2 text-[0.68rem]">
           <div className="bg-surface-0/45 rounded-md px-2 py-1">
             <span className="block text-[0.58rem] tracking-[0.12em] uppercase">Ação</span>
             <span className="text-text-primary font-semibold">
@@ -234,21 +254,37 @@ export function TokenActionBar({
               {combatState.turnResources.bonusActionAvailable ? 'Disponível' : 'Gasta'}
             </span>
           </div>
-          <div className="bg-surface-0/45 rounded-md px-2 py-1">
-            <span className="block text-[0.58rem] tracking-[0.12em] uppercase">Movimento</span>
-            <span className="text-text-primary font-semibold">
-              {combatState.turnResources.remainingMovementCells}/
-              {combatState.turnResources.totalMovementCells}
-            </span>
-          </div>
         </div>
       ) : null}
 
       <div className="bg-surface-1/75 text-text-secondary rounded-lg px-2.5 py-2 text-[0.68rem]">
         {pendingAttack?.attackerTokenId === token.id
           ? `Alvo: ${targetLabel ?? 'selecione outro token'}`
-          : 'Selecione uma ação para entrar em modo de alvo.'}
+          : isMovementArmed
+            ? 'Movimento armado: clique em uma celula valida do alcance.'
+            : 'Selecione uma ação para entrar em modo de alvo ou movimento.'}
       </div>
+
+      <button
+        type="button"
+        className={`flex items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-left transition-colors ${
+          isMovementArmed
+            ? 'border-accent-primary bg-accent-primary/10 border'
+            : 'border-surface-2 bg-surface-1/55 hover:bg-surface-1 border'
+        } ${canMove ? '' : 'opacity-60'}`}
+        data-no-panel-drag="true"
+        onClick={onArmMovement}
+        disabled={!canMove}
+      >
+        <span className="text-text-primary min-w-0 flex-1 truncate text-[0.72rem] font-semibold">
+          Mover
+        </span>
+        <span className="text-text-secondary bg-surface-0/55 rounded px-1.5 py-0.5 text-[0.62rem] font-semibold">
+          {combatState
+            ? `${combatState.turnResources.remainingMovementCells}/${combatState.turnResources.totalMovementCells}`
+            : '--/--'}
+        </span>
+      </button>
 
       <div className="flex flex-col gap-1.5">
         {attackEntries.map((attack) => {
@@ -265,6 +301,7 @@ export function TokenActionBar({
               }`}
               data-no-panel-drag="true"
               onClick={() => onArmAttack(attack)}
+              disabled={!canSpendAction}
             >
               <span className="text-text-primary min-w-0 flex-1 truncate text-[0.72rem] font-semibold">
                 {attack.label}

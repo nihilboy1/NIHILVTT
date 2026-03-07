@@ -44,7 +44,11 @@ const textMessageSchema = z.object({
   id: z.string().min(1),
   sender: z.string().min(1),
   senderUserId: z.number().int().positive().nullable().optional(),
-  senderColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable().optional(),
+  senderColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .nullable()
+    .optional(),
   text: z.string(),
   timestamp: z.string().datetime().or(z.date()),
   isDiceRoll: z.literal(false),
@@ -54,7 +58,11 @@ const diceMessageSchema = z.object({
   id: z.string().min(1),
   sender: z.string().min(1),
   senderUserId: z.number().int().positive().nullable().optional(),
-  senderColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable().optional(),
+  senderColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .nullable()
+    .optional(),
   text: z.string(),
   timestamp: z.string().datetime().or(z.date()),
   isDiceRoll: z.literal(true),
@@ -69,8 +77,8 @@ const combatParticipantSchema = z.object({
   initiativeRoll: z.number().int(),
   initiativeTotal: z.number().int(),
   dexterityScore: z.number().int(),
-  movementBudgetCells: z.number().int().min(1),
-  status: z.literal('active'),
+  movementBudgetCells: z.number().int().min(0),
+  status: z.string().trim().min(1),
 });
 
 const combatTurnResourcesSchema = z.object({
@@ -108,7 +116,9 @@ function parseSnapshotTokens(entries: unknown[]) {
         entry,
         validation: formattedError,
       });
-      throw new Error('Violação de contrato de sessão em hydrateGameSessionSnapshot.tokens: token inválido.');
+      throw new Error(
+        'Violação de contrato de sessão em hydrateGameSessionSnapshot.tokens: token inválido.',
+      );
     }
 
     return parsed.data;
@@ -125,12 +135,17 @@ function parseSnapshotMessages(entries: unknown[]) {
         entry,
         validation: formattedError,
       });
-      throw new Error('Violação de contrato de sessão em hydrateGameSessionSnapshot.messages: mensagem inválida.');
+      throw new Error(
+        'Violação de contrato de sessão em hydrateGameSessionSnapshot.messages: mensagem inválida.',
+      );
     }
 
     return {
       ...parsed.data,
-      timestamp: parsed.data.timestamp instanceof Date ? parsed.data.timestamp : new Date(parsed.data.timestamp),
+      timestamp:
+        parsed.data.timestamp instanceof Date
+          ? parsed.data.timestamp
+          : new Date(parsed.data.timestamp),
     };
   });
 }
@@ -147,7 +162,9 @@ function parseSnapshotCombat(entry: unknown): CombatState | null {
       entry,
       validation: formattedError,
     });
-    throw new Error('Violação de contrato de sessão em hydrateGameSessionSnapshot.combat: combate inválido.');
+    throw new Error(
+      'Violação de contrato de sessão em hydrateGameSessionSnapshot.combat: combate inválido.',
+    );
   }
 
   return parsed.data as CombatState;

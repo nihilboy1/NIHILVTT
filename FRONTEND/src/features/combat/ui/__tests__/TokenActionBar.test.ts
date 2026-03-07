@@ -8,6 +8,7 @@ describe('TokenActionBar action entries', () => {
         name: 'Mordida',
         bonus: '+4',
         damage: '1d6+2',
+        damageType: 'piercing',
         rangeMeters: 1.5,
       },
     ]);
@@ -18,6 +19,7 @@ describe('TokenActionBar action entries', () => {
         label: 'Mordida',
         attackBonus: 4,
         damageFormula: '1d6+2',
+        damageType: 'piercing',
         rangeMeters: 1.5,
         sourceType: 'action',
         sourceItemId: null,

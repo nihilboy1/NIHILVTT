@@ -1,8 +1,14 @@
-import { PHB2024CLASSES, PHB2024ITEMS } from '@nihilvtt/datamodeling/data';
+import {
+  PHB2024CLASSES,
+  PHB2024ITEMS,
+  UNARMED_ATTACK_PROFILE,
+  resolveUnarmedAttackDamageType,
+} from '@nihilvtt/datamodeling/data';
+import { DamageTypeEnum } from '@nihilvtt/datamodeling/primitives';
 
 import { getAbilityModifier } from '@/entities/character/model/rules/characterDerivedRules';
 import type { Action } from '@/entities/character/model/schemas/character.schema';
-import type { AttackEntry } from '@/shared/api/types';
+import type { AttackEntry, CombatDamageType } from '@/shared/api/types';
 
 function formatSignedValue(value: number): string {
   if (value > 0) {
@@ -33,7 +39,11 @@ function resolveWeaponRangeMeters(attackEffect: {
 }): number {
   if (attackEffect.weaponRange === 'ranged') {
     const normalRangeFeet = attackEffect.range?.normal;
-    if (typeof normalRangeFeet === 'number' && Number.isFinite(normalRangeFeet) && normalRangeFeet > 0) {
+    if (
+      typeof normalRangeFeet === 'number' &&
+      Number.isFinite(normalRangeFeet) &&
+      normalRangeFeet > 0
+    ) {
       return feetToMeters(normalRangeFeet);
     }
     return 6;
@@ -64,30 +74,66 @@ function hasAutomaticWeaponTypeProficiency(
       return false;
     }
 
-    return (
-      effect.choose.count === 'all' &&
-      effect.choose.from.includes(weaponType)
-    );
+    return effect.choose.count === 'all' && effect.choose.from.includes(weaponType);
   });
+}
+
+function resolvePrimaryDamageType(attackEffect: {
+  damageFormulas: { primary: { damageTypeOptions?: string[] } };
+}): CombatDamageType {
+  const options = attackEffect.damageFormulas.primary.damageTypeOptions;
+  const first = Array.isArray(options) ? options[0] : null;
+  if (typeof first !== 'string' || first.trim().length === 0) {
+    throw new Error(
+      'Violação de contrato de catálogo: ataque de arma sem damageTypeOptions.primary.',
+    );
+  }
+
+  const parsed = DamageTypeEnum.safeParse(first.trim().toLowerCase());
+  if (!parsed.success) {
+    throw new Error('Violação de contrato de catálogo: ataque de arma com damageType inválido.');
+  }
+
+  return parsed.data;
 }
 
 export function buildUnarmedAttackEntry(options: {
   strength: number;
   proficiencyBonus: number;
+  specieId?: string | null;
 }): AttackEntry {
   const strengthModifier = getAbilityModifier(options.strength);
   const attackBonus = options.proficiencyBonus + strengthModifier;
   const flatDamage = Math.max(1, 1 + strengthModifier);
+  const damageType = resolveUnarmedAttackDamageType(options.specieId);
 
   return {
-    id: 'builtin-unarmed-strike',
-    label: 'Ataque desarmado',
+    id: UNARMED_ATTACK_PROFILE.attackId,
+    label: UNARMED_ATTACK_PROFILE.label,
     attackBonus,
     damageFormula: `${flatDamage}`,
-    rangeMeters: 1.5,
-    sourceType: 'unarmed',
+    damageType,
+    rangeMeters: UNARMED_ATTACK_PROFILE.rangeMeters,
+    sourceType: UNARMED_ATTACK_PROFILE.sourceType,
     sourceItemId: null,
     sourceSlot: null,
+  };
+}
+
+export function buildUnarmedAttackAction(options: {
+  strength: number;
+  proficiencyBonus: number;
+}): Action {
+  const unarmedAttack = buildUnarmedAttackEntry(options);
+
+  return {
+    id: unarmedAttack.id,
+    name: unarmedAttack.label,
+    bonus:
+      unarmedAttack.attackBonus >= 0
+        ? `+${unarmedAttack.attackBonus}`
+        : `${unarmedAttack.attackBonus}`,
+    damage: unarmedAttack.damageFormula,
   };
 }
 
@@ -110,9 +156,7 @@ export function buildWeaponAttackEntry(
     return null;
   }
 
-  const attackEffect = item.effects.find(
-    (effect) => effect.type === 'onWield_grantWeaponAttack',
-  );
+  const attackEffect = item.effects.find((effect) => effect.type === 'onWield_grantWeaponAttack');
 
   if (!attackEffect || attackEffect.type !== 'onWield_grantWeaponAttack') {
     return null;
@@ -141,12 +185,14 @@ export function buildWeaponAttackEntry(
     attackEffect.weaponType,
   );
   const totalAttackBonus = attackModifier + (gainsProficiencyBonus ? options.proficiencyBonus : 0);
+  const damageType = resolvePrimaryDamageType(attackEffect);
 
   return {
     id: `builtin-${item.id}`,
     label: attackEffect.name,
     attackBonus: totalAttackBonus,
     damageFormula,
+    damageType,
     rangeMeters: resolveWeaponRangeMeters(attackEffect),
     sourceType: 'weapon',
     sourceItemId: item.id,

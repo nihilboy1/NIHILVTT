@@ -29,6 +29,8 @@ import { useMarqueeSelection } from '../../../features/boardMarqueeSelection/mod
 import { useRuler } from '../../../features/boardRuler/model/hooks/useRuler';
 import { useBoardSettingsStore } from '../../../features/boardSettings/model/store';
 import { useCharacterDrop } from '../../../features/characterDropOnBoard/model/hooks/useCharacterDrop';
+import { useAttackFeedbackStore } from '../../../features/combat/model/attackFeedbackStore';
+import { isBludgeoningDamageType } from '../../../features/combat/model/damageTypeRules';
 import { useUIStore } from '../../../features/layoutControls/model/store';
 import { PendingAttackSelection, Point, Token } from '../../../shared/api/types';
 import { useGameBoardEvents } from '../model/hooks/useGameBoardEvents';
@@ -47,6 +49,7 @@ interface GameBoardProps {
   copiedTokenId: string | null;
   pasteTargetCell: Point | null;
   pendingAttack: PendingAttackSelection | null;
+  pendingMovementTokenId: string | null;
   onTokenDragStart: (tokenId: string) => void;
   onTokenDragMove: (tokenId: string, visualWorldPoint: Point) => void;
   onTokenDragEnd: (tokenId: string) => void;
@@ -64,6 +67,7 @@ export function GameBoard({
   copiedTokenId,
   pasteTargetCell,
   pendingAttack,
+  pendingMovementTokenId,
   onTokenDragStart,
   onTokenDragMove,
   onTokenDragEnd,
@@ -73,6 +77,8 @@ export function GameBoard({
   onBoardPointerMove,
   onBoardPointerLeave,
 }: GameBoardProps) {
+  const CLUB_ATTACK_ANIMATION_DURATION_MS = 420;
+  const AUTO_CENTER_ANIMATION_BUFFER_MS = 80;
   const { gameId } = useParams<{ gameId: string }>();
   const { characters } = useCharactersStore();
   const runtimeCharactersById = useCharactersStore((state) => state.runtimeCharactersById);
@@ -96,6 +102,7 @@ export function GameBoard({
     () => combatState?.participants.map((participant) => participant.tokenId) ?? [],
     [combatState],
   );
+  const feedbackByTokenId = useAttackFeedbackStore((state) => state.feedbackByTokenId);
   const activeCombatTurnCanMove =
     combatState == null || combatState.turnResources.remainingMovementCells > 0;
   const isGameMaster =
@@ -159,6 +166,10 @@ export function GameBoard({
       return null;
     }
 
+    if (pendingMovementTokenId == null || pendingMovementTokenId !== selectedTokenId) {
+      return null;
+    }
+
     if (!controllableTokenIds.includes(selectedTokenId)) {
       return null;
     }
@@ -219,6 +230,7 @@ export function GameBoard({
     combatState,
     controllableTokenIds,
     multiSelectedTokenIds,
+    pendingMovementTokenId,
     pageSettings,
     tokensOnBoard,
   ]);
@@ -229,7 +241,12 @@ export function GameBoard({
   );
 
   const movementPreviewPathCells = useMemo(() => {
-    if (!movementRangeModel || !pasteTargetCell || pendingAttack != null) {
+    if (
+      !movementRangeModel ||
+      !pasteTargetCell ||
+      pendingAttack != null ||
+      pendingMovementTokenId == null
+    ) {
       return [] as Point[];
     }
 
@@ -248,7 +265,7 @@ export function GameBoard({
     );
 
     return path.length > 1 ? path : [];
-  }, [movementRangeModel, pasteTargetCell, pendingAttack]);
+  }, [movementRangeModel, pasteTargetCell, pendingAttack, pendingMovementTokenId]);
 
   const handleTokenMove = useCallback(
     (tokenId: string, newPosition: Point) => {
@@ -320,7 +337,12 @@ export function GameBoard({
 
   const tryHandleCombatClickMove = useCallback(
     (point: Point) => {
-      if (!combatState || pendingAttack != null || clickMoveInFlightRef.current) {
+      if (
+        !combatState ||
+        pendingAttack != null ||
+        pendingMovementTokenId == null ||
+        clickMoveInFlightRef.current
+      ) {
         return false;
       }
 
@@ -383,6 +405,7 @@ export function GameBoard({
       pageSettings.heightInUnits,
       pageSettings.widthInUnits,
       pendingAttack,
+      pendingMovementTokenId,
     ],
   );
 
@@ -433,6 +456,7 @@ export function GameBoard({
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastAutoCenteredTurnKeyRef = useRef<string | null>(null);
+  const pendingAutoCenterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clickMoveInFlightRef = useRef(false);
   const pixiDragRef = useRef<{
     tokenId: string;
@@ -477,7 +501,20 @@ export function GameBoard({
   }, [initializeViewBox, setZoomLevel]);
 
   useEffect(() => {
+    return () => {
+      if (pendingAutoCenterTimeoutRef.current) {
+        clearTimeout(pendingAutoCenterTimeoutRef.current);
+        pendingAutoCenterTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (combatState == null || activeCombatTurnTokenId == null) {
+      if (pendingAutoCenterTimeoutRef.current) {
+        clearTimeout(pendingAutoCenterTimeoutRef.current);
+        pendingAutoCenterTimeoutRef.current = null;
+      }
       lastAutoCenteredTurnKeyRef.current = null;
       return;
     }
@@ -509,6 +546,39 @@ export function GameBoard({
       y: (activeToken.position.y + sizeMultiplierY / 2) * gridSettings.visualCellSize,
     };
 
+    const nowMs = Date.now();
+    const latestAttackAnimationEndMs = Object.values(feedbackByTokenId)
+      .filter((entry): entry is NonNullable<typeof entry> => entry != null)
+      .filter(
+        (entry) =>
+          Boolean(entry.attackerTokenId) &&
+          isBludgeoningDamageType(entry.attackDamageType) &&
+          typeof entry.triggeredAtMs === 'number',
+      )
+      .reduce((maxEndMs, entry) => {
+        const endMs =
+          (entry.triggeredAtMs ?? nowMs) +
+          CLUB_ATTACK_ANIMATION_DURATION_MS +
+          AUTO_CENTER_ANIMATION_BUFFER_MS;
+        return Math.max(maxEndMs, endMs);
+      }, 0);
+
+    const delayMs = Math.max(0, latestAttackAnimationEndMs - nowMs);
+
+    if (pendingAutoCenterTimeoutRef.current) {
+      clearTimeout(pendingAutoCenterTimeoutRef.current);
+      pendingAutoCenterTimeoutRef.current = null;
+    }
+
+    if (delayMs > 0) {
+      pendingAutoCenterTimeoutRef.current = setTimeout(() => {
+        centerViewOnPoint(activeTokenCenter);
+        lastAutoCenteredTurnKeyRef.current = turnKey;
+        pendingAutoCenterTimeoutRef.current = null;
+      }, delayMs);
+      return;
+    }
+
     centerViewOnPoint(activeTokenCenter);
     lastAutoCenteredTurnKeyRef.current = turnKey;
   }, [
@@ -516,6 +586,7 @@ export function GameBoard({
     centerViewOnPoint,
     characters,
     combatState,
+    feedbackByTokenId,
     gridSettings.visualCellSize,
     isPanning,
     tokensOnBoard,
@@ -556,8 +627,9 @@ export function GameBoard({
   const { marqueeSelection, handleMarqueeMouseDown, handleMarqueeMouseMove, handleMarqueeMouseUp } =
     useMarqueeSelection({
       activeTool,
-      isSelectionLocked: pendingAttack != null,
+      isSelectionLocked: pendingAttack != null || pendingMovementTokenId != null,
       getWorldPoint: getWorldPointWithZoom,
+      pendingMovementTokenId,
       tokensOnBoard,
       characters,
       gridSettings,
@@ -608,7 +680,8 @@ export function GameBoard({
       }
 
       if (combatState) {
-        return false;
+        onSetMultiSelectedTokenIds([tokenId]);
+        return true;
       }
 
       const isControllableToken = controllableTokenIds.includes(tokenId);
@@ -627,8 +700,13 @@ export function GameBoard({
         return false;
       }
 
-      const tokenWorldX = token.position.x * gridSettings.visualCellSize;
-      const tokenWorldY = token.position.y * gridSettings.visualCellSize;
+      const character = characters.find((entry) => entry.id === token.characterId);
+      const [sizeMultiplierX, sizeMultiplierY] = parseTokenSize(character?.size);
+      const cellSize = gridSettings.visualCellSize;
+      const centeringOffsetX = Math.max(0, 1 - sizeMultiplierX) * 0.5 * cellSize;
+      const centeringOffsetY = Math.max(0, 1 - sizeMultiplierY) * 0.5 * cellSize;
+      const tokenWorldX = token.position.x * cellSize + centeringOffsetX;
+      const tokenWorldY = token.position.y * cellSize + centeringOffsetY;
       pixiDragRef.current = {
         tokenId,
         offsetX: point.x - tokenWorldX,
@@ -647,7 +725,9 @@ export function GameBoard({
       controllableTokenIds,
       gridSettings.visualCellSize,
       multiSelectedTokenIds,
+      onSetMultiSelectedTokenIds,
       pendingAttack,
+      pendingMovementTokenId,
       tryHandleCombatClickMove,
       tokensOnBoard,
     ],
@@ -780,10 +860,11 @@ export function GameBoard({
         if (character) {
           hasValidToken = true;
           const [sizeMultiplierX, sizeMultiplierY] = parseCharacterSize(character.size);
-          const tokenWorldX = token.position.x * gridSettings.visualCellSize;
-          const tokenWorldY = token.position.y * gridSettings.visualCellSize;
-          const tokenWorldWidth = sizeMultiplierX * gridSettings.visualCellSize;
-          const tokenWorldHeight = sizeMultiplierY * gridSettings.visualCellSize;
+          const cellSize = gridSettings.visualCellSize;
+          const tokenWorldX = token.position.x * cellSize;
+          const tokenWorldY = token.position.y * cellSize;
+          const tokenWorldWidth = Math.max(1, Math.ceil(sizeMultiplierX)) * cellSize;
+          const tokenWorldHeight = Math.max(1, Math.ceil(sizeMultiplierY)) * cellSize;
 
           minX = Math.min(minX, tokenWorldX);
           minY = Math.min(minY, tokenWorldY);
@@ -828,6 +909,7 @@ export function GameBoard({
         onBoardPointerMove={onBoardPointerMove}
         onBoardPointerLeave={onBoardPointerLeave}
         characters={characters}
+        runtimeCharactersById={runtimeCharactersById}
         tokensOnBoard={tokensOnBoard}
         gridSettings={gridSettings}
         pageSettings={pageSettings}

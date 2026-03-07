@@ -7,10 +7,11 @@ export interface ToolbarButtonProps {
   icon: React.ReactNode;
   onClick: () => void;
   variant?: 'default' | 'active' | 'toggled' | 'hide';
+  activeClassName?: string;
 }
 
 function ToolbarButtonComponent(
-  { label, icon, onClick, variant = 'default' }: ToolbarButtonProps,
+  { label, icon, onClick, variant = 'default', activeClassName }: ToolbarButtonProps,
   ref: React.Ref<HTMLButtonElement>,
 ) {
   const baseClasses =
@@ -18,7 +19,8 @@ function ToolbarButtonComponent(
 
   const variantClasses = {
     default: 'hover:bg-accent-primary-hover',
-    active: 'bg-accent-primary text-accent-primary-text hover:bg-accent-primary-hover',
+    active:
+      activeClassName ?? 'bg-accent-primary text-accent-primary-text hover:bg-accent-primary-hover',
     toggled: 'bg-accent-secondary text-accent-primary-text hover:bg-accent-primary-hover',
     hide: 'hover:bg-accent-primary-hover mt-auto',
   };

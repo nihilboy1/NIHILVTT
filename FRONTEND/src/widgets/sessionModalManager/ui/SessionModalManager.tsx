@@ -17,13 +17,16 @@ import { HPControlModal } from '../../../features/characterUpdateHp/ui/HPControl
 import { ConfirmationModal } from '../../../shared/ui/ConfirmationModal';
 import { Spinner } from '../../../shared/ui/Spinner';
 
-const SheetModal = lazy(async () => import('../../sheetModal/ui/SheetModal').then((module) => ({
-  default: module.SheetModal,
-})));
+const SheetModal = lazy(async () =>
+  import('../../sheetModal/ui/SheetModal').then((module) => ({
+    default: module.SheetModal,
+  })),
+);
 const CharacterBuilderModal = lazy(async () =>
   import('@/features/characterBuilder/components/ui/CharacterBuilderModal').then((module) => ({
     default: module.CharacterBuilderModal,
-  })));
+  })),
+);
 
 // 1. Novas Importações: Trocamos os tipos manuais pelo CharacterSchema do Zod.
 
@@ -92,14 +95,14 @@ export function SessionModalManager({
             return (
               <Suspense
                 key={(props.characterId as string | undefined) ?? (props.monsterId as string)}
-                fallback={(
+                fallback={
                   <div
                     className="fixed inset-0 flex items-center justify-center"
                     style={{ zIndex: 1000 + index }}
                   >
                     <Spinner variant="mini" />
                   </div>
-                )}
+                }
               >
                 <SheetModal
                   characterId={(props.characterId as string | undefined) ?? null}
@@ -127,20 +130,16 @@ export function SessionModalManager({
             return (
               <Suspense
                 key={modalEntry.id}
-                fallback={(
+                fallback={
                   <div
                     className="fixed inset-0 flex items-center justify-center"
                     style={{ zIndex: 1500 + index }}
                   >
                     <Spinner variant="mini" />
                   </div>
-                )}
+                }
               >
-                <CharacterBuilderModal
-                  isOpen={true}
-                  onClose={closeModal}
-                  zIndex={1500 + index}
-                />
+                <CharacterBuilderModal isOpen={true} onClose={closeModal} zIndex={1500 + index} />
               </Suspense>
             );
           }

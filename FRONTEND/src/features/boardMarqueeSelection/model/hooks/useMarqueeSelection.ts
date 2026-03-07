@@ -83,6 +83,7 @@ export function useMarqueeSelection({
           selectedIds.push(token.id);
         }
       });
+
       onSetMultiSelectedTokenIds(selectedIds);
       setMarqueeSelection({
         isActive: false,

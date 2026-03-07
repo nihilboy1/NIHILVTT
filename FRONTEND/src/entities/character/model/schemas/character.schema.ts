@@ -3,6 +3,7 @@ import {
   DiceTypeEnum,
   ProficiencyLevelEnum,
   CharacterTypeEnum,
+  DamageTypeEnum,
 } from '@nihilvtt/datamodeling/primitives';
 import { z } from 'zod';
 export { CharacterTypeEnum };
@@ -73,9 +74,14 @@ const combatStatsSchema = z
 
 export const actionSchema = z.object({
   id: z.uuid(),
+  actionId: z
+    .string()
+    .regex(/^act-[a-z0-9-]+$/, 'actionId canônico inválido.')
+    .optional(),
   name: z.string(),
   bonus: z.string().or(z.number()).optional(),
   damage: z.string().or(z.number()).optional(),
+  damageType: DamageTypeEnum.optional(),
   rangeMeters: z.number().positive().optional(),
 });
 

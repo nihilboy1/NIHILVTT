@@ -29,6 +29,7 @@
     "enums": "npx tsx src/tooling/generate-enums.ts",
     "export:backend-item-manifest": "npx tsx src/tooling/export-backend-item-manifest.ts",
     "export:backend-monster-manifest": "npx tsx src/tooling/export-backend-monster-manifest.ts",
+    "check:backend-monster-manifest-sync": "npx tsx src/tooling/check-backend-monster-manifest-sync.ts",
     "monsters": "npx tsx src/tooling/generate-monsters.ts",
     "lint": "eslint \"src/**/*.ts\" --fix"
   },

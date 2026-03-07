@@ -9,6 +9,7 @@
   "scripts": {
     "dev:front": "cd FRONTEND && pnpm dev",
     "dev:back": "cd BACKEND-JAVA; mvn spring-boot:run",
+    "check:monster-manifest-sync": "cd DATAMODELING && pnpm check:backend-monster-manifest-sync",
     "test:front": "cd FRONTEND && pnpm run test",
     "test:e2e:front": "cd FRONTEND && pnpm run e2e",
     "test:front:all": "cd FRONTEND && pnpm run test && pnpm run e2e"

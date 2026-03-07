@@ -180,12 +180,14 @@ export function getTokenWorldRect(params: {
 }): Rect {
   const [width, height] = params.sizeInCells;
   const safeCellSize = Math.max(1, params.cellSize);
+  const safeWidth = Math.max(1, Math.ceil(width));
+  const safeHeight = Math.max(1, Math.ceil(height));
 
   return {
     x: params.token.position.x * safeCellSize,
     y: params.token.position.y * safeCellSize,
-    width: Math.max(1, width) * safeCellSize,
-    height: Math.max(1, height) * safeCellSize,
+    width: safeWidth * safeCellSize,
+    height: safeHeight * safeCellSize,
   };
 }
 

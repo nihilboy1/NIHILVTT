@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 
-import {
-  requireNormalizedCharacterEntry,
-} from './adapters/sessionCharacterAdapter';
+import { requireNormalizedCharacterEntry } from './adapters/sessionCharacterAdapter';
 import {
   Character,
   PlayerCharacter,
@@ -20,7 +18,15 @@ export interface CharactersState {
   deleteCharacter: (characterId: string) => void;
   removeCharacterFromSession: (characterId: string) => void;
   updateCharacter: (characterId: string, updates: Partial<Character>) => void;
-  updateCharacterHp: (characterId: string, newHp: number, newTempHp?: number) => void;
+  updateCharacterHp: (
+    characterId: string,
+    newHp: number,
+    newTempHp?: number,
+    options?: {
+      deadConditionApplied?: boolean;
+      deadConditionRemoved?: boolean;
+    },
+  ) => void;
   duplicateCharacter: (characterId: string) => Character | null;
   replaceCharacters: (characters: unknown[]) => void;
 }
@@ -114,7 +120,7 @@ export const useCharactersStore = create<CharactersState>((set, get) => ({
     throwBlockedLocalCharacterMutation('updateCharacter');
   },
 
-  updateCharacterHp: (characterId, newHp, newTempHp) => {
+  updateCharacterHp: (characterId, newHp, newTempHp, options) => {
     set((state) => {
       const nextRuntimeCharactersById = { ...state.runtimeCharactersById };
       const runtimeCharacter = nextRuntimeCharactersById[characterId];
@@ -140,6 +146,36 @@ export const useCharactersStore = create<CharactersState>((set, get) => ({
             },
           };
         }
+        const nextEffects = nextRuntimeCharacter.activeEffects.effects.filter(
+          (effect) => effect.linkedCondition !== 'dead',
+        );
+        if (options?.deadConditionApplied) {
+          const nextEffectIndex =
+            nextEffects.reduce((max, effect) => Math.max(max, effect.effectIndex), -1) + 1;
+
+          nextEffects.push({
+            instanceId: crypto.randomUUID(),
+            source: {
+              sourceType: 'action',
+              sourceId: 'act-apply-effect',
+            },
+            effectIndex: nextEffectIndex,
+            linkedCondition: 'dead',
+            stackCount: 1,
+            isSuppressed: false,
+          });
+        }
+
+        if (options?.deadConditionApplied || options?.deadConditionRemoved) {
+          nextRuntimeCharacter = {
+            ...nextRuntimeCharacter,
+            activeEffects: {
+              ...nextRuntimeCharacter.activeEffects,
+              effects: nextEffects,
+            },
+          };
+        }
+
         nextRuntimeCharactersById[characterId] = nextRuntimeCharacter;
       }
 

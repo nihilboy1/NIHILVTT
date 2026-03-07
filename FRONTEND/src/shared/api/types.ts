@@ -1,3 +1,7 @@
+import type { CombatDamageType } from './damageTypes';
+
+export type { CombatDamageType } from './damageTypes';
+
 export type RollCategory = 'Attack' | 'Damage' | 'Attribute' | 'Skill' | 'Saving Throw' | 'Generic';
 
 export interface Roll {
@@ -105,6 +109,7 @@ export interface AttackEntry {
   label: string;
   attackBonus: number;
   damageFormula: string;
+  damageType: CombatDamageType;
   rangeMeters: number;
   sourceType: AttackSourceType;
   sourceItemId?: string | null;
@@ -124,7 +129,7 @@ export interface CombatParticipant {
   initiativeTotal: number;
   dexterityScore: number;
   movementBudgetCells: number;
-  status: 'active';
+  status: string;
 }
 
 export interface CombatTurnResources {

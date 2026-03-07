@@ -1,9 +1,12 @@
 import { PHB2024MONSTERS } from '@nihilvtt/datamodeling/data';
+import { DamageTypeEnum } from '@nihilvtt/datamodeling/primitives';
 import { type MonsterCharacterStateType } from '@nihilvtt/datamodeling/runtime';
 import { z } from 'zod';
 
-
-import { DEFAULT_PLAYER_DATA, DEFAULT_TOKEN_IMAGE } from '@/entities/character/config/sheetDefaults';
+import {
+  DEFAULT_PLAYER_DATA,
+  DEFAULT_TOKEN_IMAGE,
+} from '@/entities/character/config/sheetDefaults';
 import { getArmorClassFromEquipment } from '@/entities/character/model/rules/itemDerivedRules';
 import { getBaseWalkSpeedFromSpecieId } from '@/entities/character/model/rules/specieDerivedRules';
 import {
@@ -103,6 +106,26 @@ function formatMonsterDamageFormula(formula: unknown): string | undefined {
   return `${count}d${faces}${sign}${bonusValue}`;
 }
 
+function extractMonsterDamageType(formula: unknown): string | undefined {
+  if (!formula || typeof formula !== 'object') {
+    return undefined;
+  }
+
+  const formulaRecord = formula as Record<string, unknown>;
+  const options = formulaRecord.damageTypeOptions;
+  if (!Array.isArray(options) || options.length === 0) {
+    return undefined;
+  }
+
+  const firstOption = options[0];
+  if (typeof firstOption !== 'string' || firstOption.trim().length === 0) {
+    return undefined;
+  }
+
+  const parsed = DamageTypeEnum.safeParse(firstOption.trim().toLowerCase());
+  return parsed.success ? parsed.data : undefined;
+}
+
 function convertFeetToMeters(feet: number): number {
   const meters = feet * 0.3;
   return Number.isInteger(meters) ? meters : Number(meters.toFixed(1));
@@ -125,12 +148,33 @@ function buildMonsterActionsFromCatalog(monster: MonsterType): MonsterNpcCharact
         : undefined;
     const outcomes = Array.isArray(effect.parameters?.outcomes) ? effect.parameters.outcomes : [];
     const firstOutcome = outcomes.find((outcome) => outcome.type === 'modifyTargetHP');
+    if (!firstOutcome) {
+      return [];
+    }
+
+    const actionId = effect.actionId.trim();
+    if (actionId.length === 0) {
+      throw new Error(
+        `Violação de contrato de catálogo: ação de monstro sem actionId em ${monster.id}:${effect.name}.`,
+      );
+    }
+
+    const damageType = firstOutcome ? extractMonsterDamageType(firstOutcome.formula) : undefined;
+
+    if (firstOutcome && !damageType) {
+      throw new Error(
+        `Violação de contrato de catálogo: ação de monstro sem damageType em ${monster.id}:${effect.name}.`,
+      );
+    }
+
     return [
       {
         id: buildDeterministicUuid(`monster-action:${monster.id}:${effectIndex}:${effect.name}`),
+        actionId,
         name: effect.name,
         bonus: typeof attackBonusValue === 'number' ? attackBonusValue : 0,
         damage: firstOutcome ? formatMonsterDamageFormula(firstOutcome.formula) : undefined,
+        damageType,
         rangeMeters: typeof rangeNormal === 'number' ? convertFeetToMeters(rangeNormal) : 1.5,
       },
     ];
@@ -196,16 +240,20 @@ export function adaptMonsterCatalogToSheetModel(monster: MonsterType): MonsterNp
     actions: buildMonsterActionsFromCatalog(monster),
     attacks: [],
     equipment: [],
-    featuresAndTraits: ('traits' in monster ? monster.traits ?? [] : []).map((trait, traitIndex) => ({
-      id: buildDeterministicUuid(`monster-trait:${monster.id}:${traitIndex}:${trait.name}`),
-      name: trait.name,
-      description: trait.description,
-    })),
+    featuresAndTraits: ('traits' in monster ? (monster.traits ?? []) : []).map(
+      (trait, traitIndex) => ({
+        id: buildDeterministicUuid(`monster-trait:${monster.id}:${traitIndex}:${trait.name}`),
+        name: trait.name,
+        description: trait.description,
+      }),
+    ),
     challengeRating: Number(monster.challengeRating),
   };
 }
 
-function adaptRuntimePlayerCharacterToSheetModel(character: PlayerCharacterRuntime): PlayerCharacter {
+function adaptRuntimePlayerCharacterToSheetModel(
+  character: PlayerCharacterRuntime,
+): PlayerCharacter {
   const base = deepCloneDefaultPlayer();
 
   const sheetCharacter: PlayerCharacter = {
@@ -227,10 +275,7 @@ function adaptRuntimePlayerCharacterToSheetModel(character: PlayerCharacterRunti
         character.attributes.base.dexterity,
         base.combatStats.armorClass,
       ),
-      speed: getBaseWalkSpeedFromSpecieId(
-        character.build.specieId,
-        base.combatStats.speed,
-      ),
+      speed: getBaseWalkSpeedFromSpecieId(character.build.specieId, base.combatStats.speed),
       shieldEquipped: character.equipment.shieldItemId !== null,
     },
     level: character.progression.currentLevel,
@@ -254,7 +299,9 @@ function adaptRuntimePlayerCharacterToSheetModel(character: PlayerCharacterRunti
   return sheetCharacter;
 }
 
-function adaptRuntimeMonsterCharacterToSheetModel(character: MonsterCharacterStateType): MonsterNpcCharacter | null {
+function adaptRuntimeMonsterCharacterToSheetModel(
+  character: MonsterCharacterStateType,
+): MonsterNpcCharacter | null {
   const monster = MONSTERS_BY_ID.get(character.monsterId);
   if (!monster) {
     return null;
@@ -277,30 +324,22 @@ function adaptRuntimeMonsterCharacterToSheetModel(character: MonsterCharacterSta
   };
 }
 
-export function parseRuntimePlayerCharacter(
-  entry: unknown,
-): PlayerCharacterRuntime | null {
+export function parseRuntimePlayerCharacter(entry: unknown): PlayerCharacterRuntime | null {
   const runtimeParsed = playerCharacterRuntimeSchema.safeParse(entry);
   return runtimeParsed.success ? runtimeParsed.data : null;
 }
 
-export function parseRuntimeMonsterCharacter(
-  entry: unknown,
-): MonsterCharacterStateType | null {
+export function parseRuntimeMonsterCharacter(entry: unknown): MonsterCharacterStateType | null {
   const runtimeCharacter = parseSessionRuntimeCharacter(entry);
   return isMonsterCharacterRuntime(runtimeCharacter) ? runtimeCharacter : null;
 }
 
-export function parseSessionRuntimeCharacter(
-  entry: unknown,
-): SessionCharacterRuntime | null {
+export function parseSessionRuntimeCharacter(entry: unknown): SessionCharacterRuntime | null {
   const runtimeParsed = sessionCharacterRuntimeSchema.safeParse(entry);
   return runtimeParsed.success ? runtimeParsed.data : null;
 }
 
-export function normalizeCharacterEntry(
-  entry: unknown,
-): NormalizedCharacterEntry | null {
+export function normalizeCharacterEntry(entry: unknown): NormalizedCharacterEntry | null {
   const runtimeCharacter = parseSessionRuntimeCharacter(entry);
   if (!runtimeCharacter) {
     return null;

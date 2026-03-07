@@ -3,8 +3,8 @@ import { MonsterType } from "../../domain/monster/monster.schema.js";
 export const monstersCR1Over2 = [
   {
     id: "monster-ape",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Macaco", "Ape"],
     description:
       "O Macaco é um primata inteligente e ágil, conhecido por sua força e habilidade de escalar árvores com facilidade.",
@@ -120,8 +120,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-black-bear",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Urso Negro", "Black Bear"],
     description:
       "O Urso Negro é um mamífero poderoso e territorial, encontrado em florestas densas. É conhecido por sua força e habilidade de escalar árvores.",
@@ -204,8 +204,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-cockatrice",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Cocatriz", "Cockatrice"],
     description:
       "A Cocatriz é uma criatura pequena e feroz, conhecida por sua mordida capaz de petrificar suas vítimas.",
@@ -294,8 +294,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-crocodile",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Crocodilo", "Crocodile"],
     description:
       "O Crocodilo é um réptil predador que habita áreas alagadas e é conhecido por sua mordida poderosa e emboscadas sorrateiras.",
@@ -398,8 +398,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-darkmantle",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Manto Sombrio", "Darkmantle"],
     description:
       "O Manto Sombrio é uma criatura das profundezas que caça suas presas mergulhando do teto de cavernas e sufocando-as na escuridão.",
@@ -485,8 +485,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-dust-mephit",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Mefit de Poeira", "Dust Mephit"],
     description:
       "O Mefit de Poeira é um elemental travesso formado de poeira e vento, conhecido por suas explosões ao morrer.",
@@ -615,8 +615,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-gas-spore-fungus",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Fungo Esporo de Gás", "Gas Spore Fungus"],
     description:
       "O Fungo Esporo de Gás se assemelha a um perigoso beholder, mas explode liberando esporos mortais ao ser atacado.",
@@ -719,8 +719,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-giant-goat",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/ewI8XsF.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Cabra Gigante", "Giant Goat"],
     description:
       "A Cabra Gigante é um animal robusto e ágil, capaz de escalar terrenos íngremes e sobreviver em ambientes montanhosos hostis.",
@@ -821,8 +821,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-giant-seahorse",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Cavalo-Marinho Gigante", "Giant Seahorse"],
     description:
       "O Cavalo-Marinho Gigante é uma criatura aquática de grande porte, frequentemente usada como montaria por criaturas submarinas.",
@@ -913,8 +913,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-giant-wasp",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Vespa Gigante", "Giant Wasp"],
     description:
       "A Vespa Gigante é um inseto predador de tamanho impressionante, conhecido por seu ferrão venenoso e voo ágil.",
@@ -991,8 +991,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-gnoll-warrior",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Gnoll Guerreiro", "Gnoll Warrior"],
     description:
       "O Gnoll Guerreiro é um feroz combatente das tribos gnoll, conhecido por sua selvageria e táticas brutais em batalha.",
@@ -1079,8 +1079,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-gray-ooze",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Lodo Cinzento", "Gray Ooze"],
     description:
       "O Lodo Cinzento é uma criatura amorfa e corrosiva, encontrada em masmorras e cavernas, capaz de dissolver metal e carne.",
@@ -1173,8 +1173,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-hobgoblin-warrior",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Hobgoblin Guerreiro", "Hobgoblin Warrior"],
     description:
       "O Hobgoblin Guerreiro é um soldado disciplinado das legiões hobgoblin, treinado em táticas de combate em grupo.",
@@ -1285,8 +1285,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-ice-mephit",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Mefit de Gelo", "Ice Mephit"],
     description:
       "O Mefit de Gelo é um elemental travesso formado de gelo e ar frio, capaz de liberar rajadas congelantes.",
@@ -1421,8 +1421,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-jackalwere",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Homem-Chacal", "Jackalwere"],
     description:
       "O Homem-Chacal é uma criatura maligna capaz de alternar entre forma de chacal e humanoide, conhecida por sua astúcia e ataques em grupo.",
@@ -1533,8 +1533,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-magma-mephit",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Mefit de Magma", "Magma Mephit"],
     description:
       "O Mefit de Magma é um elemental travesso composto de rocha derretida e fogo, explodindo em chamas ao morrer.",
@@ -1666,8 +1666,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-magmin",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Magmin", "Magmin"],
     description:
       "O Magmin é uma criatura elemental de fogo, pequena e incandescente, que incendeia tudo o que toca.",
@@ -1739,8 +1739,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-modron-tridrone",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Modron Tridrone", "Modron Tridrone"],
     description:
       "O Modron Tridrone é um construto extraplanar de forma geométrica, servindo como soldado e supervisor nas fileiras modron.",
@@ -1823,8 +1823,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-myconid-adult",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Miconídeo Adulto", "Myconid Adult"],
     description:
       "O Miconídeo Adulto é um fungo inteligente do Subterrâneo, vivendo em colônias e comunicando-se por esporos telepáticos.",
@@ -1903,8 +1903,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-performer",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Artista", "Performer"],
     description:
       "O Artista é um humanoide talentoso em apresentações, usando agilidade e carisma tanto no palco quanto em situações de perigo.",
@@ -1970,8 +1970,8 @@ export const monstersCR1Over2 = [
   },
   {
     id: "monster-piercer",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     name: ["Perfurador", "Piercer"],
     description:
       "O Perfurador é uma aberração cavernícola que se assemelha a uma estalactite, caindo do teto para atacar suas presas.",
@@ -2073,8 +2073,8 @@ export const monstersCR1Over2 = [
     description:
       "O Tubarão de Recife é um predador ágil dos mares rasos, caçando em grupos e atacando presas feridas.",
     source: "MM2024",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
     size: "medium",
     type: "beast",
     alignment: "unaligned",
@@ -2148,8 +2148,8 @@ export const monstersCR1Over2 = [
     description:
       "O Monstro da Ferrugem é uma criatura subterrânea que se alimenta de metais, especialmente ferro, sendo temida por aventureiros equipados.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "medium",
     type: "monstrosity",
     alignment: "unaligned",
@@ -2227,8 +2227,8 @@ export const monstersCR1Over2 = [
     name: ["Sahuagin Guerreiro", "Sahuagin Warrior"],
     description:
       "O Sahuagin Guerreiro é um feroz habitante dos mares, conhecido por sua agressividade e domínio sobre tubarões.",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     source: "MM2024",
     size: "medium",
     type: "fiend",
@@ -2325,8 +2325,8 @@ export const monstersCR1Over2 = [
     description:
       "O Sátiro é uma criatura fey festiva e travessa, famosa por sua música, dança e resistência mágica.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "medium",
     type: "fey",
     alignment: "chaoticNeutral",
@@ -2402,8 +2402,8 @@ export const monstersCR1Over2 = [
     description:
       "O Batedor é um explorador habilidoso, mestre em sobrevivência, furtividade e reconhecimento de terreno.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "medium",
     type: "humanoid",
     alignment: "unaligned",
@@ -2505,8 +2505,8 @@ export const monstersCR1Over2 = [
     description:
       "A Sombra é um morto-vivo incorpóreo que drena a força vital de suas vítimas, temendo a luz do sol.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "medium",
     type: "undead",
     alignment: "chaoticEvil",
@@ -2601,8 +2601,8 @@ export const monstersCR1Over2 = [
     description:
       "O Enxame de Insetos é uma massa de criaturas pequenas que ataca em conjunto, difícil de ser contida por ataques convencionais.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "medium",
     type: "beast",
     alignment: "unaligned",
@@ -2701,8 +2701,8 @@ export const monstersCR1Over2 = [
     description:
       "O Durão é um humanoide robusto e resistente, acostumado a combates e a proteger aliados em situações perigosas.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "medium",
     type: "humanoid",
     alignment: "unaligned",
@@ -2791,8 +2791,8 @@ export const monstersCR1Over2 = [
     description:
       "O Membro de Troll é uma parte viva e independente de um troll, capaz de se mover e atacar até regenerar ou definhar.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "small",
     type: "giant",
     alignment: "chaoticEvil",
@@ -2867,8 +2867,8 @@ export const monstersCR1Over2 = [
       "A Praga de Videira é uma planta monstruosa que usa vinhas para agarrar e sufocar suas vítimas em florestas sombrias.",
     source: "MM2024",
     size: "medium",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     type: "plant",
     alignment: "neutralEvil",
     armorClass: 12,
@@ -2951,8 +2951,8 @@ export const monstersCR1Over2 = [
     description:
       "O Cavalo de Guerra é um animal treinado para batalha, forte e veloz, usado como montaria por cavaleiros e soldados.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "large",
     type: "beast",
     alignment: "unaligned",
@@ -3049,8 +3049,8 @@ export const monstersCR1Over2 = [
       "O Cavalo de Guerra Esqueleto é um morto-vivo animado por magia, servindo como montaria incansável em exércitos necromânticos.",
     source: "MM2024",
     size: "large",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     type: "undead",
     alignment: "lawfulEvil",
     armorClass: 13,
@@ -3137,8 +3137,8 @@ export const monstersCR1Over2 = [
     description:
       "O Worg é uma criatura lupina inteligente e maligna, frequentemente aliada a goblins e usada como montaria.",
     source: "MM2024",
-    splashArtUrl: "https://i.imgur.com/MW6e0c1.png",
-    tokenUrl: "https://i.imgur.com/TtwflB2.png",
+    splashArtUrl: "https://i.imgur.com/5ly1RRh.png",
+    tokenUrl: "https://i.imgur.com/Tpbf6Zf.png",
     size: "large",
     type: "fey",
     alignment: "neutralEvil",

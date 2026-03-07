@@ -1,8 +1,9 @@
-import { ProficiencyLevel } from "@/entities/character/model/view-models/playerCharacterSkillsViewModel";
-import { DiceFormula, RollCategory } from "@/shared/api/types";
+import { ProficiencyLevel } from '@/entities/character/model/view-models/playerCharacterSkillsViewModel';
+import { DiceFormula, RollCategory } from '@/shared/api/types';
 
 interface SkillProficiencyItemProps {
   skillLabel: string;
+  rollName?: string;
   isSavingThrow: boolean;
   proficiencyLevel: ProficiencyLevel;
   totalBonus: number;
@@ -11,12 +12,13 @@ interface SkillProficiencyItemProps {
     formula: DiceFormula,
     rollName: string,
     category: RollCategory,
-    characterName: string
+    characterName: string,
   ) => void;
 }
 
 export function SkillProficiencyItem({
   skillLabel,
+  rollName,
   isSavingThrow,
   proficiencyLevel,
   totalBonus,
@@ -24,48 +26,40 @@ export function SkillProficiencyItem({
   onRoll,
 }: SkillProficiencyItemProps) {
   const handleRoll = () => {
-    let rollName = skillLabel;
-
-    if (isSavingThrow) {
-      const match = skillLabel.match(/Salva-guarda de (.+)/);
-      if (match?.[1]) {
-        rollName = match[1];
-      }
-    }
-
-    const category: RollCategory = isSavingThrow ? "Saving Throw" : "Skill";
-    const formula: DiceFormula = `1d20${totalBonus >= 0 ? "+" : ""}${totalBonus}`;
-    onRoll(formula, rollName, category, characterName);
+    const resolvedRollName = rollName ?? skillLabel;
+    const category: RollCategory = isSavingThrow ? 'Saving Throw' : 'Skill';
+    const formula: DiceFormula = `1d20${totalBonus >= 0 ? '+' : ''}${totalBonus}`;
+    onRoll(formula, resolvedRollName, category, characterName);
   };
 
   const getProficiencyIndicator = () => {
     switch (proficiencyLevel) {
-      case "proficient":
+      case 'proficient':
         return (
           <div
             title="Proficiente"
-            className="h-3 w-3 flex-shrink-0 rounded-full bg-accent-secondary"
+            className="bg-accent-secondary h-3 w-3 flex-shrink-0 rounded-full"
           />
         );
-      case "expertise":
+      case 'expertise':
         return (
           <div
             title="Especialista"
-            className="h-3 w-3 flex-shrink-0 rounded-full bg-accent-primary ring-1 ring-accent-secondary/60"
+            className="bg-accent-primary ring-accent-secondary/60 h-3 w-3 flex-shrink-0 rounded-full ring-1"
           />
         );
-      case "none":
+      case 'none':
       default:
         return (
           <div
             title="Não Proficiente"
-            className="h-3 w-3 flex-shrink-0 rounded-full border border-surface-2/70"
+            className="border-surface-2/70 h-3 w-3 flex-shrink-0 rounded-full border"
           />
         );
     }
   };
 
-  const displayLabel = isSavingThrow ? "Salvaguarda" : skillLabel;
+  const displayLabel = isSavingThrow ? 'Salvaguarda' : skillLabel;
   const displayBonus = Number.isNaN(totalBonus)
     ? 0
     : totalBonus >= 0
@@ -83,15 +77,15 @@ export function SkillProficiencyItem({
         title="Proficiência definida pela ficha"
       >
         {getProficiencyIndicator()}
-        <span className="w-7 flex-shrink-0 text-right text-[0.72rem] font-bold text-accent-secondary">
+        <span className="text-accent-secondary w-7 flex-shrink-0 text-right text-[0.72rem] font-bold">
           {displayBonus}
         </span>
       </div>
       <span
-        className="flex-grow cursor-pointer rounded-md px-1 py-0.5 text-[0.72rem] font-medium text-text-primary transition-colors duration-200 hover:bg-surface-0/35"
+        className="text-text-primary hover:bg-surface-0/35 flex-grow cursor-pointer rounded-md px-1 py-0.5 text-[0.72rem] font-medium transition-colors duration-200"
         onClick={handleRoll}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+          if (e.key === 'Enter' || e.key === ' ') {
             handleRoll();
           }
         }}

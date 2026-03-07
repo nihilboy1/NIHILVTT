@@ -8,7 +8,10 @@ import { InitiativeTrack } from '@/features/combat/ui/InitiativeTrack';
 import { TokenActionBar } from '@/features/combat/ui/TokenActionBar';
 import { fetchGameSessionSnapshot } from '@/features/game/model/gameSessionApi';
 import { applyGameSessionEvent } from '@/features/game/model/gameSessionEventHandlers';
-import { hydrateGameSessionSnapshot, resetGameSessionClientState } from '@/features/game/model/gameSessionHydrator';
+import {
+  hydrateGameSessionSnapshot,
+  resetGameSessionClientState,
+} from '@/features/game/model/gameSessionHydrator';
 import { useGameStore } from '@/features/game/model/gameStore';
 import { GameSessionRealtimeClient } from '@/features/game/model/realtime/gameSessionRealtimeClient';
 import { getGameSessionWebSocketUrl } from '@/features/game/model/realtime/websocketUrl';
@@ -24,7 +27,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from '../shared/ui/Icons';
 import { useGameBoardInteraction } from '../widgets/gameBoard/model/hooks/useGameBoardInteraction';
 import { GameBoard } from '../widgets/gameBoard/ui/GameBoard';
 import { SessionModalManager } from '../widgets/sessionModalManager/ui/SessionModalManager';
-
 
 export default function GamePage() {
   const navigate = useNavigate();
@@ -56,6 +58,7 @@ export default function GamePage() {
     pasteTargetCell,
     selectedActionTokenId,
     pendingAttack,
+    pendingMovementTokenId,
     multiSelectedTokenIds,
     handleHPChangeFromModal,
     handleTempHpChangeFromModal,
@@ -69,10 +72,12 @@ export default function GamePage() {
     handleBoardSelectAtPoint,
     handleArmAttack,
     handleCancelPendingAttack,
+    handleArmMovement,
+    handleCancelPendingMovement,
   } = useGameBoardInteraction();
 
   const handleBoardBackgroundClick = () => {
-    if (pendingAttack != null) {
+    if (pendingAttack != null || pendingMovementTokenId != null) {
       return;
     }
 
@@ -203,12 +208,12 @@ export default function GamePage() {
 
   if (isLoadingCurrentGame || isHydratingSession || !currentGame) {
     return (
-      <div className="flex h-screen items-center justify-center bg-surface-0">
+      <div className="bg-surface-0 flex h-screen items-center justify-center">
         {isLoadingCurrentGame || isHydratingSession ? (
           <Spinner />
         ) : (
-          <div className="rounded-lg border border-surface-2 bg-surface-1 p-6 text-center">
-            <p className="mb-3 text-sm text-feedback-negative">{error || 'Jogo não encontrado.'}</p>
+          <div className="border-surface-2 bg-surface-1 rounded-lg border p-6 text-center">
+            <p className="text-feedback-negative mb-3 text-sm">{error || 'Jogo não encontrado.'}</p>
             <AppButton variant="secondary" onClick={() => navigate('/dashboard')}>
               Voltar para o dashboard
             </AppButton>
@@ -236,6 +241,7 @@ export default function GamePage() {
         copiedTokenId={copiedTokenId}
         pasteTargetCell={pasteTargetCell}
         pendingAttack={pendingAttack}
+        pendingMovementTokenId={pendingMovementTokenId}
         onTokenDragMove={handleTokenDragMove}
         onTokenDragEnd={handleTokenDragEnd}
         multiSelectedTokenIds={multiSelectedTokenIds}
@@ -251,8 +257,11 @@ export default function GamePage() {
       <TokenActionBar
         tokenId={selectedActionTokenId}
         pendingAttack={pendingAttack}
+        pendingMovementTokenId={pendingMovementTokenId}
         onArmAttack={handleArmAttack}
         onCancelAttack={handleCancelPendingAttack}
+        onArmMovement={handleArmMovement}
+        onCancelMovement={handleCancelPendingMovement}
       />
       <InitiativeTrack selectedTokenIds={multiSelectedTokenIds} />
 

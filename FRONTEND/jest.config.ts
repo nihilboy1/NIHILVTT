@@ -5,13 +5,15 @@ export default {
   clearMocks: true,
   restoreMocks: true,
   moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^.+\\.svg\\?react$': '<rootDir>/__mocks__/svgrMock.tsx',
     '\\.(gif|ttf|eot|svg|png|jpe?g|webp|avif|wav|mp3)$': '<rootDir>/__mocks__/fileMock.js',
     '^@nihilvtt/datamodeling/data$': '<rootDir>/../DATAMODELING/src/data/index.ts',
     '^@nihilvtt/datamodeling/domain$': '<rootDir>/../DATAMODELING/src/domain/index.ts',
     '^@nihilvtt/datamodeling/shared$': '<rootDir>/../DATAMODELING/src/shared/index.ts',
-    '^@nihilvtt/datamodeling/primitives$': '<rootDir>/../DATAMODELING/src/shared/primitives/index.ts',
+    '^@nihilvtt/datamodeling/primitives$':
+      '<rootDir>/../DATAMODELING/src/shared/primitives/index.ts',
     '^@nihilvtt/datamodeling/runtime$': '<rootDir>/../DATAMODELING/src/runtime/index.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
   },

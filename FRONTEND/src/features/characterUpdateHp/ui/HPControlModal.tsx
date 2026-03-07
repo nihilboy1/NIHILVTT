@@ -26,6 +26,10 @@ interface HPControlModalProps {
 
 export const HP_MODAL_ESTIMATED_HEIGHT_REM = 3.25;
 
+const QUICK_PRESET_VALUES = [1, 5, 10, 20];
+
+type HpActionMode = 'damage' | 'heal' | 'temp';
+
 export function HPControlModal({
   tokenId,
   character,
@@ -40,30 +44,32 @@ export function HPControlModal({
   rightSidebarVisible = false,
   zIndex,
 }: HPControlModalProps) {
-  const [hpDelta, setHpDelta] = useState<string>('1');
+  const [activeMode, setActiveMode] = useState<HpActionMode>('damage');
+  const [amountByMode, setAmountByMode] = useState<Record<HpActionMode, number>>({
+    damage: 1,
+    heal: 1,
+    temp: 1,
+  });
   const modalRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen && character) {
-      setHpDelta('1');
-    } else if (!character && isOpen) {
+    if (!character && isOpen) {
       onClose();
     }
   }, [isOpen, character, onClose]);
 
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
-    }
-  }, [isOpen]);
+  const activeAmount = amountByMode[activeMode];
+
+  const updateModeAmount = useCallback((mode: HpActionMode, nextValue: number) => {
+    setAmountByMode((current) => ({
+      ...current,
+      [mode]: Math.max(1, Math.trunc(nextValue)),
+    }));
+  }, []);
 
   const applyHpDelta = useCallback(
-    (direction: 'damage' | 'heal') => {
+    (direction: 'damage' | 'heal', amount: number) => {
       if (!character || !tokenId) {
-        setHpDelta('1');
         return;
       }
 
@@ -71,45 +77,22 @@ export function HPControlModal({
         character.type !== CharacterTypeEnum.enum.Player &&
         character.type !== CharacterTypeEnum.enum.NPC
       ) {
-        setHpDelta('1');
-        return;
-      }
-
-      const amount = Number(hpDelta.trim());
-      if (!Number.isInteger(amount) || amount < 1) {
-        setHpDelta('1');
         return;
       }
 
       onHPChange(tokenId, direction, amount);
     },
-    [character, hpDelta, onHPChange, tokenId],
+    [character, onHPChange, tokenId],
   );
 
   useDismissable(modalRef, isOpen, onClose);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHpDelta(e.target.value);
-  };
-
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
-  };
 
   const handleTempHpClick = () => {
     if (!tokenId) {
       return;
     }
 
-    const amount = Number(hpDelta.trim());
-    if (!Number.isInteger(amount) || amount < 1) {
-      setHpDelta('1');
-      return;
-    }
-
-    onTempHpChange(tokenId, amount);
+    onTempHpChange(tokenId, amountByMode.temp);
   };
 
   if (!isOpen || !tokenId || !character || !canAccessContext) {
@@ -137,10 +120,7 @@ export function HPControlModal({
           ? leftSafeArea
           : Math.max(leftSafeArea, window.innerWidth - estimatedWidth - rightSafeArea)
         : 16,
-    y:
-      typeof window !== 'undefined'
-        ? Math.max(16, window.innerHeight - estimatedHeight - 16)
-        : 16,
+    y: typeof window !== 'undefined' ? Math.max(16, window.innerHeight - estimatedHeight - 16) : 16,
   };
   const safeArea = {
     bottom: 16,
@@ -163,13 +143,10 @@ export function HPControlModal({
         aria-modal="true"
         aria-label="Controle de Vida"
       >
-        <FloatingPanelDragBar
-          title="Arrastar controle de vida"
-          insetClassName="-mx-2 -mt-2 mb-2"
-        />
+        <FloatingPanelDragBar title="Arrastar controle de vida" insetClassName="-mx-2 -mt-2 mb-2" />
         <div className="flex items-center gap-2">
           <span
-            className="max-w-[10rem] truncate text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary select-none"
+            className="text-text-secondary max-w-[10rem] truncate text-xs font-semibold tracking-[0.08em] uppercase select-none"
             title={character.name}
           >
             {character.name}
@@ -194,7 +171,7 @@ export function HPControlModal({
               ? character.combatStats.maxHp
               : 'N/A'}
           </span>
-          <span className="ml-1 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-text-secondary select-none">
+          <span className="text-text-secondary ml-1 text-[0.65rem] font-semibold tracking-[0.08em] uppercase select-none">
             THP:
           </span>
           <span
@@ -207,29 +184,61 @@ export function HPControlModal({
               : 'N/A'}
           </span>
           {!canModifyHp ? (
-            <span className="ml-auto text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-text-secondary select-none">
+            <span className="text-text-secondary ml-auto text-[0.65rem] font-semibold tracking-[0.08em] uppercase select-none">
               Somente o mestre
             </span>
           ) : null}
         </div>
         <div className="flex items-center gap-1.5">
-          <input
-            ref={inputRef}
-            type="number"
-            min={1}
-            step={1}
-            value={hpDelta}
-            onChange={handleInputChange}
-            onKeyDown={handleInputKeyDown}
-            className="hp-control-modal-input hide-arrows h-7 w-16 rounded-sm border p-1 text-center text-sm focus:ring-1"
-            aria-label="Quantidade para aplicar"
-            inputMode="numeric"
-            disabled={!canModifyHp}
-            data-no-panel-drag="true"
-          />
+          <div className="flex items-center rounded-sm border" data-no-panel-drag="true">
+            <button
+              type="button"
+              onClick={() => updateModeAmount(activeMode, activeAmount - 1)}
+              className="text-text-secondary px-2 py-1 text-sm font-semibold focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Diminuir valor"
+              title="Diminuir valor"
+              disabled={!canModifyHp}
+            >
+              -
+            </button>
+            <span
+              className="text-text-primary min-w-[2.2rem] px-1 text-center text-sm font-semibold select-none"
+              data-testid="hp-active-amount"
+            >
+              {activeAmount}
+            </span>
+            <button
+              type="button"
+              onClick={() => updateModeAmount(activeMode, activeAmount + 1)}
+              className="text-text-secondary px-2 py-1 text-sm font-semibold focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Aumentar valor"
+              title="Aumentar valor"
+              disabled={!canModifyHp}
+            >
+              +
+            </button>
+          </div>
+          <div className="flex items-center gap-1" data-no-panel-drag="true">
+            {QUICK_PRESET_VALUES.map((preset) => (
+              <button
+                key={`hp-preset-${preset}`}
+                type="button"
+                onClick={() => updateModeAmount(activeMode, preset)}
+                className="text-text-secondary rounded-sm border px-1.5 py-1 text-[0.65rem] font-semibold focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label={`Definir valor ${preset}`}
+                title={`Definir valor ${preset}`}
+                disabled={!canModifyHp}
+              >
+                +{preset}
+              </button>
+            ))}
+          </div>
           <button
-            onClick={() => applyHpDelta('damage')}
-            className="rounded-sm border px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-feedback-negative focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => {
+              setActiveMode('damage');
+              applyHpDelta('damage', amountByMode.damage);
+            }}
+            className="text-feedback-negative rounded-sm border px-2 py-1 text-[0.65rem] font-semibold tracking-[0.08em] uppercase focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             title="Aplicar dano"
             aria-label="Aplicar dano"
             disabled={!canModifyHp}
@@ -238,8 +247,11 @@ export function HPControlModal({
             Dano
           </button>
           <button
-            onClick={() => applyHpDelta('heal')}
-            className="rounded-sm border px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-feedback-positive focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => {
+              setActiveMode('heal');
+              applyHpDelta('heal', amountByMode.heal);
+            }}
+            className="text-feedback-positive rounded-sm border px-2 py-1 text-[0.65rem] font-semibold tracking-[0.08em] uppercase focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             title="Aplicar cura"
             aria-label="Aplicar cura"
             disabled={!canModifyHp}
@@ -248,8 +260,11 @@ export function HPControlModal({
             Cura
           </button>
           <button
-            onClick={handleTempHpClick}
-            className="rounded-sm border px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-text-secondary focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => {
+              setActiveMode('temp');
+              handleTempHpClick();
+            }}
+            className="text-text-secondary rounded-sm border px-2 py-1 text-[0.65rem] font-semibold tracking-[0.08em] uppercase focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             title="Conceder HP temporário"
             aria-label="Conceder HP temporário"
             disabled={!canModifyHp}

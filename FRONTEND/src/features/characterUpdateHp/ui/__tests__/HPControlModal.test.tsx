@@ -8,7 +8,10 @@ jest.mock('@/shared/lib/hooks/useDismissable', () => ({
 }));
 
 jest.mock('@/shared/ui/DraggablePanel', () => ({
-  DraggablePanel: ({ children, ...props }: {
+  DraggablePanel: ({
+    children,
+    ...props
+  }: {
     children: React.ReactNode;
     className?: string;
     initialPosition: { x: number; y: number };
@@ -69,11 +72,11 @@ describe('HPControlModal', () => {
     expect(screen.getByTestId('current-hp-display')).toHaveTextContent('7');
     expect(screen.getByTestId('max-hp-display')).toHaveTextContent('12');
     expect(screen.getByTestId('temp-hp-display')).toHaveTextContent('3');
-    expect(screen.getByLabelText('Quantidade para aplicar')).toHaveValue(1);
+    expect(screen.getByTestId('hp-active-amount')).toHaveTextContent('1');
     expect(screen.getByTestId('floating-panel-drag-bar')).toBeInTheDocument();
   });
 
-  it('aplica dano usando o valor atual do input', () => {
+  it('aplica dano usando valor definido por preset', () => {
     const onHPChange = jest.fn();
 
     render(
@@ -87,15 +90,13 @@ describe('HPControlModal', () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('Quantidade para aplicar'), {
-      target: { value: '5' },
-    });
+    fireEvent.click(screen.getByRole('button', { name: 'Definir valor 5' }));
     fireEvent.click(screen.getByRole('button', { name: 'Aplicar dano' }));
 
     expect(onHPChange).toHaveBeenCalledWith('token-1', 'damage', 5);
   });
 
-  it('aplica cura usando o valor atual do input', () => {
+  it('aplica cura usando stepper sem input', () => {
     const onHPChange = jest.fn();
 
     render(
@@ -109,15 +110,15 @@ describe('HPControlModal', () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('Quantidade para aplicar'), {
-      target: { value: '2' },
-    });
+    fireEvent.click(screen.getByRole('button', { name: 'Aplicar cura' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Aumentar valor' }));
     fireEvent.click(screen.getByRole('button', { name: 'Aplicar cura' }));
 
     expect(onHPChange).toHaveBeenCalledWith('token-1', 'heal', 2);
   });
 
-  it('concede HP temporario usando o valor atual do input', () => {
+  it('memoriza ultimo valor por modo (dano/cura/temp)', () => {
+    const onHPChange = jest.fn();
     const onTempHpChange = jest.fn();
 
     render(
@@ -126,17 +127,28 @@ describe('HPControlModal', () => {
         character={baseCharacter as never}
         isOpen
         onClose={jest.fn()}
-        onHPChange={jest.fn()}
+        onHPChange={onHPChange}
         onTempHpChange={onTempHpChange}
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('Quantidade para aplicar'), {
-      target: { value: '4' },
-    });
+    fireEvent.click(screen.getByRole('button', { name: 'Definir valor 10' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Aplicar dano' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Aplicar cura' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Definir valor 5' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Aplicar cura' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Conceder HP temporário' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Definir valor 20' }));
     fireEvent.click(screen.getByRole('button', { name: 'Conceder HP temporário' }));
 
-    expect(onTempHpChange).toHaveBeenCalledWith('token-1', 4);
+    fireEvent.click(screen.getByRole('button', { name: 'Aplicar dano' }));
+
+    expect(onHPChange).toHaveBeenCalledWith('token-1', 'damage', 10);
+    expect(onHPChange).toHaveBeenCalledWith('token-1', 'heal', 5);
+    expect(onHPChange).toHaveBeenLastCalledWith('token-1', 'damage', 10);
+    expect(onTempHpChange).toHaveBeenLastCalledWith('token-1', 20);
   });
 
   it('bloqueia alteracoes para nao-mestres', () => {
@@ -156,7 +168,9 @@ describe('HPControlModal', () => {
     );
 
     expect(screen.getByText('Somente o mestre')).toBeInTheDocument();
-    expect(screen.getByLabelText('Quantidade para aplicar')).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Diminuir valor' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Aumentar valor' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Definir valor 10' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Aplicar dano' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Aplicar cura' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Conceder HP temporário' })).toBeDisabled();
@@ -165,6 +179,29 @@ describe('HPControlModal', () => {
 
     expect(onHPChange).not.toHaveBeenCalled();
     expect(onTempHpChange).not.toHaveBeenCalled();
+  });
+
+  it('incrementa e decrementa valor em passos de 1 no stepper', () => {
+    render(
+      <HPControlModal
+        tokenId="token-1"
+        character={baseCharacter as never}
+        isOpen
+        onClose={jest.fn()}
+        onHPChange={jest.fn()}
+        onTempHpChange={jest.fn()}
+      />,
+    );
+
+    const amountDisplay = screen.getByTestId('hp-active-amount');
+    expect(amountDisplay).toHaveTextContent('1');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Aumentar valor' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Aumentar valor' }));
+    expect(amountDisplay).toHaveTextContent('3');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Diminuir valor' }));
+    expect(amountDisplay).toHaveTextContent('2');
   });
 
   it('configura o DraggablePanel com safeArea e posicao inicial coerentes', () => {

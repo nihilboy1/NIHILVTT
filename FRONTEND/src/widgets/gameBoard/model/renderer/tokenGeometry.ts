@@ -37,17 +37,24 @@ export function getTokenWorldRect(params: {
 }): Rect {
   const [width, height] = params.sizeInCells;
   const safeCellSize = Math.max(1, params.cellSize);
+  const safeWidth = Math.max(1, Math.ceil(width));
+  const safeHeight = Math.max(1, Math.ceil(height));
 
   return {
     x: params.token.position.x * safeCellSize,
     y: params.token.position.y * safeCellSize,
-    width: Math.max(1, width) * safeCellSize,
-    height: Math.max(1, height) * safeCellSize,
+    width: safeWidth * safeCellSize,
+    height: safeHeight * safeCellSize,
   };
 }
 
 export function doRectsIntersect(a: Rect, b: Rect): boolean {
-  return !(a.x > b.x + b.width || a.x + a.width < b.x || a.y > b.y + b.height || a.y + a.height < b.y);
+  return !(
+    a.x > b.x + b.width ||
+    a.x + a.width < b.x ||
+    a.y > b.y + b.height ||
+    a.y + a.height < b.y
+  );
 }
 
 export function getMarqueeRect(params: { startPoint: Point; currentPoint: Point }): Rect {
@@ -78,4 +85,3 @@ export function getChebyshevDistanceBetweenTokenBounds(
 
   return Math.max(deltaX, deltaY);
 }
-
