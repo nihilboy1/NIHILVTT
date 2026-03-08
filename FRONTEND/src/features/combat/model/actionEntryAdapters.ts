@@ -45,16 +45,43 @@ export function buildActionAttackEntries(
     );
   };
 
+  const requireCanonicalActionId = (action: {
+    id: string;
+    name: string;
+    actionId?: string;
+  }): string => {
+    if (typeof action.actionId === 'string' && action.actionId.trim().length > 0) {
+      return action.actionId.trim();
+    }
+
+    throw new Error(
+      `Violação de contrato de sessão: ação sem actionId canônico em ${characterId}:${action.id}:${action.name}.`,
+    );
+  };
+
+  const requireRangeMeters = (action: {
+    id: string;
+    name: string;
+    rangeMeters?: number;
+  }): number => {
+    if (typeof action.rangeMeters === 'number' && Number.isFinite(action.rangeMeters)) {
+      if (action.rangeMeters > 0) {
+        return action.rangeMeters;
+      }
+    }
+
+    throw new Error(
+      `Violação de contrato de sessão: ação sem rangeMeters válido em ${characterId}:${action.id}:${action.name}.`,
+    );
+  };
+
   return actions.map((action) => ({
-    id:
-      typeof action.actionId === 'string' && action.actionId.trim().length > 0
-        ? action.actionId.trim()
-        : `action-${characterId}-${action.id}`,
+    id: requireCanonicalActionId(action),
     label: action.name,
     attackBonus: parseAttackBonus(action.bonus),
     damageFormula: action.damage == null ? '-' : String(action.damage),
     damageType: requireDamageType(action),
-    rangeMeters: action.rangeMeters ?? 1.5,
+    rangeMeters: requireRangeMeters(action),
     sourceType: 'action',
     sourceItemId: null,
     sourceSlot: null,

@@ -10,7 +10,7 @@ import {
   getTotalAllowedPoints,
 } from '@/utils/effectProcessor';
 
-import { EffectChoices, ProcessedEffect, EntityEffect } from '../../types/effectTypes';
+import { EffectChoices, ProcessedEffect } from '../../types/effectTypes';
 
 export function useEffectsProcessor() {
   // Estado para armazenar as escolhas do usuário para os efeitos
@@ -18,7 +18,10 @@ export function useEffectsProcessor() {
 
   // Função genérica para pré-processar efeitos automáticos
   const preProcessEffects = useCallback(
-    (entity: { id: string; effects: EntityEffect[] }, entityPrefix: string) => {
+    (
+      entity: { id: string; effects: Array<{ type: string; [key: string]: unknown }> },
+      entityPrefix: string,
+    ) => {
       const updatedEffectChoices = { ...effectChoices };
 
       entity.effects.forEach((effect, index) => {
@@ -84,13 +87,13 @@ export function useEffectsProcessor() {
   );
 
   // Função genérica para adicionar onSelect aos efeitos processados
-  const addSelectHandlers = useCallback((processedEffects: ProcessedEffect[]): ProcessedEffect[] => {
+  const addSelectHandlers = useCallback((processedEffects: Array<Record<string, unknown>>): ProcessedEffect[] => {
     return processedEffects.map((effect) => ({
-      ...effect,
+      ...(effect as ProcessedEffect),
       onSelect: (choice: unknown) => {
         // Para efeitos de atributos, valida a distribuição de pontos antes de atualizar
-        if (effect.type === 'passive_modifyAbilityScore') {
-          const totalPoints = getTotalAllowedPoints(effect);
+        if ((effect as ProcessedEffect).type === 'passive_modifyAbilityScore') {
+          const totalPoints = getTotalAllowedPoints(effect as ProcessedEffect);
 
           // Se a nova escolha excede os pontos disponíveis, valida conforme regras de atributos
           if (Array.isArray(choice) && choice.length > totalPoints) {
@@ -99,9 +102,9 @@ export function useEffectsProcessor() {
           }
         }
 
-        setEffectChoices((prev) => ({ ...prev, [effect.id]: choice }));
+        setEffectChoices((prev) => ({ ...prev, [(effect as ProcessedEffect).id]: choice }));
       },
-    })) as ProcessedEffect[];
+    }));
   }, []);
 
   // Função para processar os efeitos de uma origem
@@ -136,9 +139,14 @@ export function useEffectsProcessor() {
 
       // Para cada efeito que fornece talentos, processa os efeitos dos talentos
       featProvideEffects.forEach((featProvideEffect) => {
-        if (featProvideEffect.selection?.mode === 'specific') {
+        const selection =
+          (featProvideEffect.selection as
+            | { mode?: 'specific' | 'choose'; feats?: string[] }
+            | undefined) ?? undefined;
+
+        if (selection?.mode === 'specific') {
           // Para talentos específicos, processa automaticamente
-          featProvideEffect.selection.feats.forEach((featId: string) => {
+          (selection.feats ?? []).forEach((featId: string) => {
             const feat = PHB2024FEATS.find((f) => f.id === featId);
             if (feat) {
               const featEffects = processFeatEffectsUtil(feat, effectChoices);
@@ -153,7 +161,7 @@ export function useEffectsProcessor() {
               allProcessedEffects.push(...addSelectHandlers(prefixedFeatEffects));
             }
           });
-        } else if (featProvideEffect.selection?.mode === 'choose') {
+        } else if (selection?.mode === 'choose') {
           // Para talentos de escolha, processa apenas os selecionados
           const selectedFeats = (effectChoices[featProvideEffect.id] as string[]) || [];
           selectedFeats.forEach((featId: string) => {
@@ -217,12 +225,12 @@ export function useEffectsProcessor() {
       // Busca o efeito correspondente para obter o total de pontos permitidos
       const origin = PHB2024ORIGINS.find((o) =>
         o.effects.some(
-          (_effect: EntityEffect, index: number) => `${o.id}-origin-effect-${index}` === effectId,
+          (_effect, index: number) => `${o.id}-origin-effect-${index}` === effectId,
         ),
       );
       const feat = PHB2024FEATS.find((f) =>
         f.effects.some(
-          (_effect: EntityEffect, index: number) => `${f.id}-feat-effect-${index}` === effectId,
+          (_effect, index: number) => `${f.id}-feat-effect-${index}` === effectId,
         ),
       );
 

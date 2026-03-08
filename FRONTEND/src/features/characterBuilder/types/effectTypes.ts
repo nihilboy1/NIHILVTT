@@ -41,7 +41,7 @@ export type AbilityScoreChoice = Record<string, number>;
 export type FeatChoice = string;
 export type ProficiencyChoice = string[];
 
-export type EffectChoice = AbilityScoreChoice | FeatChoice | ProficiencyChoice;
+export type EffectChoice = AbilityScoreChoice | FeatChoice | ProficiencyChoice | null | unknown;
 
 export interface ProcessedEffect {
   id: string;
@@ -50,8 +50,8 @@ export interface ProcessedEffect {
   description?: string;
   requiresChoice: boolean;
   selected: unknown;
-  onSelect: (choice: unknown) => void;
-  [key: string]: unknown; // Propriedades adicionais específicas para cada tipo
+  onSelect?: (choice: unknown) => void;
+  [key: string]: any; // Propriedades adicionais específicas para cada tipo
 }
 
 export interface EffectChoices {

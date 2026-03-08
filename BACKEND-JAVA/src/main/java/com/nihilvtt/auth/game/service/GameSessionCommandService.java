@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nihilvtt.auth.game.dto.GameSessionEventResponse;
+import com.nihilvtt.auth.game.dto.StartCombatRequest;
 import com.nihilvtt.auth.game.entity.GameEntity;
 import com.nihilvtt.auth.game.entity.GameMemberEntity;
 import com.nihilvtt.auth.game.entity.GameSessionStateEntity;
@@ -45,6 +46,8 @@ public class GameSessionCommandService {
   private static final Pattern TERM_PATTERN = Pattern.compile("[+-]?[^+-]+");
   private static final Pattern DICE_TERM_PATTERN = Pattern.compile("^\\d+d\\d+$");
   private static final Pattern INTEGER_PATTERN = Pattern.compile("^\\d+$");
+  private static final String COMBAT_MODE_FREE_FOR_ALL = "freeForAll";
+  private static final String COMBAT_MODE_TEAMS = "teams";
   private static final Set<String> ALLOWED_CATEGORIES = Set.of(
       "Attack",
       "Damage",
@@ -577,7 +580,18 @@ public class GameSessionCommandService {
     }
     int targetArmorClass = resolveCharacterArmorClass(targetCharacterNode);
 
-    int naturalRoll = ThreadLocalRandom.current().nextInt(1, 21);
+    AttackRollContext attackRollContext = resolveAttackRollContext(
+      shouldApplyMonsterAttackRollAdvantage(
+        combatState,
+        attackerCharacterNode,
+        attackId,
+        attackerTokenNode,
+        targetTokenNode,
+        tokensNode,
+        charactersNode
+      )
+    );
+    int naturalRoll = attackRollContext.naturalRoll();
     int attackTotal = naturalRoll + resolvedAttackData.attackBonus();
     boolean hit = naturalRoll == 20 || (naturalRoll != 1 && attackTotal >= targetArmorClass);
     CombatDamageType payloadDamageType = resolvedAttackData.expectedDamageType() == null
@@ -698,6 +712,11 @@ public class GameSessionCommandService {
     payloadNode.put("attackName", resolvedAttackData.attackName());
     payloadNode.put("attackDamageType", payloadDamageType.wireValue());
     payloadNode.put("attackRoll", naturalRoll);
+    payloadNode.put("attackRollMode", attackRollContext.mode());
+    ArrayNode attackRollsNode = payloadNode.putArray("attackRolls");
+    for (Integer roll : attackRollContext.rolls()) {
+      attackRollsNode.add(roll);
+    }
     payloadNode.put("attackTotal", attackTotal);
     payloadNode.put("targetArmorClass", targetArmorClass);
     payloadNode.put("hit", hit);
@@ -732,7 +751,13 @@ public class GameSessionCommandService {
   }
 
   @Transactional
-  public GameSessionEventResponse startCombat(Long userId, Long gameId, List<String> tokenIdsRaw) {
+  public GameSessionEventResponse startCombat(
+      Long userId,
+      Long gameId,
+      List<String> tokenIdsRaw,
+      String modeRaw,
+      List<StartCombatRequest.TeamAssignmentRequest> teamsRaw
+  ) {
     GameEntity game = gameAccessService.requireGameWithAccess(gameId, userId);
     if (!game.getOwner().getId().equals(userId)) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Apenas o mestre pode iniciar combate.");
@@ -748,12 +773,13 @@ public class GameSessionCommandService {
     if (tokenIds.size() < 2) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selecione ao menos dois tokens para iniciar combate.");
     }
+    CombatStartSetup combatStartSetup = normalizeCombatStartSetup(tokenIds, modeRaw, teamsRaw);
 
     if (getActiveCombatState(rootNode) != null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Já existe um combate ativo.");
     }
 
-    ObjectNode combatState = buildCombatState(tokensNode, charactersNode, tokenIds);
+    ObjectNode combatState = buildCombatState(tokensNode, charactersNode, tokenIds, combatStartSetup);
     rootNode.set("combat", combatState);
     Instant createdAt = Instant.now();
     ArrayNode messagesNode = ensureArray(rootNode, "messages");
@@ -1811,12 +1837,12 @@ public class GameSessionCommandService {
   private ObjectNode buildCombatState(
       ArrayNode tokensNode,
       ArrayNode charactersNode,
-      List<String> tokenIds
+      List<String> tokenIds,
+      CombatStartSetup combatStartSetup
   ) {
-    List<String> normalizedTokenIds = normalizeCombatTokenIds(tokenIds);
     List<ObjectNode> participants = new java.util.ArrayList<>();
 
-    for (String tokenId : normalizedTokenIds) {
+    for (String tokenId : tokenIds) {
       ObjectNode tokenNode = findTokenById(tokensNode, tokenId);
       if (tokenNode == null) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token não encontrado para iniciar combate.");
@@ -1851,6 +1877,12 @@ public class GameSessionCommandService {
       participantNode.put("dexterityScore", dexterityScore);
       participantNode.put("movementBudgetCells", resolveMovementBudgetCells(characterNode));
       participantNode.put("status", "active");
+      String participantTeamId = combatStartSetup.tokenTeamAssignments().get(tokenId);
+      if (participantTeamId == null) {
+        participantNode.putNull("teamId");
+      } else {
+        participantNode.put("teamId", participantTeamId);
+      }
       participants.add(participantNode);
     }
 
@@ -1876,6 +1908,7 @@ public class GameSessionCommandService {
 
     ObjectNode combatState = objectMapper.createObjectNode();
     combatState.put("active", true);
+    combatState.put("mode", combatStartSetup.mode());
     combatState.put("round", 1);
     combatState.put("turnIndex", 0);
 
@@ -1886,6 +1919,89 @@ public class GameSessionCommandService {
     combatState.set("participants", participantsNode);
     combatState.set("turnResources", buildTurnResourcesForActiveParticipant(combatState, charactersNode));
     return combatState;
+  }
+
+  private CombatStartSetup normalizeCombatStartSetup(
+      List<String> combatTokenIds,
+      String modeRaw,
+      List<StartCombatRequest.TeamAssignmentRequest> teamsRaw
+  ) {
+    String mode = modeRaw == null ? "" : modeRaw.trim();
+    if (!COMBAT_MODE_FREE_FOR_ALL.equals(mode) && !COMBAT_MODE_TEAMS.equals(mode)) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Modo de combate inválido.");
+    }
+
+    if (COMBAT_MODE_FREE_FOR_ALL.equals(mode)) {
+      if (teamsRaw != null) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "No modo freeForAll, o campo teams não deve ser enviado."
+        );
+      }
+      return new CombatStartSetup(mode, Map.of());
+    }
+
+    if (teamsRaw == null || teamsRaw.isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "No modo teams, o campo teams é obrigatório."
+      );
+    }
+
+    Set<String> selectedTokens = Set.copyOf(combatTokenIds);
+    Set<String> seenTeamIds = new HashSet<>();
+    Map<String, String> tokenAssignments = new HashMap<>();
+
+    for (StartCombatRequest.TeamAssignmentRequest team : teamsRaw) {
+      if (team == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time inválido no payload de combate.");
+      }
+
+      String teamId = team.teamId() == null ? "" : team.teamId().trim();
+      if (teamId.isBlank()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "teamId é obrigatório para todos os times.");
+      }
+
+      if (!seenTeamIds.add(teamId)) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "teamId duplicado no payload de combate.");
+      }
+
+      List<String> teamTokenIds = team.tokenIds();
+      if (teamTokenIds == null || teamTokenIds.isEmpty()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cada time precisa ter ao menos um token.");
+      }
+
+      for (String rawTokenId : teamTokenIds) {
+        String tokenId = rawTokenId == null ? "" : rawTokenId.trim();
+        if (tokenId.isBlank()) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido na distribuição de times.");
+        }
+
+        if (!selectedTokens.contains(tokenId)) {
+          throw new ResponseStatusException(
+              HttpStatus.BAD_REQUEST,
+              "Todos os tokens dos times precisam estar entre os tokenIds do combate."
+          );
+        }
+
+        String previousTeamId = tokenAssignments.putIfAbsent(tokenId, teamId);
+        if (previousTeamId != null) {
+          throw new ResponseStatusException(
+              HttpStatus.BAD_REQUEST,
+              "Cada token deve pertencer a exatamente um time no modo teams."
+          );
+        }
+      }
+    }
+
+    if (tokenAssignments.size() != selectedTokens.size()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "No modo teams, todos os tokens selecionados devem estar em exatamente um time."
+      );
+    }
+
+    return new CombatStartSetup(mode, Map.copyOf(tokenAssignments));
   }
 
   private ObjectNode getActiveCombatState(ObjectNode rootNode) {
@@ -3574,10 +3690,16 @@ public class GameSessionCommandService {
     );
   }
 
-  private ResolvedAttackData resolveMonsterAttackData(ObjectNode attackerCharacterNode, String attackId) {
+  private ResolvedAttackData resolveMonsterAttackData(
+      ObjectNode attackerCharacterNode,
+      String attackId
+  ) {
     MonsterCatalogManifestService.MonsterCatalogEntry monsterEntry = resolveMonsterCatalogEntry(attackerCharacterNode);
     MonsterCatalogManifestService.MonsterCatalogAttackAction attackAction =
-        monsterCatalogManifestService.requireKnownMonsterAttackAction(monsterEntry.id(), attackId);
+        monsterCatalogManifestService.requireKnownMonsterAttackAction(
+            monsterEntry.id(),
+            attackId
+        );
 
     String attackName = attackAction.name() == null ? "" : attackAction.name().trim();
     if (attackName.isBlank()) {
@@ -3762,6 +3884,211 @@ public class GameSessionCommandService {
     if (!itemId.equals(mainHandWeaponId) && !itemId.equals(offHandWeaponId)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A arma do ataque não está equipada pelo atacante.");
     }
+  }
+
+  private AttackRollContext resolveAttackRollContext(boolean hasAdvantage) {
+    int firstRoll = ThreadLocalRandom.current().nextInt(1, 21);
+    if (!hasAdvantage) {
+      return new AttackRollContext(firstRoll, List.of(firstRoll), "normal");
+    }
+
+    int secondRoll = ThreadLocalRandom.current().nextInt(1, 21);
+    int selectedRoll = Math.max(firstRoll, secondRoll);
+    return new AttackRollContext(selectedRoll, List.of(firstRoll, secondRoll), "advantage");
+  }
+
+  private boolean shouldApplyMonsterAttackRollAdvantage(
+      ObjectNode combatState,
+      ObjectNode attackerCharacterNode,
+      String attackId,
+      ObjectNode attackerTokenNode,
+      ObjectNode targetTokenNode,
+      ArrayNode tokensNode,
+      ArrayNode charactersNode
+  ) {
+    if (!isNpcCharacter(attackerCharacterNode)) {
+      return false;
+    }
+
+    MonsterCatalogManifestService.MonsterCatalogEntry monsterEntry = resolveMonsterCatalogEntry(attackerCharacterNode);
+    List<MonsterCatalogManifestService.MonsterCatalogPassiveEffect> passives = monsterEntry.automatedPassives();
+    if (passives == null || passives.isEmpty()) {
+      return false;
+    }
+
+    String normalizedAttackId = attackId == null ? "" : attackId.trim();
+    for (MonsterCatalogManifestService.MonsterCatalogPassiveEffect passive : passives) {
+      if (passive == null) {
+        continue;
+      }
+
+      if (!"passive_grantAdvantage".equals(passive.type()) || !"attackRoll".equals(passive.on())) {
+        continue;
+      }
+
+      List<String> appliesToActionIds = passive.appliesToActionIds();
+      if (appliesToActionIds != null && !appliesToActionIds.isEmpty()) {
+        boolean matchesAction = appliesToActionIds.stream()
+            .filter(value -> value != null && !value.isBlank())
+            .map(value -> value.trim())
+            .anyMatch(value -> value.equals(normalizedAttackId));
+        if (!matchesAction) {
+          continue;
+        }
+      }
+
+      MonsterCatalogManifestService.MonsterCatalogTriggerHasAllyNearby trigger = passive.triggerHasAllyNearby();
+      if (trigger == null || trigger.rangeMeters() == null || !Double.isFinite(trigger.rangeMeters())
+          || trigger.rangeMeters() <= 0) {
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Catálogo canônico do monstro está sem range válido para passive_grantAdvantage."
+        );
+      }
+
+      boolean allyMustBeActive = trigger.allyIsNotIncapacitated() == null || trigger.allyIsNotIncapacitated();
+      if (hasAllyNearbyTarget(
+          combatState,
+          attackerTokenNode,
+          targetTokenNode,
+          tokensNode,
+          charactersNode,
+          trigger.rangeMeters(),
+          allyMustBeActive
+      )) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private boolean hasAllyNearbyTarget(
+      ObjectNode combatState,
+      ObjectNode attackerTokenNode,
+      ObjectNode targetTokenNode,
+      ArrayNode tokensNode,
+      ArrayNode charactersNode,
+      double rangeMeters,
+      boolean allyMustBeActive
+  ) {
+    String attackerTokenId = attackerTokenNode.path("id").asText("").trim();
+    String targetTokenId = targetTokenNode.path("id").asText("").trim();
+    String targetSceneId = targetTokenNode.path("sceneId").asText("").trim();
+    ArrayNode participants = resolveCombatParticipants(combatState);
+
+    for (int index = 0; index < participants.size(); index += 1) {
+      JsonNode participantNode = participants.get(index);
+      String allyTokenId = participantNode.path("tokenId").asText("").trim();
+      if (allyTokenId.isBlank() || allyTokenId.equals(attackerTokenId) || allyTokenId.equals(targetTokenId)) {
+        continue;
+      }
+
+      if (!isCombatAlly(combatState, attackerTokenId, allyTokenId)) {
+        continue;
+      }
+
+      ObjectNode allyTokenNode = findTokenById(tokensNode, allyTokenId);
+      if (allyTokenNode == null) {
+        continue;
+      }
+
+      if (!targetSceneId.isBlank()) {
+        String allySceneId = allyTokenNode.path("sceneId").asText("").trim();
+        if (!targetSceneId.equals(allySceneId)) {
+          continue;
+        }
+      }
+
+      String allyCharacterId = allyTokenNode.path("characterId").asText("").trim();
+      if (allyCharacterId.isBlank()) {
+        continue;
+      }
+
+      ObjectNode allyCharacterNode = findCharacterById(charactersNode, allyCharacterId);
+      if (allyCharacterNode == null) {
+        continue;
+      }
+
+      if (allyMustBeActive && characterHasCondition(allyCharacterNode, "incapacitated")) {
+        continue;
+      }
+
+      double distanceMeters = calculateTokenDistanceMeters(allyTokenNode, targetTokenNode);
+      if (Double.isFinite(distanceMeters) && distanceMeters <= rangeMeters + 1e-9) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private boolean isCombatAlly(ObjectNode combatState, String attackerTokenId, String allyTokenId) {
+    String mode = resolveCombatMode(combatState);
+    if (!COMBAT_MODE_TEAMS.equals(mode)) {
+      return false;
+    }
+
+    ObjectNode attackerParticipant = findCombatParticipantByTokenId(combatState, attackerTokenId);
+    ObjectNode allyParticipant = findCombatParticipantByTokenId(combatState, allyTokenId);
+    if (attackerParticipant == null || allyParticipant == null) {
+      return false;
+    }
+
+    String attackerTeamId = attackerParticipant.path("teamId").asText("").trim();
+    String allyTeamId = allyParticipant.path("teamId").asText("").trim();
+    if (attackerTeamId.isBlank() || allyTeamId.isBlank()) {
+      return false;
+    }
+
+    return attackerTeamId.equals(allyTeamId);
+  }
+
+  private String resolveCombatMode(ObjectNode combatState) {
+    String mode = combatState.path("mode").asText("").trim();
+    if (mode.isBlank()) {
+      return COMBAT_MODE_FREE_FOR_ALL;
+    }
+    return mode;
+  }
+
+  private ObjectNode findCombatParticipantByTokenId(ObjectNode combatState, String tokenId) {
+    ArrayNode participants = resolveCombatParticipants(combatState);
+    for (int i = 0; i < participants.size(); i += 1) {
+      JsonNode participantNode = participants.get(i);
+      if (!(participantNode instanceof ObjectNode participantObject)) {
+        continue;
+      }
+
+      if (tokenId.equals(participantObject.path("tokenId").asText("").trim())) {
+        return participantObject;
+      }
+    }
+
+    return null;
+  }
+
+  private double calculateTokenDistanceMeters(ObjectNode firstTokenNode, ObjectNode secondTokenNode) {
+    GridCell first = readTokenAnchor(firstTokenNode);
+    GridCell second = readTokenAnchor(secondTokenNode);
+    if (first == null || second == null) {
+      return Double.NaN;
+    }
+
+    int deltaX = second.x() - first.x();
+    int deltaY = second.y() - first.y();
+    return Math.sqrt((deltaX * deltaX) + (deltaY * deltaY)) * MOVEMENT_METERS_PER_CELL;
+  }
+
+  private GridCell readTokenAnchor(ObjectNode tokenNode) {
+    JsonNode positionNode = tokenNode.path("position");
+    int x = positionNode.path("x").asInt(Integer.MIN_VALUE);
+    int y = positionNode.path("y").asInt(Integer.MIN_VALUE);
+    if (x == Integer.MIN_VALUE || y == Integer.MIN_VALUE) {
+      return null;
+    }
+
+    return new GridCell(x, y);
   }
 
   private String resolvePlayerSpecieId(ObjectNode characterNode) {
@@ -4058,6 +4385,9 @@ public class GameSessionCommandService {
   private record DiceRollResult(ObjectNode detailsNode) {
   }
 
+  private record AttackRollContext(int naturalRoll, List<Integer> rolls, String mode) {
+  }
+
   private record SenderInfo(String name, String colorHex) {
   }
 
@@ -4098,6 +4428,9 @@ public class GameSessionCommandService {
   }
 
   private record MovementPathEvaluation(boolean reachable, int costCells) {
+  }
+
+  private record CombatStartSetup(String mode, Map<String, String> tokenTeamAssignments) {
   }
 
   private record GridCell(int x, int y) {

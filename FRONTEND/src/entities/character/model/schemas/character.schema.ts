@@ -76,7 +76,7 @@ export const actionSchema = z.object({
   id: z.uuid(),
   actionId: z
     .string()
-    .regex(/^act-[a-z0-9-]+$/, 'actionId canônico inválido.')
+    .regex(/^act-[a-z0-9-]+(?::[a-z0-9-]+)?$/, 'actionId canônico inválido.')
     .optional(),
   name: z.string(),
   bonus: z.string().or(z.number()).optional(),

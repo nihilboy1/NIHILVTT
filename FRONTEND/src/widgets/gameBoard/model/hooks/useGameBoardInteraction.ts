@@ -18,7 +18,6 @@ import {
 import { useGameStore } from '@/features/game/model/gameStore';
 import { canUserControlToken } from '@/features/game/model/tokenControlPolicy';
 import { useUIStore } from '@/features/layoutControls/model/store';
-import { ModalEntry } from '@/features/modalManager/model/baseModalConfig';
 import { useSessionModalStore } from '@/features/modalManager/model/sessionModalStore';
 
 import { useSelectedTokenStore } from '../../../../entities/token/model/store/selectedTokenStore';

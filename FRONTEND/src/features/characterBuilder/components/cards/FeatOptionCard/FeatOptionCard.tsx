@@ -174,9 +174,7 @@ export function FeatOptionCard({
                   key={effect.id}
                   title={effect.name}
                   description={effect.description}
-                  isSelected={
-                    effect.selected && Array.isArray(effect.selected) && effect.selected.length > 0
-                  }
+                  isSelected={Array.isArray(effect.selected) && effect.selected.length > 0}
                   requiresChoice={effect.requiresChoice}
                   type="effect"
                 >

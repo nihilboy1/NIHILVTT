@@ -1,5 +1,6 @@
 {
   "manifestVersion": 1,
+  "combatContractVersion": 1,
   "monsters": [
     {
       "id": "monster-ape",
@@ -39,22 +40,13 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:soco",
           "actionId": "act-attack",
           "name": "Soco",
           "attackBonus": 5,
           "damageFormula": "1d4+3",
           "damageType": "bludgeoning",
           "rangeMeters": 1.5,
-          "conditionalDamageBonuses": [],
-          "conditionalAppliedConditions": []
-        },
-        {
-          "actionId": "act-throw",
-          "name": "Pedra",
-          "attackBonus": 5,
-          "damageFormula": "2d6+3",
-          "damageType": "bludgeoning",
-          "rangeMeters": 7.5,
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
@@ -103,6 +95,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:rastrar",
           "actionId": "act-attack",
           "name": "Rastrar",
           "attackBonus": 1,
@@ -153,6 +146,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 1,
@@ -216,6 +210,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 3,
@@ -266,6 +261,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 4,
@@ -316,6 +312,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:dilacerar",
           "actionId": "act-attack",
           "name": "Dilacerar",
           "attackBonus": 4,
@@ -366,6 +363,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:garras",
           "actionId": "act-attack",
           "name": "Garras",
           "attackBonus": 4,
@@ -416,6 +414,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida-petrificante",
           "actionId": "act-attack",
           "name": "Mordida Petrificante",
           "attackBonus": 3,
@@ -466,6 +465,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:clava",
           "actionId": "act-attack",
           "name": "Clava",
           "attackBonus": 2,
@@ -516,6 +516,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:garra",
           "actionId": "act-attack",
           "name": "Garra",
           "attackBonus": 3,
@@ -569,6 +570,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:pancada",
           "actionId": "act-attack",
           "name": "Pancada",
           "attackBonus": 3,
@@ -619,6 +621,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 4,
@@ -669,6 +672,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:esmagar",
           "actionId": "act-attack",
           "name": "Esmagar",
           "attackBonus": 5,
@@ -719,6 +723,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:chifres",
           "actionId": "act-attack",
           "name": "Chifres",
           "attackBonus": 3,
@@ -773,6 +778,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:garra",
           "actionId": "act-attack",
           "name": "Garra",
           "attackBonus": 4,
@@ -823,6 +829,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:garras",
           "actionId": "act-attack",
           "name": "Garras",
           "attackBonus": 4,
@@ -873,6 +880,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 3,
@@ -925,6 +933,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:tentaculo",
           "actionId": "act-attack",
           "name": "Tentáculo",
           "attackBonus": 0,
@@ -977,6 +986,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 1,
@@ -1027,6 +1037,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:investida",
           "actionId": "act-attack",
           "name": "Investida",
           "attackBonus": 5,
@@ -1088,6 +1099,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:investida",
           "actionId": "act-attack",
           "name": "Investida",
           "attackBonus": 4,
@@ -1144,6 +1156,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:ferrao",
           "actionId": "act-attack",
           "name": "Ferrão",
           "attackBonus": 4,
@@ -1194,6 +1207,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:rasgar",
           "actionId": "act-attack",
           "name": "Rasgar",
           "attackBonus": 4,
@@ -1204,6 +1218,7 @@
           "conditionalAppliedConditions": []
         },
         {
+          "catalogAttackId": "act-attack:arco-de-ossos",
           "actionId": "act-attack",
           "name": "Arco de Ossos",
           "attackBonus": 3,
@@ -1254,6 +1269,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:chifres",
           "actionId": "act-attack",
           "name": "Chifres",
           "attackBonus": 3,
@@ -1308,6 +1324,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:pseudopode",
           "actionId": "act-attack",
           "name": "Pseudópode",
           "attackBonus": 3,
@@ -1358,6 +1375,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:garras",
           "actionId": "act-attack",
           "name": "Garras",
           "attackBonus": 4,
@@ -1408,6 +1426,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:espada-longa",
           "actionId": "act-attack",
           "name": "Espada Longa",
           "attackBonus": 3,
@@ -1418,6 +1437,7 @@
           "conditionalAppliedConditions": []
         },
         {
+          "catalogAttackId": "act-attack:arco-longo",
           "actionId": "act-attack",
           "name": "Arco Longo",
           "attackBonus": 3,
@@ -1470,6 +1490,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 4,
@@ -1520,6 +1541,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 3,
@@ -1586,6 +1608,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:garra",
           "actionId": "act-attack",
           "name": "Garra",
           "attackBonus": 3,
@@ -1636,6 +1659,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 1,
@@ -1686,6 +1710,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:rasgar",
           "actionId": "act-attack",
           "name": "Rasgar",
           "attackBonus": 4,
@@ -1696,6 +1721,7 @@
           "conditionalAppliedConditions": []
         },
         {
+          "catalogAttackId": "act-attack:slam",
           "actionId": "act-attack",
           "name": "Slam",
           "attackBonus": 4,
@@ -1746,6 +1772,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 1,
@@ -1801,6 +1828,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:limo-vil",
           "actionId": "act-attack",
           "name": "Limo Vil",
           "attackBonus": 3,
@@ -1851,6 +1879,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 1,
@@ -1906,6 +1935,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:claw",
           "actionId": "act-attack",
           "name": "Claw",
           "attackBonus": 3,
@@ -1958,6 +1988,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:toque",
           "actionId": "act-attack",
           "name": "Toque",
           "attackBonus": 4,
@@ -2008,6 +2039,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:lanca-mecanica",
           "actionId": "act-attack",
           "name": "Lança Mecânica",
           "attackBonus": 3,
@@ -2058,6 +2090,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:esmagamento",
           "actionId": "act-attack",
           "name": "Esmagamento",
           "attackBonus": 2,
@@ -2108,6 +2141,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:pancada",
           "actionId": "act-attack",
           "name": "Pancada",
           "attackBonus": 3,
@@ -2158,6 +2192,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:tentaculos",
           "actionId": "act-attack",
           "name": "Tentáculos",
           "attackBonus": 4,
@@ -2208,6 +2243,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:garras",
           "actionId": "act-attack",
           "name": "Garras",
           "attackBonus": 3,
@@ -2258,6 +2294,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:shortsword",
           "actionId": "act-attack",
           "name": "Shortsword",
           "attackBonus": 5,
@@ -2308,6 +2345,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 3,
@@ -2358,6 +2396,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 5,
@@ -2408,6 +2447,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 3,
@@ -2458,6 +2498,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:bico",
           "actionId": "act-attack",
           "name": "Bico",
           "attackBonus": 3,
@@ -2508,6 +2549,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:bite",
           "actionId": "act-attack",
           "name": "Bite",
           "attackBonus": 4,
@@ -2558,6 +2600,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:bite",
           "actionId": "act-attack",
           "name": "Bite",
           "attackBonus": 3,
@@ -2611,6 +2654,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:garra",
           "actionId": "act-attack",
           "name": "Garra",
           "attackBonus": 3,
@@ -2661,6 +2705,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:hooves",
           "actionId": "act-attack",
           "name": "Hooves",
           "attackBonus": 5,
@@ -2711,6 +2756,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:ferrao",
           "actionId": "act-attack",
           "name": "Ferrão",
           "attackBonus": 3,
@@ -2761,6 +2807,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:espada-curta",
           "actionId": "act-attack",
           "name": "Espada Curta",
           "attackBonus": 4,
@@ -2771,6 +2818,7 @@
           "conditionalAppliedConditions": []
         },
         {
+          "catalogAttackId": "act-attack:arco-longo",
           "actionId": "act-attack",
           "name": "Arco Longo",
           "attackBonus": 4,
@@ -2871,6 +2919,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:toque-drenante",
           "actionId": "act-attack",
           "name": "Toque Drenante",
           "attackBonus": 4,
@@ -2960,6 +3009,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 3,
@@ -3014,6 +3064,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordidas",
           "actionId": "act-attack",
           "name": "Mordidas",
           "attackBonus": 3,
@@ -3064,6 +3115,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:maca",
           "actionId": "act-attack",
           "name": "Maça",
           "attackBonus": 4,
@@ -3074,6 +3126,7 @@
           "conditionalAppliedConditions": []
         },
         {
+          "catalogAttackId": "act-attack:besta-pesada",
           "actionId": "act-attack",
           "name": "Besta Pesada",
           "attackBonus": 3,
@@ -3124,6 +3177,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:rasgar",
           "actionId": "act-attack",
           "name": "Rasgar",
           "attackBonus": 6,
@@ -3174,6 +3228,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:vinha-constritora",
           "actionId": "act-attack",
           "name": "Vinha Constritora",
           "attackBonus": 4,
@@ -3224,6 +3279,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:bico",
           "actionId": "act-attack",
           "name": "Bico",
           "attackBonus": 4,
@@ -3285,6 +3341,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:casco",
           "actionId": "act-attack",
           "name": "Casco",
           "attackBonus": 6,
@@ -3350,6 +3407,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:casco",
           "actionId": "act-attack",
           "name": "Casco",
           "attackBonus": 6,
@@ -3405,6 +3463,7 @@
       "challengeRating": "0",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 3,
@@ -3455,6 +3514,7 @@
       "challengeRating": "1/2",
       "actions": [
         {
+          "catalogAttackId": "act-attack:mordida",
           "actionId": "act-attack",
           "name": "Mordida",
           "attackBonus": 5,

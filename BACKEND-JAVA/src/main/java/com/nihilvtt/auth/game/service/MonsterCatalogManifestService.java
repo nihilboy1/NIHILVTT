@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class MonsterCatalogManifestService {
   private static final int EXPECTED_MANIFEST_VERSION = 1;
+  private static final int EXPECTED_COMBAT_CONTRACT_VERSION = 1;
   private final Map<String, MonsterCatalogEntry> monstersById;
 
   public MonsterCatalogManifestService(ObjectMapper objectMapper) {
@@ -33,22 +34,24 @@ public class MonsterCatalogManifestService {
     return entry;
   }
 
-  public MonsterCatalogAttackAction requireKnownMonsterAttackAction(String monsterId, String actionIdRaw) {
+  public MonsterCatalogAttackAction requireKnownMonsterAttackAction(
+      String monsterId,
+      String actionIdRaw
+  ) {
     MonsterCatalogEntry monsterEntry = requireKnownMonster(monsterId);
     String actionId = actionIdRaw == null ? "" : actionIdRaw.trim();
     if (actionId.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ação de monstro é obrigatória.");
     }
 
-    MonsterCatalogAttackAction action = monsterEntry.actions().stream()
-        .filter(entry -> actionId.equals(entry.actionId()))
+    MonsterCatalogAttackAction canonicalMatch = monsterEntry.actions().stream()
+        .filter(entry -> actionId.equals(entry.catalogAttackId()))
         .findFirst()
         .orElse(null);
-    if (action == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ação de monstro não existe no catálogo canônico.");
+    if (canonicalMatch != null) {
+      return canonicalMatch;
     }
-
-    return action;
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ação de monstro não existe no catálogo canônico.");
   }
 
   private MonsterCatalogManifest loadManifest(ObjectMapper objectMapper) {
@@ -84,6 +87,22 @@ public class MonsterCatalogManifestService {
               + "."
       );
     }
+
+    JsonNode combatContractVersionNode = rootNode.get("combatContractVersion");
+    if (combatContractVersionNode == null || !combatContractVersionNode.isInt()) {
+      throw new IllegalStateException("Manifest canônico de monstros sem combatContractVersion.");
+    }
+
+    int combatContractVersion = combatContractVersionNode.intValue();
+    if (combatContractVersion != EXPECTED_COMBAT_CONTRACT_VERSION) {
+      throw new IllegalStateException(
+          "Contrato de combate de monstros incompatível. Esperado="
+              + EXPECTED_COMBAT_CONTRACT_VERSION
+              + ", recebido="
+              + combatContractVersion
+              + "."
+      );
+    }
   }
 
   private void validateManifestData(MonsterCatalogManifest manifest) {
@@ -97,7 +116,11 @@ public class MonsterCatalogManifestService {
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
-  private record MonsterCatalogManifest(Integer manifestVersion, List<MonsterCatalogEntry> monsters) {}
+  private record MonsterCatalogManifest(
+      Integer manifestVersion,
+      Integer combatContractVersion,
+      List<MonsterCatalogEntry> monsters
+  ) {}
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record MonsterCatalogEntry(
@@ -212,6 +235,7 @@ public class MonsterCatalogManifestService {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record MonsterCatalogAttackAction(
+      String catalogAttackId,
       String actionId,
       String name,
       Integer attackBonus,
@@ -227,6 +251,7 @@ public class MonsterCatalogManifestService {
     }
 
     public MonsterCatalogAttackAction(
+        String catalogAttackId,
         String actionId,
         String name,
         Integer attackBonus,
@@ -235,6 +260,7 @@ public class MonsterCatalogManifestService {
         Double rangeMeters
     ) {
       this(
+          catalogAttackId,
           actionId,
           name,
           attackBonus,

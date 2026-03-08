@@ -400,6 +400,7 @@ class GameSessionCommandServiceAttackContractTest {
             "1/2",
             List.of(
                 new MonsterCatalogManifestService.MonsterCatalogAttackAction(
+                    "act-attack:investida",
                     "act-attack",
                     "Investida",
                     5,
@@ -414,7 +415,7 @@ class GameSessionCommandServiceAttackContractTest {
     when(gameSessionStateRepository.findByGameId(gameId)).thenReturn(Optional.of(sessionState));
     when(gameSessionStateRepository.save(any(GameSessionStateEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(monsterCatalogManifestService.requireKnownMonster("monster-giant-goat")).thenReturn(monsterEntry);
-    when(monsterCatalogManifestService.requireKnownMonsterAttackAction("monster-giant-goat", "act-attack"))
+    when(monsterCatalogManifestService.requireKnownMonsterAttackAction("monster-giant-goat", "act-attack:investida"))
         .thenReturn(monsterEntry.actions().get(0));
 
     GameSessionCommandService service = new GameSessionCommandService(
@@ -432,7 +433,7 @@ class GameSessionCommandServiceAttackContractTest {
         gameId,
         "token-attacker",
         "token-target",
-        "act-attack",
+        "act-attack:investida",
         "IGNORAR NOME",
         99,
         "999",
@@ -442,6 +443,342 @@ class GameSessionCommandServiceAttackContractTest {
     assertEquals("ATTACK_RESOLVED", event.type());
     assertEquals("Investida", event.payload().path("attackName").asText());
     assertEquals("bludgeoning", event.payload().path("attackDamageType").asText());
+  }
+
+  @Test
+  void resolveAttack_appliesAdvantageWhenMonsterHasAutomatedPackTacticsAndAllyNearby() {
+    Long ownerUserId = 7L;
+    Long gameId = 451L;
+
+    GameAccessService gameAccessService = mock(GameAccessService.class);
+    GameMemberRepository gameMemberRepository = mock(GameMemberRepository.class);
+    GameSessionStateRepository gameSessionStateRepository = mock(GameSessionStateRepository.class);
+    SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
+    ItemCatalogManifestService itemCatalogManifestService = mock(ItemCatalogManifestService.class);
+    MonsterCatalogManifestService monsterCatalogManifestService = mock(MonsterCatalogManifestService.class);
+
+    GameEntity game = buildGame(ownerUserId, gameId);
+    GameSessionStateEntity sessionState = new GameSessionStateEntity();
+    sessionState.setId(1703L);
+    sessionState.setGame(game);
+    sessionState.setVersion(3L);
+    sessionState.setStateJson("""
+        {
+          "characters": [
+            {
+              "id": "attacker-char",
+              "type": "NPC",
+              "monsterId": "monster-baboon",
+              "hitPoints": { "current": 3, "temporary": 0 },
+              "activeEffects": { "effects": [] }
+            },
+            {
+              "id": "ally-char",
+              "type": "NPC",
+              "monsterId": "monster-baboon",
+              "hitPoints": { "current": 3, "temporary": 0 },
+              "activeEffects": { "effects": [] }
+            },
+            {
+              "id": "target-char",
+              "type": "Player",
+              "attributes": { "base": { "strength": 10, "dexterity": 10 } },
+              "progression": { "currentLevel": 1 },
+              "equipment": {
+                "bodyArmorItemId": null,
+                "shieldItemId": null,
+                "mainHandWeaponId": null,
+                "offHandWeaponId": null
+              },
+              "hitPoints": { "current": 10, "max": 10, "temporary": 0 }
+            }
+          ],
+          "tokens": [
+            {
+              "id": "token-attacker",
+              "characterId": "attacker-char",
+              "sceneId": "default-scene",
+              "position": { "x": 1, "y": 1 }
+            },
+            {
+              "id": "token-ally",
+              "characterId": "ally-char",
+              "sceneId": "default-scene",
+              "position": { "x": 3, "y": 1 }
+            },
+            {
+              "id": "token-target",
+              "characterId": "target-char",
+              "sceneId": "default-scene",
+              "position": { "x": 2, "y": 1 }
+            }
+          ],
+          "messages": [],
+          "combat": {
+            "active": true,
+            "mode": "teams",
+            "round": 1,
+            "turnIndex": 0,
+            "participants": [
+              { "tokenId": "token-attacker", "teamId": "team-monsters" },
+              { "tokenId": "token-ally", "teamId": "team-monsters" },
+              { "tokenId": "token-target", "teamId": "team-players" }
+            ],
+            "turnResources": {
+              "actionAvailable": true,
+              "bonusActionAvailable": true,
+              "remainingMovementCells": 6,
+              "totalMovementCells": 6
+            }
+          }
+        }
+        """);
+
+    MonsterCatalogManifestService.MonsterCatalogEntry monsterEntry =
+        new MonsterCatalogManifestService.MonsterCatalogEntry(
+            "monster-baboon",
+            "Babuíno",
+            List.of("Babuíno", "Baboon"),
+            "token.png",
+            "splash.png",
+            "small",
+            "beast",
+            "unaligned",
+            new MonsterCatalogManifestService.MonsterCatalogAbilityScores(8, 14, 11, 4, 12, 6),
+            12,
+            3,
+            new MonsterCatalogManifestService.MonsterCatalogSpeed(30, null, 30, null, null, "ft"),
+            new MonsterCatalogManifestService.MonsterCatalogDefenses(List.of(), List.of(), List.of()),
+            "0",
+            List.of(
+                new MonsterCatalogManifestService.MonsterCatalogAttackAction(
+                    "act-attack:mordida",
+                    "act-attack",
+                    "Mordida",
+                    1,
+                    "1d4-1",
+                    "piercing",
+                    1.5
+                )
+            ),
+            List.of(
+                new MonsterCatalogManifestService.MonsterCatalogPassiveEffect(
+                    "passive_grantAdvantage",
+                    "attackRoll",
+                    "Táticas de Matilha",
+                    List.of(),
+                    new MonsterCatalogManifestService.MonsterCatalogTriggerHasAllyNearby(1.5, true)
+                )
+            )
+        );
+
+    when(gameAccessService.requireGameWithAccess(gameId, ownerUserId)).thenReturn(game);
+    when(gameSessionStateRepository.findByGameId(gameId)).thenReturn(Optional.of(sessionState));
+    when(gameSessionStateRepository.save(any(GameSessionStateEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(monsterCatalogManifestService.requireKnownMonster("monster-baboon")).thenReturn(monsterEntry);
+    when(monsterCatalogManifestService.requireKnownMonsterAttackAction("monster-baboon", "act-attack:mordida"))
+        .thenReturn(monsterEntry.actions().get(0));
+
+    GameSessionCommandService service = new GameSessionCommandService(
+        gameAccessService,
+        gameMemberRepository,
+        gameSessionStateRepository,
+        objectMapper,
+        messagingTemplate,
+        itemCatalogManifestService,
+        monsterCatalogManifestService
+    );
+
+    GameSessionEventResponse event = service.resolveAttack(
+        ownerUserId,
+        gameId,
+        "token-attacker",
+        "token-target",
+        "act-attack:mordida",
+        "IGNORAR NOME",
+        99,
+        "999",
+        "piercing"
+    );
+
+    assertEquals("ATTACK_RESOLVED", event.type());
+    assertEquals("advantage", event.payload().path("attackRollMode").asText());
+    assertEquals(2, event.payload().path("attackRolls").size());
+    int firstRoll = event.payload().path("attackRolls").get(0).asInt();
+    int secondRoll = event.payload().path("attackRolls").get(1).asInt();
+    assertEquals(Math.max(firstRoll, secondRoll), event.payload().path("attackRoll").asInt());
+  }
+
+  @Test
+  void resolveAttack_doesNotApplyAdvantageWhenNearbyAllyIsIncapacitated() {
+    Long ownerUserId = 7L;
+    Long gameId = 452L;
+
+    GameAccessService gameAccessService = mock(GameAccessService.class);
+    GameMemberRepository gameMemberRepository = mock(GameMemberRepository.class);
+    GameSessionStateRepository gameSessionStateRepository = mock(GameSessionStateRepository.class);
+    SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
+    ItemCatalogManifestService itemCatalogManifestService = mock(ItemCatalogManifestService.class);
+    MonsterCatalogManifestService monsterCatalogManifestService = mock(MonsterCatalogManifestService.class);
+
+    GameEntity game = buildGame(ownerUserId, gameId);
+    GameSessionStateEntity sessionState = new GameSessionStateEntity();
+    sessionState.setId(1704L);
+    sessionState.setGame(game);
+    sessionState.setVersion(3L);
+    sessionState.setStateJson("""
+        {
+          "characters": [
+            {
+              "id": "attacker-char",
+              "type": "NPC",
+              "monsterId": "monster-baboon",
+              "hitPoints": { "current": 3, "temporary": 0 },
+              "activeEffects": { "effects": [] }
+            },
+            {
+              "id": "ally-char",
+              "type": "NPC",
+              "monsterId": "monster-baboon",
+              "hitPoints": { "current": 3, "temporary": 0 },
+              "activeEffects": {
+                "effects": [
+                  {
+                    "instanceId": "eff-inc",
+                    "source": { "sourceType": "action", "sourceId": "act-test" },
+                    "effectIndex": 0,
+                    "linkedCondition": "incapacitated",
+                    "stackCount": 1,
+                    "isSuppressed": false
+                  }
+                ]
+              }
+            },
+            {
+              "id": "target-char",
+              "type": "Player",
+              "attributes": { "base": { "strength": 10, "dexterity": 10 } },
+              "progression": { "currentLevel": 1 },
+              "equipment": {
+                "bodyArmorItemId": null,
+                "shieldItemId": null,
+                "mainHandWeaponId": null,
+                "offHandWeaponId": null
+              },
+              "hitPoints": { "current": 10, "max": 10, "temporary": 0 }
+            }
+          ],
+          "tokens": [
+            {
+              "id": "token-attacker",
+              "characterId": "attacker-char",
+              "sceneId": "default-scene",
+              "position": { "x": 1, "y": 1 }
+            },
+            {
+              "id": "token-ally",
+              "characterId": "ally-char",
+              "sceneId": "default-scene",
+              "position": { "x": 3, "y": 1 }
+            },
+            {
+              "id": "token-target",
+              "characterId": "target-char",
+              "sceneId": "default-scene",
+              "position": { "x": 2, "y": 1 }
+            }
+          ],
+          "messages": [],
+          "combat": {
+            "active": true,
+            "mode": "teams",
+            "round": 1,
+            "turnIndex": 0,
+            "participants": [
+              { "tokenId": "token-attacker", "teamId": "team-monsters" },
+              { "tokenId": "token-ally", "teamId": "team-monsters" },
+              { "tokenId": "token-target", "teamId": "team-players" }
+            ],
+            "turnResources": {
+              "actionAvailable": true,
+              "bonusActionAvailable": true,
+              "remainingMovementCells": 6,
+              "totalMovementCells": 6
+            }
+          }
+        }
+        """);
+
+    MonsterCatalogManifestService.MonsterCatalogEntry monsterEntry =
+        new MonsterCatalogManifestService.MonsterCatalogEntry(
+            "monster-baboon",
+            "Babuíno",
+            List.of("Babuíno", "Baboon"),
+            "token.png",
+            "splash.png",
+            "small",
+            "beast",
+            "unaligned",
+            new MonsterCatalogManifestService.MonsterCatalogAbilityScores(8, 14, 11, 4, 12, 6),
+            12,
+            3,
+            new MonsterCatalogManifestService.MonsterCatalogSpeed(30, null, 30, null, null, "ft"),
+            new MonsterCatalogManifestService.MonsterCatalogDefenses(List.of(), List.of(), List.of()),
+            "0",
+            List.of(
+                new MonsterCatalogManifestService.MonsterCatalogAttackAction(
+                    "act-attack:mordida",
+                    "act-attack",
+                    "Mordida",
+                    1,
+                    "1d4-1",
+                    "piercing",
+                    1.5
+                )
+            ),
+            List.of(
+                new MonsterCatalogManifestService.MonsterCatalogPassiveEffect(
+                    "passive_grantAdvantage",
+                    "attackRoll",
+                    "Táticas de Matilha",
+                    List.of(),
+                    new MonsterCatalogManifestService.MonsterCatalogTriggerHasAllyNearby(1.5, true)
+                )
+            )
+        );
+
+    when(gameAccessService.requireGameWithAccess(gameId, ownerUserId)).thenReturn(game);
+    when(gameSessionStateRepository.findByGameId(gameId)).thenReturn(Optional.of(sessionState));
+    when(gameSessionStateRepository.save(any(GameSessionStateEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(monsterCatalogManifestService.requireKnownMonster("monster-baboon")).thenReturn(monsterEntry);
+    when(monsterCatalogManifestService.requireKnownMonsterAttackAction("monster-baboon", "act-attack:mordida"))
+        .thenReturn(monsterEntry.actions().get(0));
+
+    GameSessionCommandService service = new GameSessionCommandService(
+        gameAccessService,
+        gameMemberRepository,
+        gameSessionStateRepository,
+        objectMapper,
+        messagingTemplate,
+        itemCatalogManifestService,
+        monsterCatalogManifestService
+    );
+
+    GameSessionEventResponse event = service.resolveAttack(
+        ownerUserId,
+        gameId,
+        "token-attacker",
+        "token-target",
+        "act-attack:mordida",
+        "IGNORAR NOME",
+        99,
+        "999",
+        "piercing"
+    );
+
+    assertEquals("ATTACK_RESOLVED", event.type());
+    assertEquals("normal", event.payload().path("attackRollMode").asText());
+    assertEquals(1, event.payload().path("attackRolls").size());
   }
 
   @Test
@@ -476,6 +813,7 @@ class GameSessionCommandServiceAttackContractTest {
             "1/2",
             List.of(
                 new MonsterCatalogManifestService.MonsterCatalogAttackAction(
+                    "act-attack:investida",
                     "act-attack",
                     "Investida",
                     5,
@@ -502,7 +840,7 @@ class GameSessionCommandServiceAttackContractTest {
     when(gameAccessService.requireGameWithAccess(gameId, ownerUserId)).thenReturn(game);
     when(gameSessionStateRepository.save(any(GameSessionStateEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(monsterCatalogManifestService.requireKnownMonster("monster-giant-goat")).thenReturn(monsterEntry);
-    when(monsterCatalogManifestService.requireKnownMonsterAttackAction("monster-giant-goat", "act-attack"))
+    when(monsterCatalogManifestService.requireKnownMonsterAttackAction("monster-giant-goat", "act-attack:investida"))
         .thenReturn(monsterEntry.actions().get(0));
 
     GameSessionEventResponse successfulHitEvent = null;
@@ -588,7 +926,7 @@ class GameSessionCommandServiceAttackContractTest {
           gameId,
           "token-attacker",
           "token-target",
-          "act-attack",
+          "act-attack:investida",
           "IGNORAR NOME",
           99,
           "999",

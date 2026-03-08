@@ -5,6 +5,7 @@ describe('TokenActionBar action entries', () => {
     const entries = buildActionAttackEntries('char-1', [
       {
         id: 'action-1',
+        actionId: 'act-attack:mordida',
         name: 'Mordida',
         bonus: '+4',
         damage: '1d6+2',
@@ -15,7 +16,7 @@ describe('TokenActionBar action entries', () => {
 
     expect(entries).toEqual([
       {
-        id: 'action-char-1-action-1',
+        id: 'act-attack:mordida',
         label: 'Mordida',
         attackBonus: 4,
         damageFormula: '1d6+2',

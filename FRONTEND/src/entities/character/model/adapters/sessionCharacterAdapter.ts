@@ -132,6 +132,34 @@ function convertFeetToMeters(feet: number): number {
   return Number.isInteger(meters) ? meters : Number(meters.toFixed(1));
 }
 
+function convertDistanceToMeters(normal: number, unit: unknown): number {
+  if (typeof unit !== 'string') {
+    throw new Error('Violação de contrato de catálogo: distância sem unidade válida.');
+  }
+
+  const normalizedUnit = unit.trim().toLowerCase();
+  if (normalizedUnit === 'ft' || normalizedUnit === 'feet') {
+    return convertFeetToMeters(normal);
+  }
+  if (normalizedUnit === 'm' || normalizedUnit === 'meter' || normalizedUnit === 'meters') {
+    return Number.isInteger(normal) ? normal : Number(normal.toFixed(1));
+  }
+
+  throw new Error(
+    `Violação de contrato de catálogo: unidade de distância inválida (${normalizedUnit}).`,
+  );
+}
+
+function slugify(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
 function formatHitPointsFormula(formula: MonsterType['hitPoints']['formula']): string {
   const base = `${formula.count}d${formula.faces}`;
   const bonus = formula.bonus?.value ?? 0;
@@ -220,6 +248,10 @@ function buildMonsterActionsFromCatalog(monster: MonsterType): MonsterNpcCharact
       parameters.range && typeof parameters.range === 'object'
         ? (parameters.range as Record<string, unknown>).normal
         : undefined;
+    const rangeUnit =
+      parameters.range && typeof parameters.range === 'object'
+        ? (parameters.range as Record<string, unknown>).unit
+        : undefined;
     const outcomes = Array.isArray(effect.parameters?.outcomes) ? effect.parameters.outcomes : [];
     const firstOutcome = outcomes.find((outcome) => outcome.type === 'modifyTargetHP');
     if (!firstOutcome) {
@@ -230,6 +262,25 @@ function buildMonsterActionsFromCatalog(monster: MonsterType): MonsterNpcCharact
     if (actionId.length === 0) {
       throw new Error(
         `Violação de contrato de catálogo: ação de monstro sem actionId em ${monster.id}:${effect.name}.`,
+      );
+    }
+    const nameSlug = slugify(effect.name);
+    if (nameSlug.length === 0) {
+      throw new Error(
+        `Violação de contrato de catálogo: ação de monstro sem nome canônico em ${monster.id}:${effect.name}.`,
+      );
+    }
+    const catalogAttackId = `${actionId}:${nameSlug}`;
+
+    if (typeof attackBonusValue !== 'number') {
+      throw new Error(
+        `Violação de contrato de catálogo: ação de monstro sem attackBonus em ${monster.id}:${effect.name}.`,
+      );
+    }
+
+    if (typeof rangeNormal !== 'number' || rangeNormal <= 0) {
+      throw new Error(
+        `Violação de contrato de catálogo: ação de monstro sem range.normal válido em ${monster.id}:${effect.name}.`,
       );
     }
 
@@ -244,12 +295,12 @@ function buildMonsterActionsFromCatalog(monster: MonsterType): MonsterNpcCharact
     return [
       {
         id: buildDeterministicUuid(`monster-action:${monster.id}:${effectIndex}:${effect.name}`),
-        actionId,
+        actionId: catalogAttackId,
         name: effect.name,
-        bonus: typeof attackBonusValue === 'number' ? attackBonusValue : 0,
+        bonus: attackBonusValue,
         damage: firstOutcome ? formatMonsterDamageFormula(firstOutcome.formula) : undefined,
         damageType,
-        rangeMeters: typeof rangeNormal === 'number' ? convertFeetToMeters(rangeNormal) : 1.5,
+        rangeMeters: convertDistanceToMeters(rangeNormal, rangeUnit),
       },
     ];
   });

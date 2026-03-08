@@ -629,7 +629,6 @@ export function GameBoard({
       activeTool,
       isSelectionLocked: pendingAttack != null || pendingMovementTokenId != null,
       getWorldPoint: getWorldPointWithZoom,
-      pendingMovementTokenId,
       tokensOnBoard,
       characters,
       gridSettings,
@@ -918,6 +917,7 @@ export function GameBoard({
         activeCombatTurnTokenId={activeCombatTurnTokenId}
         activeCombatNextTurnTokenId={activeCombatNextTurnTokenId}
         combatParticipantTokenIds={combatParticipantTokenIds}
+        combatState={combatState}
       />
     </>
   );

@@ -25,6 +25,16 @@ export function FeatStep({ className }: FeatStepProps) {
 
   // Processa os efeitos dos talentos fornecidos pela origem
   const featInternalEffects = origin ? effectsProcessor.processFeatEffectsFromOrigin(origin) : [];
+  const groupedFeatEffects = featInternalEffects.reduce<
+    Record<string, (typeof featInternalEffects)[number][]>
+  >((acc, effect) => {
+    const featId = effect.parentFeatId || 'unknown';
+    if (!acc[featId]) {
+      acc[featId] = [];
+    }
+    acc[featId].push(effect);
+    return acc;
+  }, {});
 
   if (!origin) {
     return (
@@ -102,19 +112,7 @@ export function FeatStep({ className }: FeatStepProps) {
             </div>
 
             {/* Agrupa efeitos por talento */}
-            {Object.entries(
-              featInternalEffects.reduce(
-                (acc, effect) => {
-                  const featId = effect.parentFeatId || 'unknown';
-                  if (!acc[featId]) {
-                    acc[featId] = [];
-                  }
-                  acc[featId].push(effect);
-                  return acc;
-                },
-                {} as Record<string, typeof featInternalEffects>,
-              ),
-            ).map(([featId, effects]) => (
+            {Object.entries(groupedFeatEffects).map(([featId, effects]) => (
               <Card key={featId} className="p-4">
                 <div className="mb-4">
                   <h4 className="text-text-primary text-lg font-medium">
