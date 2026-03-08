@@ -35,13 +35,8 @@ function resolveArmorEffect(item: (typeof PHB2024ITEMS)[number]) {
   return acEffect;
 }
 
-async function main() {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const projectRoot = path.resolve(__dirname, "../..");
-  const monorepoRoot = path.resolve(projectRoot, "..");
-
-  const manifest: ItemManifest = {
+function buildExpectedManifest(): ItemManifest {
+  return {
     manifestVersion: ITEM_CATALOG_MANIFEST_VERSION,
     items: [...PHB2024ITEMS]
       .map((item) => {
@@ -67,8 +62,14 @@ async function main() {
       })
       .sort((left, right) => left.id.localeCompare(right.id)),
   };
+}
 
-  const outputPath = path.resolve(
+async function main() {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const projectRoot = path.resolve(__dirname, "../..");
+  const monorepoRoot = path.resolve(projectRoot, "..");
+  const manifestPath = path.resolve(
     monorepoRoot,
     "BACKEND-JAVA",
     "src",
@@ -78,9 +79,19 @@ async function main() {
     "item-catalog-manifest.json",
   );
 
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
-  await fs.writeFile(outputPath, JSON.stringify(manifest, null, 2) + "\n", "utf-8");
-  console.log(`Item catalog manifest gerado em: ${outputPath}`);
+  const expectedManifest = buildExpectedManifest();
+  const expectedJson = JSON.stringify(expectedManifest, null, 2) + "\n";
+  const currentJson = await fs.readFile(manifestPath, "utf-8");
+
+  if (currentJson !== expectedJson) {
+    console.error(
+      "item-catalog-manifest.json está fora de sincronização com DATAMODELING. Rode: pnpm export:backend-item-manifest",
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log("item-catalog-manifest.json está sincronizado com DATAMODELING.");
 }
 
 main().catch((error) => {

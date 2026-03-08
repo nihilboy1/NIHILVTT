@@ -1,0 +1,742 @@
+{
+  "manifestVersion": 1,
+  "feats": [
+    {
+      "id": "feat-ability-score-improvement",
+      "primaryName": "Melhoramento nos Pontos de Habilidade",
+      "names": [
+        "Melhoramento nos Pontos de Habilidade",
+        "Ability Score Improvement"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": true
+    },
+    {
+      "id": "feat-actor",
+      "primaryName": "Ator",
+      "names": [
+        "Ator",
+        "Actor"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-alert",
+      "primaryName": "Alerta",
+      "names": [
+        "Alerta",
+        "Alert"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-archery",
+      "primaryName": "Arquearia",
+      "names": [
+        "Arquearia",
+        "Archery"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-athlete",
+      "primaryName": "Atleta",
+      "names": [
+        "Atleta",
+        "Athlete"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-blessed-warrior",
+      "primaryName": "Guerreiro Abençoado",
+      "names": [
+        "Guerreiro Abençoado",
+        "Blessed Warrior"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-blindsight",
+      "primaryName": "Sentido as Cegas",
+      "names": [
+        "Sentido as Cegas",
+        "Blindsight"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-charger",
+      "primaryName": "Investida",
+      "names": [
+        "Investida",
+        "Charger"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-chef",
+      "primaryName": "Cozinheiro",
+      "names": [
+        "Cozinheiro",
+        "Chef"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-crafter",
+      "primaryName": "Artífice",
+      "names": [
+        "Artífice",
+        "Crafter"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-crossbow-expert",
+      "primaryName": "Especialista em Bestas",
+      "names": [
+        "Especialista em Bestas",
+        "Crossbow Expert"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-crusher",
+      "primaryName": "Esmagador",
+      "names": [
+        "Esmagador",
+        "Crusher"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-defense",
+      "primaryName": "Defensivo",
+      "names": [
+        "Defensivo",
+        "Defense"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-defensive-duelist",
+      "primaryName": "Duelista Defensivo",
+      "names": [
+        "Duelista Defensivo",
+        "Defensive Duelist"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-druidic-warrior",
+      "primaryName": "Guerreiro Druídico",
+      "names": [
+        "Guerreiro Druídico",
+        "Druidic Warrior"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-dual-wielder",
+      "primaryName": "Ambidestro",
+      "names": [
+        "Ambidestro",
+        "Dual Wielder"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-dueling",
+      "primaryName": "Duelista",
+      "names": [
+        "Duelista",
+        "Dueling"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-durable",
+      "primaryName": "Durável",
+      "names": [
+        "Durável",
+        "Durable"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-elemental-adept",
+      "primaryName": "Adepto Elemental",
+      "names": [
+        "Adepto Elemental",
+        "Elemental Adept"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": true
+    },
+    {
+      "id": "feat-fey-touched",
+      "primaryName": "Tocado pela Fey",
+      "names": [
+        "Tocado pela Fey",
+        "Fey-Touched"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": true
+    },
+    {
+      "id": "feat-grappler",
+      "primaryName": "Agarrador",
+      "names": [
+        "Agarrador",
+        "Grappler"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-great-weapon-fighting",
+      "primaryName": "Lutador com Arma Pesada",
+      "names": [
+        "Lutador com Arma Pesada",
+        "Great Weapon Fighting"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-great-weapon-master",
+      "primaryName": "Mestre de Arma Pesada",
+      "names": [
+        "Mestre de Arma Pesada",
+        "Great Weapon Master"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-healer",
+      "primaryName": "Curandeiro",
+      "names": [
+        "Curandeiro",
+        "Healer"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-heavily-armored",
+      "primaryName": "Pesadamente Armadurado",
+      "names": [
+        "Pesadamente Armadurado",
+        "Heavily Armored"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-heavy-armor-master",
+      "primaryName": "Mestre em Armadura Pesada",
+      "names": [
+        "Mestre em Armadura Pesada",
+        "Heavy Armor Master"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-inspiring-leader",
+      "primaryName": "Líder Inspirador",
+      "names": [
+        "Líder Inspirador",
+        "Inspiring Leader"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-interception",
+      "primaryName": "Intercepção",
+      "names": [
+        "Intercepção",
+        "Interception"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-keen-mind",
+      "primaryName": "Mente Aguçada",
+      "names": [
+        "Mente Aguçada",
+        "Keen Mind"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-lightly-armored",
+      "primaryName": "Levemente Armadurado",
+      "names": [
+        "Levemente Armadurado",
+        "Lightly Armored"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-lucky",
+      "primaryName": "Sortudo",
+      "names": [
+        "Sortudo",
+        "Lucky"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-luta-com-duas-armas",
+      "primaryName": "luta com Duas Armas",
+      "names": [
+        "luta com Duas Armas",
+        "Two-Weapon Fighting"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-mage-slayer",
+      "primaryName": "Matador de Magos",
+      "names": [
+        "Matador de Magos",
+        "Mage Slayer"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-magic-initiate-cleric",
+      "primaryName": "Iniciado em Magia: Clérigo",
+      "names": [
+        "Iniciado em Magia: Clérigo",
+        "Magic Initiate: Cleric"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-magic-initiate-druid",
+      "primaryName": "Iniciado em Magia: Druida",
+      "names": [
+        "Iniciado em Magia: Druida",
+        "Magic Initiate: Druid"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-magic-initiate-wizard",
+      "primaryName": "Iniciado em Magia: Mago",
+      "names": [
+        "Iniciado em Magia: Mago",
+        "Magic Initiate: Wizard"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-martial-weapon-training",
+      "primaryName": "Treinamento em Armas Marciais",
+      "names": [
+        "Treinamento em Armas Marciais",
+        "Martial Weapon Training"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-medium-armor-master",
+      "primaryName": "Mestre em Armadura Média",
+      "names": [
+        "Mestre em Armadura Média",
+        "Medium Armor Master"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-moderately-armored",
+      "primaryName": "Moderadamente Armadurado",
+      "names": [
+        "Moderadamente Armadurado",
+        "Moderately Armored"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-mounted-combatant",
+      "primaryName": "Combatente Montado",
+      "names": [
+        "Combatente Montado",
+        "Mounted Combatant"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-musician",
+      "primaryName": "Músico",
+      "names": [
+        "Músico",
+        "Musician"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-observant",
+      "primaryName": "Observador",
+      "names": [
+        "Observador",
+        "Observant"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-piercer",
+      "primaryName": "Perfurador",
+      "names": [
+        "Perfurador",
+        "Piercer"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-poisoner",
+      "primaryName": "Envenenador",
+      "names": [
+        "Envenenador",
+        "Poisoner"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-polearm-master",
+      "primaryName": "Mestre em Haste",
+      "names": [
+        "Mestre em Haste",
+        "Polearm Master"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-protection",
+      "primaryName": "Proteção",
+      "names": [
+        "Proteção",
+        "Protection"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-resilient",
+      "primaryName": "Resistente",
+      "names": [
+        "Resistente",
+        "Resilient"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-ritual-caster",
+      "primaryName": "Ritualista",
+      "names": [
+        "Ritualista",
+        "Ritual Caster"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-savage-attacker",
+      "primaryName": "Atacante Selvagem",
+      "names": [
+        "Atacante Selvagem",
+        "Savage Attacker"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-sentinel",
+      "primaryName": "Sentinela",
+      "names": [
+        "Sentinela",
+        "Sentinel"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-shadow-touched",
+      "primaryName": "Tocado pelas Sombras",
+      "names": [
+        "Tocado pelas Sombras",
+        "Shadow-Touched"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-sharpshooter",
+      "primaryName": "Franco-atirador",
+      "names": [
+        "Franco-atirador",
+        "Sharpshooter"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-shield-master",
+      "primaryName": "Mestre do Escudo",
+      "names": [
+        "Mestre do Escudo",
+        "Shield Master"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-skill-expert",
+      "primaryName": "Especialista em Perícias",
+      "names": [
+        "Especialista em Perícias",
+        "Skill Expert"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-skilled",
+      "primaryName": "Perito",
+      "names": [
+        "Perito",
+        "Skilled"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": true
+    },
+    {
+      "id": "feat-skulker",
+      "primaryName": "Furtivo",
+      "names": [
+        "Furtivo",
+        "Skulker"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-slasher",
+      "primaryName": "Cortador",
+      "names": [
+        "Cortador",
+        "Slasher"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-speedy",
+      "primaryName": "Veloz",
+      "names": [
+        "Veloz",
+        "Speedy"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-spell-sniper",
+      "primaryName": "Franco-atirador de Magia",
+      "names": [
+        "Franco-atirador de Magia",
+        "Spell Sniper"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-tavern-brawler",
+      "primaryName": "Brigão de Taverna",
+      "names": [
+        "Brigão de Taverna",
+        "Tavern Brawler"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-telekinetic",
+      "primaryName": "Telecinético",
+      "names": [
+        "Telecinético",
+        "Telekinetic"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-telepathic",
+      "primaryName": "Telepata",
+      "names": [
+        "Telepata",
+        "Telepathic"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-thrown-weapon-fighting",
+      "primaryName": "Combate com Armas Arremessadas",
+      "names": [
+        "Combate com Armas Arremessadas",
+        "Thrown Weapon Fighting"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-tough",
+      "primaryName": "Durão",
+      "names": [
+        "Durão",
+        "Tough"
+      ],
+      "source": "LDJ2024",
+      "category": "origin",
+      "repeatable": false
+    },
+    {
+      "id": "feat-unarmed-fighting",
+      "primaryName": "Combate Desarmado",
+      "names": [
+        "Combate Desarmado",
+        "Unarmed Fighting"
+      ],
+      "source": "LDJ2024",
+      "category": "fightingStyle",
+      "repeatable": false
+    },
+    {
+      "id": "feat-war-caster",
+      "primaryName": "Conjurador de Guerra",
+      "names": [
+        "Conjurador de Guerra",
+        "War Caster"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    },
+    {
+      "id": "feat-weapon-master",
+      "primaryName": "Mestre em Armas",
+      "names": [
+        "Mestre em Armas",
+        "Weapon Master"
+      ],
+      "source": "LDJ2024",
+      "category": "general",
+      "repeatable": false
+    }
+  ]
+}

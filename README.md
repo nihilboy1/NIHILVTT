@@ -33,6 +33,7 @@ Hoje o projeto ja cobre autenticacao, dashboard, criacao e gerenciamento de mesa
   - guia operacional: `DATAMODELING/README.md`
   - brief tecnico: `DATAMODELING/REVIEW_BRIEF.md`
   - blueprint de monstros: `DATAMODELING/MONSTER_RUNTIME_BLUEPRINT.md`
+  - contrato de automacao de combate (v1): `DATAMODELING/COMBAT_AUTOMATION_CONTRACT.md`
 
 ## Setup rapido
 
@@ -48,7 +49,14 @@ Hoje o projeto ja cobre autenticacao, dashboard, criacao e gerenciamento de mesa
 
 - `pnpm dev:front`
 - `pnpm dev:back`
+- `pnpm check:class-manifest-sync`
+- `pnpm check:feat-manifest-sync`
+- `pnpm check:item-manifest-sync`
 - `pnpm check:monster-manifest-sync`
+- `pnpm check:origin-manifest-sync`
+- `pnpm check:specie-manifest-sync`
+- `pnpm check:spell-manifest-sync`
+- `pnpm check:contracts`
 - `pnpm test:front`
 - `pnpm test:e2e:front`
 - `pnpm test:front:all`
@@ -134,6 +142,9 @@ Os demais existem para suporte operacional e validacao especializada e nao devem
 - a mesma regra vale para tokens de mesa: criacao, remocao e reposicao de tokens devem nascer de snapshot, eventos realtime e comandos autoritativos, nunca de mutacao local paralela
 - operacoes estruturais de token no board (`copy`, `paste` e `delete`) permanecem centralizadas no mestre
 - a trilha de monstro segue o mesmo padrao data-driven: catalogo canonico em `DATAMODELING`, `MonsterCharacterState` autoritativo no backend e frontend apenas como projecao do catalogo + runtime; o fluxo operacional de spawn parte da `Biblioteca`, com drag do monstro para o grid
+- os manifests canônicos de catálogo (`class/feat/item/monster/specie/spell`) sao artefatos versionados de contrato (`manifestVersion`) e devem permanecer sincronizados com o `DATAMODELING`; drift e falha de contrato
+- o gate de contrato para esse sync e obrigatorio (`pnpm check:contracts`) e deve bloquear PR/push tanto para erro de schema/dados (`validate:data:all`) quanto para drift de manifests entre backend e datamodeling
+- a automacao de combate de monstros evolui por contrato de capacidades (v1) e nao por regra hardcoded por monstro; o recorte atual vive em `DATAMODELING/COMBAT_AUTOMATION_CONTRACT.md`
 - no frontend, `FRONTEND/src/app/styles/index.css` e a SSOT de cores (tema): qualquer cor de UI/renderer deve vir de token CSS definido ali, sem hex/rgb hardcoded paralelo
 
 ## Contribuicao

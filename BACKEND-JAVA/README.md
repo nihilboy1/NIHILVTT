@@ -47,7 +47,7 @@ Jogos:
 - `POST /games/{gameId}/session/tokens/move` (comando autoritativo de movimento de token)
 - `POST /games/{gameId}/session/tokens/remove` (comando autoritativo de remoção de token)
 - `POST /games/{gameId}/session/tokens/remove-batch` (comando autoritativo de remoção em lote de tokens)
-- `POST /games/{gameId}/session/combat/start` (inicia combate formal com tokens selecionados; apenas mestre)
+- `POST /games/{gameId}/session/combat/start` (inicia combate formal com tokens selecionados + modo `freeForAll|teams`; apenas mestre)
 - `POST /games/{gameId}/session/combat/next-turn` (avança a ordem de iniciativa; apenas mestre)
 - `POST /games/{gameId}/session/combat/end` (encerra o combate ativo; apenas mestre)
 - `POST /games/{gameId}/session/combat/attacks` (resolução autoritativa de ataque entre tokens)
@@ -155,6 +155,15 @@ Jogos:
   - backend valida ownership do mestre, exige personagem runtime compatível, adiciona/empilha o item em `state.characters[].inventory.items[]`, incrementa `version` e publica `CHARACTER_INVENTORY_UPDATED`
   - o estado da mesa agora pode carregar `combat`, com `active`, `round`, `turnIndex` e `participants[]` (ordem formal de iniciativa)
   - mestre pode iniciar combate explicitamente com `POST /games/{gameId}/session/combat/start`; o backend rola iniciativa (`1d20 + DEX mod`), ordena por total/DEX/tokenId e publica `COMBAT_STARTED`
+  - contrato autoritativo de start de combate:
+    - `tokenIds: string[]`
+    - `mode: "freeForAll" | "teams"`
+    - `teams?: Array<{ teamId: string; tokenIds: string[] }>`
+  - validacao fail-fast de contrato:
+    - `freeForAll`: `teams` deve estar ausente
+    - `teams`: todos os `tokenIds` selecionados devem aparecer em exatamente um `teamId`
+  - `combat.mode` e persistido no estado, e cada entrada de `combat.participants[]` agora persiste `teamId`
+  - semantica de aliado no runtime de combate: em `freeForAll` ninguem e aliado; em `teams`, aliado e participante com mesmo `teamId`
   - tokens cujo personagem tenha condicao runtime `dead` nao podem entrar em combate; a tentativa deve falhar cedo com erro de contrato
   - mestre pode avançar turno com `POST /games/{gameId}/session/combat/next-turn`; o backend atualiza `turnIndex`/`round` e publica `COMBAT_TURN_ADVANCED`
   - mestre pode encerrar combate com `POST /games/{gameId}/session/combat/end`; o backend limpa `combat` e publica `COMBAT_ENDED`
@@ -164,13 +173,18 @@ Jogos:
   - para alvos `NPC`, o backend aplica `resistances`, `vulnerabilities` e `damageImmunities` a partir do `monster-catalog-manifest.json` antes de consumir HP/THP; `traits` permanecem descritivos (sem execução automática no runtime atual)
   - o `ATTACK_RESOLVED` agora expõe `damageAfterDefenses` (dano após ajuste por defesas e antes da absorção por THP) para permitir projeção fiel no cliente
   - para ataques canonicos de monstro com bonus condicionais, o backend publica no `ATTACK_RESOLVED` os campos `conditionalDamageTotal` e `conditionalDamageBreakdown[]` (com `damageType` + `damage`) sempre de forma explicita, evitando heuristica do cliente para inferir tipo de dano condicional
+  - no recorte atual de `automatedPassives` (contrato v1), `passive_grantAdvantage` em `attackRoll` com trigger `hasAllyNearby` ja entra na resolução autoritativa: quando houver aliado elegivel perto do alvo, o backend rola com vantagem
+  - `ATTACK_RESOLVED` agora tambem inclui metadados de rolagem de ataque (`attackRollMode` e `attackRolls[]`) para auditoria e debug do resultado autoritativo
   - `Ataque desarmado` usa contrato canonico interno (`UnarmedAttackProfile`) com `defaultDamageType` e override por `specieId` (ex.: `specie-lizardfolk -> slashing`), com fallback explicito para `bludgeoning`
   - `attackDamageType` deve seguir estritamente o conjunto canônico; a validação no backend usa enum único (`CombatDamageType`) para evitar listas duplicadas em múltiplas bordas
   - quando um `NPC` chega a `0` HP por dano, o backend aplica a condicao runtime `dead` em `activeEffects.effects[].linkedCondition`; em combate ativo, esse participante sai de `combat.participants[]`, mas o token permanece no grid ate remocao explicita do mestre
   - no comando manual do mestre (`POST /games/{gameId}/session/characters/hp`), cura (`mode=heal`) remove a condicao `dead` para `NPC` e `Player`; essa regra e deliberadamente restrita ao HP control administrativo para permitir testes/ajustes de mesa. Fluxos futuros de cura de jogo (magias/itens/acoes) nao devem reviver `NPC` mortos automaticamente sem regra explicita
   - quando tokens/personagens saem da mesa, o backend sincroniza `combat.participants[]`; se nao restar participante, o estado de combate e limpo
 - o fluxo de concessão de item e a compatibilidade de slots passam a usar o manifest canônico `catalog/item-catalog-manifest.json`, gerado pelo `DATAMODELING`, sem heurística de prefixo no backend
+- o backend valida `manifestVersion` do catálogo de itens no boot; manifest ausente/incompativel falha cedo para evitar drift silencioso
 - a trilha autoritativa de monstros segue o mesmo padrao: o backend consome `catalog/monster-catalog-manifest.json`, gerado pelo `DATAMODELING`, e a instanciacao de `MonsterCharacterState` deve nascer por `monsterId`, sem confiar em payload estrutural de monstro vindo do frontend
+- o backend valida `manifestVersion` no boot; manifest ausente/incompativel falha cedo para evitar drift silencioso entre catalogo TS e contrato autoritativo Java
+- o manifest de monstros agora tambem inclui `automatedPassives` (contrato v1) para passivos automatizaveis; a execucao no runtime deve evoluir por capacidade (`effect + trigger + outcome`) e nao por regra hardcoded por `monsterId`
 - `MonsterCharacterState` nao aceita `controlledByUserId`; no estado atual do produto, `NPC` e sempre de uso exclusivo do mestre
 - a criacao de novos `MonsterCharacterState` continua estrita e nao aceita `controlledByUserId`; como o projeto ainda nao teve release, o backend nao deve tolerar residuos de contratos antigos em snapshot
 - o contrato de `MonsterCharacterState` e estrito: campos nullable e arrays mutaveis (`nameOverride`, `imageOverride`, `notes`, `resourcePools.pools`, `activeEffects.effects`, `hitPoints.temporary`) precisam existir explicitamente no payload, sem `default()` implícito no schema compartilhado

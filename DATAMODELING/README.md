@@ -19,6 +19,7 @@ Regra editorial do modulo:
   - `entities/`: agregados runtime persistidos, como `PlayerCharacterState`.
 - `src/tooling/`: scripts de validacao e geracao.
 - `MONSTER_RUNTIME_BLUEPRINT.md`: blueprint tecnico da futura ficha/runtime autoritativo de monstros.
+- `COMBAT_AUTOMATION_CONTRACT.md`: contrato de automacao de combate por capacidades (v1).
 
 ## Exports do pacote
 
@@ -39,19 +40,47 @@ Regra editorial do modulo:
 No diretorio `DATAMODELING/`:
 
 - `pnpm validate:data`
+- `pnpm validate:data:all`
 - `pnpm enums`
 - `pnpm monsters`
+- `pnpm export:backend-class-manifest`
+- `pnpm check:backend-class-manifest-sync`
+- `pnpm export:backend-feat-manifest`
+- `pnpm check:backend-feat-manifest-sync`
 - `pnpm export:backend-item-manifest`
+- `pnpm check:backend-item-manifest-sync`
 - `pnpm export:backend-monster-manifest`
 - `pnpm check:backend-monster-manifest-sync`
+- `pnpm export:backend-origin-manifest`
+- `pnpm check:backend-origin-manifest-sync`
+- `pnpm export:backend-specie-manifest`
+- `pnpm check:backend-specie-manifest-sync`
+- `pnpm export:backend-spell-manifest`
+- `pnpm check:backend-spell-manifest-sync`
 - `pnpm lint`
+
+## Manifests de Catálogo (Backend)
+
+- `class-catalog-manifest.json`, `feat-catalog-manifest.json`, `item-catalog-manifest.json`, `monster-catalog-manifest.json`, `origin-catalog-manifest.json`, `specie-catalog-manifest.json` e `spell-catalog-manifest.json` seguem o mesmo padrão de contrato.
+- todos são exportados do `DATAMODELING`, versionados por `manifestVersion` e validados por checks de sync dedicados.
+- `pnpm check:contracts` na raiz executa todos os checks e deve ser gate obrigatório de CI/PR.
+- `validate:data:all` é a validação não interativa completa de Spells, Items, Monsters, Feats e Origins; deve ser usada junto dos checks de manifest para cobertura de contrato de dados e sincronismo com backend.
+
+## Manifest de Itens (Backend)
+
+- `export:backend-item-manifest` gera o arquivo canônico consumido pelo backend em `BACKEND-JAVA/src/main/resources/catalog/item-catalog-manifest.json`.
+- o manifest exportado e versionado via `manifestVersion`; mudancas incompatíveis no contrato precisam subir esse valor no export/check e no backend.
+- `check:backend-item-manifest-sync` valida que o manifest atual de itens no backend esta sincronizado com o catalogo em `DATAMODELING`; o comando falha quando houver drift.
 
 ## Manifest de Monstros (Backend)
 
 - `export:backend-monster-manifest` gera o arquivo canônico consumido pelo backend em `BACKEND-JAVA/src/main/resources/catalog/monster-catalog-manifest.json`.
+- o manifest exportado e versionado via `manifestVersion`; mudancas incompatíveis no contrato precisam subir esse valor no export/check e no backend.
 - o manifest canônico de monstros exporta também `defenses` de dano (`resistances`, `vulnerabilities`, `damageImmunities`) para cálculo autoritativo de dano no backend.
 - para `effects` do tipo `activatableAction` que aplicam `modifyTargetHP` em `on: "hit"`, o catálogo deve declarar `attackBonus` em `parameters`; sem isso a ação não entra no manifest canônico e o backend rejeita o ataque por ação inexistente.
+- o manifest canônico também exporta `automatedPassives` (subset do contrato v1) para passivos automatizáveis; no recorte inicial, inclui `passive_grantAdvantage` em `attackRoll` com trigger `hasAllyNearby`.
 - `check:backend-monster-manifest-sync` valida que o manifest atual do backend esta sincronizado com o catalogo em `DATAMODELING`; o comando falha quando houver drift.
+- esse check e o gate oficial de contrato para CI/PR (`pnpm check:contracts` na raiz), junto com `check:backend-item-manifest-sync`.
 
 ## Fluxo recomendado
 

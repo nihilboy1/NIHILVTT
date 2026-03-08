@@ -75,7 +75,7 @@ const ChoiceOptionSchema = z.object({
 // Schema para equipamento inicial baseado em escolhas
 const ChoiceBasedEquipmentSchema = z.object({
   type: z.literal("choice"),
-  count: 1,
+  count: z.literal(1),
   choices: z.array(ChoiceOptionSchema).nonempty(),
 });
 

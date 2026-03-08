@@ -1,4 +1,5 @@
 {
+  "manifestVersion": 1,
   "monsters": [
     {
       "id": "monster-ape",
@@ -57,7 +58,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-awakened-shrub",
@@ -110,7 +112,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-baboon",
@@ -119,8 +122,8 @@
         "Babuíno",
         "Baboon"
       ],
-      "tokenUrl": "https://i.imgur.com/C3y7JPC.png",
-      "splashArtUrl": "https://i.imgur.com/tH9wWDA.png",
+      "tokenUrl": "https://i.imgur.com/rjpZOkL.png",
+      "splashArtUrl": "https://i.imgur.com/XGhec4R.png",
       "size": "small",
       "creatureType": "beast",
       "alignment": "unaligned",
@@ -158,6 +161,18 @@
           "rangeMeters": 1.5,
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
+        }
+      ],
+      "automatedPassives": [
+        {
+          "type": "passive_grantAdvantage",
+          "on": "attackRoll",
+          "name": "Táticas de Matilha",
+          "appliesToActionIds": [],
+          "triggerHasAllyNearby": {
+            "rangeMeters": 1.5,
+            "allyIsNotIncapacitated": true
+          }
         }
       ]
     },
@@ -210,7 +225,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-bat",
@@ -259,7 +275,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-black-bear",
@@ -308,7 +325,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-cat",
@@ -357,7 +375,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-cockatrice",
@@ -406,7 +425,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-commoner",
@@ -455,7 +475,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-crab",
@@ -504,7 +525,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-crawling-claw",
@@ -556,7 +578,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-crocodile",
@@ -605,7 +628,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-darkmantle",
@@ -654,7 +678,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-deer",
@@ -703,7 +728,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-dust-mephit",
@@ -756,7 +782,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-eagle",
@@ -805,7 +832,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-frog",
@@ -854,7 +882,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-gas-spore-fungus",
@@ -905,7 +934,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-giant-fire-beetle",
@@ -956,7 +986,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-giant-goat",
@@ -1016,7 +1047,8 @@
             }
           ]
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-giant-seahorse",
@@ -1071,7 +1103,8 @@
           ],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-giant-wasp",
@@ -1120,7 +1153,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-gnoll-warrior",
@@ -1179,7 +1213,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-goat",
@@ -1228,7 +1263,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-gray-ooze",
@@ -1281,7 +1317,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-hawk",
@@ -1330,7 +1367,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-hobgoblin-warrior",
@@ -1389,7 +1427,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-homunculus",
@@ -1440,7 +1479,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-hyena",
@@ -1488,6 +1528,18 @@
           "rangeMeters": 1.5,
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
+        }
+      ],
+      "automatedPassives": [
+        {
+          "type": "passive_grantAdvantage",
+          "on": "attackRoll",
+          "name": "Táticas de Matilha",
+          "appliesToActionIds": [],
+          "triggerHasAllyNearby": {
+            "rangeMeters": 1.5,
+            "allyIsNotIncapacitated": true
+          }
         }
       ]
     },
@@ -1543,7 +1595,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-jackal",
@@ -1592,7 +1645,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-jackalwere",
@@ -1651,7 +1705,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-larva",
@@ -1700,7 +1755,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-lemure",
@@ -1754,7 +1810,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-lizard",
@@ -1803,7 +1860,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-magma-mephit",
@@ -1857,7 +1915,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-magmin",
@@ -1908,7 +1967,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-modron-tridrone",
@@ -1957,7 +2017,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-myconid-adult",
@@ -2006,7 +2067,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-myconid-sprout",
@@ -2055,7 +2117,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-octopus",
@@ -2104,7 +2167,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-owl",
@@ -2153,7 +2217,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-performer",
@@ -2202,7 +2267,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-piercer",
@@ -2251,7 +2317,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-piranha",
@@ -2300,7 +2367,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-rat",
@@ -2349,7 +2417,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-raven",
@@ -2398,7 +2467,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-reef-shark",
@@ -2447,7 +2517,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-rust-monster",
@@ -2496,7 +2567,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-sahuagin-warrior",
@@ -2548,7 +2620,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-satyr",
@@ -2597,7 +2670,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-scorpion",
@@ -2646,7 +2720,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-scout",
@@ -2705,7 +2780,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-seahorse",
@@ -2743,7 +2819,8 @@
         "damageImmunities": []
       },
       "challengeRating": "0",
-      "actions": []
+      "actions": [],
+      "automatedPassives": []
     },
     {
       "id": "monster-shadow",
@@ -2803,7 +2880,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-shrieker-fungus",
@@ -2841,7 +2919,8 @@
         "damageImmunities": []
       },
       "challengeRating": "0",
-      "actions": []
+      "actions": [],
+      "automatedPassives": []
     },
     {
       "id": "monster-spider",
@@ -2890,7 +2969,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-swarm-of-insects",
@@ -2943,7 +3023,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-tough",
@@ -3002,7 +3083,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-troll-limb",
@@ -3051,7 +3133,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-vine-blight",
@@ -3100,7 +3183,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-vulture",
@@ -3148,6 +3232,18 @@
           "rangeMeters": 1.5,
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
+        }
+      ],
+      "automatedPassives": [
+        {
+          "type": "passive_grantAdvantage",
+          "on": "attackRoll",
+          "name": "Táticas de Matilha",
+          "appliesToActionIds": [],
+          "triggerHasAllyNearby": {
+            "rangeMeters": 1.5,
+            "allyIsNotIncapacitated": true
+          }
         }
       ]
     },
@@ -3209,7 +3305,8 @@
             }
           ]
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-warhorse-skeleton",
@@ -3267,7 +3364,8 @@
             }
           ]
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-weasel",
@@ -3316,7 +3414,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     },
     {
       "id": "monster-worg",
@@ -3365,7 +3464,8 @@
           "conditionalDamageBonuses": [],
           "conditionalAppliedConditions": []
         }
-      ]
+      ],
+      "automatedPassives": []
     }
   ]
 }

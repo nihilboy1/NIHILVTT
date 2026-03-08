@@ -1,6 +1,7 @@
 package com.nihilvtt.auth.game.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ItemCatalogManifestService {
+  private static final int EXPECTED_MANIFEST_VERSION = 1;
   private final Map<String, ItemCatalogEntry> itemsById;
 
   public ItemCatalogManifestService(ObjectMapper objectMapper) {
@@ -33,14 +35,50 @@ public class ItemCatalogManifestService {
   private ItemCatalogManifest loadManifest(ObjectMapper objectMapper) {
     ClassPathResource resource = new ClassPathResource("catalog/item-catalog-manifest.json");
     try (InputStream inputStream = resource.getInputStream()) {
-      return objectMapper.readValue(inputStream, ItemCatalogManifest.class);
+      JsonNode rootNode = objectMapper.readTree(inputStream);
+      validateManifestRoot(rootNode);
+      ItemCatalogManifest manifest = objectMapper.treeToValue(rootNode, ItemCatalogManifest.class);
+      validateManifestData(manifest);
+      return manifest;
     } catch (IOException exception) {
       throw new IllegalStateException("Não foi possível carregar o manifest canônico de itens.", exception);
     }
   }
 
+  static void validateManifestRoot(JsonNode rootNode) {
+    if (rootNode == null || !rootNode.isObject()) {
+      throw new IllegalStateException("Manifest canônico de itens inválido: raiz não é objeto.");
+    }
+
+    JsonNode manifestVersionNode = rootNode.get("manifestVersion");
+    if (manifestVersionNode == null || !manifestVersionNode.isInt()) {
+      throw new IllegalStateException("Manifest canônico de itens sem manifestVersion.");
+    }
+
+    int manifestVersion = manifestVersionNode.intValue();
+    if (manifestVersion != EXPECTED_MANIFEST_VERSION) {
+      throw new IllegalStateException(
+          "Manifest canônico de itens incompatível. Esperado="
+              + EXPECTED_MANIFEST_VERSION
+              + ", recebido="
+              + manifestVersion
+              + "."
+      );
+    }
+  }
+
+  private void validateManifestData(ItemCatalogManifest manifest) {
+    if (manifest == null) {
+      throw new IllegalStateException("Manifest canônico de itens ausente.");
+    }
+
+    if (manifest.items() == null) {
+      throw new IllegalStateException("Manifest canônico de itens sem lista de items.");
+    }
+  }
+
   @JsonIgnoreProperties(ignoreUnknown = true)
-  private record ItemCatalogManifest(List<ItemCatalogEntry> items) {}
+  private record ItemCatalogManifest(Integer manifestVersion, List<ItemCatalogEntry> items) {}
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record ItemCatalogEntry(

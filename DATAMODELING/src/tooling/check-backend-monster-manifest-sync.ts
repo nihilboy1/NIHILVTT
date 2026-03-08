@@ -38,6 +38,7 @@ type MonsterCatalogManifestEntry = {
   defenses: MonsterManifestDefenses;
   challengeRating: string;
   actions: MonsterManifestAction[];
+  automatedPassives: MonsterManifestPassiveEffect[];
 };
 
 type MonsterManifestDefenses = {
@@ -68,9 +69,23 @@ type MonsterManifestConditionalCondition = {
   requiresUserMovementAtLeastMeters: number;
 };
 
+type MonsterManifestPassiveEffect = {
+  type: "passive_grantAdvantage";
+  on: "attackRoll";
+  name: string;
+  appliesToActionIds: string[];
+  triggerHasAllyNearby: {
+    rangeMeters: number;
+    allyIsNotIncapacitated: boolean;
+  };
+};
+
 type MonsterCatalogManifest = {
+  manifestVersion: number;
   monsters: MonsterCatalogManifestEntry[];
 };
+
+const MONSTER_CATALOG_MANIFEST_VERSION = 1;
 
 function buildMonsterSpeed(
   monster: (typeof PHB2024MONSTERS)[number],
@@ -250,6 +265,80 @@ function extractMovesAtLeastRequirementMeters(
   }
 
   return null;
+}
+
+function buildMonsterAutomatedPassives(
+  monster: (typeof PHB2024MONSTERS)[number],
+): MonsterManifestPassiveEffect[] {
+  return monster.effects
+    .flatMap((effect) => {
+      if (effect.type !== "passive_grantAdvantage" || effect.on !== "attackRoll") {
+        return [] as MonsterManifestPassiveEffect[];
+      }
+
+      const triggerEvents = effect.triggers?.events;
+      if (!Array.isArray(triggerEvents)) {
+        return [] as MonsterManifestPassiveEffect[];
+      }
+
+      const hasAllyNearbyTrigger = triggerEvents.find(
+        (event): event is Record<string, unknown> =>
+          Boolean(event) && typeof event === "object" && event.type === "hasAllyNearby",
+      );
+      if (!hasAllyNearbyTrigger) {
+        return [] as MonsterManifestPassiveEffect[];
+      }
+
+      const range = hasAllyNearbyTrigger.range;
+      if (!range || typeof range !== "object") {
+        throw new Error(
+          `passive_grantAdvantage sem range valido para hasAllyNearby: ${monster.id}:${effect.name}`,
+        );
+      }
+
+      const rangeRecord = range as Record<string, unknown>;
+      const rangeNormal = rangeRecord.normal;
+      if (typeof rangeNormal !== "number" || rangeNormal <= 0) {
+        throw new Error(
+          `passive_grantAdvantage sem range.normal valido para hasAllyNearby: ${monster.id}:${effect.name}`,
+        );
+      }
+
+      const appliesToActionIds = Array.isArray(effect.appliesToActions)
+        ? [
+            ...new Set(
+              effect.appliesToActions
+                .map((actionId) => actionId.trim())
+                .filter((actionId) => actionId.length > 0),
+            ),
+          ].sort((left, right) => left.localeCompare(right))
+        : [];
+
+      return [
+        {
+          type: "passive_grantAdvantage",
+          on: "attackRoll",
+          name: effect.name,
+          appliesToActionIds,
+          triggerHasAllyNearby: {
+            rangeMeters: convertDistanceToMeters(rangeNormal, rangeRecord.unit),
+            allyIsNotIncapacitated:
+              typeof hasAllyNearbyTrigger.allyIsNotIncapacitated === "boolean"
+                ? hasAllyNearbyTrigger.allyIsNotIncapacitated
+                : true,
+          },
+        },
+      ];
+    })
+    .sort((left, right) => {
+      if (left.name !== right.name) {
+        return left.name.localeCompare(right.name);
+      }
+
+      return (
+        left.triggerHasAllyNearby.rangeMeters - right.triggerHasAllyNearby.rangeMeters
+      );
+    });
 }
 
 function buildMonsterAttackActions(
@@ -432,6 +521,7 @@ function buildMonsterAttackActions(
 
 function buildExpectedManifest(): MonsterCatalogManifest {
   return {
+    manifestVersion: MONSTER_CATALOG_MANIFEST_VERSION,
     monsters: [...PHB2024MONSTERS]
       .map((monster) => ({
         id: monster.id,
@@ -449,6 +539,7 @@ function buildExpectedManifest(): MonsterCatalogManifest {
         defenses: buildMonsterDefenses(monster),
         challengeRating: monster.challengeRating,
         actions: buildMonsterAttackActions(monster),
+        automatedPassives: buildMonsterAutomatedPassives(monster),
       }))
       .sort((left, right) => left.id.localeCompare(right.id)),
   };

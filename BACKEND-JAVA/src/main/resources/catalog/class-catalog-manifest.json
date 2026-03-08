@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "classes": [
+    {
+      "id": "class-fighter",
+      "primaryName": "Fighter",
+      "names": [
+        "Fighter",
+        "Guerreiro"
+      ],
+      "source": "LDJ2024"
+    }
+  ]
+}

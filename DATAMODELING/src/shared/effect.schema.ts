@@ -340,7 +340,7 @@ const CategoryFeatSelectionSchema = z.object({
   count: z.number().int().min(1).default(1),
 });
 
-const FeatProviderSchema = z.discriminatedUnion("selection", [
+const FeatProviderSchema = z.discriminatedUnion("mode", [
   SpecificFeatSelectionSchema,
   CategoryFeatSelectionSchema,
 ]);

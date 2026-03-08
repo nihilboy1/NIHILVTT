@@ -1,0 +1,125 @@
+{
+  "manifestVersion": 1,
+  "species": [
+    {
+      "id": "specie-aasimar",
+      "primaryName": "Aasimar",
+      "names": [
+        "Aasimar",
+        "Aasimar"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "medium",
+      "walkSpeed": 30
+    },
+    {
+      "id": "specie-dragonborn",
+      "primaryName": "Draconato",
+      "names": [
+        "Draconato",
+        "Dragonborn"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "medium",
+      "walkSpeed": 30
+    },
+    {
+      "id": "specie-dwarf",
+      "primaryName": "Anão",
+      "names": [
+        "Anão",
+        "Dwarf"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "medium",
+      "walkSpeed": 30
+    },
+    {
+      "id": "specie-elf",
+      "primaryName": "Elfo",
+      "names": [
+        "Elfo",
+        "Elf"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "medium",
+      "walkSpeed": 30
+    },
+    {
+      "id": "specie-gnome",
+      "primaryName": "Gnomo",
+      "names": [
+        "Gnomo",
+        "Gnome"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "small",
+      "walkSpeed": 30
+    },
+    {
+      "id": "specie-goliath",
+      "primaryName": "Golias",
+      "names": [
+        "Golias",
+        "Goliath"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "medium",
+      "walkSpeed": 35
+    },
+    {
+      "id": "specie-halfling",
+      "primaryName": "Halfling",
+      "names": [
+        "Halfling",
+        "Halfling"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "small",
+      "walkSpeed": 30
+    },
+    {
+      "id": "specie-human",
+      "primaryName": "Humano",
+      "names": [
+        "Humano",
+        "Human"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "medium",
+      "walkSpeed": 30
+    },
+    {
+      "id": "specie-orc",
+      "primaryName": "Orc",
+      "names": [
+        "Orc",
+        "Orc"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "medium",
+      "walkSpeed": 30
+    },
+    {
+      "id": "specie-tiefling",
+      "primaryName": "Tiefling",
+      "names": [
+        "Tiefling",
+        "Tiefling"
+      ],
+      "source": "LDJ2024",
+      "creatureType": "humanoid",
+      "size": "medium",
+      "walkSpeed": 30
+    }
+  ]
+}

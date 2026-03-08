@@ -1,0 +1,1083 @@
+{
+  "manifestVersion": 1,
+  "spells": [
+    {
+      "id": "spell-alarme",
+      "primaryName": "Alarme",
+      "names": [
+        "Alarme",
+        "Alarm"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-amizade-animal",
+      "primaryName": "Amizade Animal",
+      "names": [
+        "Amizade Animal",
+        "Animal Friendship"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-armor-of-agathys",
+      "primaryName": "Armadura de Agathys",
+      "names": [
+        "Armadura de Agathys",
+        "Armor of Agathys"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-arms-of-hadar",
+      "primaryName": "Braços de Hadar",
+      "names": [
+        "Braços de Hadar",
+        "Arms of Hadar"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-bane",
+      "primaryName": "Perdição",
+      "names": [
+        "Perdição",
+        "Bane"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-bless",
+      "primaryName": "Benção",
+      "names": [
+        "Benção",
+        "Bless"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-bolha-acida",
+      "primaryName": "Bolha Ácida",
+      "names": [
+        "Bolha Ácida",
+        "Acid Splash"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-burning-hands",
+      "primaryName": "Mãos Flamejantes",
+      "names": [
+        "Mãos Flamejantes",
+        "Burning Hands"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-charm-person",
+      "primaryName": "Enfeitiçar Pessoa",
+      "names": [
+        "Enfeitiçar Pessoa",
+        "Charm Person"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-chromatic-orb",
+      "primaryName": "Orbe Cromática",
+      "names": [
+        "Orbe Cromática",
+        "Chromatic Orb"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-color-spray",
+      "primaryName": "Leque Cromático",
+      "names": [
+        "Leque Cromático",
+        "Color Spray"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "illusion"
+    },
+    {
+      "id": "spell-command",
+      "primaryName": "Comando",
+      "names": [
+        "Comando",
+        "Command"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-compelled-duel",
+      "primaryName": "Duelo Compelido",
+      "names": [
+        "Duelo Compelido",
+        "Compelled Duel"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-comprehend-languages",
+      "primaryName": "Compreender Idiomas",
+      "names": [
+        "Compreender Idiomas",
+        "Comprehend Languages"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "divination"
+    },
+    {
+      "id": "spell-create-or-destroy-water",
+      "primaryName": "Criar ou Destruir Água",
+      "names": [
+        "Criar ou Destruir Água",
+        "Create or Destroy Water"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-cure-wounds",
+      "primaryName": "Curar Ferimentos",
+      "names": [
+        "Curar Ferimentos",
+        "Cure Wounds"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-detect-evil-and-good",
+      "primaryName": "Detectar o Bem e o Mal",
+      "names": [
+        "Detectar o Bem e o Mal",
+        "Detect Evil and Good"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "divination"
+    },
+    {
+      "id": "spell-detect-magic",
+      "primaryName": "Detectar Magia",
+      "names": [
+        "Detectar Magia",
+        "Detect Magic"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "divination"
+    },
+    {
+      "id": "spell-detect-poison-and-disease",
+      "primaryName": "Detectar Veneno e Doença",
+      "names": [
+        "Detectar Veneno e Doença",
+        "Detect Poison and Disease"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "divination"
+    },
+    {
+      "id": "spell-disguise-self",
+      "primaryName": "Disfarçar-se",
+      "names": [
+        "Disfarçar-se",
+        "Disguise Self"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "illusion"
+    },
+    {
+      "id": "spell-dissonant-whispers",
+      "primaryName": "Sussurros Dissonantes",
+      "names": [
+        "Sussurros Dissonantes",
+        "Dissonant Whispers"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-divine-favor",
+      "primaryName": "Favor Divino",
+      "names": [
+        "Favor Divino",
+        "Divine Favor"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-divine-smite",
+      "primaryName": "Golpe Divino",
+      "names": [
+        "Golpe Divino",
+        "Divine Smite"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-druidismo",
+      "primaryName": "Druidismo",
+      "names": [
+        "Druidismo",
+        "Druidcraft"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-elementalismo",
+      "primaryName": "Elementalismo",
+      "names": [
+        "Elementalismo",
+        "Elementalism"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-ensnaring-strike",
+      "primaryName": "Golpe Aprisionador",
+      "names": [
+        "Golpe Aprisionador",
+        "Ensnaring Strike"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-entangle",
+      "primaryName": "Emaranhar",
+      "names": [
+        "Emaranhar",
+        "Entangle"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-expeditious-retreat",
+      "primaryName": "Recuo Acelerado",
+      "names": [
+        "Recuo Acelerado",
+        "Expeditious Retreat"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-faerie-fire",
+      "primaryName": "Fogo das Fadas",
+      "names": [
+        "Fogo das Fadas",
+        "Faerie Fire"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-false-life",
+      "primaryName": "Vida Falsa",
+      "names": [
+        "Vida Falsa",
+        "False Life"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "necromancy"
+    },
+    {
+      "id": "spell-feather-fall",
+      "primaryName": "Queda Suave",
+      "names": [
+        "Queda Suave",
+        "Feather Fall"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-find-familiar",
+      "primaryName": "Encontrar Familiar",
+      "names": [
+        "Encontrar Familiar",
+        "Find Familiar"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-fog-cloud",
+      "primaryName": "Nuvem de Neblina",
+      "names": [
+        "Nuvem de Neblina",
+        "Fog Cloud"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-friends",
+      "primaryName": "Amizade",
+      "names": [
+        "Amizade",
+        "Friends"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-goodberry",
+      "primaryName": "Boa Baga",
+      "names": [
+        "Boa Baga",
+        "Goodberry"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-grease",
+      "primaryName": "Graxa",
+      "names": [
+        "Graxa",
+        "Grease"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-guidance",
+      "primaryName": "Orientação",
+      "names": [
+        "Orientação",
+        "Guidance"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "divination"
+    },
+    {
+      "id": "spell-guiding-bolt",
+      "primaryName": "Raio Guiador",
+      "names": [
+        "Raio Guiador",
+        "Guiding Bolt"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-hail-of-thorns",
+      "primaryName": "Chuva de Espinhos",
+      "names": [
+        "Chuva de Espinhos",
+        "Hail of Thorns"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-healing-word",
+      "primaryName": "Palavra Curativa",
+      "names": [
+        "Palavra Curativa",
+        "Healing Word"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-hellish-rebuke",
+      "primaryName": "Repreensão Infernal",
+      "names": [
+        "Repreensão Infernal",
+        "Hellish Rebuke"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-heroism",
+      "primaryName": "Heroísmo",
+      "names": [
+        "Heroísmo",
+        "Heroism"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-hex",
+      "primaryName": "Rogar Praga",
+      "names": [
+        "Rogar Praga",
+        "Hex"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-hunters-mark",
+      "primaryName": "Marca do Caçador",
+      "names": [
+        "Marca do Caçador",
+        "Hunter's Mark"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "divination"
+    },
+    {
+      "id": "spell-ice-knife",
+      "primaryName": "Faca de Gelo",
+      "names": [
+        "Faca de Gelo",
+        "Ice Knife"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-identify",
+      "primaryName": "Identificar",
+      "names": [
+        "Identificar",
+        "Identify"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "divination"
+    },
+    {
+      "id": "spell-illusory-script",
+      "primaryName": "Escrita Ilusória",
+      "names": [
+        "Escrita Ilusória",
+        "Illusory Script"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "illusion"
+    },
+    {
+      "id": "spell-inflict-wounds",
+      "primaryName": "Infligir Ferimentos",
+      "names": [
+        "Infligir Ferimentos",
+        "Inflict Wounds"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "necromancy"
+    },
+    {
+      "id": "spell-jump",
+      "primaryName": "Salto",
+      "names": [
+        "Salto",
+        "Jump"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-light",
+      "primaryName": "Luz",
+      "names": [
+        "Luz",
+        "Light"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-longstrider",
+      "primaryName": "Passos Longos",
+      "names": [
+        "Passos Longos",
+        "Longstrider"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-luzes-dancantes",
+      "primaryName": "Luzes Dançantes",
+      "names": [
+        "Luzes Dançantes",
+        "Dancing Lights"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "illusion"
+    },
+    {
+      "id": "spell-mage-armor",
+      "primaryName": "Armadura Arcana",
+      "names": [
+        "Armadura Arcana",
+        "Mage Armor"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-mage-hand",
+      "primaryName": "Mão Mágica",
+      "names": [
+        "Mão Mágica",
+        "Mage Hand"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-magic-missile",
+      "primaryName": "Míssil Mágico",
+      "names": [
+        "Míssil Mágico",
+        "Magic Missile"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-mending",
+      "primaryName": "Consertar",
+      "names": [
+        "Consertar",
+        "Mending"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-message",
+      "primaryName": "Mensagem",
+      "names": [
+        "Mensagem",
+        "Message"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-mind-sliver",
+      "primaryName": "Fagulha Mental",
+      "names": [
+        "Fagulha Mental",
+        "Mind Sliver"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-minor-illusion",
+      "primaryName": "Ilusão Menor",
+      "names": [
+        "Ilusão Menor",
+        "Minor Illusion"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "illusion"
+    },
+    {
+      "id": "spell-poison-spray",
+      "primaryName": "Rajada de Veneno",
+      "names": [
+        "Rajada de Veneno",
+        "Poison Spray"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "necromancy"
+    },
+    {
+      "id": "spell-prestidigitation",
+      "primaryName": "Prestidigitação",
+      "names": [
+        "Prestidigitação",
+        "Prestidigitation"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-produce-flame",
+      "primaryName": "Produzir Chama",
+      "names": [
+        "Produzir Chama",
+        "Produce Flame"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-protecao-contra-laminas",
+      "primaryName": "Proteção Contra Lâminas",
+      "names": [
+        "Proteção Contra Lâminas",
+        "Blade Ward"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-protection-from-evil-and-good",
+      "primaryName": "Proteção contra o Bem e o Mal",
+      "names": [
+        "Proteção contra o Bem e o Mal",
+        "Protection from Evil and Good"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-purify-food-and-drink",
+      "primaryName": "Purificar Comida e Bebida",
+      "names": [
+        "Purificar Comida e Bebida",
+        "Purify Food and Drink"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-raio-de-fogo",
+      "primaryName": "Raio de Fogo",
+      "names": [
+        "Raio de Fogo",
+        "Fire Bolt"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-rajada-mistica",
+      "primaryName": "Rajada Mística",
+      "names": [
+        "Rajada Mística",
+        "Eldritch Blast"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-ray-of-frost",
+      "primaryName": "Raio de Gelo",
+      "names": [
+        "Raio de Gelo",
+        "Ray of Frost"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-ray-of-sickness",
+      "primaryName": "Raio da Doença",
+      "names": [
+        "Raio da Doença",
+        "Ray of Sickness"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "necromancy"
+    },
+    {
+      "id": "spell-resistance",
+      "primaryName": "Resistência",
+      "names": [
+        "Resistência",
+        "Resistance"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-sacred-flame",
+      "primaryName": "Chama Sagrada",
+      "names": [
+        "Chama Sagrada",
+        "Sacred Flame"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-sanctuary",
+      "primaryName": "Santuário",
+      "names": [
+        "Santuário",
+        "Sanctuary"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-searing-smite",
+      "primaryName": "Golpe Fervente",
+      "names": [
+        "Golpe Fervente",
+        "Searing Smite"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-shield",
+      "primaryName": "Escudo Arcano",
+      "names": [
+        "Escudo Arcano",
+        "Shield"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-shield-of-faith",
+      "primaryName": "Escudo da Fé",
+      "names": [
+        "Escudo da Fé",
+        "Shield of Faith"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "spell-shillelagh",
+      "primaryName": "Bordão Místico",
+      "names": [
+        "Bordão Místico",
+        "Shillelagh"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-shocking-grasp",
+      "primaryName": "Toque Chocante",
+      "names": [
+        "Toque Chocante",
+        "Shocking Grasp"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-silent-image",
+      "primaryName": "Imagem Silenciosa",
+      "names": [
+        "Imagem Silenciosa",
+        "Silent Image"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "illusion"
+    },
+    {
+      "id": "spell-sleep",
+      "primaryName": "Sono",
+      "names": [
+        "Sono",
+        "Sleep"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-sorcerous-burst",
+      "primaryName": "Explosão Feiticeira",
+      "names": [
+        "Explosão Feiticeira",
+        "Sorcerous Burst"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-spare-the-dying",
+      "primaryName": "Poupar os Moribundos",
+      "names": [
+        "Poupar os Moribundos",
+        "Spare the Dying"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "necromancy"
+    },
+    {
+      "id": "spell-speak-with-animals",
+      "primaryName": "Falar com Animais",
+      "names": [
+        "Falar com Animais",
+        "Speak with Animals"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "divination"
+    },
+    {
+      "id": "spell-starry-wisp",
+      "primaryName": "Císcaro Estrelado",
+      "names": [
+        "Císcaro Estrelado",
+        "Starry Wisp"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-tashas-hideous-laughter",
+      "primaryName": "Riso Histérico de Tasha",
+      "names": [
+        "Riso Histérico de Tasha",
+        "Tasha's Hideous Laughter"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-tensers-floating-disk",
+      "primaryName": "Disco Flutuante de Tenser",
+      "names": [
+        "Disco Flutuante de Tenser",
+        "Tenser's Floating Disk"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-thaumaturgy",
+      "primaryName": "Taumaturgia",
+      "names": [
+        "Taumaturgia",
+        "Thaumaturgy"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-thorn-whip",
+      "primaryName": "Chicote de Espinhos",
+      "names": [
+        "Chicote de Espinhos",
+        "Thorn Whip"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "transmutation"
+    },
+    {
+      "id": "spell-thunderclap",
+      "primaryName": "Estrondo de Trovão",
+      "names": [
+        "Estrondo de Trovão",
+        "Thunderclap"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-thunderous-smite",
+      "primaryName": "Golpe Trovejante",
+      "names": [
+        "Golpe Trovejante",
+        "Thunderous Smite"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-thunderwave",
+      "primaryName": "Onda Trovejante",
+      "names": [
+        "Onda Trovejante",
+        "Thunderwave"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-toll-the-dead",
+      "primaryName": "Soar dos Mortos",
+      "names": [
+        "Soar dos Mortos",
+        "Toll the Dead"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "necromancy"
+    },
+    {
+      "id": "spell-toque-arrepiante",
+      "primaryName": "Toque Arrepiante",
+      "names": [
+        "Toque Arrepiante",
+        "Chill Touch"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "necromancy"
+    },
+    {
+      "id": "spell-true-strike",
+      "primaryName": "Ataque Certeiro",
+      "names": [
+        "Ataque Certeiro",
+        "True Strike"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "divination"
+    },
+    {
+      "id": "spell-unseen-servant",
+      "primaryName": "Servo Invisível",
+      "names": [
+        "Servo Invisível",
+        "Unseen Servant"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "spell-vicious-mockery",
+      "primaryName": "Zombaria Viciosa",
+      "names": [
+        "Zombaria Viciosa",
+        "Vicious Mockery"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "enchantment"
+    },
+    {
+      "id": "spell-witch-bolt",
+      "primaryName": "Raio Enfeitiçante",
+      "names": [
+        "Raio Enfeitiçante",
+        "Witch Bolt"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-word-of-radiance",
+      "primaryName": "Palavra de Radiancia",
+      "names": [
+        "Palavra de Radiancia",
+        "Word of Radiance"
+      ],
+      "source": "LDJ2024",
+      "level": 0,
+      "school": "evocation"
+    },
+    {
+      "id": "spell-wrathful-smite",
+      "primaryName": "Golpe Colérico",
+      "names": [
+        "Golpe Colérico",
+        "Wrathful Smite"
+      ],
+      "source": "LDJ2024",
+      "level": 1,
+      "school": "necromancy"
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "manifestVersion": 1,
+  "origins": [
+    {
+      "id": "origin-acolyte",
+      "primaryName": "Acólito",
+      "names": [
+        "Acólito",
+        "Acolyte"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-artisan",
+      "primaryName": "Artesão",
+      "names": [
+        "Artesão",
+        "Artisan"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-charlatan",
+      "primaryName": "Charlatão",
+      "names": [
+        "Charlatão",
+        "Charlatan"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-criminal",
+      "primaryName": "Criminoso",
+      "names": [
+        "Criminoso",
+        "Criminal"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-entertainer",
+      "primaryName": "Artista",
+      "names": [
+        "Artista",
+        "Entertainer"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-farmer",
+      "primaryName": "Fazendeiro",
+      "names": [
+        "Fazendeiro",
+        "Farmer"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-guard",
+      "primaryName": "Guarda",
+      "names": [
+        "Guarda",
+        "Guard"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-guide",
+      "primaryName": "Guia",
+      "names": [
+        "Guia",
+        "Guide"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-hermit",
+      "primaryName": "Eremita",
+      "names": [
+        "Eremita",
+        "Hermit"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-merchant",
+      "primaryName": "Mercador",
+      "names": [
+        "Mercador",
+        "Merchant"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-noble",
+      "primaryName": "Nobre",
+      "names": [
+        "Nobre",
+        "Noble"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-sage",
+      "primaryName": "Sábio",
+      "names": [
+        "Sábio",
+        "Sage"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-sailor",
+      "primaryName": "Marinheiro",
+      "names": [
+        "Marinheiro",
+        "Sailor"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-scribe",
+      "primaryName": "Escriba",
+      "names": [
+        "Escriba",
+        "Scribe"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-soldier",
+      "primaryName": "Soldado",
+      "names": [
+        "Soldado",
+        "Soldier"
+      ],
+      "source": "LDJ2024"
+    },
+    {
+      "id": "origin-wayfarer",
+      "primaryName": "Andarilho",
+      "names": [
+        "Andarilho",
+        "Wayfarer"
+      ],
+      "source": "LDJ2024"
+    }
+  ]
+}

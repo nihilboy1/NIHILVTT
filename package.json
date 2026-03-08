@@ -9,7 +9,14 @@
   "scripts": {
     "dev:front": "cd FRONTEND && pnpm dev",
     "dev:back": "cd BACKEND-JAVA; mvn spring-boot:run",
+    "check:class-manifest-sync": "cd DATAMODELING && pnpm check:backend-class-manifest-sync",
+    "check:feat-manifest-sync": "cd DATAMODELING && pnpm check:backend-feat-manifest-sync",
+    "check:item-manifest-sync": "cd DATAMODELING && pnpm check:backend-item-manifest-sync",
     "check:monster-manifest-sync": "cd DATAMODELING && pnpm check:backend-monster-manifest-sync",
+    "check:origin-manifest-sync": "cd DATAMODELING && pnpm check:backend-origin-manifest-sync",
+    "check:specie-manifest-sync": "cd DATAMODELING && pnpm check:backend-specie-manifest-sync",
+    "check:spell-manifest-sync": "cd DATAMODELING && pnpm check:backend-spell-manifest-sync",
+    "check:contracts": "cd DATAMODELING && pnpm validate:data:all && pnpm check:backend-manifests-sync",
     "test:front": "cd FRONTEND && pnpm run test",
     "test:e2e:front": "cd FRONTEND && pnpm run e2e",
     "test:front:all": "cd FRONTEND && pnpm run test && pnpm run e2e"
