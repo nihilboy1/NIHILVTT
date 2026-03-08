@@ -209,6 +209,7 @@ describe('applyGameSessionEvent', () => {
   it('aplica COMBAT_STARTED e sincroniza o combatState completo', () => {
     const combat = {
       active: true,
+      mode: 'teams' as const,
       round: 1,
       turnIndex: 0,
       participants: [
@@ -220,6 +221,7 @@ describe('applyGameSessionEvent', () => {
           dexterityScore: 14,
           movementBudgetCells: 6,
           status: 'active' as const,
+          teamId: 'team-1',
         },
       ],
       turnResources: {
@@ -242,6 +244,7 @@ describe('applyGameSessionEvent', () => {
   it('aplica COMBAT_TURN_ADVANCED e sincroniza o novo estado de turno', () => {
     const combat = {
       active: true,
+      mode: 'teams' as const,
       round: 2,
       turnIndex: 1,
       participants: [
@@ -253,6 +256,7 @@ describe('applyGameSessionEvent', () => {
           dexterityScore: 14,
           movementBudgetCells: 6,
           status: 'active' as const,
+          teamId: 'team-1',
         },
         {
           tokenId: 'token-2',
@@ -262,6 +266,7 @@ describe('applyGameSessionEvent', () => {
           dexterityScore: 12,
           movementBudgetCells: 6,
           status: 'active' as const,
+          teamId: 'team-2',
         },
       ],
       turnResources: {
@@ -361,6 +366,8 @@ describe('applyGameSessionEvent', () => {
         attackId: 'act-attack',
         attackName: 'Investida',
         attackDamageType: 'bludgeoning',
+        attackRollMode: 'advantage',
+        attackRolls: [4, 15],
         attackRoll: 15,
         attackTotal: 20,
         targetArmorClass: 12,
@@ -396,6 +403,18 @@ describe('applyGameSessionEvent', () => {
         text: expect.stringContaining('Detalhe dano condicional: bludgeoning +3'),
       }),
     );
+    expect(addIncomingMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sender: 'Sistema',
+        text: expect.stringContaining('Rolagem de ataque: vantagem (d20: 4, 15; escolhido: 15)'),
+      }),
+    );
+    expect(addIncomingMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sender: 'Sistema',
+        text: expect.stringContaining('Tática de Matilha: ATIVADA (vantagem aplicada)'),
+      }),
+    );
   });
 
   it('gera mensagem de ataque com dano apos defesas explicito', () => {
@@ -416,6 +435,8 @@ describe('applyGameSessionEvent', () => {
         attackId: 'manual-attack',
         attackName: 'Ataque de Teste',
         attackDamageType: 'piercing',
+        attackRollMode: 'normal',
+        attackRolls: [18],
         attackRoll: 18,
         attackTotal: 22,
         targetArmorClass: 9,
@@ -438,6 +459,12 @@ describe('applyGameSessionEvent', () => {
       expect.objectContaining({
         sender: 'Sistema',
         text: expect.stringContaining('Dano aplicado: 4 (rolado: 8; após defesas: 4)'),
+      }),
+    );
+    expect(addIncomingMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sender: 'Sistema',
+        text: expect.stringContaining('Tática de Matilha: não ativada'),
       }),
     );
   });

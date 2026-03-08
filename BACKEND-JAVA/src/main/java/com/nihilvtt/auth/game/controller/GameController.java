@@ -298,7 +298,13 @@ public class GameController {
   ) {
     Long userId = (Long) authentication.getPrincipal();
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(gameSessionCommandService.startCombat(userId, gameId, request.tokenIds()));
+      .body(gameSessionCommandService.startCombat(
+        userId,
+        gameId,
+        request.tokenIds(),
+        request.mode(),
+        request.teams()
+      ));
   }
 
   @PostMapping("/{gameId}/session/combat/next-turn")

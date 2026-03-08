@@ -75,10 +75,11 @@ No diretorio `DATAMODELING/`:
 ## Manifest de Monstros (Backend)
 
 - `export:backend-monster-manifest` gera o arquivo canônico consumido pelo backend em `BACKEND-JAVA/src/main/resources/catalog/monster-catalog-manifest.json`.
-- o manifest exportado e versionado via `manifestVersion`; mudancas incompatíveis no contrato precisam subir esse valor no export/check e no backend.
+- o manifest exportado e versionado via `manifestVersion` (estrutura) e `combatContractVersion` (subset autoritativo de combate); mudancas incompatíveis no contrato precisam subir o valor correspondente no export/check e no backend.
 - o manifest canônico de monstros exporta também `defenses` de dano (`resistances`, `vulnerabilities`, `damageImmunities`) para cálculo autoritativo de dano no backend.
 - para `effects` do tipo `activatableAction` que aplicam `modifyTargetHP` em `on: "hit"`, o catálogo deve declarar `attackBonus` em `parameters`; sem isso a ação não entra no manifest canônico e o backend rejeita o ataque por ação inexistente.
 - o manifest canônico também exporta `automatedPassives` (subset do contrato v1) para passivos automatizáveis; no recorte inicial, inclui `passive_grantAdvantage` em `attackRoll` com trigger `hasAllyNearby`.
+- export e check de manifest de monstro agora compartilham um único builder (`src/tooling/lib/monster-manifest-builder.ts`), que e a SSOT da projeção do catálogo para o backend.
 - `check:backend-monster-manifest-sync` valida que o manifest atual do backend esta sincronizado com o catalogo em `DATAMODELING`; o comando falha quando houver drift.
 - esse check e o gate oficial de contrato para CI/PR (`pnpm check:contracts` na raiz), junto com `check:backend-item-manifest-sync`.
 

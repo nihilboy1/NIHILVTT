@@ -150,6 +150,7 @@ describe('gameSessionHydrator', () => {
         ],
         combat: {
           active: true,
+          mode: 'teams',
           round: 1,
           turnIndex: 0,
           participants: [
@@ -161,6 +162,7 @@ describe('gameSessionHydrator', () => {
               dexterityScore: 14,
               movementBudgetCells: 6,
               status: 'active',
+              teamId: 'team-1',
             },
             {
               tokenId: 'token-2',
@@ -170,6 +172,7 @@ describe('gameSessionHydrator', () => {
               dexterityScore: 10,
               movementBudgetCells: 6,
               status: 'active',
+              teamId: 'team-2',
             },
           ],
           turnResources: {

@@ -23,9 +23,10 @@ import {
   RulerPathState,
   Token,
 } from '@/shared/api/types';
-import nextTurnIcon from '@/shared/assets/next.png';
+import nextTurnIcon from '@/shared/assets/nextturnattention.svg';
 import missAttackIcon from '@/shared/assets/missattack.png';
 import skullDeadIcon from '@/shared/assets/skulldead.png';
+import packTacticsIcon from '@/shared/assets/packtatics.png';
 
 import { createPixiWorldTransform } from '../model/renderer';
 
@@ -54,6 +55,7 @@ type PixiBoardPrototypeProps = {
   activeCombatTurnTokenId: string | null;
   activeCombatNextTurnTokenId: string | null;
   combatParticipantTokenIds: string[];
+  packTacticsPreviewTargetTokenIds: string[];
 };
 
 type PixiThemeColors = {
@@ -77,6 +79,7 @@ type PixiThemeColors = {
 
 const DEAD_SKULL_ALPHA = 0.7;
 const NEXT_ICON_SOURCE_SIZE = 1024;
+const PACK_TACTICS_ICON_SOURCE_SIZE = 1024;
 const TOKEN_MELEE_ANIMATION_DURATION_MS = 420;
 const CURRENT_TURN_MARKER_EXTRA_DELAY_MS = 1000;
 const CLUB_IMPACT_EFFECT_DELAY_MS = 170;
@@ -727,14 +730,14 @@ function TokenTurnIndicator({
   isNext: boolean;
   theme: PixiThemeColors;
 }) {
+  const [isNextTurnTooltipVisible, setIsNextTurnTooltipVisible] = useState(false);
   const currentPulseRef = useRef<PixiContainer | null>(null);
   const currentPulsePhaseRef = useRef(0);
   const nextPulseRef = useRef<PixiContainer | null>(null);
   const nextPulsePhaseRef = useRef(0);
   const minTokenSize = Math.min(tokenWidth, tokenHeight);
   const tokenScreenSize = minTokenSize * cameraScaleY;
-  const centerX = tokenWidth / 2;
-  const centerY = tokenHeight / 2;
+  const nextIconPadding = 0;
   const markerMinSide = Math.max(1, Math.min(markerWidth, markerHeight));
   const markerCenterX = markerX + markerWidth / 2;
   const markerCenterY = markerY + markerHeight / 2;
@@ -745,8 +748,23 @@ function TokenTurnIndicator({
     Math.max(markerMinSide * 0.2, 8 / cameraScaleY, 2.8),
   );
   const showNextIcon = tokenScreenSize >= 18;
-  const nextIconSize = Math.max(14, Math.min(70, minTokenSize * 0.624));
+  const nextIconSize = Math.max(10, Math.min(49, minTokenSize * 0.4368));
   const nextIconScale = nextIconSize / NEXT_ICON_SOURCE_SIZE;
+  // Keep the icon visually "on the corner" by letting it overhang slightly.
+  const nextIconCenterX = tokenWidth - nextIconPadding - nextIconSize * 0.34;
+  const nextIconCenterY = tokenHeight - nextIconPadding - nextIconSize * 0.34;
+  const nextTooltipWidth = Math.max(228 / cameraScaleY, 108);
+  const nextTooltipHeight = Math.max(34 / cameraScaleY, 16);
+  const nextTooltipPaddingX = Math.max(9 / cameraScaleY, 4);
+  const nextTooltipPaddingY = Math.max(7 / cameraScaleY, 3);
+  const nextTooltipX = Math.round(-nextTooltipWidth / 2);
+  const nextTooltipY = Math.round(
+    -nextIconSize / 2 - nextTooltipHeight - Math.max(8 / cameraScaleY, 3),
+  );
+  const nextTooltipTextX = Math.round(nextTooltipPaddingX);
+  const nextTooltipTextY = Math.round(nextTooltipPaddingY);
+  const nextTooltipTextResolution =
+    typeof window !== 'undefined' ? Math.max(2, Math.min(window.devicePixelRatio || 1, 3)) : 2;
 
   useTick((delta) => {
     if (isCurrent && currentPulseRef.current) {
@@ -828,7 +846,7 @@ function TokenTurnIndicator({
         </Container>
       ) : null}
       {isNext ? (
-        <Container x={centerX} y={centerY}>
+        <Container x={nextIconCenterX} y={nextIconCenterY}>
           {showNextIcon ? (
             <Container ref={nextPulseRef}>
               <Sprite
@@ -838,11 +856,95 @@ function TokenTurnIndicator({
                 anchor={{ x: 0.5, y: 0.5 }}
                 scale={{ x: -nextIconScale, y: nextIconScale }}
                 alpha={0.86}
+                eventMode="static"
+                cursor="help"
+                pointerover={() => setIsNextTurnTooltipVisible(true)}
+                pointerout={() => setIsNextTurnTooltipVisible(false)}
+              />
+            </Container>
+          ) : null}
+          {showNextIcon && isNextTurnTooltipVisible ? (
+            <Container x={nextTooltipX} y={nextTooltipY}>
+              <Graphics
+                draw={(graphics) => {
+                  graphics.clear();
+                  const radius = Math.max(4 / cameraScaleY, 1.8);
+                  graphics.lineStyle({
+                    width: Math.max(1.1 / cameraScaleY, 0.45),
+                    color: theme.warning,
+                    alpha: 0.96,
+                  });
+                  graphics.beginFill(theme.surface0, 0.96);
+                  graphics.drawRoundedRect(0, 0, nextTooltipWidth, nextTooltipHeight, radius);
+                  graphics.endFill();
+                }}
+              />
+              <Text
+                text="Este token sera o proximo a agir."
+                x={nextTooltipTextX}
+                y={nextTooltipTextY}
+                style={
+                  new TextStyle({
+                    fontSize: Math.max(12 / cameraScaleY, 5.2),
+                    fill: theme.textPrimary,
+                    fontWeight: '700',
+                    wordWrap: true,
+                    wordWrapWidth: nextTooltipWidth - nextTooltipPaddingX * 2,
+                  })
+                }
+                resolution={nextTooltipTextResolution}
+                roundPixels
               />
             </Container>
           ) : null}
         </Container>
       ) : null}
+    </Container>
+  );
+}
+
+function PackTacticsIndicator({
+  iconOffset,
+  iconScale,
+  onPointerOver,
+  onPointerOut,
+}: {
+  iconOffset: number;
+  iconScale: number;
+  onPointerOver: () => void;
+  onPointerOut: () => void;
+}) {
+  const pulseRef = useRef<PixiContainer | null>(null);
+  const pulsePhaseRef = useRef(0);
+
+  useTick((delta) => {
+    if (!pulseRef.current) {
+      return;
+    }
+
+    pulsePhaseRef.current += 0.045 * delta;
+    const pulse = (Math.sin(pulsePhaseRef.current) + 1) / 2;
+    const scale = 1 + pulse * 0.06;
+    pulseRef.current.scale.set(scale);
+    pulseRef.current.alpha = 1;
+  });
+
+  return (
+    <Container x={iconOffset} y={iconOffset}>
+      <Container ref={pulseRef}>
+        <Sprite
+          image={packTacticsIcon}
+          x={0}
+          y={0}
+          anchor={{ x: 0.5, y: 0.5 }}
+          scale={{ x: -iconScale, y: iconScale }}
+          alpha={1}
+          eventMode="static"
+          cursor="help"
+          pointerover={onPointerOver}
+          pointerout={onPointerOut}
+        />
+      </Container>
     </Container>
   );
 }
@@ -1133,9 +1235,11 @@ export function PixiBoardPrototype({
   activeCombatTurnTokenId,
   activeCombatNextTurnTokenId,
   combatParticipantTokenIds,
+  packTacticsPreviewTargetTokenIds,
 }: PixiBoardPrototypeProps) {
   const { elementRef, size } = useElementSize();
   const theme = usePixiThemeColors();
+  const [hoveredPackTacticsTokenId, setHoveredPackTacticsTokenId] = useState<string | null>(null);
   const feedbackByTokenId = useAttackFeedbackStore((state) => state.feedbackByTokenId);
   const stageResolution =
     typeof window !== 'undefined' ? Math.max(1, Math.min(window.devicePixelRatio || 1, 3)) : 1;
@@ -1247,6 +1351,10 @@ export function PixiBoardPrototype({
   const tokenSpriteById = useMemo(
     () => new Map(orderedTokenSprites.map((sprite) => [sprite.id, sprite])),
     [orderedTokenSprites],
+  );
+  const packTacticsPreviewTargetTokenIdSet = useMemo(
+    () => new Set(packTacticsPreviewTargetTokenIds),
+    [packTacticsPreviewTargetTokenIds],
   );
   const meleeAnimationByTokenId = useMemo(() => {
     const animations = new Map<string, TokenMeleeAnimation>();
@@ -1497,6 +1605,36 @@ export function PixiBoardPrototype({
             />
           ) : null}
           {orderedTokenSprites.map((tokenSprite) => {
+            const attackFeedback = feedbackByTokenId[tokenSprite.id];
+            const isPackTacticsPreviewTarget = packTacticsPreviewTargetTokenIdSet.has(
+              tokenSprite.id,
+            );
+            // This visual is exclusive to Pack Tactics targets, never to generic advantage states.
+            const isPackTacticsAdvantageActive =
+              isPackTacticsPreviewTarget && attackFeedback?.attackRollMode === 'advantage';
+            const showPackTacticsIcon = isPackTacticsPreviewTarget;
+            const minTokenSide = Math.min(tokenSprite.width, tokenSprite.height);
+            const tokenScreenSize = minTokenSide * cameraTransform.scaleY;
+            const showPackTacticsIconSprite = showPackTacticsIcon && tokenScreenSize >= 18;
+            const packTacticsIconSize = Math.max(29, Math.min(134, minTokenSide * 1.10565));
+            const packTacticsIconScale = packTacticsIconSize / PACK_TACTICS_ICON_SOURCE_SIZE;
+            const packTacticsIconOffset = packTacticsIconSize * 0.14;
+            const packTacticsTooltipWidth = Math.max(240 / cameraTransform.scaleY, 112);
+            const packTacticsTooltipHeight = Math.max(42 / cameraTransform.scaleY, 18);
+            const packTacticsTooltipPaddingX = Math.max(9 / cameraTransform.scaleY, 4);
+            const packTacticsTooltipPaddingY = Math.max(7 / cameraTransform.scaleY, 3);
+            const packTacticsTooltipX = Math.max(
+              packTacticsIconOffset - packTacticsTooltipWidth / 2,
+              1,
+            );
+            const packTacticsTooltipY =
+              packTacticsIconOffset -
+              packTacticsTooltipHeight -
+              Math.max(8 / cameraTransform.scaleY, 3);
+            const packTacticsReason = isPackTacticsAdvantageActive
+              ? 'Vantagem aplicada: Taticas de Matilha (aliado proximo ao alvo).'
+              : 'Vantagem disponivel: Taticas de Matilha (aliado proximo ao alvo).';
+            const isPackTacticsTooltipVisible = hoveredPackTacticsTokenId === tokenSprite.id;
             const tokenMeleeAnimation = meleeAnimationByTokenId.get(tokenSprite.id);
             const markerHiddenUntilMs = tokenMeleeAnimation
               ? tokenMeleeAnimation.startMs +
@@ -1618,11 +1756,66 @@ export function PixiBoardPrototype({
                   resolution={Math.max(2, stageResolution * 1.5)}
                   roundPixels
                 />
-                {feedbackByTokenId[tokenSprite.id] ? (
+                {showPackTacticsIconSprite ? (
                   <Container>
-                    {feedbackByTokenId[tokenSprite.id]?.hit ? (
+                    <PackTacticsIndicator
+                      iconOffset={packTacticsIconOffset}
+                      iconScale={packTacticsIconScale}
+                      onPointerOver={() => setHoveredPackTacticsTokenId(tokenSprite.id)}
+                      onPointerOut={() =>
+                        setHoveredPackTacticsTokenId((current) =>
+                          current === tokenSprite.id ? null : current,
+                        )
+                      }
+                    />
+                    {isPackTacticsTooltipVisible ? (
+                      <Container x={packTacticsTooltipX} y={packTacticsTooltipY}>
+                        <Graphics
+                          draw={(graphics) => {
+                            graphics.clear();
+                            const radius = Math.max(4 / cameraTransform.scaleY, 1.8);
+                            graphics.lineStyle({
+                              width: Math.max(1.1 / cameraTransform.scaleY, 0.45),
+                              color: theme.warning,
+                              alpha: 0.96,
+                            });
+                            graphics.beginFill(theme.surface0, 0.96);
+                            graphics.drawRoundedRect(
+                              0,
+                              0,
+                              packTacticsTooltipWidth,
+                              packTacticsTooltipHeight,
+                              radius,
+                            );
+                            graphics.endFill();
+                          }}
+                        />
+                        <Text
+                          text={packTacticsReason}
+                          x={packTacticsTooltipPaddingX}
+                          y={packTacticsTooltipPaddingY}
+                          style={
+                            new TextStyle({
+                              fontSize: Math.max(12 / cameraTransform.scaleY, 5.2),
+                              fill: theme.textPrimary,
+                              fontWeight: '700',
+                              wordWrap: true,
+                              wordWrapWidth:
+                                packTacticsTooltipWidth - packTacticsTooltipPaddingX * 2,
+                            })
+                          }
+                          resolution={Math.max(2, stageResolution)}
+                          roundPixels
+                        />
+                      </Container>
+                    ) : null}
+                  </Container>
+                ) : null}
+                {attackFeedback ? (
+                  <Container>
+                    {attackFeedback.hit ? (
                       <Text
-                        text={`-${feedbackByTokenId[tokenSprite.id]?.damageApplied ?? 0}`}
+                        text={`-${attackFeedback.damageApplied ?? 0}`}
                         x={tokenSprite.width / 2}
                         y={tokenSprite.height / 2 - Math.max(4 / cameraTransform.scaleY, 2)}
                         anchor={{ x: 0.5, y: 0.5 }}
@@ -1648,9 +1841,7 @@ export function PixiBoardPrototype({
                         y={tokenSprite.height / 2 - Math.max(3 / cameraTransform.scaleY, 1)}
                         width={Math.max(tokenSprite.width * 0.62, 10)}
                         height={Math.max(tokenSprite.height * 0.62, 10)}
-                        triggeredAtMs={
-                          feedbackByTokenId[tokenSprite.id]?.triggeredAtMs ?? Date.now()
-                        }
+                        triggeredAtMs={attackFeedback.triggeredAtMs ?? Date.now()}
                       />
                     )}
                   </Container>

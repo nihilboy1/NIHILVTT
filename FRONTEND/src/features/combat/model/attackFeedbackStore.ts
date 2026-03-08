@@ -2,12 +2,16 @@ import { create } from 'zustand';
 
 import type { CombatDamageType } from '@/shared/api/types';
 
+export type AttackRollMode = 'normal' | 'advantage';
+
 export interface AttackFeedbackEntry {
   id: string;
   tokenId: string;
   attackerTokenId?: string;
   attackName?: string;
   attackDamageType: CombatDamageType;
+  attackRollMode?: AttackRollMode;
+  attackRolls?: number[];
   triggeredAtMs?: number;
   hit: boolean;
   attackTotal: number;

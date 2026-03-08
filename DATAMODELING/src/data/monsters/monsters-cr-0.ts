@@ -77,8 +77,8 @@ export const monstersCR0 = [
     name: ["Babuíno", "Baboon"],
     description:
       "Babuínos são primatas agressivos que vivem em bandos. Eles são conhecidos por sua tática de matilha e mordidas ferozes.",
-    tokenUrl: "https://i.imgur.com/C3y7JPC.png",
-    splashArtUrl: "https://i.imgur.com/tH9wWDA.png",
+    tokenUrl: "https://i.imgur.com/rjpZOkL.png",
+    splashArtUrl: "https://i.imgur.com/XGhec4R.png",
     source: "MM2024",
     size: "small",
     type: "beast",

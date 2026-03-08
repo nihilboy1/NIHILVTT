@@ -269,6 +269,7 @@ const combatParticipantSchema = z.object({
   dexterityScore: z.number().int(),
   movementBudgetCells: z.number().int().min(0),
   status: z.string().trim().min(1),
+  teamId: z.string().trim().min(1).nullable(),
 });
 
 const combatTurnResourcesSchema = z.object({
@@ -280,6 +281,7 @@ const combatTurnResourcesSchema = z.object({
 
 const combatStateSchema = z.object({
   active: z.literal(true),
+  mode: z.enum(['freeForAll', 'teams']),
   round: z.number().int().min(1),
   turnIndex: z.number().int().min(0),
   participants: z.array(combatParticipantSchema),
@@ -293,6 +295,8 @@ const attackResolvedPayloadSchema = z.object({
   attackId: z.string().min(1),
   attackName: z.string().min(1),
   attackDamageType: DamageTypeEnum,
+  attackRollMode: z.enum(['normal', 'advantage']).optional().default('normal'),
+  attackRolls: z.array(z.number().int().min(1).max(20)).optional().default([]),
   attackRoll: z.number().int().min(1).max(20),
   attackTotal: z.number().int(),
   targetArmorClass: z.number().int().nonnegative(),
@@ -458,6 +462,8 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
       attackerTokenId: parsed.attackerTokenId,
       attackName: parsed.attackName,
       attackDamageType: parsed.attackDamageType,
+      attackRollMode: parsed.attackRollMode,
+      attackRolls: parsed.attackRolls,
       triggeredAtMs: Date.now(),
       hit: parsed.hit,
       attackTotal: parsed.attackTotal,
@@ -468,6 +474,13 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
     const attackerName = resolveTokenDisplayName(parsed.attackerTokenId);
     const targetName = resolveTokenDisplayName(parsed.targetTokenId);
     const hitStatus = parsed.hit ? 'ACERTO' : 'ERRO';
+    const attackRollsSummary =
+      parsed.attackRolls.length > 0 ? parsed.attackRolls.join(', ') : String(parsed.attackRoll);
+    const attackRollModeSummary = parsed.attackRollMode === 'advantage' ? 'vantagem' : 'normal';
+    const packTacticsLine =
+      parsed.attackRollMode === 'advantage'
+        ? 'Tática de Matilha: ATIVADA (vantagem aplicada)'
+        : 'Tática de Matilha: não ativada';
     const remainingHpSummary =
       parsed.remainingTempHp > 0
         ? `${parsed.remainingCurrentHp} HP + ${parsed.remainingTempHp} THP`
@@ -501,6 +514,8 @@ export function applyGameSessionEvent(event: GameSessionEvent): void {
       `Ataque: ${parsed.attackName}`,
       `Atacante: ${attackerName}`,
       `Alvo(s): ${targetName}`,
+      `Rolagem de ataque: ${attackRollModeSummary} (d20: ${attackRollsSummary}; escolhido: ${parsed.attackRoll})`,
+      packTacticsLine,
       `Resultado: ${parsed.attackTotal} vs CA ${parsed.targetArmorClass} -> ${hitStatus}`,
       parsed.hit
         ? `Dano aplicado: ${parsed.damageApplied} (rolado: ${parsed.damageTotal}${damageDefenseSuffix})`

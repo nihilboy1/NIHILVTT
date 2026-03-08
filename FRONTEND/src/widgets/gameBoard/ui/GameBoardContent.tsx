@@ -1,10 +1,15 @@
 import React from 'react';
 
+import { PHB2024MONSTERS } from '@nihilvtt/datamodeling/data';
 import { parseCharacterSize } from '@/entities/character/lib/utils/characterUtils';
 import { type Character } from '@/entities/character/model/schemas/character.schema';
-import type { SessionCharacterRuntime } from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
+import {
+  isMonsterCharacterRuntime,
+  type SessionCharacterRuntime,
+} from '@/entities/character/model/schemas/playerCharacterRuntime.schema';
 import { useUIStore } from '@/features/layoutControls/model/store';
 import {
+  CombatState,
   GridSettings,
   MarqueeSelectionState,
   PageSettings,
@@ -16,7 +21,11 @@ import {
 import aimCursorUrl from '@/shared/assets/aim.png';
 
 import { PageSettingsModal } from '../../../features/boardSettings/ui/PageSettingsModal';
-import { pickTopmostTokenIdAtWorldPoint } from '../model/renderer';
+import {
+  getChebyshevDistanceBetweenTokenBounds,
+  getTokenGridBounds,
+  pickTopmostTokenIdAtWorldPoint,
+} from '../model/renderer';
 
 import { GameBoardSideOption } from './GameBoardSideOption';
 import { PixiBoardPrototype } from './PixiBoardPrototype';
@@ -58,6 +67,77 @@ interface GameBoardContentProps {
   activeCombatTurnTokenId: string | null;
   activeCombatNextTurnTokenId: string | null;
   combatParticipantTokenIds: string[];
+  combatState: CombatState | null;
+}
+
+type PackTacticsTrigger = {
+  rangeMeters: number;
+  allyIsNotIncapacitated: boolean;
+};
+
+function convertDistanceToMeters(normal: number, unit: string | undefined): number {
+  return unit === 'm' ? normal : normal * 0.3;
+}
+
+const PACK_TACTICS_TRIGGERS_BY_MONSTER_ID = new Map<string, PackTacticsTrigger[]>(
+  PHB2024MONSTERS.map((monster) => {
+    const triggers = monster.effects.flatMap((effect) => {
+      if (effect.type !== 'passive_grantAdvantage' || effect.on !== 'attackRoll') {
+        return [];
+      }
+
+      const triggerEvents = effect.triggers?.events ?? [];
+
+      return triggerEvents.flatMap((event) => {
+        if (event.type !== 'hasAllyNearby') {
+          return [];
+        }
+
+        const rangeNormal = event.range?.normal;
+        if (typeof rangeNormal !== 'number' || rangeNormal <= 0) {
+          return [];
+        }
+
+        return [
+          {
+            rangeMeters: convertDistanceToMeters(rangeNormal, event.range?.unit),
+            allyIsNotIncapacitated: event.allyIsNotIncapacitated === true,
+          },
+        ];
+      });
+    });
+
+    return [monster.id, triggers] as const;
+  }),
+);
+
+const MAX_ATTACK_RANGE_METERS_BY_MONSTER_ID = new Map<string, number>(
+  PHB2024MONSTERS.map((monster) => {
+    const maxRangeMeters = monster.effects.reduce((maxRange, effect) => {
+      if (effect.type !== 'activatableAction') {
+        return maxRange;
+      }
+
+      const rangeNormal = effect.parameters?.range?.normal;
+      if (typeof rangeNormal !== 'number' || rangeNormal <= 0) {
+        return maxRange;
+      }
+
+      const nextRangeMeters = convertDistanceToMeters(rangeNormal, effect.parameters.range?.unit);
+      return Math.max(maxRange, nextRangeMeters);
+    }, 0);
+
+    return [monster.id, maxRangeMeters] as const;
+  }),
+);
+
+function hasIncapacitatedCondition(runtimeCharacter: SessionCharacterRuntime | null): boolean {
+  const activeEffects = runtimeCharacter?.activeEffects?.effects;
+  if (!Array.isArray(activeEffects)) {
+    return false;
+  }
+
+  return activeEffects.some((effect) => effect?.linkedCondition === 'incapacitated');
 }
 
 export function GameBoardContent({
@@ -92,6 +172,7 @@ export function GameBoardContent({
   activeCombatTurnTokenId,
   activeCombatNextTurnTokenId,
   combatParticipantTokenIds,
+  combatState,
 }: GameBoardContentProps) {
   const { isRightSidebarVisible } = useUIStore();
   const handleBoardDoubleClick = (event: React.MouseEvent<Element>) => {
@@ -181,6 +262,146 @@ export function GameBoardContent({
         })()
       : [];
 
+  const packTacticsPreviewTargetTokenIds = React.useMemo(() => {
+    if (combatState == null || combatState.mode !== 'teams' || gridSettings.metersPerSquare <= 0) {
+      return [] as string[];
+    }
+
+    const attackerTokenId = pendingAttack?.attackerTokenId ?? activeCombatTurnTokenId;
+    if (!attackerTokenId) {
+      return [] as string[];
+    }
+
+    const attackerToken = tokensOnBoard.find((token) => token.id === attackerTokenId);
+    if (!attackerToken) {
+      return [] as string[];
+    }
+
+    const attackerRuntime = runtimeCharactersById[attackerToken.characterId] ?? null;
+    if (!isMonsterCharacterRuntime(attackerRuntime)) {
+      return [] as string[];
+    }
+
+    const packTacticsTriggers =
+      PACK_TACTICS_TRIGGERS_BY_MONSTER_ID.get(attackerRuntime.monsterId) ?? [];
+    if (packTacticsTriggers.length === 0) {
+      return [] as string[];
+    }
+
+    const participantByTokenId = new Map(
+      combatState.participants.map((participant) => [participant.tokenId, participant]),
+    );
+    const attackerParticipant = participantByTokenId.get(attackerToken.id);
+    const attackerTeamId = attackerParticipant?.teamId ?? null;
+    if (!attackerTeamId) {
+      return [] as string[];
+    }
+
+    const tokenById = new Map(tokensOnBoard.map((token) => [token.id, token]));
+    const characterById = new Map(characters.map((character) => [character.id, character]));
+    const boundsByTokenId = new Map<string, ReturnType<typeof getTokenGridBounds>>();
+
+    const resolveTokenBounds = (token: Token) => {
+      const cached = boundsByTokenId.get(token.id);
+      if (cached) {
+        return cached;
+      }
+
+      const character = characterById.get(token.characterId);
+      const [sizeXRaw, sizeYRaw] = parseCharacterSize(character?.size ?? 'Medium');
+      const bounds = getTokenGridBounds({
+        token,
+        sizeInCells: [Math.max(1, Math.ceil(sizeXRaw)), Math.max(1, Math.ceil(sizeYRaw))],
+      });
+      boundsByTokenId.set(token.id, bounds);
+      return bounds;
+    };
+
+    const attackerBounds = resolveTokenBounds(attackerToken);
+    const attackerRangeMeters =
+      pendingAttack != null
+        ? pendingAttack.attack.rangeMeters
+        : (MAX_ATTACK_RANGE_METERS_BY_MONSTER_ID.get(attackerRuntime.monsterId) ?? 0);
+    if (attackerRangeMeters <= 0) {
+      return [] as string[];
+    }
+
+    const allyParticipants = combatState.participants.filter(
+      (participant) =>
+        participant.tokenId !== attackerToken.id && participant.teamId === attackerTeamId,
+    );
+
+    if (allyParticipants.length === 0) {
+      return [] as string[];
+    }
+
+    const eligibleTargetIds: string[] = [];
+
+    tokensOnBoard.forEach((targetToken) => {
+      if (targetToken.id === attackerToken.id) {
+        return;
+      }
+
+      const targetParticipant = participantByTokenId.get(targetToken.id);
+      if (
+        !targetParticipant ||
+        targetParticipant.teamId == null ||
+        targetParticipant.teamId === attackerTeamId
+      ) {
+        return;
+      }
+
+      const targetBounds = resolveTokenBounds(targetToken);
+      const attackerDistanceSquares = getChebyshevDistanceBetweenTokenBounds(
+        attackerBounds,
+        targetBounds,
+      );
+      const attackerDistanceMeters = attackerDistanceSquares * gridSettings.metersPerSquare;
+      if (attackerDistanceMeters > attackerRangeMeters + Number.EPSILON) {
+        return;
+      }
+
+      const hasAnyTriggerSatisfied = packTacticsTriggers.some((trigger) => {
+        return allyParticipants.some((allyParticipant) => {
+          const allyToken = tokenById.get(allyParticipant.tokenId);
+          if (!allyToken) {
+            return false;
+          }
+
+          if (trigger.allyIsNotIncapacitated) {
+            const allyRuntime = runtimeCharactersById[allyToken.characterId] ?? null;
+            if (allyRuntime == null || hasIncapacitatedCondition(allyRuntime)) {
+              return false;
+            }
+          }
+
+          const allyBounds = resolveTokenBounds(allyToken);
+          const allyDistanceSquares = getChebyshevDistanceBetweenTokenBounds(
+            allyBounds,
+            targetBounds,
+          );
+          const allyDistanceMeters = allyDistanceSquares * gridSettings.metersPerSquare;
+
+          return allyDistanceMeters <= trigger.rangeMeters + Number.EPSILON;
+        });
+      });
+
+      if (hasAnyTriggerSatisfied) {
+        eligibleTargetIds.push(targetToken.id);
+      }
+    });
+
+    return eligibleTargetIds;
+  }, [
+    characters,
+    activeCombatTurnTokenId,
+    combatState,
+    gridSettings.metersPerSquare,
+    pendingAttack,
+    runtimeCharactersById,
+    tokensOnBoard,
+  ]);
+
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
@@ -220,6 +441,7 @@ export function GameBoardContent({
         activeCombatTurnTokenId={activeCombatTurnTokenId}
         activeCombatNextTurnTokenId={activeCombatNextTurnTokenId}
         combatParticipantTokenIds={combatParticipantTokenIds}
+        packTacticsPreviewTargetTokenIds={packTacticsPreviewTargetTokenIds}
       />
 
       <GameBoardSideOption

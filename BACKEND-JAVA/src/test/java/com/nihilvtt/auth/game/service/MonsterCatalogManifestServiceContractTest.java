@@ -16,6 +16,7 @@ class MonsterCatalogManifestServiceContractTest {
     JsonNode root = objectMapper.readTree("""
         {
           "manifestVersion": 1,
+          "combatContractVersion": 1,
           "monsters": []
         }
         """);
@@ -27,6 +28,7 @@ class MonsterCatalogManifestServiceContractTest {
   void validateManifestRoot_rejectsMissingVersion() throws Exception {
     JsonNode root = objectMapper.readTree("""
         {
+          "combatContractVersion": 1,
           "monsters": []
         }
         """);
@@ -44,6 +46,7 @@ class MonsterCatalogManifestServiceContractTest {
     JsonNode root = objectMapper.readTree("""
         {
           "manifestVersion": 999,
+          "combatContractVersion": 1,
           "monsters": []
         }
         """);
@@ -55,6 +58,44 @@ class MonsterCatalogManifestServiceContractTest {
 
     assertEquals(
         "Manifest canônico de monstros incompatível. Esperado=1, recebido=999.",
+        exception.getMessage()
+    );
+  }
+
+  @Test
+  void validateManifestRoot_rejectsMissingCombatContractVersion() throws Exception {
+    JsonNode root = objectMapper.readTree("""
+        {
+          "manifestVersion": 1,
+          "monsters": []
+        }
+        """);
+
+    IllegalStateException exception = assertThrows(
+        IllegalStateException.class,
+        () -> MonsterCatalogManifestService.validateManifestRoot(root)
+    );
+
+    assertEquals("Manifest canônico de monstros sem combatContractVersion.", exception.getMessage());
+  }
+
+  @Test
+  void validateManifestRoot_rejectsIncompatibleCombatContractVersion() throws Exception {
+    JsonNode root = objectMapper.readTree("""
+        {
+          "manifestVersion": 1,
+          "combatContractVersion": 999,
+          "monsters": []
+        }
+        """);
+
+    IllegalStateException exception = assertThrows(
+        IllegalStateException.class,
+        () -> MonsterCatalogManifestService.validateManifestRoot(root)
+    );
+
+    assertEquals(
+        "Contrato de combate de monstros incompatível. Esperado=1, recebido=999.",
         exception.getMessage()
     );
   }

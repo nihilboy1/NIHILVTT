@@ -157,11 +157,27 @@ export async function sendGameResolveAttack(
 export async function sendGameStartCombat(
   gameId: number,
   tokenIds: string[],
+  mode: 'freeForAll' | 'teams',
+  teams?: Array<{ teamId: string; tokenIds: string[] }>,
 ): Promise<GameSessionEvent> {
   try {
-    const response = await sessionApi.post<unknown>(`/games/${gameId}/session/combat/start`, {
+    const payload: {
+      tokenIds: string[];
+      mode: 'freeForAll' | 'teams';
+      teams?: Array<{ teamId: string; tokenIds: string[] }>;
+    } = {
       tokenIds,
-    });
+      mode,
+    };
+
+    if (mode === 'teams') {
+      payload.teams = teams ?? [];
+    }
+
+    const response = await sessionApi.post<unknown>(
+      `/games/${gameId}/session/combat/start`,
+      payload,
+    );
     return gameSessionEventSchema.parse(response.data);
   } catch (error) {
     throw parseApiError(error, 'Falha ao iniciar combate.');

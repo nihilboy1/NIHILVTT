@@ -263,7 +263,13 @@ class GameSessionCommandServiceDeathConditionTest {
 
     ResponseStatusException exception = assertThrows(
         ResponseStatusException.class,
-        () -> service.startCombat(ownerUserId, gameId, java.util.List.of("token-alive", "token-dead"))
+      () -> service.startCombat(
+        ownerUserId,
+        gameId,
+        java.util.List.of("token-alive", "token-dead"),
+        "freeForAll",
+        null
+      )
     );
 
     assertEquals(400, exception.getStatusCode().value());

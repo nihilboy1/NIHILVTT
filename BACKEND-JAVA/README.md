@@ -183,7 +183,7 @@ Jogos:
 - o fluxo de concessão de item e a compatibilidade de slots passam a usar o manifest canônico `catalog/item-catalog-manifest.json`, gerado pelo `DATAMODELING`, sem heurística de prefixo no backend
 - o backend valida `manifestVersion` do catálogo de itens no boot; manifest ausente/incompativel falha cedo para evitar drift silencioso
 - a trilha autoritativa de monstros segue o mesmo padrao: o backend consome `catalog/monster-catalog-manifest.json`, gerado pelo `DATAMODELING`, e a instanciacao de `MonsterCharacterState` deve nascer por `monsterId`, sem confiar em payload estrutural de monstro vindo do frontend
-- o backend valida `manifestVersion` no boot; manifest ausente/incompativel falha cedo para evitar drift silencioso entre catalogo TS e contrato autoritativo Java
+- o backend valida `manifestVersion` e `combatContractVersion` no boot; manifest ausente/incompativel falha cedo para evitar drift silencioso entre catalogo TS e contrato autoritativo Java
 - o manifest de monstros agora tambem inclui `automatedPassives` (contrato v1) para passivos automatizaveis; a execucao no runtime deve evoluir por capacidade (`effect + trigger + outcome`) e nao por regra hardcoded por `monsterId`
 - `MonsterCharacterState` nao aceita `controlledByUserId`; no estado atual do produto, `NPC` e sempre de uso exclusivo do mestre
 - a criacao de novos `MonsterCharacterState` continua estrita e nao aceita `controlledByUserId`; como o projeto ainda nao teve release, o backend nao deve tolerar residuos de contratos antigos em snapshot

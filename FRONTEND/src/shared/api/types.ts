@@ -130,7 +130,10 @@ export interface CombatParticipant {
   dexterityScore: number;
   movementBudgetCells: number;
   status: string;
+  teamId: string | null;
 }
+
+export type CombatMode = 'freeForAll' | 'teams';
 
 export interface CombatTurnResources {
   actionAvailable: boolean;
@@ -141,6 +144,7 @@ export interface CombatTurnResources {
 
 export interface CombatState {
   active: true;
+  mode: CombatMode;
   round: number;
   turnIndex: number;
   participants: CombatParticipant[];

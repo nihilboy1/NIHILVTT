@@ -79,6 +79,7 @@ const combatParticipantSchema = z.object({
   dexterityScore: z.number().int(),
   movementBudgetCells: z.number().int().min(0),
   status: z.string().trim().min(1),
+  teamId: z.string().trim().min(1).nullable(),
 });
 
 const combatTurnResourcesSchema = z.object({
@@ -90,6 +91,7 @@ const combatTurnResourcesSchema = z.object({
 
 const combatStateSchema = z.object({
   active: z.literal(true),
+  mode: z.enum(['freeForAll', 'teams']),
   round: z.number().int().min(1),
   turnIndex: z.number().int().min(0),
   participants: z.array(combatParticipantSchema),
